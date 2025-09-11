@@ -311,12 +311,9 @@ Track both positive habits (things you want to do) and vices (things you want to
 ## 🚀 Future Enhancements
 
 ### **Settings & Customization Features**
-- 🎨 **Light/Dark Mode Toggle**: System theme preference
-- 🖼 **Custom App Icons**: Multiple icon options for personalization
 - 💝 **Donate Button**: Support development with in-app donations
 - 📊 **Export Graphs**: Save charts as images (PNG/PDF)
 - 📤 **Share App**: Native iOS sharing for app promotion
-- 🔄 **Data Import**: Import data from other habit tracking apps
 - 📱 **Backup & Restore**: iCloud backup with restore functionality
 
 ### **Phase 2 Features**
@@ -325,6 +322,7 @@ Track both positive habits (things you want to do) and vices (things you want to
 - ⌚ **Apple Watch App**: Companion for quick logging
 - ☁️ **iCloud Sync**: Cross-device data synchronization
 - ✅ **Data Export**: JSON export for analysis (IMPLEMENTED)
+AppIcon - logging options when 3d touch (i dont remember what this is called)
 
 ### **Phase 3 Features**
 - 🏆 **Achievement System**: Badges for milestones
@@ -488,16 +486,9 @@ Track both positive habits (things you want to do) and vices (things you want to
 *This specification reflects the current implementation as of the latest development cycle, including the innovative dual habit/vice tracking system and motivation features that set this app apart from traditional habit trackers.*
 
 #### My Ideas - Sandbox area
+Lets go ahead and add a dark mode / light mode to settings. I want to do this by creating a Color asset catalog folder. A new theme should be made by creating a new asset catalog for it and then adding it as an option to an enum and then it should work from there
 
 
-* Mini-Game inside of the social media section (track how much they scroll / add a fidget section)
-* I want to add a de-stressor / fidget to take mind off vices
- * I want to revamp the social media motivations view and maybe put a small lite idle game there to desress while you read your motivations; 
- 
- In settings, change what is considered the start of the week. I think now it is Sunday, some people prefer other days (Saturday/Monday being the next most common)
 
 
-Known Issues:
-* What would happen if someone set a goal of 31 days / monthly and a month doesnt have 31 days?
-    * Fixed. 
-* Time zones
+
