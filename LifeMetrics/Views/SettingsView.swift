@@ -13,7 +13,9 @@ struct SettingsView: View {
     @State private var showingDeleteConfirmation = false
     @State private var exportData: Data?
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
+    @AppStorage("selectedTheme") private var selectedTheme: String = Theme.system.rawValue
     @State private var currentTime = Date()
+    @StateObject private var themeManager = ThemeManager.shared
     
     private var dateJoinedText: String {
         guard let earliestMetric = metrics.min(by: { $0.createdAt < $1.createdAt }) else {
@@ -61,6 +63,25 @@ struct SettingsView: View {
                         Text("Saturday").tag(7)
                     }
                     .pickerStyle(.menu)
+                }
+                
+                // Theme Settings Section
+                Section("Appearance") {
+                    Picker("Theme", selection: $selectedTheme) {
+                        ForEach(Theme.allCases, id: \.rawValue) { theme in
+                            HStack {
+                                Image(systemName: theme.icon)
+                                Text(theme.displayName)
+                            }
+                            .tag(theme.rawValue)
+                        }
+                    }
+                    .pickerStyle(.menu)
+                    .onChange(of: selectedTheme) { _, newValue in
+                        if let theme = Theme(rawValue: newValue) {
+                            themeManager.updateTheme(theme)
+                        }
+                    }
                 }
                 
                 // Help & Support Section
@@ -120,16 +141,6 @@ struct SettingsView: View {
                 
                 // Future Features Section
                 Section("Coming Soon") {
-                    HStack {
-                        Image(systemName: "paintbrush")
-                            .foregroundColor(.gray)
-                        Text("Light/Dark Mode Toggle")
-                        Spacer()
-                        Text("Soon")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                    }
-                    
                     HStack {
                         Image(systemName: "app.badge")
                             .foregroundColor(.gray)

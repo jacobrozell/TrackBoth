@@ -35,6 +35,8 @@
 				LineChartView.swift,
 				MetricRowView.swift,
 				MotivationalInsightsView.swift,
+				QuantityChartView.swift,
+				QuantityInputSheet.swift,
 				StatCard.swift,
 				StatsSectionView.swift,
 				StreakInfoView.swift,

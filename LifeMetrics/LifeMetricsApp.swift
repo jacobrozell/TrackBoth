@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct LifeMetricsApp: App {
+    @AppStorage("selectedTheme") private var selectedTheme: String = Theme.system.rawValue
+    
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Metric.self,
@@ -23,10 +25,15 @@ struct LifeMetricsApp: App {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
+    
+    private var currentTheme: Theme {
+        Theme(rawValue: selectedTheme) ?? .system
+    }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .preferredColorScheme(currentTheme.colorScheme)
         }
         .modelContainer(sharedModelContainer)
     }

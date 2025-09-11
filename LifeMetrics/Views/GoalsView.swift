@@ -12,7 +12,16 @@ struct GoalsView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
+            ZStack {
+                // Background gradient to match home view
+                LinearGradient(
+                    colors: [Color(.systemBackground), Color(.systemGray6).opacity(0.3)],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
                 if metricsWithGoals.isEmpty {
                     emptyStateView
                 } else {
@@ -41,6 +50,7 @@ struct GoalsView: View {
                         .padding(.bottom, 20)
                     }
                 }
+            }
             }
             .navigationTitle("Goals")
             .toolbar {

@@ -6,6 +6,7 @@ import Combine
 struct ContentView: View {
     @State private var selectedTab = 0
     @State private var showingOnboarding = false
+    @StateObject private var themeManager = ThemeManager.shared
     
     var body: some View {
         Group {
@@ -47,7 +48,15 @@ struct ContentView: View {
                     Text("Motivation")
                 }
                 .tag(4)
+            
+            SettingsView()
+                .tabItem {
+                    Image(systemName: "gear")
+                    Text("Settings")
                 }
+                .tag(5)
+                }
+                .themedBackground()
             }
         }
         .onAppear {
