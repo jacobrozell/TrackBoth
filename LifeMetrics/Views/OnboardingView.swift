@@ -1,0 +1,174 @@
+import SwiftUI
+
+// MARK: - OnboardingView
+/// Onboarding flow introducing users to each tab of the app
+struct OnboardingView: View {
+    @State private var currentPage = 0
+    
+    private let pages = OnboardingPage.allPages
+    
+    var body: some View {
+        ZStack {
+            // Background gradient
+            LinearGradient(
+                colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .ignoresSafeArea()
+            
+            VStack(spacing: 0) {
+                // Page content
+                TabView(selection: $currentPage) {
+                    ForEach(pages.indices, id: \.self) { index in
+                        OnboardingPageView(page: pages[index])
+                            .tag(index)
+                    }
+                }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                .animation(.easeInOut, value: currentPage)
+                
+                // Bottom controls
+                VStack(spacing: 24) {
+                    // Page indicator dots
+                    HStack(spacing: 8) {
+                        ForEach(pages.indices, id: \.self) { index in
+                            Circle()
+                                .fill(currentPage == index ? Color.accentColor : Color.gray.opacity(0.3))
+                                .frame(width: 8, height: 8)
+                                .scaleEffect(currentPage == index ? 1.2 : 1.0)
+                                .animation(.easeInOut(duration: 0.2), value: currentPage)
+                        }
+                    }
+                    
+                    // Navigation buttons
+                    HStack(spacing: 16) {
+                        if currentPage > 0 {
+                            Button("Previous") {
+                                withAnimation {
+                                    currentPage -= 1
+                                }
+                            }
+                            .buttonStyle(SecondaryButtonStyle())
+                        }
+                        
+                        Spacer()
+                        
+                        if currentPage < pages.count - 1 {
+                            Button("Next") {
+                                withAnimation {
+                                    currentPage += 1
+                                }
+                            }
+                            .buttonStyle(PrimaryButtonStyle())
+                        } else {
+                            Button("Get Started") {
+                                completeOnboarding()
+                            }
+                            .buttonStyle(PrimaryButtonStyle())
+                        }
+                    }
+                    .padding(.horizontal, 32)
+                }
+                .padding(.bottom, 50)
+            }
+        }
+    }
+    
+    private func completeOnboarding() {
+        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
+        // Trigger a notification to refresh the ContentView
+        NotificationCenter.default.post(name: NSNotification.Name("OnboardingCompleted"), object: nil)
+    }
+}
+
+// MARK: - OnboardingPageView
+struct OnboardingPageView: View {
+    let page: OnboardingPage
+    
+    var body: some View {
+        VStack(spacing: 32) {
+            Spacer()
+            
+            // Icon
+            ZStack {
+                Circle()
+                    .fill(page.color.opacity(0.2))
+                    .frame(width: 120, height: 120)
+                
+                Image(systemName: page.icon)
+                    .font(.system(size: 50, weight: .medium))
+                    .foregroundColor(page.color)
+            }
+            
+            // Content
+            VStack(spacing: 16) {
+                Text(page.title)
+                    .font(.system(size: 32, weight: .bold))
+                    .foregroundColor(.primary)
+                    .multilineTextAlignment(.center)
+                
+                Text(page.description)
+                    .font(.system(size: 18, weight: .regular))
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(4)
+                    .padding(.horizontal, 20)
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 40)
+    }
+}
+
+// MARK: - OnboardingPage Model
+struct OnboardingPage {
+    let title: String
+    let description: String
+    let icon: String
+    let color: Color
+    
+    static let allPages: [OnboardingPage] = [
+        OnboardingPage(
+            title: "Welcome to QuickLog",
+            description: "Track your habits and vices with simple yes/no logging. Build streaks, set goals, and visualize your progress over time.",
+            icon: "house.fill",
+            color: .blue
+        ),
+        OnboardingPage(
+            title: "Home Tab",
+            description: "Your daily habit dashboard. Toggle habits on/off, view your streaks, and see today's progress at a glance.",
+            icon: "house.fill",
+            color: .green
+        ),
+        OnboardingPage(
+            title: "History Tab",
+            description: "View your tracking history in a beautiful calendar. See patterns, search entries, and review your journey over time.",
+            icon: "calendar",
+            color: .orange
+        ),
+        OnboardingPage(
+            title: "Goals Tab",
+            description: "Set monthly and yearly targets for your habits. Track progress with visual indicators and stay motivated to reach your goals.",
+            icon: "target",
+            color: .purple
+        ),
+        OnboardingPage(
+            title: "Charts Tab",
+            description: "Visualize your data with interactive charts. See trends, streaks, and patterns to understand your habits better.",
+            icon: "chart.bar.fill",
+            color: .red
+        ),
+        OnboardingPage(
+            title: "Motivation Tab",
+            description: "Build your motivation library. Add reasons for avoiding vices and revisit them when you need strength to stay on track.",
+            icon: "heart.text.square",
+            color: .pink
+        )
+    ]
+}
+
+#Preview {
+    OnboardingView()
+}
