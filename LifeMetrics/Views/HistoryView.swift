@@ -316,14 +316,24 @@ struct CalendarDayView: View {
                     .frame(width: 6, height: 6)
             }
             
-            // Show details if available
-            if let entry = entryWithDetails, let details = entry.details {
-                Text(details)
-                    .font(.caption2)
-                    .foregroundColor(.secondary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 2)
+            // Show details or quantity if available
+            if let entry = entryWithDetails {
+                if let details = entry.details, !details.isEmpty {
+                    Text(details)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 2)
+                } else if let quantityString = entry.quantityString {
+                    Text(quantityString)
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .foregroundColor(.blue)
+                        .lineLimit(1)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 2)
+                }
             }
         }
         .frame(minHeight: 40)
@@ -411,6 +421,8 @@ struct EditableEntryCell: View {
     @State private var editingDetails = ""
     @State private var editingMotivation = ""
     @State private var editingValue = false
+    @State private var editingQuantity = 1
+    @State private var editingUnit = ""
     
     private var metric: Metric? {
         metrics.first { $0.id == entry.metricID }
@@ -446,12 +458,27 @@ struct EditableEntryCell: View {
                             .foregroundColor(.secondary)
                     }
                     
-                    // Metric name - small and unobtrusive
+                    // Metric name and quantity - small and unobtrusive
                     if let metric = metric {
-                        Text(metric.name)
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                            .opacity(0.7)
+                        HStack(spacing: 4) {
+                            Text(metric.name)
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .opacity(0.7)
+                            
+                            if let quantityString = entry.quantityString {
+                                Text(quantityString)
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(metric.safeHabitType == .positive ? .blue : .orange)
+                                    .padding(.horizontal, 4)
+                                    .padding(.vertical, 1)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill((metric.safeHabitType == .positive ? Color.blue : Color.orange).opacity(0.2))
+                                    )
+                            }
+                        }
                     }
                 }
                 
@@ -462,6 +489,8 @@ struct EditableEntryCell: View {
                     editingDetails = entry.details ?? ""
                     editingMotivation = entry.motivation ?? ""
                     editingValue = entry.value
+                    editingQuantity = entry.quantity ?? 1
+                    editingUnit = entry.unit ?? ""
                     isEditing = true
                 } label: {
                     Image(systemName: "pencil")
@@ -497,7 +526,9 @@ struct EditableEntryCell: View {
                 editingDetails: $editingDetails,
                 editingMotivation: $editingMotivation,
                 editingValue: $editingValue,
-                isPresented: $isEditing
+                isPresented: $isEditing,
+                editingQuantity: $editingQuantity,
+                editingUnit: $editingUnit
             )
         }
     }
@@ -514,6 +545,8 @@ struct EditEntryView: View {
     @Binding var editingMotivation: String
     @Binding var editingValue: Bool
     @Binding var isPresented: Bool
+    @Binding var editingQuantity: Int
+    @Binding var editingUnit: String
     
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
@@ -556,6 +589,49 @@ struct EditEntryView: View {
                             .font(.body)
                     }
                     .toggleStyle(SwitchToggleStyle(tint: isVice ? .red : .green))
+                }
+                
+                // Quantity section
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Quantity (Optional)")
+                        .font(.headline)
+                    
+                    HStack(spacing: 12) {
+                        // Quantity stepper
+                        HStack(spacing: 8) {
+                            Button {
+                                if editingQuantity > 0 {
+                                    editingQuantity -= 1
+                                }
+                            } label: {
+                                Image(systemName: "minus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(editingQuantity > 0 ? .blue : .gray)
+                            }
+                            .disabled(editingQuantity <= 0)
+                            
+                            Text("\(editingQuantity)")
+                                .font(.title2)
+                                .fontWeight(.bold)
+                                .foregroundColor(.blue)
+                                .frame(minWidth: 40)
+                            
+                            Button {
+                                editingQuantity += 1
+                            } label: {
+                                Image(systemName: "plus.circle.fill")
+                                    .font(.title2)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        // Unit picker
+                        TextField("Unit", text: $editingUnit)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 80)
+                    }
                 }
                 
                 // Details (for positive habits)
@@ -607,6 +683,8 @@ struct EditEntryView: View {
         entry.value = editingValue
         entry.details = editingDetails.isEmpty ? nil : editingDetails
         entry.motivation = editingMotivation.isEmpty ? nil : editingMotivation
+        entry.quantity = editingQuantity > 0 ? editingQuantity : nil
+        entry.unit = editingUnit.isEmpty ? nil : editingUnit
         
         try? modelContext.save()
         dismiss()

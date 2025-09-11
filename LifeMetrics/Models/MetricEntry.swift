@@ -13,9 +13,11 @@ class MetricEntry {
     var motivation: String?
     var starred: Bool?
     var details: String?
+    var quantity: Int?
+    var unit: String?
     
     // MARK: - Initialization
-    init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil) {
+    init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil, quantity: Int? = nil, unit: String? = nil) {
         self.id = UUID()
         self.metricID = metricID
         self.date = date
@@ -23,6 +25,8 @@ class MetricEntry {
         self.motivation = motivation
         self.starred = starred
         self.details = details
+        self.quantity = quantity
+        self.unit = unit
     }
     
     // MARK: - Computed Properties
@@ -31,11 +35,24 @@ class MetricEntry {
         return starred ?? false
     }
     
-    /// Check if entry has meaningful content (value, motivation, or details)
+    /// Check if entry has meaningful content (value, motivation, details, or quantity)
     var hasContent: Bool {
         return value || 
                (details != nil && !details!.isEmpty) || 
-               (motivation != nil && !motivation!.isEmpty)
+               (motivation != nil && !motivation!.isEmpty) ||
+               (quantity != nil && quantity! > 0)
+    }
+    
+    /// Check if entry has quantity data
+    var hasQuantity: Bool {
+        return quantity != nil && quantity! > 0
+    }
+    
+    /// Get formatted quantity string (e.g., "3 times", "30 minutes")
+    var quantityString: String? {
+        guard let quantity = quantity, quantity > 0 else { return nil }
+        let unitText = unit ?? "times"
+        return "\(quantity) \(unitText)"
     }
     
     // MARK: - Static Methods
@@ -68,6 +85,8 @@ extension MetricEntry {
         details: String? = nil,
         motivation: String? = nil,
         starred: Bool? = nil,
+        quantity: Int? = nil,
+        unit: String? = nil,
         in context: ModelContext,
         entries: [MetricEntry]
     ) -> MetricEntry {
@@ -85,6 +104,12 @@ extension MetricEntry {
         }
         if let starred = starred {
             entry.starred = starred
+        }
+        if let quantity = quantity {
+            entry.quantity = quantity > 0 ? quantity : nil
+        }
+        if let unit = unit {
+            entry.unit = unit.isEmpty ? nil : unit
         }
         
         return entry

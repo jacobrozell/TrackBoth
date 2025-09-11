@@ -120,3 +120,34 @@ enum MetricFilter: Hashable {
         }
     }
 }
+
+// MARK: - QuantityGoalType Enum
+enum QuantityGoalType: String, CaseIterable, Codable {
+    case maxDaily = "maxDaily"
+    case avgDaily = "avgDaily"
+    case totalPeriod = "totalPeriod"
+    
+    var displayName: String {
+        switch self {
+        case .maxDaily: return "Max Daily"
+        case .avgDaily: return "Average Daily"
+        case .totalPeriod: return "Total Period"
+        }
+    }
+    
+    var description: String {
+        switch self {
+        case .maxDaily: return "Keep under X per day"
+        case .avgDaily: return "Average X per day"
+        case .totalPeriod: return "Total X per period"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .maxDaily: return "arrow.down"
+        case .avgDaily: return "chart.bar"
+        case .totalPeriod: return "sum"
+        }
+    }
+}

@@ -11,6 +11,7 @@ struct EnhancedMetricRowView: View {
     @State private var editingDetailsText = ""
     @State private var isEditingMotivation = false
     @State private var editingMotivationText = ""
+    @State private var showingQuantityInput = false
     
     private var selectedDateEntry: MetricEntry? {
         let calendar = Calendar.current
@@ -54,6 +55,20 @@ struct EnhancedMetricRowView: View {
                         Text(metric.name)
                             .font(.title2)
                             .fontWeight(.semibold)
+                        
+                        // Quantity indicator
+                        if let quantityString = selectedDateEntry?.quantityString {
+                            Text(quantityString)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(metric.safeHabitType == .positive ? .blue : .orange)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill((metric.safeHabitType == .positive ? Color.blue : Color.orange).opacity(0.2))
+                                )
+                        }
                     }
                     
                     // Enhanced info row
@@ -87,18 +102,55 @@ struct EnhancedMetricRowView: View {
                 
                 Spacer()
                 
-                // Enhanced toggle button
-                Button {
-                    toggleSelectedDateEntry()
-                } label: {
-                    VStack(spacing: 4) {
-                        Image(systemName: selectedDateEntry?.value == true ? "checkmark.circle.fill" : "circle")
-                            .font(.title)
-                            .foregroundColor(selectedDateEntry?.value == true ? .green : .gray)
-                        
-                        Text(selectedDateEntry?.value == true ? "Done" : "Tap")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
+                // Action buttons
+                HStack(spacing: 8) {
+                    // Enhanced toggle button
+                    Button {
+                        toggleSelectedDateEntry()
+                    } label: {
+                        VStack(spacing: 4) {
+                            Image(systemName: selectedDateEntry?.value == true ? "checkmark.circle.fill" : "circle")
+                                .font(.title)
+                                .foregroundColor(selectedDateEntry?.value == true ? .green : .gray)
+                            
+                            Text(selectedDateEntry?.value == true ? "Done" : "Tap")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    
+                    // Quantity input button (only for positive habits)
+                    if metric.safeHabitType == .positive {
+                        Button {
+                            showingQuantityInput = true
+                        } label: {
+                            VStack(spacing: 4) {
+                                Image(systemName: "plus.circle")
+                                    .font(.title2)
+                                    .foregroundColor(.blue)
+                                
+                                Text("Qty")
+                                    .font(.caption2)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                    }
+                    
+                    // Quantity log button for vices (different styling)
+                    if metric.safeHabitType == .vice {
+                        Button {
+                            showingQuantityInput = true
+                        } label: {
+                            VStack(spacing: 4) {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .font(.title2)
+                                    .foregroundColor(.orange)
+                                
+                                Text("Log")
+                                    .font(.caption2)
+                                    .foregroundColor(.orange)
+                            }
+                        }
                     }
                 }
             }
@@ -127,6 +179,34 @@ struct EnhancedMetricRowView: View {
                             .font(.subheadline)
                             .fontWeight(.medium)
                             .foregroundColor(selectedDateEntry?.value == false ? .green : .red)
+                    }
+                }
+                
+                // Quantity display section
+                if let quantityString = selectedDateEntry?.quantityString {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Quantity")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.secondary)
+                            
+                            Spacer()
+                            
+                            Button {
+                                showingQuantityInput = true
+                            } label: {
+                                Text("Edit")
+                                    .font(.caption)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        
+                        Text(quantityString)
+                            .font(.body)
+                            .fontWeight(.medium)
+                            .foregroundColor(metric.safeHabitType == .positive ? .blue : .orange)
+                            .padding(.vertical, 4)
                     }
                 }
                 
@@ -271,6 +351,9 @@ struct EnhancedMetricRowView: View {
             editingDetailsText = selectedDateEntry?.details ?? ""
             editingMotivationText = selectedDateEntry?.motivation ?? ""
         }
+        .sheet(isPresented: $showingQuantityInput) {
+            QuantityInputSheet(metric: metric, selectedDate: selectedDate)
+        }
     }
     
     // MARK: - Private Methods
@@ -333,6 +416,397 @@ struct EnhancedMetricRowView: View {
         }
         
         try? modelContext.save()
+    }
+}
+
+// MARK: - QuantityInputSheet Component
+/// Safe quantity input sheet with different flows for habits vs vices
+struct QuantityInputSheet: View {
+    let metric: Metric
+    let selectedDate: Date
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query private var entries: [MetricEntry]
+    
+    @State private var quantity: Int = 1
+    @State private var unit: String = ""
+    @State private var showingUnitPicker = false
+    
+    // Common units for different habit types
+    private var commonUnits: [String] {
+        switch metric.safeHabitType {
+        case .positive:
+            return ["times", "minutes", "hours", "pages", "glasses", "servings", "sets", "reps"]
+        case .vice:
+            return ["times", "cigarettes", "drinks", "minutes", "hours", "servings"]
+        }
+    }
+    
+    private var isVice: Bool {
+        metric.safeHabitType == .vice
+    }
+    
+    private var maxQuantity: Int {
+        if let maxDaily = metric.safeMaxDailyQuantity {
+            return max(maxDaily, 10) // At least 10 for flexibility
+        }
+        return isVice ? 20 : 100 // Reasonable limits
+    }
+    
+    private var quickPresets: [Int] {
+        if isVice {
+            return [1, 2, 3, 5, 10] // Smaller increments for vices
+        } else {
+            return [1, 2, 3, 5, 10, 15, 30, 60] // Larger range for habits
+        }
+    }
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 24) {
+                // Header with habit info
+                VStack(spacing: 8) {
+                    HStack {
+                        Image(systemName: metric.safeHabitType.icon)
+                            .foregroundColor(isVice ? .red : .green)
+                            .font(.title2)
+                        
+                        Text(metric.name)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                    }
+                    
+                    Text(DateFormatter.dayFormatter.string(from: selectedDate))
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 16)
+                
+                // Main input section
+                VStack(spacing: 20) {
+                    if isVice {
+                        // Vice-specific UI with safety messaging
+                        viceInputSection
+                    } else {
+                        // Positive habit UI
+                        habitInputSection
+                    }
+                }
+                
+                Spacer()
+                
+                // Action buttons
+                HStack(spacing: 16) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.secondary)
+                    
+                    Spacer()
+                    
+                    Button(isVice ? "Log Amount" : "Save") {
+                        saveQuantity()
+                    }
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(isVice ? Color.orange : Color.blue)
+                    .cornerRadius(8)
+                    .fontWeight(.medium)
+                }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+            }
+            .navigationBarHidden(true)
+        }
+        .onAppear {
+            setupInitialValues()
+        }
+    }
+    
+    // MARK: - Vice Input Section (Safe Design)
+    private var viceInputSection: some View {
+        VStack(spacing: 16) {
+            // Status indicator
+            HStack {
+                Text("Status:")
+                    .font(.headline)
+                Spacer()
+                Text("Avoided ✓")
+                    .font(.headline)
+                    .foregroundColor(.green)
+            }
+            .padding(.horizontal, 20)
+            
+            Divider()
+            
+            // Warning message
+            VStack(spacing: 8) {
+                HStack {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundColor(.orange)
+                    Text("If you did \(metric.name.lowercased()) today:")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                }
+                
+                Text("Remember: Your goal is to reduce this habit")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(.horizontal, 20)
+            
+            // Quantity input
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Amount:")
+                        .font(.headline)
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                
+                HStack(spacing: 12) {
+                    // Quantity stepper
+                    HStack(spacing: 8) {
+                        Button {
+                            if quantity > 1 {
+                                quantity -= 1
+                            }
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(quantity > 1 ? .orange : .gray)
+                        }
+                        .disabled(quantity <= 1)
+                        
+                        Text("\(quantity)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.orange)
+                            .frame(minWidth: 40)
+                        
+                        Button {
+                            if quantity < maxQuantity {
+                                quantity += 1
+                            }
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(quantity < maxQuantity ? .orange : .gray)
+                        }
+                        .disabled(quantity >= maxQuantity)
+                    }
+                    
+                    Spacer()
+                    
+                    // Unit picker
+                    Button {
+                        showingUnitPicker = true
+                    } label: {
+                        HStack {
+                            Text(unit.isEmpty ? "times" : unit)
+                                .foregroundColor(.primary)
+                            Image(systemName: "chevron.down")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                    }
+                }
+                .padding(.horizontal, 20)
+                
+                // Quick presets for vices
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(quickPresets, id: \.self) { preset in
+                            Button {
+                                quantity = preset
+                            } label: {
+                                Text("\(preset)")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(quantity == preset ? .white : .orange)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(quantity == preset ? Color.orange : Color.orange.opacity(0.2))
+                                    )
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Habit Input Section
+    private var habitInputSection: some View {
+        VStack(spacing: 16) {
+            // Quantity input
+            VStack(spacing: 12) {
+                HStack {
+                    Text("Quantity:")
+                        .font(.headline)
+                    Spacer()
+                }
+                .padding(.horizontal, 20)
+                
+                HStack(spacing: 12) {
+                    // Quantity stepper
+                    HStack(spacing: 8) {
+                        Button {
+                            if quantity > 1 {
+                                quantity -= 1
+                            }
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(quantity > 1 ? .blue : .gray)
+                        }
+                        .disabled(quantity <= 1)
+                        
+                        Text("\(quantity)")
+                            .font(.title)
+                            .fontWeight(.bold)
+                            .foregroundColor(.blue)
+                            .frame(minWidth: 40)
+                        
+                        Button {
+                            if quantity < maxQuantity {
+                                quantity += 1
+                            }
+                        } label: {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.title2)
+                                .foregroundColor(quantity < maxQuantity ? .blue : .gray)
+                        }
+                        .disabled(quantity >= maxQuantity)
+                    }
+                    
+                    Spacer()
+                    
+                    // Unit picker
+                    Button {
+                        showingUnitPicker = true
+                    } label: {
+                        HStack {
+                            Text(unit.isEmpty ? "times" : unit)
+                                .foregroundColor(.primary)
+                            Image(systemName: "chevron.down")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color(.systemGray6))
+                        .cornerRadius(8)
+                    }
+                }
+                .padding(.horizontal, 20)
+                
+                // Quick presets for habits
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(quickPresets, id: \.self) { preset in
+                            Button {
+                                quantity = preset
+                            } label: {
+                                Text("\(preset)")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(quantity == preset ? .white : .blue)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(quantity == preset ? Color.blue : Color.blue.opacity(0.2))
+                                    )
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
+            }
+        }
+    }
+    
+    // MARK: - Private Methods
+    private func setupInitialValues() {
+        unit = metric.safeDefaultUnit
+        
+        // Check if there's an existing entry for today
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: selectedDate)
+        
+        if let existingEntry = entries.first(where: { 
+            $0.metricID == metric.id && calendar.isDate($0.date, inSameDayAs: startOfDay) 
+        }) {
+            quantity = existingEntry.quantity ?? 1
+            unit = existingEntry.unit ?? metric.safeDefaultUnit
+        }
+    }
+    
+    private func saveQuantity() {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: selectedDate)
+        
+        // For vices, we need to set value to false (not avoided) when logging quantity
+        // For habits, we set value to true (done) when logging quantity
+        let entryValue = isVice ? false : true
+        
+        MetricEntry.updateOrCreate(
+            for: metric.id,
+            date: startOfDay,
+            value: entryValue,
+            quantity: quantity,
+            unit: unit.isEmpty ? nil : unit,
+            in: modelContext,
+            entries: entries
+        )
+        
+        try? modelContext.save()
+        dismiss()
+    }
+}
+
+// MARK: - Unit Picker Sheet
+struct UnitPickerSheet: View {
+    @Binding var selectedUnit: String
+    let units: [String]
+    @Environment(\.dismiss) private var dismiss
+    
+    var body: some View {
+        NavigationView {
+            List(units, id: \.self) { unit in
+                Button {
+                    selectedUnit = unit
+                    dismiss()
+                } label: {
+                    HStack {
+                        Text(unit)
+                            .foregroundColor(.primary)
+                        Spacer()
+                        if selectedUnit == unit {
+                            Image(systemName: "checkmark")
+                                .foregroundColor(.blue)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Select Unit")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
 
