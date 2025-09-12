@@ -40,20 +40,49 @@ struct HomeView: View {
             ZStack {
                 VStack(spacing: 0) {
                     if metrics.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "plus.circle")
-                                .font(.system(size: 60))
-                                .foregroundColor(.gray)
-
-                            Text("No habits yet")
-                                .font(.title2)
-                                .fontWeight(.medium)
-
-                            Text("Tap the + button below to add your first habit")
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
+                        VStack(spacing: 32) {
+                            VStack(spacing: 16) {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.blue.opacity(0.1))
+                                        .frame(width: 120, height: 120)
+                                    
+                                    Image(systemName: "plus.circle.fill")
+                                        .font(.system(size: 50))
+                                        .foregroundColor(.blue)
+                                }
+                                
+                                VStack(spacing: 8) {
+                                    Text("No Habits Yet")
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.primary)
+                                    
+                                    Text("Start tracking your habits and vices to build a better you")
+                                        .font(.body)
+                                        .foregroundColor(.secondary)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, 32)
+                                }
+                            }
+                            
+                            Button {
+                                viewModel.showAddMetric()
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "plus.circle.fill")
+                                    Text("Add Your First Habit")
+                                        .fontWeight(.semibold)
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 24)
+                                .padding(.vertical, 12)
+                                .background(Color.blue)
+                                .cornerRadius(25)
+                            }
                         }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color(.systemBackground))
                     } else {
                         // Stats Overview Section
                         VStack(spacing: 12) {

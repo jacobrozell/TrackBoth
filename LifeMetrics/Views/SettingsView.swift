@@ -1,6 +1,9 @@
 import SwiftUI
 import SwiftData
 
+// Import the backup service and components
+// These should be accessible if all files are in the same target
+
 // MARK: - SettingsView
 /// View for app settings, data export, and configuration
 struct SettingsView: View {
@@ -11,20 +14,59 @@ struct SettingsView: View {
     
     @State private var showingExportSheet = false
     @State private var showingDeleteConfirmation = false
+    @State private var showingShareSheet = false
+    @State private var showingBackupSheet = false
+    @State private var showingRestoreSheet = false
     @State private var exportData: Data?
+    @State private var backupService = iCloudBackupService()
+    @State private var backupInfo: BackupInfo?
+    @State private var isBackingUp = false
+    @State private var isRestoring = false
+    @State private var backupError: String?
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
     @AppStorage("selectedTheme") private var selectedTheme: String = Theme.system.rawValue
     @State private var currentTime = Date()
     @StateObject private var themeManager = ThemeManager.shared
     
     private var dateJoinedText: String {
-        guard let earliestMetric = metrics.min(by: { $0.createdAt < $1.createdAt }) else {
-            return "Unknown"
-        }
-        
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
-        return formatter.string(from: earliestMetric.createdAt)
+        
+        // If user has metrics, use the earliest one's creation date
+        if let earliestMetric = metrics.min(by: { $0.createdAt < $1.createdAt }) {
+            return formatter.string(from: earliestMetric.createdAt)
+        }
+        
+        // For new users who just finished onboarding, show today's date
+        return formatter.string(from: Date())
+    }
+    
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+    }
+    
+    private var shareAppContent: String {
+        let totalHabits = metrics.filter { $0.safeHabitType == .positive }.count
+        let totalVices = metrics.filter { $0.safeHabitType == .vice }.count
+        let totalEntries = entries.count
+        
+        return """
+        📱 Check out QuickLog - my habit tracking app!
+        
+        I've been using it to track \(totalHabits) positive habits and \(totalVices) vices, with \(totalEntries) total entries logged.
+        
+        ✨ Features:
+        • Track both positive habits and vices
+        • Visual progress charts and streaks
+        • Goal setting and tracking
+        • Motivation system
+        • Quantity tracking
+        • Beautiful themes
+        
+        Perfect for building better habits and breaking bad ones! 🎯
+        
+        #HabitTracking #PersonalDevelopment #QuickLog
+        """
     }
     
     var body: some View {
@@ -49,6 +91,30 @@ struct SettingsView: View {
                         showingDeleteConfirmation = true
                     }
                     .foregroundColor(.red)
+                }
+                
+                // iCloud Backup Section
+                Section("iCloud Backup") {
+                    Button("Backup to iCloud") {
+                        showingBackupSheet = true
+                    }
+                    .foregroundColor(.blue)
+                    .disabled(isBackingUp)
+                    
+                    Button("Restore from iCloud") {
+                        showingRestoreSheet = true
+                    }
+                    .foregroundColor(.green)
+                    .disabled(isRestoring)
+                    
+                    if let backupInfo = backupInfo {
+                        HStack {
+                            Text("Last Backup")
+                            Spacer()
+                            Text(backupInfo.timestamp, style: .relative)
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
                 
                 // Week Settings Section
@@ -86,6 +152,11 @@ struct SettingsView: View {
                 
                 // Help & Support Section
                 Section("Help & Support") {
+                    Button("Share App") {
+                        showingShareSheet = true
+                    }
+                    .foregroundColor(.blue)
+                    
                     Button("View Onboarding Again") {
                         showOnboardingAgain()
                     }
@@ -97,7 +168,7 @@ struct SettingsView: View {
                     HStack {
                         Text("Version")
                         Spacer()
-                        Text("1.0.0")
+                        Text(appVersion)
                             .foregroundColor(.secondary)
                     }
                     
@@ -162,24 +233,16 @@ struct SettingsView: View {
                     }
                     
                     HStack {
-                        Image(systemName: "chart.bar.doc.horizontal")
+                        Image(systemName: "app.badge")
                             .foregroundColor(.gray)
-                        Text("Export Graphs")
+                        Text("Custom App Icons")
                         Spacer()
                         Text("Soon")
                             .foregroundColor(.secondary)
                             .font(.caption)
                     }
                     
-                    HStack {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(.gray)
-                        Text("Share App")
-                        Spacer()
-                        Text("Soon")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                    }
+                    
                 }
                 
                 // Current Time Section
@@ -206,11 +269,36 @@ struct SettingsView: View {
                 Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                     currentTime = Date()
                 }
+                
+                // Load backup info
+                loadBackupInfo()
             }
             .sheet(isPresented: $showingExportSheet) {
                 if let exportData = exportData {
                     ShareSheet(activityItems: [exportData])
                 }
+            }
+            .sheet(isPresented: $showingShareSheet) {
+                ShareSheet(activityItems: [shareAppContent])
+            }
+            .sheet(isPresented: $showingBackupSheet) {
+                BackupSheet(
+                    backupService: backupService,
+                    metrics: metrics,
+                    entries: entries,
+                    isBackingUp: $isBackingUp,
+                    backupError: $backupError
+                )
+            }
+            .sheet(isPresented: $showingRestoreSheet) {
+                RestoreSheet(
+                    backupService: backupService,
+                    isRestoring: $isRestoring,
+                    backupError: $backupError,
+                    onRestore: { backupData in
+                        try backupService.restoreFromBackup(backupData, context: modelContext)
+                    }
+                )
             }
             .alert("Delete All Data", isPresented: $showingDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { }
@@ -279,6 +367,22 @@ struct SettingsView: View {
         
         // Post notification to trigger onboarding
         NotificationCenter.default.post(name: NSNotification.Name("OnboardingCompleted"), object: nil)
+    }
+    
+    private func loadBackupInfo() {
+        Task {
+            do {
+                let info = try await backupService.getBackupInfo()
+                await MainActor.run {
+                    self.backupInfo = info
+                }
+            } catch {
+                // Silently fail - backup info is optional
+                await MainActor.run {
+                    self.backupInfo = nil
+                }
+            }
+        }
     }
 }
 

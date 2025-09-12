@@ -13,16 +13,26 @@ struct LifeMetricsApp: App {
     @AppStorage("selectedTheme") private var selectedTheme: String = Theme.system.rawValue
     
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Metric.self,
-            MetricEntry.self
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            // Create a simple container with just the basic models
+            let container = try ModelContainer(for: Metric.self, MetricEntry.self)
+            print("✅ SwiftData ModelContainer created successfully")
+            return container
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            print("❌ SwiftData Error: \(error)")
+            print("Error details: \(error.localizedDescription)")
+            
+            // Try with explicit schema
+            do {
+                let schema = Schema([Metric.self, MetricEntry.self])
+                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                let container = try ModelContainer(for: schema, configurations: [config])
+                print("✅ SwiftData ModelContainer created with in-memory storage")
+                return container
+            } catch {
+                print("❌ Even in-memory storage failed: \(error)")
+                fatalError("Could not create ModelContainer: \(error)")
+            }
         }
     }()
     

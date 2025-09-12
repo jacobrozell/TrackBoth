@@ -54,7 +54,7 @@ enum GoalPeriod: String, CaseIterable, Codable {
     
     /// Returns the actual number of days in the current period
     func actualDaysInCurrentPeriod() -> Int {
-        let calendar = CalendarHelper.calendar
+        let calendar = Calendar.current
         let now = Date()
         
         switch self {
@@ -71,7 +71,7 @@ enum GoalPeriod: String, CaseIterable, Codable {
     
     /// Returns the actual number of days in a specific period
     func actualDaysInPeriod(for date: Date) -> Int {
-        let calendar = CalendarHelper.calendar
+        let calendar = Calendar.current
         
         switch self {
         case .weekly:

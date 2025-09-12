@@ -6,10 +6,10 @@ import SwiftData
 /// Stores daily tracking data including completion status, details, and motivation
 @Model
 class MetricEntry {
-    var id: UUID
-    var metricID: UUID
-    var date: Date
-    var value: Bool
+    var id: UUID = UUID()
+    var metricID: UUID = UUID()
+    var date: Date = Date()
+    var value: Bool = false
     var motivation: String?
     var starred: Bool?
     var details: String?
@@ -18,7 +18,6 @@ class MetricEntry {
     
     // MARK: - Initialization
     init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil, quantity: Int? = nil, unit: String? = nil) {
-        self.id = UUID()
         self.metricID = metricID
         self.date = date
         self.value = value

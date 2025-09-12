@@ -19,30 +19,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0B9C2DE92E735AE50089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				BarChartView.swift,
-				ChartContentView.swift,
-				ChartControlsView.swift,
-				ChartsEmptyStateView.swift,
-				DateNavigationView.swift,
-				EmptyStateView.swift,
-				EnhancedMetricRowView.swift,
-				FilterButton.swift,
-				FloatingActionButton.swift,
-				HeatmapView.swift,
-				LineChartView.swift,
-				MetricRowView.swift,
-				MotivationalInsightsView.swift,
-				QuantityChartView.swift,
-				QuantityInputSheet.swift,
-				StatCard.swift,
-				StatsSectionView.swift,
-				StreakInfoView.swift,
-			);
-			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
-		};
 		0B9C2DEA2E735AE50089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -79,13 +55,39 @@
 			);
 			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
 		};
+		0B9C2FD52E73932F0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				BackupSheet.swift,
+				BarChartView.swift,
+				ChartContentView.swift,
+				ChartControlsView.swift,
+				ChartsEmptyStateView.swift,
+				DateNavigationView.swift,
+				EmptyStateView.swift,
+				EnhancedMetricRowView.swift,
+				FilterButton.swift,
+				FloatingActionButton.swift,
+				HeatmapView.swift,
+				LineChartView.swift,
+				MetricRowView.swift,
+				MotivationalInsightsView.swift,
+				QuantityChartView.swift,
+				QuantityInputSheet.swift,
+				RestoreSheet.swift,
+				StatCard.swift,
+				StatsSectionView.swift,
+				StreakInfoView.swift,
+			);
+			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0B9C2DA12E735AE50089A5FD /* Components */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C2DE92E735AE50089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */,
+				0B9C2FD52E73932F0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */,
 			);
 			path = Components;
 			sourceTree = "<group>";

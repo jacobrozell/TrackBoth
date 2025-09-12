@@ -6,9 +6,9 @@ import SwiftData
 /// Contains embedded goal information for tracking progress
 @Model
 class Metric {
-    var id: UUID
-    var name: String
-    var createdAt: Date
+    var id: UUID = UUID()
+    var name: String = ""
+    var createdAt: Date = Date()
     var habitType: HabitType?
     var primaryMotivation: String? // Primary motivation set when creating the habit/vice
     // Embedded goal fields (migrated from separate Goal model)
@@ -25,9 +25,7 @@ class Metric {
     
     // MARK: - Initialization
     init(name: String, habitType: HabitType = .positive, primaryMotivation: String? = nil, goalPeriod: GoalPeriod? = nil, goalTarget: Int? = nil, enableQuantity: Bool? = nil, defaultUnit: String? = nil, maxDailyQuantity: Int? = nil, quantityGoalType: QuantityGoalType? = nil, quantityGoalTarget: Int? = nil, quantityGoalPeriod: GoalPeriod? = nil) {
-        self.id = UUID()
         self.name = name
-        self.createdAt = Date()
         self.habitType = habitType
         self.primaryMotivation = primaryMotivation
         self.goalPeriod = goalPeriod
