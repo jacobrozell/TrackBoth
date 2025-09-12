@@ -45,17 +45,25 @@ struct QuickLogTimelineProvider: TimelineProvider {
     }
     
     func getSnapshot(in context: Context, completion: @escaping (QuickLogEntry) -> ()) {
+        logger.debug("Widget snapshot requested", category: .widget)
         // For preview/snapshot, return placeholder data
         completion(placeholder(in: context))
     }
     
     func getTimeline(in context: Context, completion: @escaping (Timeline<QuickLogEntry>) -> ()) {
+        logger.info("Widget timeline requested", category: .widget)
+        let startTime = Date()
+        
         // Load data from App Groups shared container
         let entry = loadWidgetData()
         
         // Update every 15 minutes
         let nextUpdate = Calendar.current.date(byAdding: .minute, value: 15, to: Date()) ?? Date()
         let timeline = Timeline(entries: [entry], policy: .after(nextUpdate))
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Widget timeline generation", duration: duration)
+        logger.debug("Widget timeline generated - Metrics: \(entry.metrics.count), Entries: \(entry.todaysEntries.count)", category: .widget)
         
         completion(timeline)
     }

@@ -18,6 +18,7 @@ class WidgetDataManager {
     
     /// Save metrics data for widget
     func saveMetrics(_ metrics: [Metric]) {
+        logger.info("Saving metrics data for widget - Count: \(metrics.count)", category: .widget)
         let widgetMetrics = metrics.map { metric in
             QuickLogEntry.WidgetMetric(
                 id: metric.id.uuidString,
@@ -35,6 +36,7 @@ class WidgetDataManager {
     
     /// Save entries data for widget
     func saveEntries(_ entries: [MetricEntry]) {
+        logger.info("Saving entries data for widget - Count: \(entries.count)", category: .widget)
         let widgetEntries = entries.map { entry in
             QuickLogEntry.WidgetEntry(
                 metricID: entry.metricID.uuidString,

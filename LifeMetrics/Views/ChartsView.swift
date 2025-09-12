@@ -44,10 +44,15 @@ struct ChartsView: View {
                     }
                 }
                 .navigationTitle("Charts")
+                .onAppear {
+                    logger.info("ChartsView appeared", category: .ui)
+                    logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(selectedFilter), ChartType: \(selectedChartType)", category: .ui)
+                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         if metrics.isEmpty {
                             Button("Try Demo Data") {
+                                logger.logUserAction("Generate demo data")
                                 DemoDataGenerator.generateDemoData(modelContext: modelContext)
                             }
                             .font(.caption)
@@ -60,11 +65,13 @@ struct ChartsView: View {
                             if !metrics.isEmpty {
                                 Menu {
                                     Button("Export as PNG") {
+                                        logger.logUserAction("Export chart as PNG")
                                         exportFormat = .png
                                         exportCurrentChart()
                                     }
                                     
                                     Button("Export as PDF") {
+                                        logger.logUserAction("Export chart as PDF")
                                         exportFormat = .pdf
                                         exportCurrentChart()
                                     }
@@ -74,6 +81,7 @@ struct ChartsView: View {
                             }
                             
                             Button {
+                                logger.logUserAction("Show settings")
                                 showingSettings = true
                             } label: {
                                 Image(systemName: "gear")
@@ -102,6 +110,9 @@ struct ChartsView: View {
     // MARK: - Export Functions
     
     private func exportCurrentChart() {
+        logger.info("Starting chart export - Format: \(exportFormat)", category: .ui)
+        let startTime = Date()
+        
         let chartTitle = getChartTitle()
         let chartView = getCurrentChartView()
         
@@ -115,6 +126,10 @@ struct ChartsView: View {
             format: exportFormat,
             size: CGSize(width: 800, height: 600)
         )
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Chart export", duration: duration)
+        logger.info("Chart export completed - Format: \(exportFormat), Title: \(chartTitle)", category: .ui)
         
         showingExportSheet = true
     }

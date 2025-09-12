@@ -44,6 +44,9 @@ struct StatsSectionView: View {
         }
         .padding(.bottom, 16)
         .background(Color(.systemGray6))
+        .onAppear {
+            logger.debug("StatsSectionView displayed - Habits: \(totalHabits), Vices: \(totalVices), Streaks: \(activeStreaks), Today: \(todayCompleted)/\(totalMetrics)", category: .ui)
+        }
     }
 }
 

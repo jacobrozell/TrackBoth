@@ -5,6 +5,7 @@ struct StreakUtils {
     
     /// Calculate current streak for a metric
     static func calculateCurrentStreak(for metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> Int {
+        let startTime = Date()
         let isVice = metric.safeHabitType == .vice
         
         // For positive habits: count consecutive days with value == true
@@ -31,6 +32,7 @@ struct StreakUtils {
     
     /// Calculate longest streak for a metric
     static func calculateLongestStreak(for metric: Metric, entries: [MetricEntry]) -> Int {
+        let startTime = Date()
         let isVice = metric.safeHabitType == .vice
         
         let sortedEntries = entries

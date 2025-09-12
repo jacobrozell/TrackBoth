@@ -11,27 +11,39 @@ struct HomeView: View {
     
     // MARK: - Computed Properties
     private var totalHabits: Int {
-        viewModel.totalHabits(from: metrics)
+        let count = viewModel.totalHabits(from: metrics)
+        logger.debug("Total habits calculated: \(count)", category: .business)
+        return count
     }
     
     private var totalVices: Int {
-        viewModel.totalVices(from: metrics)
+        let count = viewModel.totalVices(from: metrics)
+        logger.debug("Total vices calculated: \(count)", category: .business)
+        return count
     }
     
     private var activeStreaks: Int {
-        viewModel.activeStreaks(from: metrics, entries: entries)
+        let count = viewModel.activeStreaks(from: metrics, entries: entries)
+        logger.debug("Active streaks calculated: \(count)", category: .business)
+        return count
     }
     
     private var todayCompleted: Int {
-        viewModel.todayCompleted(from: metrics, entries: entries)
+        let count = viewModel.todayCompleted(from: metrics, entries: entries)
+        logger.debug("Today completed calculated: \(count)", category: .business)
+        return count
     }
     
     private var canGoBack: Bool {
-        viewModel.canGoBack
+        let canGo = viewModel.canGoBack
+        logger.debug("Can go back: \(canGo)")
+        return canGo
     }
     
     private var isToday: Bool {
-        viewModel.isToday
+        let today = viewModel.isToday
+        logger.debug("Is today: \(today)")
+        return today
     }
     
     // MARK: - Body
@@ -67,6 +79,7 @@ struct HomeView: View {
                             }
                             
                             Button {
+                                logger.logUserAction("Add first habit button tapped")
                                 viewModel.showAddMetric()
                             } label: {
                                 HStack(spacing: 8) {
@@ -89,6 +102,7 @@ struct HomeView: View {
                             // Date Navigation Header
                             HStack {
                                 Button {
+                                    logger.logUserAction("Previous day button tapped")
                                     viewModel.goToPreviousDay()
                                 } label: {
                                     Image(systemName: "chevron.left")
@@ -99,6 +113,7 @@ struct HomeView: View {
                                 Spacer()
                                 
                                 Button {
+                                    logger.logUserAction("Date picker button tapped")
                                     viewModel.showingDatePicker = true
                                 } label: {
                                     VStack(spacing: 2) {
@@ -114,6 +129,7 @@ struct HomeView: View {
                                 Spacer()
                                 
                                 Button {
+                                    logger.logUserAction("Next day button tapped")
                                     viewModel.goToNextDay()
                                 } label: {
                                     Image(systemName: "chevron.right")
@@ -128,6 +144,7 @@ struct HomeView: View {
                                 HStack {
                                     Spacer()
                                     Button("Today") {
+                                        logger.logUserAction("Today button tapped")
                                         viewModel.goToToday()
                                     }
                                     .font(.caption)
@@ -195,6 +212,7 @@ struct HomeView: View {
                         }
                         .overlay(alignment: .bottomTrailing) {
                             FloatingActionButton {
+                                logger.logUserAction("Floating action button tapped")
                                 viewModel.showAddMetric()
                             }
                         }
@@ -204,23 +222,40 @@ struct HomeView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
+                            logger.logUserAction("Settings button tapped")
                             viewModel.showSettings()
                         } label: {
                             Image(systemName: "gear")
                         }
                     }
                 }
+                .onAppear {
+                    logger.info("HomeView appeared")
+                    logger.debug("Metrics count: \(metrics.count), Entries count: \(entries.count)", category: .data)
+                }
                 .sheet(isPresented: $viewModel.showingAddMetric) {
                     AddMetricView()
+                        .onAppear {
+                            logger.info("AddMetricView sheet presented")
+                        }
                 }
                 .sheet(item: $viewModel.metricToEdit) { metric in
                     EditMetricView(metric: metric)
+                        .onAppear {
+                            logger.info("EditMetricView sheet presented - Metric: \(metric.name)")
+                        }
                 }
                 .sheet(isPresented: $viewModel.showingSettings) {
                     SettingsView()
+                        .onAppear {
+                            logger.info("SettingsView sheet presented")
+                        }
                 }
                 .sheet(isPresented: $viewModel.showingDatePicker) {
                     DatePickerSheet(selectedDate: $viewModel.selectedDate)
+                        .onAppear {
+                            logger.info("DatePickerSheet presented")
+                        }
                 }
                 .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
                     Button("Cancel", role: .cancel) {

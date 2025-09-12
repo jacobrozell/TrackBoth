@@ -15,9 +15,16 @@ class MotivationViewModel {
     // MARK: - Computed Properties
     /// Entries with motivation content
     func entriesWithMotivation(_ entries: [MetricEntry]) -> [MetricEntry] {
-        entries.filter { entry in
+        let startTime = Date()
+        let result = entries.filter { entry in
             entry.motivation != nil && !entry.motivation!.isEmpty
         }.sorted { $0.date > $1.date }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Motivation entries filtering", duration: duration)
+        logger.debug("Motivation entries filtered - Result: \(result.count) out of \(entries.count)", category: .business)
+        
+        return result
     }
     
     /// Entries with starred content
@@ -65,16 +72,19 @@ class MotivationViewModel {
     // MARK: - Actions
     /// Select a metric for motivation view
     func selectMetric(_ metric: Metric?) {
+        logger.logUserAction("Motivation metric selected", details: "Metric: \(metric?.name ?? "None")")
         selectedMetric = metric
     }
     
     /// Show add motivation sheet
     func showAddMotivation() {
+        logger.logUserAction("Show add motivation")
         showingAddMotivation = true
     }
     
     /// Show add metric sheet
     func showAddMetric() {
+        logger.logUserAction("Show add metric")
         showingAddMetric = true
     }
     

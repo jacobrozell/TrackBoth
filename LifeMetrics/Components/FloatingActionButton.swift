@@ -10,6 +10,7 @@ struct FloatingActionButton: View {
             HStack {
                 Spacer()
                 Button(action: {
+                    logger.logUserAction("Floating action button tapped")
                     // Add haptic feedback
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
                     impactFeedback.impactOccurred()

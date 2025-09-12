@@ -195,6 +195,7 @@ struct RestoreSheet: View {
     }
     
     private func startRestore() {
+        logger.logUserAction("Start iCloud restore")
         Task {
             isRestoring = true
             backupError = nil

@@ -15,17 +15,26 @@ class WidgetDataSync: ObservableObject {
     
     /// Sync all data with widgets
     func syncAllData(metrics: [Metric], entries: [MetricEntry]) {
+        logger.info("Syncing all data with widgets - Metrics: \(metrics.count), Entries: \(entries.count)", category: .widget)
+        let startTime = Date()
+        
         widgetIntegration.updateAllData(metrics: metrics, entries: entries)
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Widget data sync", duration: duration)
+        logger.debug("Widget data sync completed", category: .widget)
     }
     
     /// Sync when a habit is logged
     func onHabitLogged(metric: Metric, entry: MetricEntry, allMetrics: [Metric], allEntries: [MetricEntry]) {
+        logger.logUserAction("Habit logged - syncing with widgets", details: "Metric: \(metric.name)")
         widgetIntegration.onHabitLogged(metric: metric, entry: entry)
         syncAllData(metrics: allMetrics, entries: allEntries)
     }
     
     /// Sync when a metric is created or updated
     func onMetricChanged(metric: Metric, allMetrics: [Metric], allEntries: [MetricEntry]) {
+        logger.logUserAction("Metric changed - syncing with widgets", details: "Metric: \(metric.name)")
         widgetIntegration.onMetricChanged(metric: metric, entries: allEntries)
         syncAllData(metrics: allMetrics, entries: allEntries)
     }

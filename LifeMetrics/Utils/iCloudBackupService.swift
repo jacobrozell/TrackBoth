@@ -64,6 +64,9 @@ class iCloudBackupService {
     
     /// Create a backup of all app data
     func createBackup(metrics: [Metric], entries: [MetricEntry]) async throws -> BackupData {
+        logger.info("Creating iCloud backup - Metrics: \(metrics.count), Entries: \(entries.count)", category: .network)
+        let startTime = Date()
+        
         let backupMetrics = metrics.map { metric in
             BackupMetric(
                 id: metric.id.uuidString,
@@ -102,17 +105,26 @@ class iCloudBackupService {
             appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         )
         
-        return BackupData(
+        let backupData = BackupData(
             version: "1.0",
             timestamp: Date(),
             metrics: backupMetrics,
             entries: backupEntries,
             deviceInfo: deviceInfo
         )
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("iCloud backup creation", duration: duration)
+        logger.info("iCloud backup created successfully - Size: \(backupMetrics.count) metrics, \(backupEntries.count) entries", category: .network)
+        
+        return backupData
     }
     
     /// Upload backup to iCloud
     func uploadBackup(_ backupData: BackupData) async throws {
+        logger.info("Uploading backup to iCloud - Timestamp: \(DateFormatter.dateFormatter.string(from: backupData.timestamp))", category: .network)
+        let startTime = Date()
+        
         let record = CKRecord(recordType: "QuickLogBackup")
         record["timestamp"] = backupData.timestamp
         record["version"] = backupData.version
@@ -123,6 +135,10 @@ class iCloudBackupService {
         record["backupData"] = asset
         
         try await database.save(record)
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("iCloud backup upload", duration: duration)
+        logger.info("Backup uploaded to iCloud successfully", category: .network)
     }
     
     /// Download latest backup from iCloud
@@ -148,6 +164,9 @@ class iCloudBackupService {
     
     /// Restore data from backup
     func restoreFromBackup(_ backupData: BackupData, context: ModelContext) throws {
+        logger.info("Restoring data from iCloud backup - Metrics: \(backupData.metrics.count), Entries: \(backupData.entries.count)", category: .network)
+        let startTime = Date()
+        
         // Clear existing data
         try clearAllData(context: context)
         
@@ -191,6 +210,10 @@ class iCloudBackupService {
         }
         
         try context.save()
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("iCloud backup restore", duration: duration)
+        logger.info("Data restored from iCloud backup successfully - Restored \(backupData.metrics.count) metrics and \(backupData.entries.count) entries", category: .network)
     }
     
     /// Check if iCloud is available

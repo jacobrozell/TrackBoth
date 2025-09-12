@@ -25,6 +25,8 @@ class Metric {
     
     // MARK: - Initialization
     init(name: String, habitType: HabitType = .positive, primaryMotivation: String? = nil, goalPeriod: GoalPeriod? = nil, goalTarget: Int? = nil, enableQuantity: Bool? = nil, defaultUnit: String? = nil, maxDailyQuantity: Int? = nil, quantityGoalType: QuantityGoalType? = nil, quantityGoalTarget: Int? = nil, quantityGoalPeriod: GoalPeriod? = nil) {
+        logger.debug("Creating new Metric - Name: \(name), Type: \(habitType.rawValue)", category: .data)
+        
         self.name = name
         self.habitType = habitType
         self.primaryMotivation = primaryMotivation

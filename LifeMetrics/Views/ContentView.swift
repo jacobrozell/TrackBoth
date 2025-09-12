@@ -12,6 +12,9 @@ struct ContentView: View {
         Group {
             if showingOnboarding {
                 OnboardingView()
+                    .onAppear {
+                        logger.info("OnboardingView displayed")
+                    }
             } else {
                 TabView(selection: $selectedTab) {
                     HomeView()
@@ -57,12 +60,19 @@ struct ContentView: View {
                         .tag(5)
                 }
                 .themedBackground()
+                .onChange(of: selectedTab) { oldValue, newValue in
+                    let tabNames = ["Home", "Goals", "Charts", "Motivation", "History", "Settings"]
+                    let tabName = newValue < tabNames.count ? tabNames[newValue] : "Unknown"
+                    logger.logUserAction("Tab changed", details: "From \(oldValue) to \(newValue) (\(tabName))")
+                }
             }
         }
         .onAppear {
+            logger.info("ContentView appeared")
             checkFirstLaunch()
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OnboardingCompleted"))) { _ in
+            logger.info("Onboarding completed notification received")
             checkFirstLaunch()
         }
     }
@@ -70,6 +80,7 @@ struct ContentView: View {
     private func checkFirstLaunch() {
         let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
         showingOnboarding = !hasCompletedOnboarding
+        logger.info("First launch check - Onboarding completed: \(hasCompletedOnboarding), showing onboarding: \(showingOnboarding)")
     }
 }
 

@@ -24,6 +24,9 @@ struct GoalsView: View {
                 VStack(spacing: 0) {
                 if metricsWithGoals.isEmpty {
                     emptyStateView
+                        .onAppear {
+                            logger.info("GoalsView empty state displayed")
+                        }
                 } else {
                     ScrollView {
                         VStack(spacing: 24) {
@@ -53,6 +56,10 @@ struct GoalsView: View {
             }
             }
             .navigationTitle("Goals")
+            .onAppear {
+                logger.info("GoalsView appeared")
+                logger.debug("Metrics with goals count: \(metricsWithGoals.count)", category: .data)
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink {
@@ -64,6 +71,9 @@ struct GoalsView: View {
             }
             .sheet(isPresented: $showingAddGoal) {
                 AddGoalView()
+                    .onAppear {
+                        logger.info("AddGoalView sheet presented")
+                    }
             }
         }
     }
@@ -102,6 +112,7 @@ struct GoalsView: View {
                     .foregroundColor(.secondary)
                 Spacer()
                 Button("This Week") {
+                    logger.logUserAction("This Week button tapped")
                     selectedDate = Date()
                 }
                 .font(.caption)
@@ -154,6 +165,7 @@ struct GoalsView: View {
             }
             
             Button {
+                logger.logUserAction("Add goal button tapped")
                 showingAddGoal = true
             } label: {
                 HStack(spacing: 8) {
@@ -268,6 +280,7 @@ struct GoalsView: View {
     
     private var addGoalButton: some View {
         Button {
+            logger.logUserAction("Add goal floating button tapped")
             showingAddGoal = true
         } label: {
             HStack(spacing: 12) {
@@ -501,9 +514,15 @@ struct EnhancedGoalCardView: View {
         )
         .sheet(isPresented: $showingEditGoal) {
             EditGoalView(metric: metric)
+                .onAppear {
+                    logger.info("EditGoalView sheet presented - Metric: \(metric.name)")
+                }
         }
         .sheet(isPresented: $showingHistory) {
             GoalHistoryView(metric: metric, entries: entries)
+                .onAppear {
+                    logger.info("GoalHistoryView sheet presented - Metric: \(metric.name)")
+                }
         }
     }
     

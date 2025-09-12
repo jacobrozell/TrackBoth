@@ -16,6 +16,7 @@ class HistoryViewModel {
     // MARK: - Computed Properties
     /// Filtered metrics based on selected filter and search text
     func filteredMetrics(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
         var filtered = metrics
         
         // Apply filter
@@ -36,6 +37,10 @@ class HistoryViewModel {
                 metric.name.localizedCaseInsensitiveContains(searchText)
             }
         }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("History metrics filtering", duration: duration)
+        logger.debug("History metrics filtered - Filter: \(selectedFilter), Search: '\(searchText)', Result: \(filtered.count) out of \(metrics.count)", category: .business)
         
         return filtered
     }
@@ -76,16 +81,19 @@ class HistoryViewModel {
     // MARK: - Actions
     /// Update selected filter
     func updateFilter(_ filter: MetricFilter) {
+        logger.logUserAction("History filter updated", details: "From \(selectedFilter) to \(filter)")
         selectedFilter = filter
     }
     
     /// Update selected date
     func updateSelectedDate(_ date: Date) {
+        logger.logUserAction("History date updated", details: "From \(DateFormatter.dateFormatter.string(from: selectedDate)) to \(DateFormatter.dateFormatter.string(from: date))")
         selectedDate = date
     }
     
     /// Update search text
     func updateSearchText(_ text: String) {
+        logger.logUserAction("History search updated", details: "From '\(searchText)' to '\(text)'")
         searchText = text
     }
     

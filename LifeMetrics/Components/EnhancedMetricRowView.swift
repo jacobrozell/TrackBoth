@@ -106,6 +106,7 @@ struct EnhancedMetricRowView: View {
                 HStack(spacing: 8) {
                     // Enhanced toggle button
                     Button {
+                        logger.logUserAction("Toggle metric completion", details: "Metric: \(metric.name)")
                         toggleSelectedDateEntry()
                     } label: {
                         VStack(spacing: 4) {
@@ -236,8 +237,10 @@ struct EnhancedMetricRowView: View {
                             
                             Button {
                                 if isEditingDetails {
+                                    logger.logUserAction("Save details", details: "Metric: \(metric.name)")
                                     saveDetails()
                                 } else {
+                                    logger.logUserAction("Start editing details", details: "Metric: \(metric.name)")
                                     startEditingDetails()
                                 }
                             } label: {

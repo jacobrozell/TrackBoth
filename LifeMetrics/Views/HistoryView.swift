@@ -13,6 +13,7 @@ struct HistoryView: View {
     @State private var showingSettings = false
     
     private var calendarEntries: [Date: [MetricEntry]] {
+        let startTime = Date()
         let filteredEntries = entries.filter { entry in
             // Only show entries that have meaningful content
             guard entry.hasContent else { return false }
@@ -37,9 +38,15 @@ struct HistoryView: View {
             }
         }
         
-        return Dictionary(grouping: filteredEntries) { entry in
+        let result = Dictionary(grouping: filteredEntries) { entry in
             Calendar.current.startOfDay(for: entry.date)
         }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Calendar entries calculation", duration: duration)
+        logger.debug("Calendar entries calculated - Filtered: \(filteredEntries.count), Grouped: \(result.count) days", category: .performance)
+        
+        return result
     }
     
     var body: some View {
@@ -149,6 +156,10 @@ struct HistoryView: View {
                     }
                 }
                 .navigationTitle("History")
+                .onAppear {
+                    logger.info("HistoryView appeared", category: .ui)
+                    logger.debug("History data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(selectedFilter)", category: .ui)
+                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {

@@ -12,10 +12,14 @@ class ThemeManager: ObservableObject {
         if let savedTheme = UserDefaults.standard.string(forKey: "selectedTheme"),
            let theme = Theme(rawValue: savedTheme) {
             currentTheme = theme
+            logger.info("Theme loaded from UserDefaults - Theme: \(theme.rawValue)")
+        } else {
+            logger.info("Using default theme - Theme: \(currentTheme.rawValue)")
         }
     }
     
     func updateTheme(_ theme: Theme) {
+        logger.logUserAction("Theme updated", details: "From \(currentTheme.rawValue) to \(theme.rawValue)")
         currentTheme = theme
         UserDefaults.standard.set(theme.rawValue, forKey: "selectedTheme")
     }

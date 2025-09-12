@@ -15,12 +15,14 @@ class WidgetIntegration: ObservableObject {
     
     /// Update widget data when metrics change
     func updateMetrics(_ metrics: [Metric]) {
+        logger.info("Updating widget metrics - Count: \(metrics.count)", category: .widget)
         widgetDataManager.saveMetrics(metrics)
         widgetDataManager.updateWidget()
     }
     
     /// Update widget data when entries change
     func updateEntries(_ entries: [MetricEntry]) {
+        logger.info("Updating widget entries - Count: \(entries.count)", category: .widget)
         widgetDataManager.saveEntries(entries)
         widgetDataManager.updateWidget()
     }

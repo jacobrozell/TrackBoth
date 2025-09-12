@@ -168,6 +168,10 @@ struct MotivationView: View {
                     }
                 }
                 .navigationTitle("Motivation")
+                .onAppear {
+                    logger.info("MotivationView appeared", category: .ui)
+                    logger.debug("Motivation data - Vice metrics: \(viceMetrics.count), Motivation entries: \(motivationEntries.count)", category: .ui)
+                }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {

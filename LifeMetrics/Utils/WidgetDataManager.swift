@@ -16,6 +16,9 @@ class WidgetDataManager {
     
     /// Save metrics data for widget
     func saveMetrics(_ metrics: [Metric]) {
+        logger.info("Saving metrics data for widget - Count: \(metrics.count)", category: .widget)
+        let startTime = Date()
+        
         let widgetMetrics = metrics.map { metric in
             WidgetMetricData(
                 id: metric.id.uuidString,
@@ -28,11 +31,19 @@ class WidgetDataManager {
         
         if let data = try? JSONEncoder().encode(widgetMetrics) {
             userDefaults?.set(data, forKey: "widget_metrics")
+            let duration = Date().timeIntervalSince(startTime)
+            logger.logPerformance("Widget metrics save", duration: duration)
+            logger.debug("Widget metrics saved successfully", category: .widget)
+        } else {
+            logger.error("Failed to encode widget metrics data", category: .widget)
         }
     }
     
     /// Save entries data for widget
     func saveEntries(_ entries: [MetricEntry]) {
+        logger.info("Saving entries data for widget - Count: \(entries.count)", category: .widget)
+        let startTime = Date()
+        
         let widgetEntries = entries.map { entry in
             WidgetEntryData(
                 metricID: entry.metricID.uuidString,
@@ -44,6 +55,11 @@ class WidgetDataManager {
         
         if let data = try? JSONEncoder().encode(widgetEntries) {
             userDefaults?.set(data, forKey: "widget_entries")
+            let duration = Date().timeIntervalSince(startTime)
+            logger.logPerformance("Widget entries save", duration: duration)
+            logger.debug("Widget entries saved successfully", category: .widget)
+        } else {
+            logger.error("Failed to encode widget entries data", category: .widget)
         }
     }
     

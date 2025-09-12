@@ -6,10 +6,13 @@ enum HabitType: String, CaseIterable, Codable {
     case vice = "vice"
     
     var displayName: String {
+        let result: String
         switch self {
-        case .positive: return "Positive Habit"
-        case .vice: return "Vice to Avoid"
+        case .positive: result = "Positive Habit"
+        case .vice: result = "Vice to Avoid"
         }
+        logger.debug("HabitType displayName accessed - Type: \(self.rawValue), Display: \(result)", category: .data)
+        return result
     }
     
     var icon: String {

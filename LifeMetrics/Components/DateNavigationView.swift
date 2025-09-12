@@ -10,7 +10,11 @@ struct DateNavigationView: View {
         HStack {
             Button {
                 if canGoBack {
+                    let oldDate = selectedDate
                     selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+                    logger.logUserAction("Previous day navigation", details: "From \(DateFormatter.dateFormatter.string(from: oldDate)) to \(DateFormatter.dateFormatter.string(from: selectedDate))")
+                } else {
+                    logger.debug("Cannot navigate to previous day - already at earliest date")
                 }
             } label: {
                 Image(systemName: "chevron.left")
@@ -37,7 +41,11 @@ struct DateNavigationView: View {
             
             Button {
                 if !isToday {
+                    let oldDate = selectedDate
                     selectedDate = Date()
+                    logger.logUserAction("Navigate to today", details: "From \(DateFormatter.dateFormatter.string(from: oldDate)) to today")
+                } else {
+                    logger.debug("Already at today's date")
                 }
             } label: {
                 Image(systemName: "chevron.right")

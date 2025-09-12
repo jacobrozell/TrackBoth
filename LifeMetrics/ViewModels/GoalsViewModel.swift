@@ -13,9 +13,14 @@ class GoalsViewModel {
     // MARK: - Computed Properties
     /// Metrics with goals set
     func metricsWithGoals(_ metrics: [Metric]) -> [Metric] {
-        metrics.filter { metric in
+        let startTime = Date()
+        let result = metrics.filter { metric in
             metric.goalPeriod != nil && metric.goalTarget != nil
         }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Metrics with goals calculation", duration: duration)
+        logger.debug("Metrics with goals calculated: \(result.count) out of \(metrics.count)", category: .business)
+        return result
     }
     
     /// Metrics without goals
@@ -27,13 +32,20 @@ class GoalsViewModel {
     
     /// Calculate goal progress for a metric
     func goalProgress(for metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> (current: Int, target: Int, percentage: Double) {
-        GoalUtils.calculateGoalProgress(for: metric, entries: entries, selectedDate: selectedDate)
+        let startTime = Date()
+        let result = GoalUtils.calculateGoalProgress(for: metric, entries: entries, selectedDate: selectedDate)
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Goal progress calculation", duration: duration)
+        logger.debug("Goal progress calculated - Metric: \(metric.name), Current: \(result.current)/\(result.target) (\(String(format: "%.1f", result.percentage))%)", category: .business)
+        return result
     }
     
     /// Check if metric has achieved its goal
     func hasAchievedGoal(for metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> Bool {
         let progress = goalProgress(for: metric, entries: entries, selectedDate: selectedDate)
-        return progress.current >= progress.target
+        let achieved = progress.current >= progress.target
+        logger.debug("Goal achievement check - Metric: \(metric.name), Achieved: \(achieved)", category: .business)
+        return achieved
     }
     
     /// Get goal status text

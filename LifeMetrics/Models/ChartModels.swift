@@ -6,6 +6,12 @@ struct ChartDataPoint: Identifiable {
     let id = UUID()
     let date: Date
     let value: Int
+    
+    init(date: Date, value: Int) {
+        self.date = date
+        self.value = value
+        logger.debug("ChartDataPoint created - Date: \(DateFormatter.dateFormatter.string(from: date)), Value: \(value)", category: .data)
+    }
 }
 
 struct WeeklyData: Identifiable {

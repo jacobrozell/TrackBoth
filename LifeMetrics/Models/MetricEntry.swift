@@ -18,6 +18,8 @@ class MetricEntry {
     
     // MARK: - Initialization
     init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil, quantity: Int? = nil, unit: String? = nil) {
+        logger.debug("Creating new MetricEntry - MetricID: \(metricID.uuidString), Date: \(DateFormatter.dateFormatter.string(from: date)), Value: \(value)", category: .data)
+        
         self.metricID = metricID
         self.date = date
         self.value = value

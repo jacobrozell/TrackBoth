@@ -13,12 +13,16 @@ class SettingsViewModel {
     // MARK: - Computed Properties
     /// Total number of metrics
     func totalMetrics(_ metrics: [Metric]) -> Int {
-        metrics.count
+        let count = metrics.count
+        logger.debug("Total metrics calculated: \(count)", category: .business)
+        return count
     }
     
     /// Total number of entries
     func totalEntries(_ entries: [MetricEntry]) -> Int {
-        entries.count
+        let count = entries.count
+        logger.debug("Total entries calculated: \(count)", category: .business)
+        return count
     }
     
     /// Number of positive habits
@@ -79,6 +83,9 @@ class SettingsViewModel {
     
     /// Export all data as CSV
     func exportDataAsCSV(_ metrics: [Metric], entries: [MetricEntry]) -> String {
+        logger.info("Starting CSV export - Metrics: \(metrics.count), Entries: \(entries.count)", category: .ui)
+        let startTime = Date()
+        
         var csvContent = "Metric Name,Habit Type,Date,Value,Motivation,Details,Starred\n"
         
         for entry in entries.sorted(by: { $0.date > $1.date }) {
@@ -93,6 +100,10 @@ class SettingsViewModel {
             
             csvContent += "\"\(metricName)\",\"\(habitType)\",\"\(dateString)\",\"\(value)\",\"\(motivation)\",\"\(details)\",\"\(starred)\"\n"
         }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("CSV export", duration: duration)
+        logger.info("CSV export completed - Size: \(csvContent.count) characters", category: .ui)
         
         return csvContent
     }

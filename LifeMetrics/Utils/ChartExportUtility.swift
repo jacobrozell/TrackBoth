@@ -34,6 +34,9 @@ class ChartExportUtility {
         format: ExportFormat,
         size: CGSize = CGSize(width: 800, height: 600)
     ) -> Data? {
+        logger.info("Starting chart export - Format: \(format), Size: \(size)", category: .ui)
+        let startTime = Date()
+        
         let hostingController = UIHostingController(rootView: view)
         hostingController.view.frame = CGRect(origin: .zero, size: size)
         hostingController.view.backgroundColor = UIColor.systemBackground
@@ -41,12 +44,19 @@ class ChartExportUtility {
         // Force layout
         hostingController.view.layoutIfNeeded()
         
+        let result: Data?
         switch format {
         case .png:
-            return exportAsPNG(hostingController.view, size: size)
+            result = exportAsPNG(hostingController.view, size: size)
         case .pdf:
-            return exportAsPDF(hostingController.view, size: size)
+            result = exportAsPDF(hostingController.view, size: size)
         }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Chart export", duration: duration)
+        logger.info("Chart export completed - Format: \(format), Success: \(result != nil)", category: .ui)
+        
+        return result
     }
     
     /// Export a chart view as an image

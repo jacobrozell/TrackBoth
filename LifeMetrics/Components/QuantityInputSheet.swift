@@ -339,6 +339,7 @@ struct QuantityInputSheet: View {
     }
     
     private func saveQuantity() {
+        logger.logUserAction("Save quantity", details: "Metric: \(metric.name), Quantity: \(quantity), Unit: \(unit)")
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
         

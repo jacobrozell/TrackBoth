@@ -62,6 +62,7 @@ struct MetricRowView: View {
                 
                 // Toggle button - only for completion status
                 Button {
+                    logger.logUserAction("Toggle metric completion", details: "Metric: \(metric.name)")
                     toggleTodayEntry()
                 } label: {
                     Image(systemName: todayEntry?.value == true ? "checkmark.circle.fill" : "circle")
@@ -105,8 +106,10 @@ struct MetricRowView: View {
                             
                             Button {
                                 if isEditingDetails {
+                                    logger.logUserAction("Save details", details: "Metric: \(metric.name)")
                                     saveDetails()
                                 } else {
+                                    logger.logUserAction("Start editing details", details: "Metric: \(metric.name)")
                                     startEditingDetails()
                                 }
                             } label: {
@@ -158,8 +161,10 @@ struct MetricRowView: View {
                             
                             Button {
                                 if isEditingMotivation {
+                                    logger.logUserAction("Save motivation", details: "Metric: \(metric.name)")
                                     saveMotivation()
                                 } else {
+                                    logger.logUserAction("Start editing motivation", details: "Metric: \(metric.name)")
                                     startEditingMotivation()
                                 }
                             } label: {
@@ -250,6 +255,7 @@ struct MetricRowView: View {
     }
     
     private func toggleTodayEntry() {
+        logger.debug("Toggling today's entry - Metric: \(metric.name)", category: .data)
         let today = Calendar.current.startOfDay(for: Date())
         
         if let existingEntry = todayEntry {

@@ -5,6 +5,7 @@ struct GoalUtils {
     
     /// Calculate goal progress for a metric
     static func calculateGoalProgress(for metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> (current: Int, target: Int, percentage: Double) {
+        let startTime = Date()
         let isVice = metric.safeHabitType == .vice
         let period = metric.goalPeriod ?? .monthly
         let target = metric.goalTarget ?? 20

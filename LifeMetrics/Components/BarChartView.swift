@@ -9,6 +9,7 @@ struct BarChartView: View {
     @State private var animateChart = false
     
     private var weeklyData: [WeeklyData] {
+        let startTime = Date()
         let calendar = CalendarHelper.calendar
         let endDate = Date()
         let startDate = calendar.date(byAdding: .day, value: -28, to: endDate) ?? endDate
@@ -31,9 +32,15 @@ struct BarChartView: View {
             }
         }
         
-        return weeklyCounts.map { week, count in
+        let result = weeklyCounts.map { week, count in
             WeeklyData(week: week, count: count)
         }.sorted { $0.week < $1.week }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Bar chart data calculation", duration: duration)
+        logger.debug("Bar chart data calculated - Filter: \(filter), Data points: \(result.count)", category: .performance)
+        
+        return result
     }
     
     private func matchesFilter(entry: MetricEntry) -> Bool {
@@ -143,6 +150,7 @@ struct BarChartView: View {
         .background(Color(.systemGray6))
         .cornerRadius(12)
         .onAppear {
+            logger.debug("BarChartView appeared - Filter: \(filter), Entries: \(entries.count)", category: .ui)
             animateChart = true
         }
     }

@@ -15,6 +15,7 @@ struct LogHabitIntent: AppIntent {
     var value: Bool
     
     func perform() async throws -> some IntentResult {
+        logger.logUserAction("Log habit intent", details: "MetricID: \(metricID), Value: \(value)")
         // This would interact with the shared data container
         // For now, we'll just return success
         return .result()
@@ -28,6 +29,7 @@ struct OpenAppIntent: AppIntent {
     static var description: IntentDescription = "Open the QuickLog app"
     
     func perform() async throws -> some IntentResult & OpensIntent {
+        logger.logUserAction("Open app intent")
         return .result(opensIntent: true)
     }
 }

@@ -19,26 +19,36 @@ class HomeViewModel {
     // MARK: - Computed Properties
     /// Total number of positive habits
     func totalHabits(from metrics: [Metric]) -> Int {
-        metrics.filter { $0.safeHabitType == .positive }.count
+        let count = metrics.filter { $0.safeHabitType == .positive }.count
+        logger.debug("Total habits calculated: \(count)", category: .business)
+        return count
     }
     
     /// Total number of vices
     func totalVices(from metrics: [Metric]) -> Int {
-        metrics.filter { $0.safeHabitType == .vice }.count
+        let count = metrics.filter { $0.safeHabitType == .vice }.count
+        logger.debug("Total vices calculated: \(count)", category: .business)
+        return count
     }
     
     /// Number of metrics with active streaks (1+ days)
     func activeStreaks(from metrics: [Metric], entries: [MetricEntry]) -> Int {
-        metrics.compactMap { metric in
+        let startTime = Date()
+        let count = metrics.compactMap { metric in
             let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
             return streak > 0 ? streak : nil
         }.count
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Active streaks calculation", duration: duration)
+        logger.debug("Active streaks calculated: \(count)", category: .business)
+        return count
     }
     
     /// Number of metrics completed today
     func todayCompleted(from metrics: [Metric], entries: [MetricEntry]) -> Int {
+        let startTime = Date()
         let today = Calendar.current.startOfDay(for: selectedDate)
-        return metrics.filter { metric in
+        let count = metrics.filter { metric in
             let isVice = metric.safeHabitType == .vice
             let todayEntry = entries.first { entry in
                 entry.metricID == metric.id && 
@@ -46,6 +56,10 @@ class HomeViewModel {
             }
             return todayEntry?.value == !isVice
         }.count
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Today completed calculation", duration: duration)
+        logger.debug("Today completed calculated: \(count)", category: .business)
+        return count
     }
     
     /// Whether user can navigate to previous day
@@ -64,50 +78,72 @@ class HomeViewModel {
     /// Navigate to previous day
     func goToPreviousDay() {
         if canGoBack {
+            let oldDate = selectedDate
             selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
+            logger.logUserAction("Navigate to previous day", details: "From \(DateFormatter.dateFormatter.string(from: oldDate)) to \(DateFormatter.dateFormatter.string(from: selectedDate))")
+        } else {
+            logger.debug("Cannot go to previous day - already at earliest date", category: .ui)
         }
     }
     
     /// Navigate to next day or today
     func goToNextDay() {
         if !isToday {
+            let oldDate = selectedDate
             selectedDate = Calendar.current.date(byAdding: .day, value: 1, to: selectedDate) ?? selectedDate
+            logger.logUserAction("Navigate to next day", details: "From \(DateFormatter.dateFormatter.string(from: oldDate)) to \(DateFormatter.dateFormatter.string(from: selectedDate))")
+        } else {
+            logger.debug("Cannot go to next day - already at today", category: .ui)
         }
     }
     
     /// Go to today's date
     func goToToday() {
+        let oldDate = selectedDate
         selectedDate = Date()
+        logger.logUserAction("Navigate to today", details: "From \(DateFormatter.dateFormatter.string(from: oldDate)) to \(DateFormatter.dateFormatter.string(from: selectedDate))")
     }
     
     /// Show add metric sheet
     func showAddMetric() {
+        logger.logUserAction("Show add metric sheet")
         showingAddMetric = true
     }
     
     /// Show settings sheet
     func showSettings() {
+        logger.logUserAction("Show settings sheet")
         showingSettings = true
     }
     
     /// Show delete confirmation for metric
     func showDeleteConfirmation(for metric: Metric) {
+        logger.logUserAction("Show delete confirmation", details: "Metric: \(metric.name)")
         metricToDelete = metric
         showingDeleteConfirmation = true
     }
     
     /// Show edit sheet for metric
     func showEditMetric(_ metric: Metric) {
+        logger.logUserAction("Show edit metric sheet", details: "Metric: \(metric.name)")
         metricToEdit = metric
     }
     
     /// Delete metric and all associated entries
     func deleteMetric(in modelContext: ModelContext, entries: [MetricEntry]) {
-        guard let metric = metricToDelete else { return }
+        guard let metric = metricToDelete else { 
+            logger.warn("Attempted to delete metric but metricToDelete is nil", category: .data)
+            return 
+        }
 
+        logger.logUserAction("Delete metric", details: "Metric: \(metric.name)")
+        let startTime = Date()
+        
         withAnimation {
             // Delete all associated entries first
             let entriesToDelete = entries.filter { $0.metricID == metric.id }
+            logger.debug("Deleting \(entriesToDelete.count) entries for metric: \(metric.name)", category: .data)
+            
             for entry in entriesToDelete {
                 modelContext.delete(entry)
             }
@@ -116,7 +152,15 @@ class HomeViewModel {
             modelContext.delete(metric)
             
             // Save changes
-            try? modelContext.save()
+            do {
+                try modelContext.save()
+                let duration = Date().timeIntervalSince(startTime)
+                logger.logPerformance("Metric deletion", duration: duration)
+                logger.logDataOperation("DELETE", entity: "Metric", success: true)
+            } catch {
+                logger.logError(error, context: "Failed to save after deleting metric")
+                logger.logDataOperation("DELETE", entity: "Metric", success: false)
+            }
         }
         
         // Reset state
@@ -130,12 +174,17 @@ class HomeViewModel {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
         
+        logger.logUserAction("Toggle metric completion", details: "Metric: \(metric.name), Date: \(DateFormatter.dateFormatter.string(from: selectedDate))")
+        let startTime = Date()
+        
         // Look for existing entry for this metric and date
         if let existingEntry = entries.first(where: { 
             $0.metricID == metric.id && calendar.isDate($0.date, inSameDayAs: startOfDay) 
         }) {
             // Toggle existing entry
+            let oldValue = existingEntry.value
             existingEntry.value.toggle()
+            logger.debug("Toggled existing entry - Metric: \(metric.name), From: \(oldValue) to \(existingEntry.value)", category: .data)
         } else {
             // Create new entry
             let newEntry = MetricEntry(
@@ -144,9 +193,18 @@ class HomeViewModel {
                 value: !isVice // Default to completed for positive habits, not completed for vices
             )
             modelContext.insert(newEntry)
+            logger.debug("Created new entry - Metric: \(metric.name), Value: \(newEntry.value)", category: .data)
         }
         
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            let duration = Date().timeIntervalSince(startTime)
+            logger.logPerformance("Metric toggle save", duration: duration)
+            logger.logDataOperation("UPDATE", entity: "MetricEntry", success: true)
+        } catch {
+            logger.logError(error, context: "Failed to save after toggling metric")
+            logger.logDataOperation("UPDATE", entity: "MetricEntry", success: false)
+        }
     }
     
     /// Update metric entry with details and motivation

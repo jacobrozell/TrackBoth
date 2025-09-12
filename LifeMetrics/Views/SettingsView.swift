@@ -48,6 +48,7 @@ struct SettingsView: View {
     private var shareAppContent: String {
         let totalHabits = metrics.filter { $0.safeHabitType == .positive }.count
         let totalVices = metrics.filter { $0.safeHabitType == .vice }.count
+        logger.debug("Share app content calculated - Habits: \(totalHabits), Vices: \(totalVices)", category: .business)
         let totalEntries = entries.count
         
         return """
@@ -75,6 +76,7 @@ struct SettingsView: View {
                 // Data Management Section
                 Section("Data Management") {
                     Button("Export Data") {
+                        logger.logUserAction("Export data button tapped")
                         exportData = generateExportData()
                         showingExportSheet = true
                     }
@@ -82,12 +84,14 @@ struct SettingsView: View {
                     
                     if !metrics.isEmpty {
                         Button("Clear Demo Data") {
+                            logger.logUserAction("Clear demo data button tapped")
                             DemoDataGenerator.clearDemoData(modelContext: modelContext)
                         }
                         .foregroundColor(.orange)
                     }
                     
                     Button("Delete All Data") {
+                        logger.logUserAction("Delete all data button tapped")
                         showingDeleteConfirmation = true
                     }
                     .foregroundColor(.red)
@@ -96,12 +100,14 @@ struct SettingsView: View {
                 // iCloud Backup Section
                 Section("iCloud Backup") {
                     Button("Backup to iCloud") {
+                        logger.logUserAction("Backup to iCloud button tapped")
                         showingBackupSheet = true
                     }
                     .foregroundColor(.blue)
                     .disabled(isBackingUp)
                     
                     Button("Restore from iCloud") {
+                        logger.logUserAction("Restore from iCloud button tapped")
                         showingRestoreSheet = true
                     }
                     .foregroundColor(.green)
@@ -265,6 +271,8 @@ struct SettingsView: View {
             }
             .navigationTitle("Settings")
             .onAppear {
+                logger.info("SettingsView appeared")
+                logger.debug("Metrics count: \(metrics.count), Entries count: \(entries.count)", category: .data)
                 // Update time every second
                 Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
                     currentTime = Date()
@@ -276,10 +284,16 @@ struct SettingsView: View {
             .sheet(isPresented: $showingExportSheet) {
                 if let exportData = exportData {
                     ShareSheet(activityItems: [exportData])
+                        .onAppear {
+                            logger.info("Export data sheet presented")
+                        }
                 }
             }
             .sheet(isPresented: $showingShareSheet) {
                 ShareSheet(activityItems: [shareAppContent])
+                    .onAppear {
+                        logger.info("Share app sheet presented")
+                    }
             }
             .sheet(isPresented: $showingBackupSheet) {
                 BackupSheet(
@@ -289,6 +303,9 @@ struct SettingsView: View {
                     isBackingUp: $isBackingUp,
                     backupError: $backupError
                 )
+                .onAppear {
+                    logger.info("Backup sheet presented")
+                }
             }
             .sheet(isPresented: $showingRestoreSheet) {
                 RestoreSheet(
@@ -299,6 +316,9 @@ struct SettingsView: View {
                         try backupService.restoreFromBackup(backupData, context: modelContext)
                     }
                 )
+                .onAppear {
+                    logger.info("Restore sheet presented")
+                }
             }
             .alert("Delete All Data", isPresented: $showingDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { }

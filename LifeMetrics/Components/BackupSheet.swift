@@ -104,6 +104,7 @@ struct BackupSheet: View {
                 // Action Buttons
                 VStack(spacing: 12) {
                     Button("Start Backup") {
+                        logger.logUserAction("Start iCloud backup", details: "Metrics: \(metrics.count), Entries: \(entries.count)")
                         startBackup()
                     }
                     .buttonStyle(.borderedProminent)
@@ -136,6 +137,7 @@ struct BackupSheet: View {
     }
     
     private func startBackup() {
+        logger.info("Starting iCloud backup process", category: .network)
         Task {
             isBackingUp = true
             backupError = nil
@@ -159,10 +161,12 @@ struct BackupSheet: View {
                 backupProgress = "Backup complete!"
                 isBackingUp = false
                 showingSuccessAlert = true
+                logger.info("iCloud backup completed successfully", category: .network)
                 
             } catch {
                 backupError = error.localizedDescription
                 isBackingUp = false
+                logger.logError(error, context: "iCloud backup failed")
             }
         }
     }

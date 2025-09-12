@@ -63,6 +63,7 @@ struct OnboardingView: View {
                             .buttonStyle(PrimaryButtonStyle())
                         } else {
                             Button("Get Started") {
+                                logger.logUserAction("Complete onboarding")
                                 completeOnboarding()
                             }
                             .buttonStyle(PrimaryButtonStyle())
@@ -76,6 +77,7 @@ struct OnboardingView: View {
     }
     
     private func completeOnboarding() {
+        logger.info("Onboarding completed")
         UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
         // Trigger a notification to refresh the ContentView
         NotificationCenter.default.post(name: NSNotification.Name("OnboardingCompleted"), object: nil)
