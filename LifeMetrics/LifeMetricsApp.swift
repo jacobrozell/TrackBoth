@@ -21,8 +21,8 @@ struct LifeMetricsApp: App {
         let startTime = Date()
         
         do {
-            // Create a simple container with just the basic models
-            let container = try ModelContainer(for: Metric.self, MetricEntry.self)
+            // Create a simple container with all models
+            let container = try ModelContainer(for: Metric.self, MetricEntry.self, Goal.self)
             let duration = Date().timeIntervalSince(startTime)
             logger.logPerformance("SwiftData ModelContainer creation", duration: duration)
             logger.info("SwiftData ModelContainer created successfully", category: .data)
@@ -33,7 +33,7 @@ struct LifeMetricsApp: App {
             
             // Try with explicit schema
             do {
-                let schema = Schema([Metric.self, MetricEntry.self])
+                let schema = Schema([Metric.self, MetricEntry.self, Goal.self])
                 let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
                 let container = try ModelContainer(for: schema, configurations: [config])
                 let duration = Date().timeIntervalSince(startTime)

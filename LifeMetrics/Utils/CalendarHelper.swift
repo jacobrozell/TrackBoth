@@ -117,4 +117,57 @@ class CalendarHelper {
         let daysToSubtract = (firstWeekday - cal.firstWeekday + 7) % 7
         return cal.date(byAdding: .day, value: -daysToSubtract, to: startOfMonth) ?? startOfMonth
     }
+    
+    // MARK: - Date Comparison Utilities
+    
+    /// Check if a date is today
+    static func isToday(_ date: Date) -> Bool {
+        return calendar.isDateInToday(date)
+    }
+    
+    /// Check if two dates are on the same day
+    static func isSameDay(_ date1: Date, _ date2: Date) -> Bool {
+        return calendar.isDate(date1, inSameDayAs: date2)
+    }
+    
+    /// Get start of day for a date
+    static func startOfDay(for date: Date) -> Date {
+        return calendar.startOfDay(for: date)
+    }
+    
+    /// Add days to a date
+    static func addDays(_ days: Int, to date: Date) -> Date {
+        return calendar.date(byAdding: .day, value: days, to: date) ?? date
+    }
+    
+    /// Get the number of days between two dates
+    static func daysBetween(_ startDate: Date, _ endDate: Date) -> Int {
+        let components = calendar.dateComponents([.day], from: startDate, to: endDate)
+        return components.day ?? 0
+    }
+    
+    /// Check if a date is in the current week
+    static func isInCurrentWeek(_ date: Date) -> Bool {
+        return calendar.isDate(date, equalTo: Date(), toGranularity: .weekOfYear)
+    }
+    
+    /// Check if a date is in the current month
+    static func isInCurrentMonth(_ date: Date) -> Bool {
+        return calendar.isDate(date, equalTo: Date(), toGranularity: .month)
+    }
+    
+    /// Check if a date is in the current year
+    static func isInCurrentYear(_ date: Date) -> Bool {
+        return calendar.isDate(date, equalTo: Date(), toGranularity: .year)
+    }
+    
+    /// Get the number of days in a month
+    static func daysInMonth(for date: Date) -> Int {
+        return calendar.range(of: .day, in: .month, for: date)?.count ?? 30
+    }
+    
+    /// Get the number of days in a year
+    static func daysInYear(for date: Date) -> Int {
+        return calendar.range(of: .day, in: .year, for: date)?.count ?? 365
+    }
 }

@@ -29,7 +29,8 @@ struct QuantityInputSheet: View {
     }
     
     private var maxQuantity: Int {
-        if let maxDaily = metric.safeMaxDailyQuantity {
+        if let goal = metric.quantityGoals.first,
+           let maxDaily = goal.safeMaxDailyQuantity {
             return max(maxDaily, 10) // At least 10 for flexibility
         }
         return isVice ? 20 : 100 // Reasonable limits
@@ -324,7 +325,7 @@ struct QuantityInputSheet: View {
     
     // MARK: - Private Methods
     private func setupInitialValues() {
-        unit = metric.safeDefaultUnit
+        unit = metric.quantityGoals.first?.safeDefaultUnit ?? "times"
         
         // Check if there's an existing entry for today
         let calendar = Calendar.current
@@ -334,7 +335,7 @@ struct QuantityInputSheet: View {
             $0.metricID == metric.id && calendar.isDate($0.date, inSameDayAs: startOfDay) 
         }) {
             quantity = existingEntry.quantity ?? 1
-            unit = existingEntry.unit ?? metric.safeDefaultUnit
+            unit = existingEntry.unit ?? (metric.quantityGoals.first?.safeDefaultUnit ?? "times")
         }
     }
     
@@ -343,14 +344,11 @@ struct QuantityInputSheet: View {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
         
-        // For vices, we need to set value to false (not avoided) when logging quantity
-        // For habits, we set value to true (done) when logging quantity
-        let entryValue = isVice ? false : true
-        
+        // If they log quantity, we know they did it - set boolean to true
         MetricEntry.updateOrCreate(
             for: metric.id,
             date: startOfDay,
-            value: entryValue,
+            value: true, // They did it if they're logging quantity
             quantity: quantity,
             unit: unit.isEmpty ? nil : unit,
             in: modelContext,

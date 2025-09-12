@@ -1,20 +1,16 @@
 import SwiftUI
 
-// MARK: - DateNavigationView Component
-struct DateNavigationView: View {
+// MARK: - Weekly Date Navigation Component
+struct WeeklyDateNavigationView: View {
     @Binding var selectedDate: Date
     let canGoBack: Bool
-    let isToday: Bool
+    let isCurrentWeek: Bool
     
     var body: some View {
         HStack {
             Button {
                 if canGoBack {
-                    let oldDate = selectedDate
-                    selectedDate = Calendar.current.date(byAdding: .day, value: -1, to: selectedDate) ?? selectedDate
-                    logger.logUserAction("Previous day navigation", details: "From \(DateFormatter.dateFormatter.string(from: oldDate)) to \(DateFormatter.dateFormatter.string(from: selectedDate))")
-                } else {
-                    logger.debug("Cannot navigate to previous day - already at earliest date")
+                    selectedDate = Calendar.current.date(byAdding: .weekOfYear, value: -1, to: selectedDate) ?? selectedDate
                 }
             } label: {
                 Image(systemName: "chevron.left")
@@ -28,10 +24,10 @@ struct DateNavigationView: View {
                 // This will be handled by parent view
             } label: {
                 VStack(spacing: 2) {
-                    Text(isToday ? "Today" : DateFormatter.dayFormatter.string(from: selectedDate))
+                    Text(weekDisplayText)
                         .font(.headline)
                         .foregroundColor(.primary)
-                    Text(DateFormatter.dateFormatter.string(from: selectedDate))
+                    Text(weekRangeText)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }
@@ -40,31 +36,34 @@ struct DateNavigationView: View {
             Spacer()
             
             Button {
-                if !isToday {
-                    let oldDate = selectedDate
-                    selectedDate = Date()
-                    logger.logUserAction("Navigate to today", details: "From \(DateFormatter.dateFormatter.string(from: oldDate)) to today")
-                } else {
-                    logger.debug("Already at today's date")
-                }
+                selectedDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: selectedDate) ?? selectedDate
             } label: {
                 Image(systemName: "chevron.right")
-                    .foregroundColor(isToday ? .gray : .blue)
+                    .foregroundColor(.blue)
             }
-            .disabled(isToday)
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
     }
+    
+    private var weekDisplayText: String {
+        if isCurrentWeek {
+            return "This Week"
+        } else {
+            let formatter = DateFormatter()
+            formatter.dateFormat = "MMM d"
+            let startOfWeek = CalendarHelper.startOfWeek(for: selectedDate)
+            return formatter.string(from: startOfWeek)
+        }
+    }
+    
+    private var weekRangeText: String {
+        let startOfWeek = CalendarHelper.startOfWeek(for: selectedDate)
+        let endOfWeek = CalendarHelper.endOfWeek(for: selectedDate)
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        
+        return "\(formatter.string(from: startOfWeek)) - \(formatter.string(from: endOfWeek))"
+    }
 }
-
-#Preview {
-    DateNavigationView(
-        selectedDate: .constant(Date()),
-        canGoBack: true,
-        isToday: false
-    )
-}
-
-
-

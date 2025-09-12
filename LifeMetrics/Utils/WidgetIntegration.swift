@@ -66,125 +66,30 @@ class WidgetIntegration: ObservableObject {
     }
     
     private func calculateCurrentStreak(for metric: Metric, entries: [MetricEntry]) -> Int {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        var streak = 0
-        var currentDate = today
-        
-        // Sort entries by date descending
-        let sortedEntries = entries.sorted { $0.date > $1.date }
-        
-        for entry in sortedEntries {
-            let entryDate = calendar.startOfDay(for: entry.date)
-            
-            if calendar.isDate(entryDate, inSameDayAs: currentDate) {
-                // Check if this entry counts as a success
-                let isSuccess = metric.safeHabitType == .vice ? !entry.value : entry.value
-                
-                if isSuccess {
-                    streak += 1
-                    currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
-                } else {
-                    break
-                }
-            } else if entryDate < currentDate {
-                // Gap in entries, streak is broken
-                break
-            }
-        }
-        
-        return streak
+        return StreakUtils.calculateCurrentStreak(for: metric, entries: entries)
     }
     
     private func calculateLongestStreak(for metric: Metric, entries: [MetricEntry]) -> Int {
-        let calendar = Calendar.current
-        let sortedEntries = entries.sorted { $0.date < $1.date }
-        
-        var maxStreak = 0
-        var currentStreak = 0
-        var lastSuccessDate: Date?
-        
-        for entry in sortedEntries {
-            let isSuccess = metric.safeHabitType == .vice ? !entry.value : entry.value
-            
-            if isSuccess {
-                if let lastDate = lastSuccessDate {
-                    let daysBetween = calendar.dateComponents([.day], from: lastDate, to: entry.date).day ?? 0
-                    if daysBetween == 1 {
-                        currentStreak += 1
-                    } else {
-                        maxStreak = max(maxStreak, currentStreak)
-                        currentStreak = 1
-                    }
-                } else {
-                    currentStreak = 1
-                }
-                lastSuccessDate = entry.date
-            } else {
-                maxStreak = max(maxStreak, currentStreak)
-                currentStreak = 0
-            }
-        }
-        
-        return max(maxStreak, currentStreak)
+        return StreakUtils.calculateLongestStreak(for: metric, entries: entries)
     }
     
     private func calculateGoals(_ metrics: [Metric], entries: [MetricEntry]) -> [WidgetGoalData] {
         return metrics.compactMap { metric in
-            guard let goalTarget = metric.goalTarget,
-                  let goalPeriod = metric.goalPeriod else {
+            guard let goal = metric.booleanGoals.first else {
                 return nil
             }
             
             // Calculate progress based on current period using actual entry data
-            let progress = calculateGoalProgress(for: metric, target: goalTarget, period: goalPeriod, entries: entries)
+            let progress = GoalUtils.calculateGoalProgress(for: goal, metric: metric, entries: entries)
             
             return WidgetGoalData(
                 metricID: metric.id,
                 name: metric.name,
-                progress: progress,
-                target: goalTarget,
-                period: goalPeriod
+                progress: progress.percentage / 100.0,
+                target: Int(progress.target),
+                period: goal.period
             )
         }
-    }
-    
-    private func calculateGoalProgress(for metric: Metric, target: Int, period: GoalPeriod, entries: [MetricEntry]) -> Double {
-        let calendar = Calendar.current
-        let now = Date()
-        
-        let startDate: Date
-        switch period {
-        case .monthly:
-            startDate = calendar.dateInterval(of: .month, for: now)?.start ?? now
-        case .yearly:
-            startDate = calendar.dateInterval(of: .year, for: now)?.start ?? now
-        case .weekly:
-            startDate = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? now
-        case .biWeekly:
-            // Bi-weekly: 2 weeks from start of current week
-            let weekStart = calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? now
-            startDate = calendar.date(byAdding: .weekOfYear, value: -2, to: weekStart) ?? now
-        }
-        
-        // Filter entries for this metric within the goal period
-        let periodEntries = entries.filter { entry in
-            entry.metricID == metric.id &&
-            entry.date >= startDate &&
-            entry.date <= now
-        }
-        
-        // Count successful entries based on habit type
-        let successfulEntries = periodEntries.filter { entry in
-            let isVice = metric.safeHabitType == .vice
-            // For positive habits: count when value == true (completed)
-            // For vices: count when value == false (avoided)
-            return isVice ? !entry.value : entry.value
-        }
-        
-        let currentCount = successfulEntries.count
-        let progress = target > 0 ? Double(currentCount) / Double(target) : 0.0
-        return min(progress, 1.0) // Cap at 100%
     }
 }
 

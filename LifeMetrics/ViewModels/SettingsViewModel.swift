@@ -38,7 +38,7 @@ class SettingsViewModel {
     /// Number of metrics with goals
     func metricsWithGoals(_ metrics: [Metric]) -> Int {
         metrics.filter { metric in
-            metric.goalPeriod != nil && metric.goalTarget != nil
+            ((metric.goals?.isEmpty) == nil)
         }.count
     }
     
@@ -116,8 +116,8 @@ class SettingsViewModel {
             let name = metric.name.replacingOccurrences(of: "\"", with: "\"\"")
             let habitType = metric.safeHabitType.displayName
             let createdDate = DateFormatter.dateFormatter.string(from: metric.createdAt)
-            let goalPeriod = metric.goalPeriod?.displayName ?? "None"
-            let goalTarget = metric.goalTarget?.description ?? "None"
+            let goalPeriod = metric.booleanGoals.first?.period.displayName ?? "None"
+            let goalTarget = metric.booleanGoals.first?.target.description ?? "None"
             
             csvContent += "\"\(name)\",\"\(habitType)\",\"\(createdDate)\",\"\(goalPeriod)\",\"\(goalTarget)\"\n"
         }

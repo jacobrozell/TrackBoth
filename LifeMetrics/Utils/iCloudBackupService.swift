@@ -33,14 +33,18 @@ class iCloudBackupService {
         let createdAt: Date
         let habitType: String?
         let primaryMotivation: String?
-        let goalPeriod: String?
-        let goalTarget: Int?
-        let enableQuantity: Bool?
+        let goals: [BackupGoal]
+    }
+    
+    struct BackupGoal: Codable {
+        let id: String
+        let goalType: String
+        let period: String
+        let target: Int
+        let createdAt: Date
+        let quantityGoalType: String?
         let defaultUnit: String?
         let maxDailyQuantity: Int?
-        let quantityGoalType: String?
-        let quantityGoalTarget: Int?
-        let quantityGoalPeriod: String?
     }
     
     struct BackupEntry: Codable {
@@ -68,20 +72,26 @@ class iCloudBackupService {
         let startTime = Date()
         
         let backupMetrics = metrics.map { metric in
-            BackupMetric(
+            let backupGoals = metric.goals?.map { goal in
+                BackupGoal(
+                    id: goal.id.uuidString,
+                    goalType: goal.goalType.rawValue,
+                    period: goal.period.rawValue,
+                    target: goal.target,
+                    createdAt: goal.createdAt,
+                    quantityGoalType: goal.quantityGoalType?.rawValue,
+                    defaultUnit: goal.defaultUnit,
+                    maxDailyQuantity: goal.maxDailyQuantity
+                )
+            } ?? []
+            
+            return BackupMetric(
                 id: metric.id.uuidString,
                 name: metric.name,
                 createdAt: metric.createdAt,
                 habitType: metric.habitType?.rawValue,
                 primaryMotivation: metric.primaryMotivation,
-                goalPeriod: metric.goalPeriod?.rawValue,
-                goalTarget: metric.goalTarget,
-                enableQuantity: metric.enableQuantity,
-                defaultUnit: metric.defaultUnit,
-                maxDailyQuantity: metric.maxDailyQuantity,
-                quantityGoalType: metric.quantityGoalType?.rawValue,
-                quantityGoalTarget: metric.quantityGoalTarget,
-                quantityGoalPeriod: metric.quantityGoalPeriod?.rawValue
+                goals: backupGoals
             )
         }
         
@@ -175,19 +185,30 @@ class iCloudBackupService {
             let metric = Metric(
                 name: backupMetric.name,
                 habitType: HabitType(rawValue: backupMetric.habitType ?? "positive") ?? .positive,
-                primaryMotivation: backupMetric.primaryMotivation,
-                goalPeriod: backupMetric.goalPeriod != nil ? GoalPeriod(rawValue: backupMetric.goalPeriod!) : nil,
-                goalTarget: backupMetric.goalTarget,
-                enableQuantity: backupMetric.enableQuantity,
-                defaultUnit: backupMetric.defaultUnit,
-                maxDailyQuantity: backupMetric.maxDailyQuantity,
-                quantityGoalType: backupMetric.quantityGoalType != nil ? QuantityGoalType(rawValue: backupMetric.quantityGoalType!) : nil,
-                quantityGoalTarget: backupMetric.quantityGoalTarget,
-                quantityGoalPeriod: backupMetric.quantityGoalPeriod != nil ? GoalPeriod(rawValue: backupMetric.quantityGoalPeriod!) : nil
+                primaryMotivation: backupMetric.primaryMotivation
             )
             
             // Set the original ID
             metric.id = UUID(uuidString: backupMetric.id) ?? UUID()
+            
+            // Restore goals
+            for backupGoal in backupMetric.goals {
+                let goal = Goal(
+                    goalType: GoalType(rawValue: backupGoal.goalType) ?? .boolean,
+                    period: GoalPeriod(rawValue: backupGoal.period) ?? .monthly,
+                    target: backupGoal.target,
+                    quantityGoalType: backupGoal.quantityGoalType != nil ? QuantityGoalType(rawValue: backupGoal.quantityGoalType!) : nil,
+                    defaultUnit: backupGoal.defaultUnit,
+                    maxDailyQuantity: backupGoal.maxDailyQuantity
+                )
+                
+                goal.id = UUID(uuidString: backupGoal.id) ?? UUID()
+                goal.createdAt = backupGoal.createdAt
+                goal.metric = metric
+                metric.goals?.append(goal)
+                context.insert(goal)
+            }
+            
             context.insert(metric)
         }
         

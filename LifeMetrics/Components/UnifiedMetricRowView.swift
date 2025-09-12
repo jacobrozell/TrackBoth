@@ -1,0 +1,435 @@
+import SwiftUI
+import SwiftData
+
+// MARK: - Unified Metric Row Component
+struct UnifiedMetricRowView: View {
+    let metric: Metric
+    let selectedDate: Date
+    let showGoalProgress: Bool
+    let showQuantitySupport: Bool
+    @Environment(\.modelContext) private var modelContext
+    @Query private var entries: [MetricEntry]
+    @State private var isEditingDetails = false
+    @State private var editingDetailsText = ""
+    @State private var isEditingMotivation = false
+    @State private var editingMotivationText = ""
+    @State private var showingQuantityInput = false
+    
+    // MARK: - Initializers
+    init(metric: Metric, selectedDate: Date = Date(), showGoalProgress: Bool = false, showQuantitySupport: Bool = false) {
+        self.metric = metric
+        self.selectedDate = selectedDate
+        self.showGoalProgress = showGoalProgress
+        self.showQuantitySupport = showQuantitySupport
+    }
+    
+    // MARK: - Computed Properties
+    private var selectedDateEntry: MetricEntry? {
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: selectedDate)
+        return entries.first { entry in
+            entry.metricID == metric.id && 
+            calendar.isDate(entry.date, inSameDayAs: startOfDay)
+        }
+    }
+    
+    private var streak: Int {
+        StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
+    }
+    
+    private var goalProgress: (current: Int, target: Int, percentage: Double) {
+        guard showGoalProgress, let goal = metric.booleanGoals.first else {
+            return (current: 0, target: 0, percentage: 0.0)
+        }
+        let progress = GoalUtils.calculateGoalProgress(for: goal, metric: metric, entries: entries, selectedDate: selectedDate)
+        return (current: Int(progress.current), target: Int(progress.target), percentage: progress.percentage)
+    }
+    
+    private var recentDetails: String? {
+        // Only show recent details if we're viewing today or a future date
+        guard CalendarHelper.isSameDay(selectedDate, Date()) || selectedDate > Date() else {
+            return nil
+        }
+        
+        let sortedEntries = entries
+            .filter { $0.metricID == metric.id && $0.details != nil && !$0.details!.isEmpty }
+            .sorted { $0.date > $1.date }
+        return sortedEntries.first?.details
+    }
+    
+    // MARK: - Body
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header with habit name and toggle button
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack {
+                        Image(systemName: metric.safeHabitType.icon)
+                            .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                            .font(.title3)
+                        
+                        Text(metric.name)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                        
+                        // Quantity indicator (only if quantity support is enabled)
+                        if showQuantitySupport, let quantityString = selectedDateEntry?.quantityString {
+                            Text(quantityString)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(metric.safeHabitType == .positive ? .blue : .orange)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill((metric.safeHabitType == .positive ? Color.blue : Color.orange).opacity(0.2))
+                                )
+                        }
+                    }
+                    
+                    // Enhanced info row (only if goal progress is enabled)
+                    if showGoalProgress {
+                        HStack(spacing: 16) {
+                            if streak > 0 {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "flame.fill")
+                                        .foregroundColor(.orange)
+                                        .font(.caption)
+                                    Text(metric.safeHabitType == .positive ? 
+                                         "\(streak) day streak" : 
+                                         "\(streak) days clean")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            
+                            // Goal progress
+                            HStack(spacing: 4) {
+                                Image(systemName: "target")
+                                    .foregroundColor(.blue)
+                                    .font(.caption)
+                                Text("\(goalProgress.current)/\(goalProgress.target)")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    } else if streak > 0 {
+                        // Simple streak display for basic mode
+                        HStack {
+                            Image(systemName: "flame.fill")
+                                .foregroundColor(.orange)
+                            Text(metric.safeHabitType == .positive ? 
+                                 "\(streak) day streak" : 
+                                 "\(streak) days clean")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                
+                Spacer()
+                
+                // Toggle button - only for completion status
+                Button {
+                    logger.logUserAction("Toggle metric completion", details: "Metric: \(metric.name)")
+                    toggleSelectedDateEntry()
+                } label: {
+                    Image(systemName: selectedDateEntry?.value == true ? "checkmark.circle.fill" : "circle")
+                        .font(.title)
+                        .foregroundColor(selectedDateEntry?.value == true ? .green : .gray)
+                }
+            }
+            
+            // Today's status and details section
+            VStack(alignment: .leading, spacing: 8) {
+                HStack {
+                    Text(CalendarHelper.isSameDay(selectedDate, Date()) ? "Today" : "Selected Day")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+                    
+                    Spacer()
+                    
+                    if metric.safeHabitType == .positive {
+                        Text(selectedDateEntry?.value == true ? "Done" : "Not Done")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(selectedDateEntry?.value == true ? .green : .secondary)
+                    } else {
+                        Text(selectedDateEntry?.value == false ? "Avoided" : "Not Avoided")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(selectedDateEntry?.value == false ? .green : .red)
+                    }
+                }
+                
+                // Details section for positive habits
+                if metric.safeHabitType == .positive {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Details")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                            
+                            Spacer()
+                            
+                            Button {
+                                logger.logUserAction("Edit details", details: "Metric: \(metric.name)")
+                                isEditingDetails = true
+                                editingDetailsText = selectedDateEntry?.details ?? ""
+                            } label: {
+                                Image(systemName: "pencil")
+                                    .font(.caption)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        
+                        if isEditingDetails {
+                            VStack(alignment: .leading, spacing: 8) {
+                                TextField("Enter details...", text: $editingDetailsText, axis: .vertical)
+                                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                                    .lineLimit(2...4)
+                                
+                                HStack {
+                                    Button("Cancel") {
+                                        isEditingDetails = false
+                                        editingDetailsText = ""
+                                    }
+                                    .foregroundColor(.secondary)
+                                    
+                                    Spacer()
+                                    
+                                    Button("Save") {
+                                        saveDetails()
+                                    }
+                                    .foregroundColor(.blue)
+                                    .fontWeight(.medium)
+                                }
+                            }
+                        } else {
+                            if let details = selectedDateEntry?.details, !details.isEmpty {
+                                Text(details)
+                                    .font(.subheadline)
+                                    .foregroundColor(.primary)
+                                    .padding(.vertical, 4)
+                            } else if let recentDetails = recentDetails {
+                                Text(recentDetails)
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .italic()
+                                    .padding(.vertical, 4)
+                            } else {
+                                Text("Tap to add details")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                    .italic()
+                                    .padding(.vertical, 4)
+                            }
+                        }
+                    }
+                }
+                
+                // Quantity section (only if quantity support is enabled)
+                if showQuantitySupport {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("Quantity")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                            
+                            Spacer()
+                            
+                            Button {
+                                logger.logUserAction("Edit quantity", details: "Metric: \(metric.name)")
+                                showingQuantityInput = true
+                            } label: {
+                                Image(systemName: "plus.circle")
+                                    .font(.caption)
+                                    .foregroundColor(.blue)
+                            }
+                        }
+                        
+                        if let quantityString = selectedDateEntry?.quantityString {
+                            Text(quantityString)
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                                .padding(.vertical, 4)
+                        } else {
+                            Text("Tap to add quantity")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .italic()
+                                .padding(.vertical, 4)
+                        }
+                    }
+                }
+                
+                // Motivation section
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Motivation")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        Button {
+                            logger.logUserAction("Edit motivation", details: "Metric: \(metric.name)")
+                            isEditingMotivation = true
+                            editingMotivationText = selectedDateEntry?.motivation ?? ""
+                        } label: {
+                            Image(systemName: "heart")
+                                .font(.caption)
+                                .foregroundColor(.pink)
+                        }
+                    }
+                    
+                    if isEditingMotivation {
+                        VStack(alignment: .leading, spacing: 8) {
+                            TextField("Why is this important?", text: $editingMotivationText, axis: .vertical)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .lineLimit(2...4)
+                            
+                            HStack {
+                                Button("Cancel") {
+                                    isEditingMotivation = false
+                                    editingMotivationText = ""
+                                }
+                                .foregroundColor(.secondary)
+                                
+                                Spacer()
+                                
+                                Button("Save") {
+                                    saveMotivation()
+                                }
+                                .foregroundColor(.pink)
+                                .fontWeight(.medium)
+                            }
+                        }
+                    } else {
+                        if let motivation = selectedDateEntry?.motivation, !motivation.isEmpty {
+                            Text(motivation)
+                                .font(.subheadline)
+                                .foregroundColor(.primary)
+                                .padding(.vertical, 4)
+                        } else if let primaryMotivation = metric.primaryMotivation, !primaryMotivation.isEmpty {
+                            Text(primaryMotivation)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .italic()
+                                .padding(.vertical, 4)
+                        } else {
+                            Text("Tap to add motivation")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .italic()
+                                .padding(.vertical, 4)
+                        }
+                    }
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemBackground))
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+        .sheet(isPresented: $showingQuantityInput) {
+            QuantityInputSheet(
+                metric: metric,
+                selectedDate: selectedDate
+            )
+        }
+    }
+    
+    // MARK: - Private Methods
+    private func toggleSelectedDateEntry() {
+        let startOfDay = CalendarHelper.startOfDay(for: selectedDate)
+        
+        if let existingEntry = selectedDateEntry {
+            // Toggle existing entry
+            existingEntry.value.toggle()
+            logger.debug("Toggled existing entry for \(metric.name) on \(DateFormatter.dateFormatter.string(from: selectedDate))", category: .data)
+        } else {
+            // Create new entry
+            let newEntry = MetricEntry(
+                metricID: metric.id,
+                date: startOfDay,
+                value: true
+            )
+            modelContext.insert(newEntry)
+            logger.debug("Created new entry for \(metric.name) on \(DateFormatter.dateFormatter.string(from: selectedDate))", category: .data)
+        }
+        
+        do {
+            try modelContext.save()
+            logger.info("Successfully saved metric entry toggle", category: .data)
+        } catch {
+            logger.error("Failed to save metric entry toggle: \(error.localizedDescription)", category: .data)
+        }
+    }
+    
+    private func saveDetails() {
+        let startOfDay = CalendarHelper.startOfDay(for: selectedDate)
+        
+        if let existingEntry = selectedDateEntry {
+            existingEntry.details = editingDetailsText.isEmpty ? nil : editingDetailsText
+        } else {
+            let newEntry = MetricEntry(
+                metricID: metric.id,
+                date: startOfDay,
+                value: false,
+                details: editingDetailsText.isEmpty ? nil : editingDetailsText
+            )
+            modelContext.insert(newEntry)
+        }
+        
+        do {
+            try modelContext.save()
+            isEditingDetails = false
+            editingDetailsText = ""
+            logger.info("Successfully saved metric details", category: .data)
+        } catch {
+            logger.error("Failed to save metric details: \(error.localizedDescription)", category: .data)
+        }
+    }
+    
+    private func saveMotivation() {
+        let startOfDay = CalendarHelper.startOfDay(for: selectedDate)
+        
+        if let existingEntry = selectedDateEntry {
+            existingEntry.motivation = editingMotivationText.isEmpty ? nil : editingMotivationText
+        } else {
+            let newEntry = MetricEntry(
+                metricID: metric.id,
+                date: startOfDay,
+                value: false,
+                motivation: editingMotivationText.isEmpty ? nil : editingMotivationText
+            )
+            modelContext.insert(newEntry)
+        }
+        
+        do {
+            try modelContext.save()
+            isEditingMotivation = false
+            editingMotivationText = ""
+            logger.info("Successfully saved metric motivation", category: .data)
+        } catch {
+            logger.error("Failed to save metric motivation: \(error.localizedDescription)", category: .data)
+        }
+    }
+}
+
+// MARK: - Convenience Initializers
+extension UnifiedMetricRowView {
+    /// Basic metric row for simple display (replaces MetricRowView)
+    static func basic(metric: Metric, selectedDate: Date = Date()) -> UnifiedMetricRowView {
+        return UnifiedMetricRowView(metric: metric, selectedDate: selectedDate, showGoalProgress: false, showQuantitySupport: false)
+    }
+    
+    /// Enhanced metric row with goal progress and quantity support (replaces EnhancedMetricRowView)
+    static func enhanced(metric: Metric, selectedDate: Date = Date()) -> UnifiedMetricRowView {
+        return UnifiedMetricRowView(metric: metric, selectedDate: selectedDate, showGoalProgress: true, showQuantitySupport: true)
+    }
+}

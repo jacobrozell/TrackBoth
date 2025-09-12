@@ -19,16 +19,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0B9C2DEA2E735AE50089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				ChartModels.swift,
-				Enums.swift,
-				Metric.swift,
-				MetricEntry.swift,
-			);
-			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
-		};
 		0B9C2DEB2E735AE50089A5FD /* Exceptions for "ViewModels" folder in "LifeMetrics" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -41,11 +31,30 @@
 			);
 			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
 		};
-		0B9C2DEC2E735AE50089A5FD /* Exceptions for "Views" folder in "LifeMetrics" target */ = {
+		0B9C30FC2E73C64D0089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				ChartModels.swift,
+				EntryTypeFilter.swift,
+				Enums.swift,
+				Goal.swift,
+				Metric.swift,
+				MetricEntry.swift,
+				QuickPreset.swift,
+			);
+			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+		};
+		0B9C31112E73C6590089A5FD /* Exceptions for "Views" folder in "LifeMetrics" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AddGoalView.swift,
+				AddMetricView.swift,
+				AddMotivationView.swift,
 				ChartsView.swift,
 				ContentView.swift,
+				EditEntryView.swift,
+				EditGoalView.swift,
+				EditMetricView.swift,
 				GoalsView.swift,
 				HistoryView.swift,
 				HomeView.swift,
@@ -55,29 +64,41 @@
 			);
 			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
 		};
-		0B9C2FD52E73932F0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */ = {
+		0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				BackupSheet.swift,
 				BarChartView.swift,
+				CalendarDayView.swift,
+				CalendarGridView.swift,
 				ChartContentView.swift,
 				ChartControlsView.swift,
 				ChartsEmptyStateView.swift,
 				DateNavigationView.swift,
+				DatePickerSheet.swift,
+				EditableEntryCell.swift,
 				EmptyStateView.swift,
-				EnhancedMetricRowView.swift,
+				EntriesListView.swift,
 				FilterButton.swift,
 				FloatingActionButton.swift,
+				GoalCardViews.swift,
+				GoalHistoryViews.swift,
+				GoalPresets.swift,
 				HeatmapView.swift,
 				LineChartView.swift,
-				MetricRowView.swift,
+				MetricChipStyle.swift,
 				MotivationalInsightsView.swift,
+				MotivationCardView.swift,
+				MultiGoalViews.swift,
+				PresetButtons.swift,
+				PrimaryMotivationCardView.swift,
 				QuantityChartView.swift,
 				QuantityInputSheet.swift,
 				RestoreSheet.swift,
 				StatCard.swift,
 				StatsSectionView.swift,
 				StreakInfoView.swift,
+				UnifiedMetricRowView.swift,
 			);
 			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
 		};
@@ -87,7 +108,7 @@
 		0B9C2DA12E735AE50089A5FD /* Components */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C2FD52E73932F0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */,
+				0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -100,7 +121,7 @@
 		0B9C2DA72E735AE50089A5FD /* Models */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C2DEA2E735AE50089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */,
+				0B9C30FC2E73C64D0089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -121,7 +142,7 @@
 		0B9C2DBF2E735AE50089A5FD /* Views */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C2DEC2E735AE50089A5FD /* Exceptions for "Views" folder in "LifeMetrics" target */,
+				0B9C31112E73C6590089A5FD /* Exceptions for "Views" folder in "LifeMetrics" target */,
 			);
 			path = Views;
 			sourceTree = "<group>";
