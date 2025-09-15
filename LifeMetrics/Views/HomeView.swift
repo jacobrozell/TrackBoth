@@ -50,7 +50,7 @@ struct HomeView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                VStack(spacing: 0) {
+                GeometryReader { geometry in
                     if metrics.isEmpty {
                         VStack(spacing: 32) {
                             VStack(spacing: 16) {
@@ -97,123 +97,260 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .background(Color(.systemBackground))
                     } else {
-                        // Stats Overview Section
-                        VStack(spacing: 12) {
-                            // Date Navigation Header
-                            HStack {
-                                Button {
-                                    logger.logUserAction("Previous day button tapped")
-                                    viewModel.goToPreviousDay()
-                                } label: {
-                                    Image(systemName: "chevron.left")
-                                        .foregroundColor(canGoBack ? .blue : .gray)
-                                }
-                                .disabled(!canGoBack)
-                                
-                                Spacer()
-                                
-                                Button {
-                                    logger.logUserAction("Date picker button tapped")
-                                    viewModel.showingDatePicker = true
-                                } label: {
-                                    VStack(spacing: 2) {
-                                        Text(isToday ? "Today" : DateFormatter.dayFormatter.string(from: viewModel.selectedDate))
-                                            .font(.headline)
-                                            .foregroundColor(.primary)
-                                        Text(DateFormatter.dateFormatter.string(from: viewModel.selectedDate))
-                                            .font(.caption)
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                                
-                                Spacer()
-                                
-                                Button {
-                                    logger.logUserAction("Next day button tapped")
-                                    viewModel.goToNextDay()
-                                } label: {
-                                    Image(systemName: "chevron.right")
-                                        .foregroundColor(.blue)
-                                }
-                            }
-                            .padding(.horizontal, 20)
-                            .padding(.top, 8)
-                            
-                            // Today Button (right-aligned like Goals)
-                            if !isToday {
-                                HStack {
-                                    Spacer()
-                                    Button("Today") {
-                                        logger.logUserAction("Today button tapped")
-                                        viewModel.goToToday()
-                                    }
-                                    .font(.caption)
-                                    .foregroundColor(.blue)
-                                }
-                                .padding(.horizontal, 16)
-                            }
-                            
-                            // Quick Stats
-                            HStack(spacing: 20) {
-                                StatCard(
-                                    title: "Habits",
-                                    value: "\(totalHabits)",
-                                    icon: "checkmark.circle.fill",
-                                    color: .green
-                                )
-                                
-                                StatCard(
-                                    title: "Vices",
-                                    value: "\(totalVices)",
-                                    icon: "xmark.circle.fill",
-                                    color: .red
-                                )
-                                
-                                StatCard(
-                                    title: "Streaks",
-                                    value: "\(activeStreaks)",
-                                    icon: "flame.fill",
-                                    color: .orange
-                                )
-                                
-                                StatCard(
-                                    title: "Today",
-                                    value: "\(todayCompleted)/\(metrics.count)",
-                                    icon: "calendar",
-                                    color: .blue
-                                )
-                            }
-                            .padding(.horizontal, 16)
-                        }
-                        .padding(.bottom, 16)
-                        .background(Color(.systemGray6))
-                        
-                        // Habits List
-                        ScrollView {
-                            LazyVStack(spacing: 16) {
-                                ForEach(metrics) { metric in
-                                    UnifiedMetricRowView.enhanced(metric: metric, selectedDate: viewModel.selectedDate)
-                                        .contextMenu {
-                                            Button {
-                                                viewModel.showEditMetric(metric)
-                                            } label: {
-                                                Label("Edit", systemImage: "pencil")
-                                            }
-                                            Button(role: .destructive) {
-                                                viewModel.showDeleteConfirmation(for: metric)
-                                            } label: {
-                                                Label("Delete Habit", systemImage: "trash")
+                        if geometry.size.width > geometry.size.height {
+                            // Landscape layout
+                            HStack(spacing: 0) {
+                                // Left side - Stats and Date Navigation
+                                VStack(spacing: 12) {
+                                    // Date Navigation Header
+                                    HStack {
+                                        Button {
+                                            logger.logUserAction("Previous day button tapped")
+                                            viewModel.goToPreviousDay()
+                                        } label: {
+                                            Image(systemName: "chevron.left")
+                                                .foregroundColor(canGoBack ? .blue : .gray)
+                                        }
+                                        .disabled(!canGoBack)
+                                        
+                                        Spacer()
+                                        
+                                        Button {
+                                            logger.logUserAction("Date picker button tapped")
+                                            viewModel.showingDatePicker = true
+                                        } label: {
+                                            VStack(spacing: 2) {
+                                                Text(isToday ? "Today" : DateFormatter.dayFormatter.string(from: viewModel.selectedDate))
+                                                    .font(.headline)
+                                                    .foregroundColor(.primary)
+                                                Text(DateFormatter.dateFormatter.string(from: viewModel.selectedDate))
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
                                             }
                                         }
+                                        
+                                        Spacer()
+                                        
+                                        Button {
+                                            logger.logUserAction("Next day button tapped")
+                                            viewModel.goToNextDay()
+                                        } label: {
+                                            Image(systemName: "chevron.right")
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.top, 8)
+                                    
+                                    // Today Button
+                                    if !isToday {
+                                        HStack {
+                                            Spacer()
+                                            Button("Today") {
+                                                logger.logUserAction("Today button tapped")
+                                                viewModel.goToToday()
+                                            }
+                                            .font(.caption)
+                                            .foregroundColor(.blue)
+                                        }
+                                        .padding(.horizontal, 16)
+                                    }
+                                    
+                                    // Quick Stats - Vertical layout for landscape
+                                    VStack(spacing: 12) {
+                                        HStack(spacing: 12) {
+                                            StatCard(
+                                                title: "Habits",
+                                                value: "\(totalHabits)",
+                                                icon: "checkmark.circle.fill",
+                                                color: .green
+                                            )
+                                            
+                                            StatCard(
+                                                title: "Vices",
+                                                value: "\(totalVices)",
+                                                icon: "xmark.circle.fill",
+                                                color: .red
+                                            )
+                                        }
+                                        
+                                        HStack(spacing: 12) {
+                                            StatCard(
+                                                title: "Streaks",
+                                                value: "\(activeStreaks)",
+                                                icon: "flame.fill",
+                                                color: .orange
+                                            )
+                                            
+                                            StatCard(
+                                                title: "Today",
+                                                value: "\(todayCompleted)/\(metrics.count)",
+                                                icon: "calendar",
+                                                color: .blue
+                                            )
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    
+                                    Spacer()
+                                }
+                                .frame(width: min(280, geometry.size.width * 0.4))
+                                .background(Color(.systemGray6))
+                                
+                                Divider()
+                                    .frame(height: geometry.size.height)
+                                
+                                // Right side - Habits List
+                                ScrollView {
+                                    LazyVStack(spacing: 16) {
+                                        ForEach(metrics) { metric in
+                                            UnifiedMetricRowView.enhanced(metric: metric, selectedDate: viewModel.selectedDate)
+                                                .contextMenu {
+                                                    Button {
+                                                        viewModel.showEditMetric(metric)
+                                                    } label: {
+                                                        Label("Edit", systemImage: "pencil")
+                                                    }
+                                                    Button(role: .destructive) {
+                                                        viewModel.showDeleteConfirmation(for: metric)
+                                                    } label: {
+                                                        Label("Delete Habit", systemImage: "trash")
+                                                    }
+                                                }
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                }
+                                .overlay(alignment: .bottomTrailing) {
+                                    FloatingActionButton {
+                                        logger.logUserAction("Floating action button tapped")
+                                        viewModel.showAddMetric()
+                                    }
                                 }
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                        }
-                        .overlay(alignment: .bottomTrailing) {
-                            FloatingActionButton {
-                                logger.logUserAction("Floating action button tapped")
-                                viewModel.showAddMetric()
+                        } else {
+                            // Portrait layout
+                            VStack(spacing: 0) {
+                                // Stats Overview Section
+                                VStack(spacing: 12) {
+                                    // Date Navigation Header
+                                    HStack {
+                                        Button {
+                                            logger.logUserAction("Previous day button tapped")
+                                            viewModel.goToPreviousDay()
+                                        } label: {
+                                            Image(systemName: "chevron.left")
+                                                .foregroundColor(canGoBack ? .blue : .gray)
+                                        }
+                                        .disabled(!canGoBack)
+                                        
+                                        Spacer()
+                                        
+                                        Button {
+                                            logger.logUserAction("Date picker button tapped")
+                                            viewModel.showingDatePicker = true
+                                        } label: {
+                                            VStack(spacing: 2) {
+                                                Text(isToday ? "Today" : DateFormatter.dayFormatter.string(from: viewModel.selectedDate))
+                                                    .font(.headline)
+                                                    .foregroundColor(.primary)
+                                                Text(DateFormatter.dateFormatter.string(from: viewModel.selectedDate))
+                                                    .font(.caption)
+                                                    .foregroundColor(.secondary)
+                                            }
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        Button {
+                                            logger.logUserAction("Next day button tapped")
+                                            viewModel.goToNextDay()
+                                        } label: {
+                                            Image(systemName: "chevron.right")
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.top, 8)
+                                    
+                                    // Today Button (right-aligned like Goals)
+                                    if !isToday {
+                                        HStack {
+                                            Spacer()
+                                            Button("Today") {
+                                                logger.logUserAction("Today button tapped")
+                                                viewModel.goToToday()
+                                            }
+                                            .font(.caption)
+                                            .foregroundColor(.blue)
+                                        }
+                                        .padding(.horizontal, 16)
+                                    }
+                                    
+                                    // Quick Stats
+                                    HStack(spacing: 20) {
+                                        StatCard(
+                                            title: "Habits",
+                                            value: "\(totalHabits)",
+                                            icon: "checkmark.circle.fill",
+                                            color: .green
+                                        )
+                                        
+                                        StatCard(
+                                            title: "Vices",
+                                            value: "\(totalVices)",
+                                            icon: "xmark.circle.fill",
+                                            color: .red
+                                        )
+                                        
+                                        StatCard(
+                                            title: "Streaks",
+                                            value: "\(activeStreaks)",
+                                            icon: "flame.fill",
+                                            color: .orange
+                                        )
+                                        
+                                        StatCard(
+                                            title: "Today",
+                                            value: "\(todayCompleted)/\(metrics.count)",
+                                            icon: "calendar",
+                                            color: .blue
+                                        )
+                                    }
+                                    .padding(.horizontal, 16)
+                                }
+                                .padding(.bottom, 16)
+                                .background(Color(.systemGray6))
+                                
+                                // Habits List
+                                ScrollView {
+                                    LazyVStack(spacing: 16) {
+                                        ForEach(metrics) { metric in
+                                            UnifiedMetricRowView.enhanced(metric: metric, selectedDate: viewModel.selectedDate)
+                                                .contextMenu {
+                                                    Button {
+                                                        viewModel.showEditMetric(metric)
+                                                    } label: {
+                                                        Label("Edit", systemImage: "pencil")
+                                                    }
+                                                    Button(role: .destructive) {
+                                                        viewModel.showDeleteConfirmation(for: metric)
+                                                    } label: {
+                                                        Label("Delete Habit", systemImage: "trash")
+                                                    }
+                                                }
+                                        }
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                }
+                                .overlay(alignment: .bottomTrailing) {
+                                    FloatingActionButton {
+                                        logger.logUserAction("Floating action button tapped")
+                                        viewModel.showAddMetric()
+                                    }
+                                }
                             }
                         }
                     }

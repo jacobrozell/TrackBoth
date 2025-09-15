@@ -22,39 +22,78 @@ struct GoalsView: View {
                 )
                 .ignoresSafeArea()
                 
-                VStack(spacing: 0) {
-                if metricsWithGoals.isEmpty {
-                    emptyStateView
-                        .onAppear {
-                            logger.info("GoalsView empty state displayed")
-                        }
-                } else {
-                    ScrollView {
-                        VStack(spacing: 24) {
-                            // Date Navigation Section
-                            dateNavigationSection
-                            
-                            // Summary Stats Section
-                            summaryStatsSection
-                            
-                            // Boolean Goals Sections
-                            if !habitsWithBooleanGoals.isEmpty || !vicesWithBooleanGoals.isEmpty {
-                                booleanGoalsSection
+                GeometryReader { geometry in
+                    if metricsWithGoals.isEmpty {
+                        emptyStateView
+                            .onAppear {
+                                logger.info("GoalsView empty state displayed")
                             }
-                            
-                            // Quantity Goals Sections
-                            if !habitsWithQuantityGoals.isEmpty || !vicesWithQuantityGoals.isEmpty {
-                                quantityGoalsSection
+                    } else {
+                        if geometry.size.width > geometry.size.height {
+                            // Landscape layout
+                            HStack(spacing: 0) {
+                                // Left side - Date Navigation and Summary Stats
+                                VStack(spacing: 16) {
+                                    dateNavigationSection
+                                    summaryStatsSection
+                                    Spacer()
+                                }
+                                .frame(width: min(300, geometry.size.width * 0.35))
+                                .padding(.horizontal, 16)
+                                .background(Color(.systemGray6).opacity(0.3))
+                                
+                                Divider()
+                                    .frame(height: geometry.size.height)
+                                
+                                // Right side - Goals sections
+                                ScrollView {
+                                    VStack(spacing: 24) {
+                                        // Boolean Goals Sections
+                                        if !habitsWithBooleanGoals.isEmpty || !vicesWithBooleanGoals.isEmpty {
+                                            booleanGoalsSection
+                                        }
+                                        
+                                        // Quantity Goals Sections
+                                        if !habitsWithQuantityGoals.isEmpty || !vicesWithQuantityGoals.isEmpty {
+                                            quantityGoalsSection
+                                        }
+                                        
+                                        // Add Goal Button
+                                        addGoalButton
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.bottom, 20)
+                                }
                             }
-                            
-                            // Add Goal Button
-                            addGoalButton
+                        } else {
+                            // Portrait layout
+                            ScrollView {
+                                VStack(spacing: 24) {
+                                    // Date Navigation Section
+                                    dateNavigationSection
+                                    
+                                    // Summary Stats Section
+                                    summaryStatsSection
+                                    
+                                    // Boolean Goals Sections
+                                    if !habitsWithBooleanGoals.isEmpty || !vicesWithBooleanGoals.isEmpty {
+                                        booleanGoalsSection
+                                    }
+                                    
+                                    // Quantity Goals Sections
+                                    if !habitsWithQuantityGoals.isEmpty || !vicesWithQuantityGoals.isEmpty {
+                                        quantityGoalsSection
+                                    }
+                                    
+                                    // Add Goal Button
+                                    addGoalButton
+                                }
+                                .padding(.horizontal, 16)
+                                .padding(.bottom, 20)
+                            }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.bottom, 20)
                     }
                 }
-            }
             }
             .navigationTitle("Goals")
             .onAppear {

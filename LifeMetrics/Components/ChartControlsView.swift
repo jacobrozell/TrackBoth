@@ -5,6 +5,7 @@ struct ChartControlsView: View {
     @Binding var selectedFilter: MetricFilter
     @Binding var selectedChartType: ChartType
     let metrics: [Metric]
+    let isLandscape: Bool
     
     var body: some View {
         VStack(spacing: 20) {
@@ -16,43 +17,22 @@ struct ChartControlsView: View {
                     .foregroundColor(.secondary)
                     .padding(.horizontal)
                 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        // All filter
-                        FilterButton(
-                            filter: .all,
-                            isSelected: selectedFilter == .all
-                        ) {
-                            selectedFilter = .all
+                if isLandscape {
+                    // Landscape: vertical list (sidebar)
+                    ScrollView(.vertical, showsIndicators: false) {
+                        LazyVStack(spacing: 8) {
+                            filterButtons
                         }
-
-                        // All Habits filter
-                        FilterButton(
-                            filter: .allHabits,
-                            isSelected: selectedFilter == .allHabits
-                        ) {
-                            selectedFilter = .allHabits
-                        }
-
-                        // All Vices filter
-                        FilterButton(
-                            filter: .allVices,
-                            isSelected: selectedFilter == .allVices
-                        ) {
-                            selectedFilter = .allVices
-                        }
-
-                        // Individual metrics
-                        ForEach(metrics) { metric in
-                            FilterButton(
-                                filter: .specific(metric),
-                                isSelected: selectedFilter == .specific(metric)
-                            ) {
-                                selectedFilter = .specific(metric)
-                            }
-                        }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
+                } else {
+                    // Portrait: horizontal chips row
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 12) {
+                            filterButtons
+                        }
+                        .padding(.horizontal)
+                    }
                 }
             }
 
@@ -76,12 +56,50 @@ struct ChartControlsView: View {
         .padding(.vertical)
         .background(Color(.systemGray6).opacity(0.5))
     }
+    
+    @ViewBuilder
+    private var filterButtons: some View {
+        // All filter
+        FilterButton(
+            filter: .all,
+            isSelected: selectedFilter == .all
+        ) {
+            selectedFilter = .all
+        }
+
+        // All Habits filter
+        FilterButton(
+            filter: .allHabits,
+            isSelected: selectedFilter == .allHabits
+        ) {
+            selectedFilter = .allHabits
+        }
+
+        // All Vices filter
+        FilterButton(
+            filter: .allVices,
+            isSelected: selectedFilter == .allVices
+        ) {
+            selectedFilter = .allVices
+        }
+
+        // Individual metrics
+        ForEach(metrics) { metric in
+            FilterButton(
+                filter: .specific(metric),
+                isSelected: selectedFilter == .specific(metric)
+            ) {
+                selectedFilter = .specific(metric)
+            }
+        }
+    }
 }
 
 #Preview {
     ChartControlsView(
         selectedFilter: .constant(.all),
         selectedChartType: .constant(.line),
-        metrics: []
+        metrics: [],
+        isLandscape: false
     )
 }

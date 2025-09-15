@@ -63,136 +63,14 @@ struct HistoryView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                VStack {
+                GeometryReader { geometry in
                     if metrics.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "calendar.badge.exclamationmark")
-                                .font(.system(size: 60))
-                                .foregroundColor(.gray)
-                            
-                            Text("No data yet")
-                                .font(.title2)
-                                .fontWeight(.medium)
-                            
-                            Text("Start tracking habits and vices to see your history")
-                                .foregroundColor(.secondary)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        emptyStateView
                     } else {
-                        ScrollView {
-                            VStack(spacing: 0) {
-                                // Search bar
-                                HStack {
-                                    Image(systemName: "magnifyingglass")
-                                        .foregroundColor(.secondary)
-                                    
-                                    TextField("Search details...", text: $searchText)
-                                        .textFieldStyle(PlainTextFieldStyle())
-                                    
-                                    if !searchText.isEmpty {
-                                        Button {
-                                            searchText = ""
-                                        } label: {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                                .padding()
-                                .background(Color(.systemGray6))
-                                .cornerRadius(10)
-                                .padding(.horizontal)
-                                .padding(.top)
-                                
-                                // Filter picker
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 12) {
-                                        // All filter
-                                        FilterButton(
-                                            filter: .all,
-                                            isSelected: selectedFilter == .all
-                                        ) {
-                                            selectedFilter = .all
-                                        }
-                                        
-                                        // All Habits filter
-                                        FilterButton(
-                                            filter: .allHabits,
-                                            isSelected: selectedFilter == .allHabits
-                                        ) {
-                                            selectedFilter = .allHabits
-                                        }
-                                        
-                                        // All Vices filter
-                                        FilterButton(
-                                            filter: .allVices,
-                                            isSelected: selectedFilter == .allVices
-                                        ) {
-                                            selectedFilter = .allVices
-                                        }
-                                        
-                                        // Individual metrics
-                                        ForEach(metrics) { metric in
-                                            FilterButton(
-                                                filter: .specific(metric),
-                                                isSelected: selectedFilter == .specific(metric)
-                                            ) {
-                                                selectedFilter = .specific(metric)
-                                            }
-                                        }
-                                    }
-                                    .padding(.horizontal)
-                                }
-                                .padding(.vertical)
-                                
-                                // Entry type filter
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack(spacing: 12) {
-                                        ForEach(EntryTypeFilter.allCases, id: \.self) { filter in
-                                            Button {
-                                                entryTypeFilter = filter
-                                            } label: {
-                                                HStack(spacing: 6) {
-                                                    Image(systemName: filter.icon)
-                                                        .font(.caption)
-                                                    Text(filter.displayName)
-                                                        .font(.caption)
-                                                        .fontWeight(.medium)
-                                                }
-                                                .foregroundColor(entryTypeFilter == filter ? .white : .primary)
-                                                .padding(.horizontal, 12)
-                                                .padding(.vertical, 6)
-                                                .background(
-                                                    RoundedRectangle(cornerRadius: 16)
-                                                        .fill(entryTypeFilter == filter ? Color.blue : Color(.systemGray5))
-                                                )
-                                            }
-                                            .buttonStyle(PlainButtonStyle())
-                                        }
-                                    }
-                                    .padding(.horizontal)
-                                }
-                                
-                                Divider()
-                                
-                                // Calendar view
-                                CalendarGridView(
-                                    entries: calendarEntries,
-                                    selectedFilter: selectedFilter,
-                                    selectedDate: $selectedDate,
-                                    metrics: metrics
-                                )
-                                
-                                Divider()
-                                
-                                // Entries list view
-                                EntriesListView(
-                                    selectedFilter: selectedFilter,
-                                    entryTypeFilter: entryTypeFilter,
-                                    entries: entries,
-                                    metrics: metrics
-                                )
-                            }
+                        if geometry.size.width > geometry.size.height {
+                            landscapeLayout(geometry: geometry)
+                        } else {
+                            portraitLayout
                         }
                     }
                 }
@@ -214,6 +92,221 @@ struct HistoryView: View {
                     SettingsView()
                 }
             }
+        }
+    }
+    
+    private func landscapeLayout(geometry: GeometryProxy) -> some View {
+        HStack(spacing: 0) {
+            // Left side - Filters and Search
+            VStack(spacing: 16) {
+                searchBar
+                landscapeFilterSection
+                landscapeEntryTypeFilter
+                Spacer()
+            }
+            .frame(width: min(280, geometry.size.width * 0.35))
+            .padding(.horizontal, 16)
+            .background(Color(.systemGray6).opacity(0.3))
+
+            Divider()
+                .frame(height: geometry.size.height)
+
+            // Right side - Calendar
+            ScrollView {
+                CalendarGridView(
+                    entries: calendarEntries,
+                    selectedFilter: selectedFilter,
+                    selectedDate: $selectedDate,
+                    metrics: metrics
+                )
+                .padding()
+            }
+        }
+    }
+    
+    private var portraitLayout: some View {
+        ScrollView {
+            VStack(spacing: 0) {
+                searchBar
+                    .padding(.horizontal)
+                    .padding(.top)
+                
+                horizontalFilterSection
+                horizontalEntryTypeFilter
+                
+                Divider()
+
+                // Calendar view
+                CalendarGridView(
+                    entries: calendarEntries,
+                    selectedFilter: selectedFilter,
+                    selectedDate: $selectedDate,
+                    metrics: metrics
+                )
+
+                Divider()
+
+                // Entries list view
+                EntriesListView(
+                    selectedFilter: selectedFilter,
+                    entryTypeFilter: entryTypeFilter,
+                    entries: entries,
+                    metrics: metrics
+                )
+            }
+        }
+    }
+    
+    // MARK: - View Components
+    
+    private var emptyStateView: some View {
+        VStack(spacing: 20) {
+            Image(systemName: "calendar.badge.exclamationmark")
+                .font(.system(size: 60))
+                .foregroundColor(.gray)
+
+            Text("No data yet")
+                .font(.title2)
+                .fontWeight(.medium)
+
+            Text("Start tracking habits and vices to see your history")
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+    
+    private var searchBar: some View {
+        HStack {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.secondary)
+
+            TextField("Search details...", text: $searchText)
+                .textFieldStyle(PlainTextFieldStyle())
+
+            if !searchText.isEmpty {
+                Button {
+                    searchText = ""
+                } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(.secondary)
+                }
+            }
+        }
+        .padding()
+        .background(Color(.systemGray6))
+        .cornerRadius(10)
+    }
+    
+    private var landscapeFilterSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Filter by Metric")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.secondary)
+
+            ScrollView(.vertical, showsIndicators: false) {
+                LazyVStack(spacing: 8) {
+                    FilterButton(filter: .all, isSelected: selectedFilter == .all) {
+                        selectedFilter = .all
+                    }
+                    FilterButton(filter: .allHabits, isSelected: selectedFilter == .allHabits) {
+                        selectedFilter = .allHabits
+                    }
+                    FilterButton(filter: .allVices, isSelected: selectedFilter == .allVices) {
+                        selectedFilter = .allVices
+                    }
+                    ForEach(metrics) { metric in
+                        FilterButton(filter: .specific(metric), isSelected: selectedFilter == .specific(metric)) {
+                            selectedFilter = .specific(metric)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    private var horizontalFilterSection: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                FilterButton(filter: .all, isSelected: selectedFilter == .all) {
+                    selectedFilter = .all
+                }
+                FilterButton(filter: .allHabits, isSelected: selectedFilter == .allHabits) {
+                    selectedFilter = .allHabits
+                }
+                FilterButton(filter: .allVices, isSelected: selectedFilter == .allVices) {
+                    selectedFilter = .allVices
+                }
+                ForEach(metrics) { metric in
+                    FilterButton(filter: .specific(metric), isSelected: selectedFilter == .specific(metric)) {
+                        selectedFilter = .specific(metric)
+                    }
+                }
+            }
+            .padding(.horizontal)
+        }
+        .padding(.vertical)
+    }
+    
+    private var landscapeEntryTypeFilter: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Entry Type")
+                .font(.subheadline)
+                .fontWeight(.medium)
+                .foregroundColor(.secondary)
+
+            VStack(spacing: 8) {
+                ForEach(EntryTypeFilter.allCases, id: \.self) { filter in
+                    Button {
+                        entryTypeFilter = filter
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: filter.icon)
+                                .font(.caption)
+                            Text(filter.displayName)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundColor(entryTypeFilter == filter ? .white : .primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(entryTypeFilter == filter ? Color.blue : Color(.systemGray5))
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+        }
+    }
+    
+    private var horizontalEntryTypeFilter: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(EntryTypeFilter.allCases, id: \.self) { filter in
+                    Button {
+                        entryTypeFilter = filter
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: filter.icon)
+                                .font(.caption)
+                            Text(filter.displayName)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                        }
+                        .foregroundColor(entryTypeFilter == filter ? .white : .primary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(entryTypeFilter == filter ? Color.blue : Color(.systemGray5))
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(.horizontal)
         }
     }
 }

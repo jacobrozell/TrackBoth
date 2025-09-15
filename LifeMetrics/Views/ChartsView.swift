@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 // MARK: - ChartsView
 /// View displaying various chart visualizations of habit tracking data
@@ -13,33 +14,65 @@ struct ChartsView: View {
     @State private var showingExportSheet = false
     @State private var exportData: Data?
     @State private var exportFormat: ChartExportUtility.ExportFormat = .png
+    @State private var isExporting = false
     @Environment(\.modelContext) private var modelContext
     
     // MARK: - Body
     var body: some View {
         NavigationView {
             ZStack {
-                VStack {
+                GeometryReader { geometry in
                     if metrics.isEmpty {
                         ChartsEmptyStateView()
                     } else {
-                        VStack(spacing: 0) {
-                            // Controls
-                            ChartControlsView(
-                                selectedFilter: $selectedFilter,
-                                selectedChartType: $selectedChartType,
-                                metrics: metrics
-                            )
+                        if geometry.size.width > geometry.size.height {
+                            // Landscape layout
+                            HStack(spacing: 0) {
+                                // Left side - Controls
+                                VStack {
+                                    ChartControlsView(
+                                        selectedFilter: $selectedFilter,
+                                        selectedChartType: $selectedChartType,
+                                        metrics: metrics,
+                                        isLandscape: true
+                                    )
+                                    Spacer()
+                                }
+                                .frame(width: min(320, geometry.size.width * 0.35))
+                                .background(Color(.systemGray6).opacity(0.3))
+                                
+                                Divider()
+                                    .frame(height: geometry.size.height)
+                                
+                                // Right side - Chart content
+                                ChartContentView(
+                                    selectedChartType: selectedChartType,
+                                    selectedFilter: selectedFilter,
+                                    entries: entries,
+                                    metrics: metrics
+                                )
+                            }
+                        } else {
+                            // Portrait layout
+                            VStack(spacing: 0) {
+                                // Controls
+                                ChartControlsView(
+                                    selectedFilter: $selectedFilter,
+                                    selectedChartType: $selectedChartType,
+                                    metrics: metrics,
+                                    isLandscape: false
+                                )
 
-                            Divider()
+                                Divider()
 
-                            // Chart content
-                            ChartContentView(
-                                selectedChartType: selectedChartType,
-                                selectedFilter: selectedFilter,
-                                entries: entries,
-                                metrics: metrics
-                            )
+                                // Chart content
+                                ChartContentView(
+                                    selectedChartType: selectedChartType,
+                                    selectedFilter: selectedFilter,
+                                    entries: entries,
+                                    metrics: metrics
+                                )
+                            }
                         }
                     }
                 }
@@ -69,15 +102,23 @@ struct ChartsView: View {
                                         exportFormat = .png
                                         exportCurrentChart()
                                     }
+                                    .disabled(isExporting)
                                     
                                     Button("Export as PDF") {
                                         logger.logUserAction("Export chart as PDF")
                                         exportFormat = .pdf
                                         exportCurrentChart()
                                     }
+                                    .disabled(isExporting)
                                 } label: {
-                                    Image(systemName: "square.and.arrow.up")
+                                    if isExporting {
+                                        ProgressView()
+                                            .scaleEffect(0.8)
+                                    } else {
+                                        Image(systemName: "square.and.arrow.up")
+                                    }
                                 }
+                                .disabled(isExporting)
                             }
                             
                             Button {
@@ -95,7 +136,10 @@ struct ChartsView: View {
                 }
                 .sheet(isPresented: $showingExportSheet) {
                     if let exportData = exportData {
-                        ShareSheet(activityItems: [exportData])
+                        ShareSheet(activityItems: createShareItems(from: exportData))
+                            .onDisappear {
+                                cleanupTempFiles()
+                            }
                     }
                 }
                 .onAppear {
@@ -109,10 +153,55 @@ struct ChartsView: View {
     
     // MARK: - Export Functions
     
+    private func createShareItems(from data: Data) -> [Any] {
+        switch exportFormat {
+        case .png:
+            // For PNG, create UIImage which works better with UIActivityViewController
+            if let image = UIImage(data: data) {
+                logger.info("Created UIImage for PNG sharing", category: .ui)
+                return [image]
+            } else {
+                logger.error("Failed to create UIImage from PNG data", category: .ui)
+                return [data]
+            }
+        case .pdf:
+            // For PDF, use temporary file
+            let fileName = "QuickLog_Chart_\(Date().timeIntervalSince1970).pdf"
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
+            
+            do {
+                try data.write(to: tempURL)
+                logger.info("Created temporary PDF file for sharing: \(fileName)", category: .ui)
+                return [tempURL]
+            } catch {
+                logger.error("Failed to create temporary PDF file for sharing: \(error)", category: .ui)
+                return [data] // Fallback to raw data
+            }
+        }
+    }
+    
+    private func cleanupTempFiles() {
+        let tempDir = FileManager.default.temporaryDirectory
+        do {
+            let tempFiles = try FileManager.default.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
+            for file in tempFiles {
+                if file.lastPathComponent.hasPrefix("QuickLog_Chart_") && file.pathExtension == "pdf" {
+                    try FileManager.default.removeItem(at: file)
+                    logger.info("Cleaned up temporary PDF file: \(file.lastPathComponent)", category: .ui)
+                }
+            }
+        } catch {
+            logger.error("Failed to cleanup temporary files: \(error)", category: .ui)
+        }
+    }
+    
     private func exportCurrentChart() {
         logger.info("Starting chart export - Format: \(exportFormat)", category: .ui)
         let startTime = Date()
         
+        isExporting = true
+        
+        // Create view on main thread
         let chartTitle = getChartTitle()
         let chartView = getCurrentChartView()
         
@@ -121,17 +210,30 @@ struct ChartsView: View {
             title: chartTitle
         )
         
-        exportData = ChartExportUtility.exportView(
-            exportView,
-            format: exportFormat,
-            size: CGSize(width: 800, height: 600)
-        )
-        
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Chart export", duration: duration)
-        logger.info("Chart export completed - Format: \(exportFormat), Title: \(chartTitle)", category: .ui)
-        
-        showingExportSheet = true
+        // Perform export on background queue to avoid blocking UI
+        Task {
+            let result = await ChartExportUtility.exportViewAsync(
+                exportView,
+                format: exportFormat,
+                size: CGSize(width: 800, height: 600)
+            )
+            
+            await MainActor.run {
+                self.isExporting = false
+                self.exportData = result
+                
+                let duration = Date().timeIntervalSince(startTime)
+                logger.logPerformance("Chart export", duration: duration)
+                logger.info("Chart export completed - Format: \(exportFormat), Title: \(chartTitle), Success: \(result != nil)", category: .ui)
+                
+                if let data = result {
+                    logger.info("Chart export successful - Data size: \(data.count) bytes", category: .ui)
+                    self.showingExportSheet = true
+                } else {
+                    logger.error("Chart export failed - no data generated", category: .ui)
+                }
+            }
+        }
     }
     
     private func getChartTitle() -> String {

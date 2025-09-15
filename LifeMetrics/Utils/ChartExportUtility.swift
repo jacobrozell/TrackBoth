@@ -37,12 +37,24 @@ class ChartExportUtility {
         logger.info("Starting chart export - Format: \(format), Size: \(size)", category: .ui)
         let startTime = Date()
         
-        let hostingController = UIHostingController(rootView: view)
+        // Create hosting controller with proper configuration
+        let hostingController = UIHostingController(rootView: view.colorScheme(.light))
         hostingController.view.frame = CGRect(origin: .zero, size: size)
-        hostingController.view.backgroundColor = UIColor.systemBackground
+        hostingController.view.backgroundColor = UIColor.white
         
-        // Force layout
+        // Ensure proper rendering environment
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Force layout multiple times to ensure proper rendering
         hostingController.view.layoutIfNeeded()
+        hostingController.view.setNeedsLayout()
+        hostingController.view.layoutIfNeeded()
+        
+        // Ensure the view has content
+        if hostingController.view.bounds.isEmpty {
+            logger.error("Chart export failed - view has empty bounds", category: .ui)
+            return nil
+        }
         
         let result: Data?
         switch format {
@@ -55,6 +67,10 @@ class ChartExportUtility {
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("Chart export", duration: duration)
         logger.info("Chart export completed - Format: \(format), Success: \(result != nil)", category: .ui)
+        
+        if result == nil {
+            logger.error("Chart export failed - no data generated for format: \(format)", category: .ui)
+        }
         
         return result
     }
@@ -74,23 +90,130 @@ class ChartExportUtility {
         return Self.exportView(exportView, format: format, size: size)
     }
     
+    /// Export a SwiftUI view as an image asynchronously
+    static func exportViewAsync<Content: View>(
+        _ view: Content,
+        format: ExportFormat,
+        size: CGSize = CGSize(width: 800, height: 600)
+    ) async -> Data? {
+        return await withCheckedContinuation { continuation in
+            // Create hosting controller on main thread
+            DispatchQueue.main.async {
+                let hostingController = UIHostingController(rootView: view.colorScheme(.light))
+                hostingController.view.frame = CGRect(origin: .zero, size: size)
+                hostingController.view.backgroundColor = UIColor.white
+                hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+                
+                // Force layout multiple times to ensure proper rendering
+                hostingController.view.layoutIfNeeded()
+                hostingController.view.setNeedsLayout()
+                hostingController.view.layoutIfNeeded()
+                
+                // Ensure the view has content
+                if hostingController.view.bounds.isEmpty {
+                    logger.error("Chart export failed - view has empty bounds", category: .ui)
+                    continuation.resume(returning: nil)
+                    return
+                }
+                
+                // Give the view a moment to fully render
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                    let result: Data?
+                    switch format {
+                    case .png:
+                        result = Self.exportAsPNGWithDrawHierarchy(hostingController.view, size: size)
+                    case .pdf:
+                        // PDF must be done on main thread since it uses drawHierarchy
+                        let pdfResult = Self.exportAsPDF(hostingController.view, size: size)
+                        continuation.resume(returning: pdfResult)
+                        return
+                    }
+                    
+                    continuation.resume(returning: result)
+                }
+            }
+        }
+    }
+    
     // MARK: - Private Methods
     
     private static func exportAsPNG(_ view: UIView, size: CGSize) -> Data? {
-        UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
+        // Use higher scale for better quality
+        let scale: CGFloat = 2.0
+        let scaledSize = CGSize(width: size.width * scale, height: size.height * scale)
+        
+        UIGraphicsBeginImageContextWithOptions(scaledSize, false, scale)
         defer { UIGraphicsEndImageContext() }
         
-        guard let context = UIGraphicsGetCurrentContext() else { return nil }
+        guard let context = UIGraphicsGetCurrentContext() else { 
+            logger.error("Chart export failed - no graphics context", category: .ui)
+            return nil 
+        }
         
-        // Set background color
-        context.setFillColor(UIColor.systemBackground.cgColor)
-        context.fill(CGRect(origin: .zero, size: size))
+        // Set background color to white for better visibility
+        context.setFillColor(UIColor.white.cgColor)
+        context.fill(CGRect(origin: .zero, size: scaledSize))
         
-        // Render view
-        view.layer.render(in: context)
+        // Use drawHierarchy instead of layer.render for better SwiftUI compatibility
+        // and to avoid threading issues
+        let success = view.drawHierarchy(in: CGRect(origin: .zero, size: size), afterScreenUpdates: true)
         
-        guard let image = UIGraphicsGetImageFromCurrentImageContext() else { return nil }
-        return image.pngData()
+        if !success {
+            logger.error("Chart export failed - drawHierarchy returned false", category: .ui)
+            return nil
+        }
+        
+        guard let image = UIGraphicsGetImageFromCurrentImageContext() else { 
+            logger.error("Chart export failed - no image generated", category: .ui)
+            return nil 
+        }
+        
+        guard let imageData = image.pngData() else {
+            logger.error("Chart export failed - could not convert to PNG data", category: .ui)
+            return nil
+        }
+        
+        logger.info("Chart export successful - PNG data size: \(imageData.count) bytes", category: .ui)
+        return imageData
+    }
+    
+    private static func exportAsPNGWithDrawHierarchy(_ view: UIView, size: CGSize) -> Data? {
+        // Use higher scale for better quality
+        let scale: CGFloat = 2.0
+        let scaledSize = CGSize(width: size.width * scale, height: size.height * scale)
+        
+        UIGraphicsBeginImageContextWithOptions(scaledSize, false, scale)
+        defer { UIGraphicsEndImageContext() }
+        
+        guard let context = UIGraphicsGetCurrentContext() else { 
+            logger.error("Chart export failed - no graphics context", category: .ui)
+            return nil 
+        }
+        
+        // Set background color to white for better visibility
+        context.setFillColor(UIColor.white.cgColor)
+        context.fill(CGRect(origin: .zero, size: scaledSize))
+        
+        // Use drawHierarchy instead of render - works better with SwiftUI Charts
+        let success = view.drawHierarchy(in: CGRect(origin: .zero, size: size), afterScreenUpdates: true)
+        
+        if !success {
+            logger.error("Chart export failed - drawHierarchy returned false", category: .ui)
+            return nil
+        }
+        
+        guard let image = UIGraphicsGetImageFromCurrentImageContext() else { 
+            logger.error("Chart export failed - no image generated", category: .ui)
+            return nil 
+        }
+        
+        guard let imageData = image.pngData() else {
+            logger.error("Chart export failed - could not convert to PNG data", category: .ui)
+            return nil
+        }
+        
+        logger.info("Chart export successful with drawHierarchy - PNG data size: \(imageData.count) bytes", category: .ui)
+        return imageData
     }
     
     private static func exportAsPDF(_ view: UIView, size: CGSize) -> Data? {
@@ -100,20 +223,30 @@ class ChartExportUtility {
         UIGraphicsBeginPDFPage()
         
         guard let context = UIGraphicsGetCurrentContext() else {
+            logger.error("Chart export failed - no PDF graphics context", category: .ui)
             UIGraphicsEndPDFContext()
             return nil
         }
         
-        // Set background color
-        context.setFillColor(UIColor.systemBackground.cgColor)
+        // Set background color to white for better visibility
+        context.setFillColor(UIColor.white.cgColor)
         context.fill(CGRect(origin: .zero, size: size))
         
-        // Render view
-        view.layer.render(in: context)
+        // Use drawHierarchy instead of layer.render for better SwiftUI compatibility
+        // and to avoid threading issues
+        let success = view.drawHierarchy(in: CGRect(origin: .zero, size: size), afterScreenUpdates: true)
+        
+        if !success {
+            logger.error("Chart export failed - drawHierarchy returned false for PDF", category: .ui)
+            UIGraphicsEndPDFContext()
+            return nil
+        }
         
         UIGraphicsEndPDFContext()
         
-        return pdfData as Data
+        let pdfDataResult = pdfData as Data
+        logger.info("Chart export successful - PDF data size: \(pdfDataResult.count) bytes", category: .ui)
+        return pdfDataResult
     }
 }
 
@@ -130,27 +263,33 @@ struct ChartExportWrapper<Content: View>: View {
                 .font(.title2)
                 .fontWeight(.bold)
                 .multilineTextAlignment(.center)
+                .foregroundColor(.black)
                 .padding(.horizontal)
             
-            // Chart
+            // Chart with explicit sizing and forced light color scheme
             chartView
+                .frame(height: 400)
+                .background(Color.white)
+                .colorScheme(.light) // Force light color scheme for export
             
             // Footer
             HStack {
                 Text("Generated by QuickLog")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
                 
                 Spacer()
                 
                 Text(Date(), style: .date)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.gray)
             }
             .padding(.horizontal)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .frame(width: 800, height: 600)
+        .background(Color.white)
+        .colorScheme(.light) // Force light color scheme for entire export
     }
 }
 
