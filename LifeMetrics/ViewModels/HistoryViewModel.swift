@@ -12,6 +12,8 @@ class HistoryViewModel {
     var selectedDate = Date()
     var searchText = ""
     var showingAddMetric = false
+    var showingSettings = false
+    var entryTypeFilter: EntryTypeFilter = .all
     
     // MARK: - Computed Properties
     /// Filtered metrics based on selected filter and search text
@@ -78,6 +80,54 @@ class HistoryViewModel {
         }
     }
     
+    /// Calendar entries grouped by date with all filters applied
+    func calendarEntries(_ entries: [MetricEntry], metrics: [Metric]) -> [Date: [MetricEntry]] {
+        let startTime = Date()
+        let filteredEntries = entries.filter { entry in
+            // Only show entries that have meaningful content
+            guard entry.hasContent else { return false }
+            
+            // Apply search filter
+            if !searchText.isEmpty {
+                guard entry.details?.localizedCaseInsensitiveContains(searchText) == true else {
+                    return false
+                }
+            }
+            
+            // Apply entry type filter
+            switch entryTypeFilter {
+            case .all:
+                break
+            case .boolean:
+                guard !entry.hasQuantity else { return false }
+            case .quantity:
+                guard entry.hasQuantity else { return false }
+            }
+            
+            // Apply metric filter
+            switch selectedFilter {
+            case .all:
+                return true
+            case .allHabits:
+                return metrics.first { $0.id == entry.metricID }?.safeHabitType == .positive
+            case .allVices:
+                return metrics.first { $0.id == entry.metricID }?.safeHabitType == .vice
+            case .specific(let metric):
+                return entry.metricID == metric.id
+            }
+        }
+        
+        let result = Dictionary(grouping: filteredEntries) { entry in
+            CalendarHelper.startOfDay(for: entry.date)
+        }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Calendar entries calculation", duration: duration)
+        logger.debug("Calendar entries calculated - Filtered: \(filteredEntries.count), Grouped: \(result.count) days", category: .performance)
+        
+        return result
+    }
+    
     // MARK: - Actions
     /// Update selected filter
     func updateFilter(_ filter: MetricFilter) {
@@ -100,6 +150,17 @@ class HistoryViewModel {
     /// Show add metric sheet
     func showAddMetric() {
         showingAddMetric = true
+    }
+    
+    /// Show settings sheet
+    func showSettings() {
+        showingSettings = true
+    }
+    
+    /// Update entry type filter
+    func updateEntryTypeFilter(_ filter: EntryTypeFilter) {
+        logger.logUserAction("History entry type filter updated", details: "From \(entryTypeFilter) to \(filter)")
+        entryTypeFilter = filter
     }
     
     /// Navigate to previous month
@@ -125,5 +186,7 @@ class HistoryViewModel {
         selectedDate = Date()
         searchText = ""
         showingAddMetric = false
+        showingSettings = false
+        entryTypeFilter = .all
     }
 }

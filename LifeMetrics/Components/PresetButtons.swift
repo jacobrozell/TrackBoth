@@ -12,23 +12,24 @@ struct PresetButton: View {
                 Text(preset.title)
                     .font(.headline)
                     .fontWeight(.semibold)
+                    .foregroundColor(.currentText)
                 
                 Text(preset.description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                 
                 Text("\(preset.target) days")
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.currentPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(isSelected ? Color.blue.opacity(0.1) : Color(.systemGray6))
+            .background(isSelected ? Color.currentPrimary.opacity(0.1) : Color.currentSecondaryBackground)
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? Color.currentPrimary : Color.clear, lineWidth: 2)
             )
         }
         .buttonStyle(PlainButtonStyle())
@@ -46,23 +47,24 @@ struct QuantityPresetButton: View {
                 Text(preset.title)
                     .font(.headline)
                     .fontWeight(.semibold)
+                    .foregroundColor(.currentText)
                 
                 Text(preset.description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                 
                 Text("\(preset.target) \(preset.unit)")
                     .font(.caption)
                     .fontWeight(.medium)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.currentPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding()
-            .background(isSelected ? Color.blue.opacity(0.1) : Color(.systemGray6))
+            .background(isSelected ? Color.currentPrimary.opacity(0.1) : Color.currentSecondaryBackground)
             .cornerRadius(8)
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(isSelected ? Color.blue : Color.clear, lineWidth: 2)
+                    .stroke(isSelected ? Color.currentPrimary : Color.clear, lineWidth: 2)
             )
         }
         .buttonStyle(PlainButtonStyle())

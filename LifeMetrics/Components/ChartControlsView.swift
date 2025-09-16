@@ -14,7 +14,7 @@ struct ChartControlsView: View {
                 Text("Filter Data")
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                     .padding(.horizontal)
                 
                 if isLandscape {
@@ -41,7 +41,7 @@ struct ChartControlsView: View {
                 Text("Chart Type")
                     .font(.subheadline)
                     .fontWeight(.medium)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                     .padding(.horizontal)
                 
                 Picker("Chart Type", selection: $selectedChartType) {
@@ -54,7 +54,7 @@ struct ChartControlsView: View {
             }
         }
         .padding(.vertical)
-        .background(Color(.systemGray6).opacity(0.5))
+        .background(Color.currentSecondaryBackground.opacity(0.5))
     }
     
     @ViewBuilder

@@ -11,6 +11,7 @@ class MotivationViewModel {
     var selectedMetric: Metric?
     var showingAddMotivation = false
     var showingAddMetric = false
+    var showingSettings = false
     
     // MARK: - Computed Properties
     /// Entries with motivation content
@@ -69,6 +70,71 @@ class MotivationViewModel {
         !entriesWithContent(entries).isEmpty
     }
     
+    /// Vice metrics filtered from all metrics
+    func viceMetrics(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = metrics.filter { $0.safeHabitType == .vice }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Vice metrics filtering", duration: duration)
+        logger.debug("Vice metrics filtered: \(result.count) out of \(metrics.count)", category: .business)
+        return result
+    }
+    
+    /// Motivation entries filtered by selected metric
+    func motivationEntries(_ entries: [MetricEntry]) -> [MetricEntry] {
+        let startTime = Date()
+        let filteredEntries = entries.filter { entry in
+            entry.motivation != nil && !entry.motivation!.isEmpty
+        }
+        
+        let result: [MetricEntry]
+        if let selectedMetric = selectedMetric {
+            result = filteredEntries.filter { $0.metricID == selectedMetric.id }
+        } else {
+            result = filteredEntries
+        }
+        
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Motivation entries filtering", duration: duration)
+        logger.debug("Motivation entries filtered - Selected metric: \(selectedMetric?.name ?? "None"), Result: \(result.count) out of \(entries.count)", category: .business)
+        
+        return result
+    }
+    
+    /// Check if there are any motivations to display
+    func hasAnyMotivations(_ metrics: [Metric], entries: [MetricEntry]) -> Bool {
+        let motivationEntries = entriesWithMotivation(entries)
+        let primaryMotivations = metrics.filter { metric in
+            metric.primaryMotivation != nil && !metric.primaryMotivation!.isEmpty
+        }
+        return !motivationEntries.isEmpty || !primaryMotivations.isEmpty
+    }
+    
+    /// Primary motivations filtered by selected metric
+    func primaryMotivations(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = metrics.filter { metric in
+            metric.primaryMotivation != nil && !metric.primaryMotivation!.isEmpty &&
+            (selectedMetric == nil || metric.id == selectedMetric?.id)
+        }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Primary motivations filtering", duration: duration)
+        logger.debug("Primary motivations filtered - Selected metric: \(selectedMetric?.name ?? "None"), Result: \(result.count)", category: .business)
+        return result
+    }
+    
+    /// Daily motivations sorted by date
+    func dailyMotivations(_ entries: [MetricEntry]) -> [MetricEntry] {
+        let startTime = Date()
+        let result = motivationEntries(entries).filter {
+            $0.motivation != nil && !$0.motivation!.isEmpty
+        }.sorted { $0.date > $1.date }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Daily motivations filtering", duration: duration)
+        logger.debug("Daily motivations filtered: \(result.count)", category: .business)
+        return result
+    }
+    
     // MARK: - Actions
     /// Select a metric for motivation view
     func selectMetric(_ metric: Metric?) {
@@ -86,6 +152,12 @@ class MotivationViewModel {
     func showAddMetric() {
         logger.logUserAction("Show add metric")
         showingAddMetric = true
+    }
+    
+    /// Show settings sheet
+    func showSettings() {
+        logger.logUserAction("Show settings")
+        showingSettings = true
     }
     
     /// Add motivation to an entry
@@ -152,5 +224,6 @@ class MotivationViewModel {
         selectedMetric = nil
         showingAddMotivation = false
         showingAddMetric = false
+        showingSettings = false
     }
 }

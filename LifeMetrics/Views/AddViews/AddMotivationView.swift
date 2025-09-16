@@ -11,18 +11,18 @@ struct AddMotivationView: View {
     @State private var motivationText = ""
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     // Header section
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Add Motivation")
                             .font(.system(size: 28, weight: .bold))
-                            .foregroundColor(.primary)
+                            .foregroundColor(Color.currentText)
                         
                         Text("Write down your reasons for avoiding a vice. This will help you stay strong when you're struggling.")
                             .font(.system(size: 16, weight: .regular))
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                             .lineSpacing(2)
                     }
                     .padding(.top, 8)
@@ -31,14 +31,14 @@ struct AddMotivationView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Select Vice")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.primary)
+                            .foregroundColor(Color.currentText)
                         
                         Picker("Vice", selection: $selectedMetric) {
                             Text("Choose a vice to motivate against").tag(nil as Metric?)
                             ForEach(metrics) { metric in
                                 HStack(spacing: 12) {
                                     Image(systemName: metric.safeHabitType.icon)
-                                        .foregroundColor(.red)
+                                        .foregroundColor(Color.currentError)
                                         .font(.system(size: 16))
                                         .frame(width: 20)
                                     Text(metric.name)
@@ -51,11 +51,11 @@ struct AddMotivationView: View {
                         .padding(.vertical, 12)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color(.systemGray6))
+                                .fill(Color.currentSecondaryBackground)
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color(.systemGray4), lineWidth: 1)
+                                .stroke(Color.currentSecondaryBackground, lineWidth: 1)
                         )
                     }
                     
@@ -63,7 +63,7 @@ struct AddMotivationView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Your Motivation")
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.primary)
+                            .foregroundColor(Color.currentText)
                         
                         TextEditor(text: $motivationText)
                             .frame(minHeight: 200)
@@ -71,11 +71,11 @@ struct AddMotivationView: View {
                             .padding(16)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(.systemGray6))
+                                    .fill(Color.currentSecondaryBackground)
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(.systemGray4), lineWidth: 1)
+                                    .stroke(Color.currentSecondaryBackground, lineWidth: 1)
                             )
                             .overlay(
                                 // Placeholder text
@@ -85,7 +85,7 @@ struct AddMotivationView: View {
                                             HStack {
                                                 Text("Why do you want to avoid this vice?")
                                                     .font(.system(size: 16))
-                                                    .foregroundColor(.secondary)
+                                                    .foregroundColor(Color.currentSecondaryText)
                                                     .padding(.leading, 20)
                                                     .padding(.top, 24)
                                                 Spacer()

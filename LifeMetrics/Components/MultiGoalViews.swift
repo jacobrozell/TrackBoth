@@ -8,7 +8,6 @@ struct MultiGoalCardView: View {
     let entries: [MetricEntry]
     let goals: [Goal]
     @Environment(\.modelContext) private var modelContext
-    @State private var showingAddGoal = false
     
     private var metricGoals: [Goal] {
         goals.filter { $0.metric?.id == metric.id }
@@ -21,29 +20,21 @@ struct MultiGoalCardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
                             .font(.title3)
                         
                         Text(metric.name)
                             .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.currentText)
                     }
                     
                     Text("\(metricGoals.count) goal\(metricGoals.count == 1 ? "" : "s")")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                 }
                 
                 Spacer()
-                
-                Button {
-                    showingAddGoal = true
-                } label: {
-                    Image(systemName: "plus.circle")
-                        .foregroundColor(.blue)
-                        .font(.title2)
-                }
             }
             
             // Goals list
@@ -51,67 +42,12 @@ struct MultiGoalCardView: View {
                 ForEach(metricGoals, id: \.id) { goal in
                     GoalProgressRow(goal: goal, metric: metric, selectedDate: selectedDate, entries: entries)
                 }
-                
-                // Show available periods for adding new goals
-                if metricGoals.count < 8 { // Max 8 goals (2 types × 4 periods)
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Available periods:")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 4) {
-                            ForEach(GoalPeriod.allCases, id: \.self) { period in
-                                let hasBoolean = metricGoals.contains { $0.goalType == .boolean && $0.period == period }
-                                let hasMaxDaily = metricGoals.contains { $0.goalType == .quantity && $0.period == period && $0.quantityGoalType == .maxDaily }
-                                let hasAvgDaily = metricGoals.contains { $0.goalType == .quantity && $0.period == period && $0.quantityGoalType == .avgDaily }
-                                let hasTotalPeriod = metricGoals.contains { $0.goalType == .quantity && $0.period == period && $0.quantityGoalType == .totalPeriod }
-                                
-                                VStack(spacing: 2) {
-                                    Text(period.displayName)
-                                        .font(.caption2)
-                                        .fontWeight(.medium)
-                                    
-                                    HStack(spacing: 1) {
-                                        // Boolean goal
-                                        Circle()
-                                            .fill(hasBoolean ? Color.blue : Color.gray.opacity(0.3))
-                                            .frame(width: 4, height: 4)
-                                        
-                                        // Quantity goals
-                                        Circle()
-                                            .fill(hasMaxDaily ? Color.purple : Color.gray.opacity(0.3))
-                                            .frame(width: 4, height: 4)
-                                        Circle()
-                                            .fill(hasAvgDaily ? Color.orange : Color.gray.opacity(0.3))
-                                            .frame(width: 4, height: 4)
-                                        Circle()
-                                            .fill(hasTotalPeriod ? Color.green : Color.gray.opacity(0.3))
-                                            .frame(width: 4, height: 4)
-                                    }
-                                }
-                                .padding(4)
-                                .background(Color(.systemGray6))
-                                .cornerRadius(4)
-                            }
-                        }
-                        
-                        Text("Blue = Boolean, Purple = Max Daily, Orange = Avg Daily, Green = Total Period")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                }
             }
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
-        .sheet(isPresented: $showingAddGoal) {
-            AddGoalView(selectedMetric: metric)
-        }
     }
 }
 
@@ -136,17 +72,18 @@ struct GoalProgressRow: View {
                     Text(goalDescription)
                         .font(.subheadline)
                         .fontWeight(.medium)
+                        .foregroundColor(.currentText)
                     
                     Text(goal.period.displayName)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                 }
                 
                 Spacer()
                 
                 // Status indicator
                 Image(systemName: progress.percentage >= 1.0 ? "checkmark.circle.fill" : "circle")
-                    .foregroundColor(progress.percentage >= 1.0 ? .green : .gray)
+                    .foregroundColor(progress.percentage >= 1.0 ? .currentSuccess : .currentSecondaryText)
                     .font(.title3)
             }
             
@@ -156,7 +93,7 @@ struct GoalProgressRow: View {
                     Text(progressText)
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.currentText)
                     
                     Spacer()
                     
@@ -210,11 +147,11 @@ struct GoalProgressRow: View {
     
     private var progressColor: Color {
         if progress.percentage >= 1.0 {
-            return .green
+            return .currentSuccess
         } else if progress.percentage >= 0.7 {
-            return .orange
+            return .currentWarning
         } else {
-            return .red
+            return .currentError
         }
     }
 }

@@ -21,14 +21,14 @@ struct AddGoalView: View {
     @State private var quantityTarget: Int = 10
     @State private var quantityUnit: String = "times"
     @State private var selectedQuantityPreset: QuantityPreset?
-    @State private var showingConflictAlert = false
+    @State private var showingUnitPicker = false
     
     private var effectiveSelectedMetric: Metric? {
         return selectedMetric ?? pickerSelectedMetric
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 // Metric Selection (only show if no metric pre-selected)
                 if selectedMetric == nil {
@@ -38,7 +38,7 @@ struct AddGoalView: View {
                             ForEach(metricsWithoutGoals, id: \.id) { metric in
                                 HStack {
                                     Image(systemName: metric.safeHabitType.icon)
-                                        .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                                        .foregroundColor(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
                                     Text(metric.name)
                                 }
                                 .tag(metric as Metric?)
@@ -71,10 +71,23 @@ struct AddGoalView: View {
                     // Goal Type Selection
                     Section {
                         Picker("Goal Type", selection: $goalType) {
-                            Text("Boolean Goal").tag(GoalType.boolean)
-                            Text("Quantity Goal").tag(GoalType.quantity)
+                            ForEach(availableGoalTypes, id: \.self) { type in
+                                Text("\(type.displayName) Goal").tag(type)
+                            }
                         }
                         .pickerStyle(.segmented)
+                        .onAppear {
+                            // If current goal type is not available, switch to first available
+                            if !availableGoalTypes.contains(goalType) {
+                                goalType = availableGoalTypes.first ?? .boolean
+                            }
+                        }
+                        .onChange(of: effectiveSelectedMetric) { _, _ in
+                            // If current goal type is not available, switch to first available
+                            if !availableGoalTypes.contains(goalType) {
+                                goalType = availableGoalTypes.first ?? .boolean
+                            }
+                        }
                     } header: {
                         Text("Goal Type")
                     } footer: {
@@ -92,10 +105,8 @@ struct AddGoalView: View {
             }
             .navigationTitle("Add Goal")
             .navigationBarTitleDisplayMode(.inline)
-            .alert("Goal Conflict", isPresented: $showingConflictAlert) {
-                Button("OK") { }
-            } message: {
-                Text("You already have a \(goalType.displayName.lowercased()) goal for \(selectedPeriod.displayName.lowercased()). Please choose a different period or goal type.")
+            .sheet(isPresented: $showingUnitPicker) {
+                UnitPickerSheet(selectedUnit: $quantityUnit, units: commonUnits)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -106,13 +117,9 @@ struct AddGoalView: View {
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Save") {
-                        if hasConflict {
-                            showingConflictAlert = true
-                        } else {
-                            saveGoal()
-                        }
+                        saveGoal()
                     }
-                    .disabled(effectiveSelectedMetric == nil || hasConflict)
+                    .disabled(effectiveSelectedMetric == nil)
                 }
             }
         }
@@ -128,35 +135,43 @@ struct AddGoalView: View {
     
     private var hasConflict: Bool {
         guard let metric = effectiveSelectedMetric else { return false }
-        return metric.goals?.contains { goal in
-            if goal.goalType == .boolean && goalType == .boolean {
-                // Boolean goals: same type + period = conflict
-                return goal.period == selectedPeriod
-            } else if goal.goalType == .quantity && goalType == .quantity {
-                // Quantity goals: same type + period + quantityGoalType = conflict
-                return goal.period == selectedPeriod && goal.quantityGoalType == quantityGoalType
-            } else {
-                // Different goal types = no conflict
-                return false
+        
+        // Check if metric already has a goal of the same type (regardless of period)
+        if goalType == .boolean {
+            return metric.booleanGoals.count > 0
+        } else if goalType == .quantity {
+            return metric.quantityGoals.count > 0
+        }
+        
+        return false
+    }
+    
+    private var availableGoalTypes: [GoalType] {
+        guard let metric = effectiveSelectedMetric else { return GoalType.allCases }
+        
+        return GoalType.allCases.filter { goalType in
+            switch goalType {
+            case .boolean:
+                return metric.booleanGoals.count == 0
+            case .quantity:
+                return metric.quantityGoals.count == 0
             }
-        } ?? false
+        }
     }
     
     private var availablePeriods: [GoalPeriod] {
-        guard let metric = effectiveSelectedMetric else { return GoalPeriod.allCases }
-        return GoalPeriod.allCases.filter { period in
-            !(metric.goals?.contains { goal in
-                if goal.goalType == .boolean && goalType == .boolean {
-                    // Boolean goals: same type + period = conflict
-                    return goal.period == period
-                } else if goal.goalType == .quantity && goalType == .quantity {
-                    // Quantity goals: same type + period + quantityGoalType = conflict
-                    return goal.period == period && goal.quantityGoalType == quantityGoalType
-                } else {
-                    // Different goal types = no conflict
-                    return false
-                }
-            } ?? false)
+        // Since we only allow 1 goal per type, all periods are available
+        return GoalPeriod.allCases
+    }
+    
+    private var commonUnits: [String] {
+        guard let metric = effectiveSelectedMetric else { return ["times", "minutes", "hours", "pages", "glasses", "servings", "sets", "reps"] }
+        
+        switch metric.safeHabitType {
+        case .positive:
+            return ["times", "minutes", "hours", "pages", "glasses", "servings", "sets", "reps"]
+        case .vice:
+            return ["times", "minutes", "hours", "servings"]
         }
     }
     
@@ -189,16 +204,17 @@ struct AddGoalView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .onChange(of: selectedPeriod) { _, newPeriod in
+                    // Clamp customTarget to new period's bounds when period changes
+                    if customTarget > newPeriod.maxDays {
+                        customTarget = newPeriod.maxDays
+                        selectedPreset = nil // Clear selected preset since target changed
+                    }
+                }
             } header: {
                 Text("Goal Period")
             } footer: {
-                if hasConflict {
-                    Text("⚠️ You already have a \(goalType.displayName.lowercased()) goal for \(selectedPeriod.displayName.lowercased())")
-                        .foregroundColor(.red)
-                } else if availablePeriods.isEmpty {
-                    Text("All periods are taken for \(goalType.displayName.lowercased()) goals")
-                        .foregroundColor(.orange)
-                }
+                Text("Choose the period for your goal")
             }
             
             // Preset Options
@@ -227,23 +243,23 @@ struct AddGoalView: View {
                         Spacer()
                         Text("\(customTarget) days")
                             .font(.headline)
-                            .foregroundColor(.blue)
+                            .foregroundColor(Color.currentPrimary)
                     }
                     
                     Slider(value: Binding(
                         get: { Double(customTarget) },
                         set: { customTarget = Int($0) }
                     ), in: 1.0...Double(maxTarget), step: 1.0)
-                    .accentColor(.blue)
+                    .accentColor(Color.currentPrimary)
                     
                     HStack {
                         Text("1")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                         Spacer()
                         Text("\(maxTarget)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                 }
             } header: {
@@ -256,18 +272,11 @@ struct AddGoalView: View {
         VStack(spacing: 16) {
             // Quantity Goal Type
             Section {
-                Picker("Goal Type", selection: $quantityGoalType) {
+                VStack(spacing: 12) {
                     ForEach(QuantityGoalType.allCases, id: \.self) { type in
-                        VStack(alignment: .leading) {
-                            Text(type.displayName)
-                            Text(type.description)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .tag(type)
+                        quantityGoalTypeButton(for: type)
                     }
                 }
-                .pickerStyle(.wheel)
             } header: {
                 Text("Quantity Goal Type")
             } footer: {
@@ -299,26 +308,37 @@ struct AddGoalView: View {
                     }
                 }
                 .pickerStyle(.segmented)
+                .onChange(of: selectedPeriod) { _, newPeriod in
+                    // Clamp quantityTarget to new period's bounds when period changes
+                    if quantityTarget > quantityMaxTarget {
+                        quantityTarget = quantityMaxTarget
+                        selectedQuantityPreset = nil // Clear selected preset since target changed
+                    }
+                }
             } header: {
                 Text("Goal Period")
-            } footer: {
-                if hasConflict {
-                    Text("⚠️ You already have a \(goalType.displayName.lowercased()) goal for \(selectedPeriod.displayName.lowercased())")
-                        .foregroundColor(.red)
-                } else if availablePeriods.isEmpty {
-                    Text("All periods are taken for \(goalType.displayName.lowercased()) goals")
-                        .foregroundColor(.orange)
-                }
             }
             
             // Unit Selection
             Section {
-                TextField("Unit (e.g., times, minutes, pages)", text: $quantityUnit)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                Button(action: {
+                    showingUnitPicker = true
+                }) {
+                    HStack {
+                        Text(quantityUnit.isEmpty ? "Select Unit" : quantityUnit)
+                            .foregroundColor(quantityUnit.isEmpty ? Color.currentSecondaryText : Color.currentText)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(Color.currentSecondaryText)
+                            .font(.caption)
+                    }
+                    .padding(.vertical, 8)
+                }
+                .buttonStyle(PlainButtonStyle())
             } header: {
                 Text("Unit")
             } footer: {
-                Text("What unit do you want to track? (e.g., times, minutes, pages, cups)")
+                Text("Choose a unit to track your progress")
             }
             
             // Target Selection
@@ -330,23 +350,23 @@ struct AddGoalView: View {
                         Spacer()
                         Text("\(quantityTarget) \(quantityUnit)")
                             .font(.headline)
-                            .foregroundColor(.blue)
+                            .foregroundColor(Color.currentPrimary)
                     }
                     
                     Slider(value: Binding(
                         get: { Double(quantityTarget) },
                         set: { quantityTarget = Int($0) }
                     ), in: 1.0...Double(quantityMaxTarget), step: 1.0)
-                    .accentColor(.blue)
+                    .accentColor(Color.currentPrimary)
                     
                     HStack {
                         Text("1")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                         Spacer()
                         Text("\(quantityMaxTarget)")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                 }
             } header: {
@@ -428,5 +448,54 @@ struct AddGoalView: View {
         modelContext.insert(newGoal)
         try? modelContext.save()
         dismiss()
+    }
+    
+    // MARK: - Helper Views
+    
+    @ViewBuilder
+    private func quantityGoalTypeButton(for type: QuantityGoalType) -> some View {
+        let isSelected = quantityGoalType == type
+        
+        Button(action: {
+            quantityGoalType = type
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: type.icon)
+                    .foregroundColor(isSelected ? .white : Color.currentPrimary)
+                    .frame(width: 20)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(type.displayName)
+                        .font(.headline)
+                        .foregroundColor(isSelected ? .white : Color.currentText)
+                    
+                    Text(type.description)
+                        .font(.caption)
+                        .foregroundColor(isSelected ? .white.opacity(0.8) : Color.currentSecondaryText)
+                }
+                
+                Spacer()
+                
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundColor(.white)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(buttonBackground(isSelected: isSelected))
+            .overlay(buttonOverlay(isSelected: isSelected))
+        }
+        .buttonStyle(PlainButtonStyle())
+    }
+    
+    private func buttonBackground(isSelected: Bool) -> some View {
+        RoundedRectangle(cornerRadius: 12)
+            .fill(isSelected ? Color.currentPrimary : Color.currentSecondaryBackground)
+    }
+    
+    private func buttonOverlay(isSelected: Bool) -> some View {
+        RoundedRectangle(cornerRadius: 12)
+            .stroke(isSelected ? Color.currentPrimary : Color.currentSecondaryBackground, lineWidth: 1)
     }
 }

@@ -36,16 +36,17 @@ struct EditableEntryCell: View {
                     Text(dateFormatter.string(from: entry.date))
                         .font(.subheadline)
                         .fontWeight(.medium)
+                        .foregroundColor(.currentText)
                     
                     HStack(spacing: 4) {
                         // Focus on boolean status - show traditional status
                         Image(systemName: entry.value ? (isVice ? "xmark.circle.fill" : "checkmark.circle.fill") : (isVice ? "checkmark.circle.fill" : "xmark.circle.fill"))
-                            .foregroundColor(entry.value ? (isVice ? .red : .green) : (isVice ? .green : .red))
+                            .foregroundColor(entry.value ? (isVice ? .currentError : .currentSuccess) : (isVice ? .currentSuccess : .currentError))
                             .font(.caption)
                         
                         Text(entry.value ? (isVice ? "Did it" : "Done") : (isVice ? "Avoided" : "Skipped"))
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.currentSecondaryText)
                     }
                     
                     // Metric name and quantity - small and unobtrusive
@@ -53,19 +54,19 @@ struct EditableEntryCell: View {
                         HStack(spacing: 4) {
                             Text(metric.name)
                                 .font(.caption2)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                                 .opacity(0.7)
                             
                             if let quantityString = entry.quantityString {
                                 Text(quantityString)
                                     .font(.caption2)
                                     .fontWeight(.medium)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.currentSecondaryText)
                                     .padding(.horizontal, 4)
                                     .padding(.vertical, 1)
                                     .background(
                                         RoundedRectangle(cornerRadius: 4)
-                                            .fill(Color(.systemGray5))
+                                            .fill(Color.currentSecondaryBackground)
                                     )
                             }
                         }
@@ -85,7 +86,7 @@ struct EditableEntryCell: View {
                 } label: {
                     Image(systemName: "pencil")
                         .font(.caption)
-                        .foregroundColor(.accentColor)
+                        .foregroundColor(.currentAccent)
                 }
             }
             
@@ -93,7 +94,7 @@ struct EditableEntryCell: View {
             if let details = entry.details, !details.isEmpty {
                 Text(details)
                     .font(.body)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.currentText)
                     .padding(.vertical, 4)
             }
             
@@ -101,13 +102,13 @@ struct EditableEntryCell: View {
             if let motivation = entry.motivation, !motivation.isEmpty {
                 Text(motivation)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                     .italic()
                     .padding(.vertical, 2)
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.currentBackground)
         .cornerRadius(12)
         .sheet(isPresented: $isEditing) {
             EditEntryView(

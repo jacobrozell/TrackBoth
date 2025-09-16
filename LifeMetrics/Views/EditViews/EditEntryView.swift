@@ -27,7 +27,7 @@ struct EditEntryView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
@@ -37,12 +37,12 @@ struct EditEntryView: View {
                     
                     Text(dateFormatter.string(from: entry.date))
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                     
                     if let metric = metric {
                         Text(metric.name)
                             .font(.headline)
-                            .foregroundColor(.primary)
+                            .foregroundColor(Color.currentText)
                     }
                 }
                 
@@ -55,7 +55,7 @@ struct EditEntryView: View {
                         Text(editingValue ? (isVice ? "Avoided" : "Done") : (isVice ? "Did it" : "Skipped"))
                             .font(.body)
                     }
-                    .toggleStyle(SwitchToggleStyle(tint: isVice ? .red : .green))
+                    .toggleStyle(SwitchToggleStyle(tint: isVice ? Color.currentError : Color.currentSuccess))
                 }
                 
                 // Quantity section
@@ -73,14 +73,14 @@ struct EditEntryView: View {
                             } label: {
                                 Image(systemName: "minus.circle.fill")
                                     .font(.title2)
-                                    .foregroundColor(editingQuantity > 0 ? .blue : .gray)
+                                    .foregroundColor(editingQuantity > 0 ? Color.currentPrimary : Color.currentSecondaryText)
                             }
                             .disabled(editingQuantity <= 0)
                             
                             Text("\(editingQuantity)")
                                 .font(.title2)
                                 .fontWeight(.bold)
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color.currentPrimary)
                                 .frame(minWidth: 40)
                             
                             Button {
@@ -88,7 +88,7 @@ struct EditEntryView: View {
                             } label: {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title2)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color.currentPrimary)
                             }
                         }
                         

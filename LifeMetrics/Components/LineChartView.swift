@@ -82,14 +82,15 @@ struct LineChartView: View {
             HStack {
                 Text(chartTitle)
                     .font(.headline)
+                    .foregroundColor(.currentText)
                 Spacer()
                 if chartData.count < 7 {
                     Text("Building momentum...")
                         .font(.caption)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.currentWarning)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.orange.opacity(0.1))
+                        .background(Color.currentWarning.opacity(0.1))
                         .cornerRadius(8)
                 }
             }
@@ -98,10 +99,10 @@ struct LineChartView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .font(.system(size: 40))
-                        .foregroundColor(.gray.opacity(0.6))
+                        .foregroundColor(.currentSecondaryText.opacity(0.6))
                     
                     Text(emptyStateMessage)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .frame(height: 200)
@@ -112,14 +113,14 @@ struct LineChartView: View {
                             x: .value("Date", dataPoint.date),
                             y: .value("Count", dataPoint.value)
                         )
-                        .foregroundStyle(.blue.gradient)
+                        .foregroundStyle(Color.currentPrimary.gradient)
                         .lineStyle(StrokeStyle(lineWidth: 3))
                         
                         AreaMark(
                             x: .value("Date", dataPoint.date),
                             y: .value("Count", dataPoint.value)
                         )
-                        .foregroundStyle(.blue.opacity(0.2))
+                        .foregroundStyle(Color.currentPrimary.opacity(0.2))
                     }
                     .frame(height: 120)
                     .opacity(animateChart ? 1.0 : 0.0)
@@ -127,7 +128,7 @@ struct LineChartView: View {
                     
                     Text("Great start! Keep going to see trends emerge")
                         .font(.caption)
-                        .foregroundColor(.blue)
+                        .foregroundColor(.currentPrimary)
                         .multilineTextAlignment(.center)
                 }
                 .frame(height: 200)
@@ -138,14 +139,14 @@ struct LineChartView: View {
                             x: .value("Date", dataPoint.date),
                             y: .value("Count", dataPoint.value)
                         )
-                        .foregroundStyle(.blue.gradient)
+                        .foregroundStyle(Color.currentPrimary.gradient)
                         .lineStyle(StrokeStyle(lineWidth: 3))
                         
                         AreaMark(
                             x: .value("Date", dataPoint.date),
                             y: .value("Count", dataPoint.value)
                         )
-                        .foregroundStyle(.blue.opacity(0.2))
+                        .foregroundStyle(Color.currentPrimary.opacity(0.2))
                     }
                     .frame(height: 180)
                     .opacity(animateChart ? 1.0 : 0.0)
@@ -156,17 +157,17 @@ struct LineChartView: View {
                         let progress = latest.value - first.value
                         HStack {
                             Image(systemName: progress > 0 ? "arrow.up.right" : progress < 0 ? "arrow.down.right" : "minus")
-                                .foregroundColor(progress > 0 ? .green : progress < 0 ? .red : .gray)
+                                .foregroundColor(progress > 0 ? .currentSuccess : progress < 0 ? .currentError : .currentSecondaryText)
                             Text("\(progress > 0 ? "+" : "")\(progress) habits since start")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                         }
                     }
                 }
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.currentBackground)
         .cornerRadius(12)
         .onAppear {
             animateChart = true

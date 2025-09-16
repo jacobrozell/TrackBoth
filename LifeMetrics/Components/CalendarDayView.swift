@@ -63,7 +63,7 @@ struct CalendarDayView: View {
             Text(dayNumber)
                 .font(.caption)
                 .fontWeight(isToday ? .bold : .regular)
-                .foregroundColor(isCurrentMonth ? .primary : .secondary)
+                .foregroundColor(isCurrentMonth ? Color.currentText : Color.currentSecondaryText)
             
             if hasEntry {
                 // Show appropriate color based on entry type and metric type
@@ -75,24 +75,24 @@ struct CalendarDayView: View {
                     // Focus on boolean status - if they did it (value = true), show success color
                     if entry.value {
                         Circle()
-                            .fill(metric.safeHabitType == .positive ? .green : .red)
+                            .fill(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
                             .frame(width: 6, height: 6)
                     } else {
                         // For failed entries
                         Circle()
-                            .fill(metric.safeHabitType == .positive ? .red : .green)
+                            .fill(metric.safeHabitType == .positive ? Color.currentError : Color.currentSuccess)
                             .frame(width: 6, height: 6)
                     }
                 } else {
                     // Fallback
                     Circle()
-                        .fill(Color.green)
+                        .fill(Color.currentSuccess)
                         .frame(width: 6, height: 6)
                 }
             } else if !entries.isEmpty {
                 // Show red for entries that exist but don't meet hasEntry criteria
                 Circle()
-                    .fill(Color.red)
+                    .fill(Color.currentError)
                     .frame(width: 6, height: 6)
             }
             
@@ -101,7 +101,7 @@ struct CalendarDayView: View {
                 if let details = entry.details, !details.isEmpty {
                     Text(details)
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 2)
@@ -109,7 +109,7 @@ struct CalendarDayView: View {
                     Text(quantityString)
                         .font(.caption2)
                         .fontWeight(.medium)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                         .lineLimit(1)
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 2)
@@ -119,7 +119,7 @@ struct CalendarDayView: View {
         .frame(minHeight: 40)
         .background(
             RoundedRectangle(cornerRadius: 8)
-                .fill(isToday ? Color.accentColor.opacity(0.2) : Color.clear)
+                .fill(isToday ? Color.currentAccent.opacity(0.2) : Color.clear)
         )
     }
 }

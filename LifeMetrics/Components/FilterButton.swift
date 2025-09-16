@@ -19,8 +19,8 @@ struct FilterButton: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(isSelected ? Color.accentColor : Color.gray.opacity(0.2))
-            .foregroundColor(isSelected ? .white : .primary)
+            .background(isSelected ? Color.currentAccent : Color.currentSecondaryText.opacity(0.2))
+            .foregroundColor(isSelected ? .white : Color.currentText)
             .clipShape(Capsule())
         }
     }

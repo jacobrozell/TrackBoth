@@ -51,17 +51,18 @@ struct QuantityInputSheet: View {
                 VStack(spacing: 8) {
                     HStack {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(isVice ? .red : .green)
+                            .foregroundColor(isVice ? .currentError : .currentSuccess)
                             .font(.title2)
                         
                         Text(metric.name)
                             .font(.title2)
                             .fontWeight(.semibold)
+                            .foregroundColor(.currentText)
                     }
                     
                     Text(DateFormatter.dayFormatter.string(from: selectedDate))
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                 }
                 .padding(.top, 16)
                 
@@ -83,7 +84,7 @@ struct QuantityInputSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                     
                     Spacer()
                     
@@ -93,7 +94,7 @@ struct QuantityInputSheet: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
-                    .background(isVice ? Color.orange : Color.blue)
+                    .background(isVice ? Color.currentWarning : Color.currentPrimary)
                     .cornerRadius(8)
                     .fontWeight(.medium)
                 }
@@ -120,10 +121,11 @@ struct QuantityInputSheet: View {
             HStack {
                 Text("Status:")
                     .font(.headline)
+                    .foregroundColor(.currentText)
                 Spacer()
                 Text("Avoided ✓")
                     .font(.headline)
-                    .foregroundColor(.green)
+                    .foregroundColor(.currentSuccess)
             }
             .padding(.horizontal, 20)
             
@@ -133,15 +135,16 @@ struct QuantityInputSheet: View {
             VStack(spacing: 8) {
                 HStack {
                     Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundColor(.orange)
+                        .foregroundColor(.currentWarning)
                     Text("If you did \(metric.name.lowercased()) today:")
                         .font(.subheadline)
                         .fontWeight(.medium)
+                        .foregroundColor(.currentText)
                 }
                 
                 Text("Remember: Your goal is to reduce this habit")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                     .multilineTextAlignment(.center)
             }
             .padding(.horizontal, 20)
@@ -151,6 +154,7 @@ struct QuantityInputSheet: View {
                 HStack {
                     Text("Amount:")
                         .font(.headline)
+                        .foregroundColor(.currentText)
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -165,14 +169,14 @@ struct QuantityInputSheet: View {
                         } label: {
                             Image(systemName: "minus.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(quantity > 1 ? .orange : .gray)
+                                .foregroundColor(quantity > 1 ? .currentWarning : .currentSecondaryText)
                         }
                         .disabled(quantity <= 1)
                         
                         Text("\(quantity)")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.orange)
+                            .foregroundColor(.currentWarning)
                             .frame(minWidth: 40)
                         
                         Button {
@@ -182,7 +186,7 @@ struct QuantityInputSheet: View {
                         } label: {
                             Image(systemName: "plus.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(quantity < maxQuantity ? .orange : .gray)
+                                .foregroundColor(quantity < maxQuantity ? .currentWarning : .currentSecondaryText)
                         }
                         .disabled(quantity >= maxQuantity)
                     }
@@ -195,13 +199,13 @@ struct QuantityInputSheet: View {
                     } label: {
                         HStack {
                             Text(unit.isEmpty ? "times" : unit)
-                                .foregroundColor(.primary)
+                                .foregroundColor(.currentText)
                             Image(systemName: "chevron.down")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(Color(.systemGray6))
+                        .background(Color.currentSecondaryBackground)
                         .cornerRadius(8)
                     }
                 }
@@ -217,12 +221,12 @@ struct QuantityInputSheet: View {
                                 Text("\(preset)")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                    .foregroundColor(quantity == preset ? .white : .orange)
+                                    .foregroundColor(quantity == preset ? .white : .currentWarning)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
                                     .background(
                                         RoundedRectangle(cornerRadius: 16)
-                                            .fill(quantity == preset ? Color.orange : Color.orange.opacity(0.2))
+                                            .fill(quantity == preset ? Color.currentWarning : Color.currentWarning.opacity(0.2))
                                     )
                             }
                         }
@@ -241,6 +245,7 @@ struct QuantityInputSheet: View {
                 HStack {
                     Text("Quantity:")
                         .font(.headline)
+                        .foregroundColor(.currentText)
                     Spacer()
                 }
                 .padding(.horizontal, 20)
@@ -255,14 +260,14 @@ struct QuantityInputSheet: View {
                         } label: {
                             Image(systemName: "minus.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(quantity > 1 ? .blue : .gray)
+                                .foregroundColor(quantity > 1 ? .currentPrimary : .currentSecondaryText)
                         }
                         .disabled(quantity <= 1)
                         
                         Text("\(quantity)")
                             .font(.title)
                             .fontWeight(.bold)
-                            .foregroundColor(.blue)
+                            .foregroundColor(.currentPrimary)
                             .frame(minWidth: 40)
                         
                         Button {
@@ -272,7 +277,7 @@ struct QuantityInputSheet: View {
                         } label: {
                             Image(systemName: "plus.circle.fill")
                                 .font(.title2)
-                                .foregroundColor(quantity < maxQuantity ? .blue : .gray)
+                                .foregroundColor(quantity < maxQuantity ? .currentPrimary : .currentSecondaryText)
                         }
                         .disabled(quantity >= maxQuantity)
                     }
@@ -285,13 +290,13 @@ struct QuantityInputSheet: View {
                     } label: {
                         HStack {
                             Text(unit.isEmpty ? "times" : unit)
-                                .foregroundColor(.primary)
+                                .foregroundColor(.currentText)
                             Image(systemName: "chevron.down")
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
-                        .background(Color(.systemGray6))
+                        .background(Color.currentSecondaryBackground)
                         .cornerRadius(8)
                     }
                 }
@@ -307,12 +312,12 @@ struct QuantityInputSheet: View {
                                 Text("\(preset)")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                    .foregroundColor(quantity == preset ? .white : .blue)
+                                    .foregroundColor(quantity == preset ? .white : .currentPrimary)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
                                     .background(
                                         RoundedRectangle(cornerRadius: 16)
-                                            .fill(quantity == preset ? Color.blue : Color.blue.opacity(0.2))
+                                            .fill(quantity == preset ? Color.currentPrimary : Color.currentPrimary.opacity(0.2))
                                     )
                             }
                         }
@@ -379,11 +384,11 @@ struct UnitPickerSheet: View {
                     } label: {
                         HStack {
                             Text(unit)
-                                .foregroundColor(.primary)
+                                .foregroundColor(.currentText)
                             Spacer()
                             if selectedUnit == unit {
                                 Image(systemName: "checkmark")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.currentPrimary)
                             }
                         }
                     }
@@ -395,9 +400,9 @@ struct UnitPickerSheet: View {
                 } label: {
                     HStack {
                         Image(systemName: "plus.circle")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.currentPrimary)
                         Text("Custom Unit")
-                            .foregroundColor(.blue)
+                            .foregroundColor(.currentPrimary)
                         Spacer()
                     }
                 }

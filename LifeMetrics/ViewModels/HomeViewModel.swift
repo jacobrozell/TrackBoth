@@ -69,6 +69,11 @@ class HomeViewModel {
         return daysBack < 7 // Allow going back up to 7 days
     }
     
+    /// Whether user can navigate to next day
+    var canGoForward: Bool {
+        return !isToday
+    }
+    
     /// Whether selected date is today
     var isToday: Bool {
         Calendar.current.isDate(selectedDate, inSameDayAs: Date())

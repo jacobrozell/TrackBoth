@@ -17,18 +17,18 @@ struct EnhancedGoalCardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
                             .font(.title3)
                         
                         Text(metric.name)
                             .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.currentText)
                     }
                     
                     Text(goalDescription)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                 }
                 
                 Spacer()
@@ -43,7 +43,7 @@ struct EnhancedGoalCardView: View {
                     Text("Progress")
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.currentText)
                     
                     Spacer()
                     
@@ -56,7 +56,7 @@ struct EnhancedGoalCardView: View {
                 // Enhanced progress bar
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color(.systemGray5))
+                        .fill(Color.currentSecondaryBackground)
                         .frame(height: 8)
                     
                     RoundedRectangle(cornerRadius: 4)
@@ -70,10 +70,10 @@ struct EnhancedGoalCardView: View {
                     HStack {
                         Image(systemName: "clock")
                             .font(.caption2)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.currentSecondaryText)
                         Text(timeRemaining)
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(.currentSecondaryText)
                     }
                 }
             }
@@ -90,10 +90,10 @@ struct EnhancedGoalCardView: View {
                 }
                 .font(.caption)
                 .fontWeight(.medium)
-                .foregroundColor(.purple)
+                .foregroundColor(.currentAccent)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Color.purple.opacity(0.1))
+                .background(Color.currentAccent.opacity(0.1))
                 .cornerRadius(6)
                 
                 Spacer()
@@ -103,15 +103,15 @@ struct EnhancedGoalCardView: View {
                 }
                 .font(.caption)
                 .fontWeight(.medium)
-                .foregroundColor(.blue)
+                .foregroundColor(.currentPrimary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Color.blue.opacity(0.1))
+                .background(Color.currentPrimary.opacity(0.1))
                 .cornerRadius(6)
             }
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .overlay(
@@ -136,61 +136,61 @@ struct EnhancedGoalCardView: View {
         VStack(spacing: 4) {
             if progressValue >= 1.0 {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(.currentSuccess)
                     .font(.title2)
                 
                 Text("Complete")
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.green)
+                    .foregroundColor(.currentSuccess)
             } else if progressValue >= 0.7 {
                 Image(systemName: "clock.circle.fill")
-                    .foregroundColor(.orange)
+                    .foregroundColor(.currentWarning)
                     .font(.title2)
                 
                 Text("On Track")
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.orange)
+                    .foregroundColor(.currentWarning)
             } else {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.red)
+                    .foregroundColor(.currentError)
                     .font(.title2)
                 
                 Text("Behind")
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.red)
+                    .foregroundColor(.currentError)
             }
         }
     }
     
     private var borderColor: Color {
         if progressValue >= 1.0 {
-            return .green.opacity(0.3)
+            return .currentSuccess.opacity(0.3)
         } else if progressValue >= 0.7 {
-            return .orange.opacity(0.3)
+            return .currentWarning.opacity(0.3)
         } else {
-            return .red.opacity(0.3)
+            return .currentError.opacity(0.3)
         }
     }
     
     private var historicalSuccessIndicator: some View {
         HStack {
             Image(systemName: wasGoalAchieved ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .foregroundColor(wasGoalAchieved ? .green : .red)
+                .foregroundColor(wasGoalAchieved ? .currentSuccess : .currentError)
                 .font(.title3)
             
             Text(wasGoalAchieved ? "Goal achieved this week!" : "Goal not achieved this week")
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundColor(wasGoalAchieved ? .green : .red)
+                .foregroundColor(wasGoalAchieved ? .currentSuccess : .currentError)
             
             Spacer()
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .background((wasGoalAchieved ? Color.green : Color.red).opacity(0.1))
+        .background((wasGoalAchieved ? Color.currentSuccess : Color.currentError).opacity(0.1))
         .cornerRadius(8)
     }
     
@@ -227,11 +227,11 @@ struct EnhancedGoalCardView: View {
     private var progressColor: Color {
         let progress = progressValue
         if progress >= 1.0 {
-            return .green
+            return .currentSuccess
         } else if progress >= 0.7 {
-            return .orange
+            return .currentWarning
         } else {
-            return .red
+            return .currentError
         }
     }
     
@@ -286,13 +286,13 @@ struct QuantityGoalCardView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
                             .font(.title3)
                         
                         Text(metric.name)
                             .font(.headline)
                             .fontWeight(.bold)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.currentText)
                     }
                     
                     Text(quantityGoalDescription)
@@ -312,7 +312,7 @@ struct QuantityGoalCardView: View {
                     Text("Progress")
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.currentText)
                     
                     Spacer()
                     
@@ -325,7 +325,7 @@ struct QuantityGoalCardView: View {
                 // Enhanced progress bar
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 4)
-                        .fill(Color(.systemGray5))
+                        .fill(Color.currentSecondaryBackground)
                         .frame(height: 8)
                     
                     RoundedRectangle(cornerRadius: 4)
@@ -359,10 +359,10 @@ struct QuantityGoalCardView: View {
                 }
                 .font(.caption)
                 .fontWeight(.medium)
-                .foregroundColor(.purple)
+                .foregroundColor(.currentAccent)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Color.purple.opacity(0.1))
+                .background(Color.currentAccent.opacity(0.1))
                 .cornerRadius(6)
                 
                 Spacer()
@@ -372,15 +372,15 @@ struct QuantityGoalCardView: View {
                 }
                 .font(.caption)
                 .fontWeight(.medium)
-                .foregroundColor(.blue)
+                .foregroundColor(.currentPrimary)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(Color.blue.opacity(0.1))
+                .background(Color.currentPrimary.opacity(0.1))
                 .cornerRadius(6)
             }
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(16)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .overlay(
@@ -405,61 +405,61 @@ struct QuantityGoalCardView: View {
         VStack(spacing: 4) {
             if progressValue >= 1.0 {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(.currentSuccess)
                     .font(.title2)
                 
                 Text("Complete")
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.green)
+                    .foregroundColor(.currentSuccess)
             } else if progressValue >= 0.7 {
                 Image(systemName: "clock.circle.fill")
-                    .foregroundColor(.orange)
+                    .foregroundColor(.currentWarning)
                     .font(.title2)
                 
                 Text("On Track")
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.orange)
+                    .foregroundColor(.currentWarning)
             } else {
                 Image(systemName: "exclamationmark.circle.fill")
-                    .foregroundColor(.red)
+                    .foregroundColor(.currentError)
                     .font(.title2)
                 
                 Text("Behind")
                     .font(.caption2)
                     .fontWeight(.semibold)
-                    .foregroundColor(.red)
+                    .foregroundColor(.currentError)
             }
         }
     }
     
     private var borderColor: Color {
         if progressValue >= 1.0 {
-            return .green.opacity(0.3)
+            return .currentSuccess.opacity(0.3)
         } else if progressValue >= 0.7 {
-            return .orange.opacity(0.3)
+            return .currentWarning.opacity(0.3)
         } else {
-            return .red.opacity(0.3)
+            return .currentError.opacity(0.3)
         }
     }
     
     private var historicalSuccessIndicator: some View {
         HStack {
             Image(systemName: wasGoalAchieved ? "checkmark.circle.fill" : "xmark.circle.fill")
-                .foregroundColor(wasGoalAchieved ? .green : .red)
+                .foregroundColor(wasGoalAchieved ? .currentSuccess : .currentError)
                 .font(.title3)
             
             Text(wasGoalAchieved ? "Goal achieved this week!" : "Goal not achieved this week")
                 .font(.subheadline)
                 .fontWeight(.medium)
-                .foregroundColor(wasGoalAchieved ? .green : .red)
+                .foregroundColor(wasGoalAchieved ? .currentSuccess : .currentError)
             
             Spacer()
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .background((wasGoalAchieved ? Color.green : Color.red).opacity(0.1))
+        .background((wasGoalAchieved ? Color.currentSuccess : Color.currentError).opacity(0.1))
         .cornerRadius(8)
     }
     
@@ -503,11 +503,11 @@ struct QuantityGoalCardView: View {
     private var progressColor: Color {
         let progress = progressValue
         if progress >= 1.0 {
-            return .green
+            return .currentSuccess
         } else if progress >= 0.7 {
-            return .orange
+            return .currentWarning
         } else {
-            return .red
+            return .currentError
         }
     }
     
@@ -555,7 +555,7 @@ struct EditQuantityGoalView: View {
                 
                 Text("Coming Soon")
                     .font(.body)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                 
                 Spacer()
             }

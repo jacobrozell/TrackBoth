@@ -34,19 +34,19 @@ struct MotivationCardView: View {
                     if let metric = metric {
                         HStack(spacing: 8) {
                             Image(systemName: metric.safeHabitType.icon)
-                                .foregroundColor(.red)
+                                .foregroundColor(.currentError)
                                 .font(.system(size: 16, weight: .medium))
                                 .frame(width: 20)
                             
                             Text(metric.name)
                                 .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(.primary)
+                                .foregroundColor(.currentText)
                         }
                     }
                     
                     Text("\(dayOfWeek) • \(timeAgo)")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .padding(.leading, 28) // Align with metric name
                 }
                 
@@ -54,9 +54,9 @@ struct MotivationCardView: View {
                 
                 // Success indicator with better size
                 Image(systemName: isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundColor(isSuccess ? Color.green : Color.red)
+                    .foregroundColor(isSuccess ? Color.currentSuccess : Color.currentError)
                     .font(.system(size: 24))
-                    .shadow(color: (isSuccess ? Color.green : Color.red).opacity(0.3), radius: 2)
+                    .shadow(color: (isSuccess ? Color.currentSuccess : Color.currentError).opacity(0.3), radius: 2)
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
@@ -64,7 +64,7 @@ struct MotivationCardView: View {
             // Motivation text with better typography
             Text(entry.motivation ?? "")
                 .font(.system(size: 16, weight: .regular))
-                .foregroundColor(.primary)
+                .foregroundColor(.currentText)
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
                 .padding(.horizontal, 20)
@@ -72,13 +72,13 @@ struct MotivationCardView: View {
             
             // Bottom accent with better visibility
             Rectangle()
-                .fill(isSuccess ? Color.green.opacity(0.4) : Color.red.opacity(0.4))
+                .fill(isSuccess ? Color.currentSuccess.opacity(0.4) : Color.currentError.opacity(0.4))
                 .frame(height: 4)
                 .cornerRadius(2)
         }
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(LinearGradient(colors: [Color(.systemBackground), Color(.systemGray6).opacity(0.3)], startPoint: .top, endPoint: .bottom))
+                .fill(LinearGradient(colors: [Color.currentSecondaryBackground, Color.currentSecondaryBackground.opacity(0.3)], startPoint: .top, endPoint: .bottom))
         )
         .shadow(
             color: .black.opacity(0.08), 

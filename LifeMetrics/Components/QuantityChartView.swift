@@ -103,10 +103,11 @@ struct QuantityChartView: View {
                 Text(chartTitle)
                     .font(.title2)
                     .fontWeight(.semibold)
+                    .foregroundColor(.currentText)
                 
                 Text(chartSubtitle)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
             }
             
             if hasQuantityData {
@@ -132,15 +133,15 @@ struct QuantityChartView: View {
                 VStack(spacing: 16) {
                     Image(systemName: "chart.line.downtrend.xyaxis")
                         .font(.system(size: 48))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.currentSecondaryText)
                     
                     Text("No Quantity Data")
                         .font(.headline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                     
                     Text("Start logging quantities to see trends here")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
@@ -148,7 +149,7 @@ struct QuantityChartView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.currentBackground)
         .cornerRadius(12)
     }
     
@@ -159,14 +160,14 @@ struct QuantityChartView: View {
                 x: .value("Date", dataPoint.date),
                 y: .value("Quantity", dataPoint.quantity)
             )
-            .foregroundStyle(dataPoint.habitType == .positive ? .blue : .orange)
+            .foregroundStyle(dataPoint.habitType == .positive ? Color.currentPrimary : Color.currentWarning)
             .lineStyle(StrokeStyle(lineWidth: 2))
             
             PointMark(
                 x: .value("Date", dataPoint.date),
                 y: .value("Quantity", dataPoint.quantity)
             )
-            .foregroundStyle(dataPoint.habitType == .positive ? .blue : .orange)
+            .foregroundStyle(dataPoint.habitType == .positive ? Color.currentPrimary : Color.currentWarning)
             .symbolSize(50)
         }
         .chartXAxis {
@@ -193,7 +194,7 @@ struct QuantityChartView: View {
                 x: .value("Week", data.week),
                 y: .value("Average Quantity", data.averageQuantity)
             )
-            .foregroundStyle(.blue.gradient)
+            .foregroundStyle(Color.currentPrimary.gradient)
         }
         .chartXAxis {
             AxisMarks { _ in
@@ -217,34 +218,35 @@ struct QuantityChartView: View {
             Text("Summary")
                 .font(.headline)
                 .fontWeight(.semibold)
+                .foregroundColor(.currentText)
             
             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
                 StatCard(
                     title: "Total Entries",
                     value: "\(quantityData.count)",
                     icon: "calendar",
-                    color: .blue
+                    color: .currentPrimary
                 )
                 
                 StatCard(
                     title: "Total Quantity",
                     value: "\(quantityData.reduce(0) { $0 + $1.quantity })",
                     icon: "number",
-                    color: .green
+                    color: .currentSuccess
                 )
                 
                 StatCard(
                     title: "Average",
                     value: String(format: "%.1f", Double(quantityData.reduce(0) { $0 + $1.quantity }) / Double(quantityData.count)),
                     icon: "chart.bar",
-                    color: .orange
+                    color: .currentWarning
                 )
                 
                 StatCard(
                     title: "Max Daily",
                     value: "\(quantityData.map { $0.quantity }.max() ?? 0)",
                     icon: "arrow.up",
-                    color: .red
+                    color: .currentError
                 )
             }
         }

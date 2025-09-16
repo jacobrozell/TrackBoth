@@ -7,10 +7,7 @@ import UIKit
 struct ChartsView: View {
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
-    @State private var selectedFilter: MetricFilter = .all
-    @State private var selectedChartType: ChartType = .line
-    @State private var showingAddMetric = false
-    @State private var showingSettings = false
+    @State private var viewModel = ChartsViewModel()
     @State private var showingExportSheet = false
     @State private var exportData: Data?
     @State private var exportFormat: ChartExportUtility.ExportFormat = .png
@@ -19,7 +16,7 @@ struct ChartsView: View {
     
     // MARK: - Body
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 GeometryReader { geometry in
                     if metrics.isEmpty {
@@ -31,23 +28,23 @@ struct ChartsView: View {
                                 // Left side - Controls
                                 VStack {
                                     ChartControlsView(
-                                        selectedFilter: $selectedFilter,
-                                        selectedChartType: $selectedChartType,
+                                        selectedFilter: $viewModel.selectedFilter,
+                                        selectedChartType: $viewModel.selectedChartType,
                                         metrics: metrics,
                                         isLandscape: true
                                     )
                                     Spacer()
                                 }
                                 .frame(width: min(320, geometry.size.width * 0.35))
-                                .background(Color(.systemGray6).opacity(0.3))
+                                .background(Color.currentSecondaryBackground.opacity(0.3))
                                 
                                 Divider()
                                     .frame(height: geometry.size.height)
                                 
                                 // Right side - Chart content
                                 ChartContentView(
-                                    selectedChartType: selectedChartType,
-                                    selectedFilter: selectedFilter,
+                                    selectedChartType: viewModel.selectedChartType,
+                                    selectedFilter: viewModel.selectedFilter,
                                     entries: entries,
                                     metrics: metrics
                                 )
@@ -56,19 +53,19 @@ struct ChartsView: View {
                             // Portrait layout
                             VStack(spacing: 0) {
                                 // Controls
-                                ChartControlsView(
-                                    selectedFilter: $selectedFilter,
-                                    selectedChartType: $selectedChartType,
-                                    metrics: metrics,
-                                    isLandscape: false
-                                )
+                            ChartControlsView(
+                                selectedFilter: $viewModel.selectedFilter,
+                                selectedChartType: $viewModel.selectedChartType,
+                                metrics: metrics,
+                                isLandscape: false
+                            )
 
                                 Divider()
 
                                 // Chart content
                                 ChartContentView(
-                                    selectedChartType: selectedChartType,
-                                    selectedFilter: selectedFilter,
+                                    selectedChartType: viewModel.selectedChartType,
+                                    selectedFilter: viewModel.selectedFilter,
                                     entries: entries,
                                     metrics: metrics
                                 )
@@ -79,7 +76,7 @@ struct ChartsView: View {
                 .navigationTitle("Charts")
                 .onAppear {
                     logger.info("ChartsView appeared", category: .ui)
-                    logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(selectedFilter), ChartType: \(selectedChartType)", category: .ui)
+                    logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(viewModel.selectedFilter), ChartType: \(viewModel.selectedChartType)", category: .ui)
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
@@ -89,7 +86,14 @@ struct ChartsView: View {
                                 DemoDataGenerator.generateDemoData(modelContext: modelContext)
                             }
                             .font(.caption)
-                            .foregroundColor(.blue)
+                            .foregroundColor(Color.currentPrimary)
+                        } else if DemoDataGenerator.hasDemoData() {
+                            Button("Undo Demo Data") {
+                                logger.logUserAction("Clear demo data")
+                                DemoDataGenerator.clearDemoData(modelContext: modelContext)
+                            }
+                            .font(.caption)
+                            .foregroundColor(Color.currentWarning)
                         }
                     }
                     
@@ -123,7 +127,7 @@ struct ChartsView: View {
                             
                             Button {
                                 logger.logUserAction("Show settings")
-                                showingSettings = true
+                                viewModel.showingSettings = true
                             } label: {
                                 Image(systemName: "gear")
                             }
@@ -131,7 +135,7 @@ struct ChartsView: View {
                     }
                 }
 
-                .sheet(isPresented: $showingSettings) {
+                .sheet(isPresented: $viewModel.showingSettings) {
                     SettingsView()
                 }
                 .sheet(isPresented: $showingExportSheet) {
@@ -143,8 +147,8 @@ struct ChartsView: View {
                     }
                 }
                 .onAppear {
-                    if selectedFilter == .all && !metrics.isEmpty {
-                        selectedFilter = .all
+                    if viewModel.selectedFilter == .all && !metrics.isEmpty {
+                        viewModel.selectedFilter = .all
                     }
                 }
             }
@@ -237,9 +241,9 @@ struct ChartsView: View {
     }
     
     private func getChartTitle() -> String {
-        switch selectedChartType {
+        switch viewModel.selectedChartType {
         case .line:
-            switch selectedFilter {
+            switch viewModel.selectedFilter {
             case .allVices: return "30-Day Avoidance Trend"
             case .allHabits: return "30-Day Completion Trend"
             case .all: return "30-Day Progress Trend"
@@ -247,7 +251,7 @@ struct ChartsView: View {
                 return metric.safeHabitType == .vice ? "30-Day Avoidance Trend" : "30-Day Completion Trend"
             }
         case .bar:
-            switch selectedFilter {
+            switch viewModel.selectedFilter {
             case .allVices: return "Weekly Avoidance"
             case .allHabits: return "Weekly Completion"
             case .all: return "Weekly Progress"
@@ -255,7 +259,7 @@ struct ChartsView: View {
                 return metric.safeHabitType == .vice ? "Weekly Avoidance" : "Weekly Completion"
             }
         case .heatmap:
-            switch selectedFilter {
+            switch viewModel.selectedFilter {
             case .allVices: return "90-Day Avoidance Heatmap"
             case .allHabits: return "90-Day Completion Heatmap"
             case .all: return "90-Day Progress Heatmap"
@@ -263,7 +267,7 @@ struct ChartsView: View {
                 return metric.safeHabitType == .vice ? "90-Day Avoidance Heatmap" : "90-Day Completion Heatmap"
             }
         case .quantity:
-            switch selectedFilter {
+            switch viewModel.selectedFilter {
             case .allVices: return "Quantity Tracking - Vices"
             case .allHabits: return "Quantity Tracking - Habits"
             case .all: return "Quantity Tracking - All"
@@ -275,28 +279,28 @@ struct ChartsView: View {
     
     @ViewBuilder
     private func getCurrentChartView() -> some View {
-        switch selectedChartType {
+        switch viewModel.selectedChartType {
         case .line:
             LineChartView(
-                filter: selectedFilter,
+                filter: viewModel.selectedFilter,
                 entries: entries,
                 metrics: metrics
             )
         case .bar:
             BarChartView(
-                filter: selectedFilter,
+                filter: viewModel.selectedFilter,
                 entries: entries,
                 metrics: metrics
             )
         case .heatmap:
             HeatmapView(
-                filter: selectedFilter,
+                filter: viewModel.selectedFilter,
                 entries: entries,
                 metrics: metrics
             )
         case .quantity:
             QuantityChartView(
-                filter: selectedFilter,
+                filter: viewModel.selectedFilter,
                 entries: entries,
                 metrics: metrics
             )

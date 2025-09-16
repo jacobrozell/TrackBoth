@@ -78,14 +78,15 @@ struct BarChartView: View {
             HStack {
                 Text(chartTitle)
                     .font(.headline)
+                    .foregroundColor(.currentText)
                 Spacer()
                 if weeklyData.count < 2 {
                     Text("Getting started...")
                         .font(.caption)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.currentWarning)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.orange.opacity(0.1))
+                        .background(Color.currentWarning.opacity(0.1))
                         .cornerRadius(8)
                 }
             }
@@ -94,10 +95,10 @@ struct BarChartView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "chart.bar.fill")
                         .font(.system(size: 40))
-                        .foregroundColor(.gray.opacity(0.6))
+                        .foregroundColor(.currentSecondaryText.opacity(0.6))
                     
                     Text(emptyStateMessage)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .frame(height: 200)
@@ -108,7 +109,7 @@ struct BarChartView: View {
                             x: .value("Week", data.week),
                             y: .value("Count", data.count)
                         )
-                        .foregroundStyle(.green.gradient)
+                        .foregroundStyle(Color.currentPrimary.gradient)
                     }
                     .frame(height: 120)
                     .opacity(animateChart ? 1.0 : 0.0)
@@ -116,7 +117,7 @@ struct BarChartView: View {
                     
                     Text("Keep it up! More weeks will show patterns")
                         .font(.caption)
-                        .foregroundColor(.green)
+                        .foregroundColor(.currentSuccess)
                         .multilineTextAlignment(.center)
                 }
                 .frame(height: 200)
@@ -127,7 +128,7 @@ struct BarChartView: View {
                             x: .value("Week", data.week),
                             y: .value("Count", data.count)
                         )
-                        .foregroundStyle(.green.gradient)
+                        .foregroundStyle(Color.currentPrimary.gradient)
                     }
                     .frame(height: 180)
                     .opacity(animateChart ? 1.0 : 0.0)
@@ -137,17 +138,17 @@ struct BarChartView: View {
                     if let bestWeek = weeklyData.max(by: { $0.count < $1.count }) {
                         HStack {
                             Image(systemName: "star.fill")
-                                .foregroundColor(.yellow)
+                                .foregroundColor(.currentWarning)
                             Text("Best week: \(bestWeek.count) completions")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                         }
                     }
                 }
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.currentBackground)
         .cornerRadius(12)
         .onAppear {
             logger.debug("BarChartView appeared - Filter: \(filter), Entries: \(entries.count)", category: .ui)

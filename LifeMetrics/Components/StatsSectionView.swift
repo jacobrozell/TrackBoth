@@ -16,34 +16,34 @@ struct StatsSectionView: View {
                     title: "Habits",
                     value: "\(totalHabits)",
                     icon: "checkmark.circle.fill",
-                    color: .green
+                    color: .currentSuccess
                 )
                 
                 StatCard(
                     title: "Vices",
                     value: "\(totalVices)",
                     icon: "xmark.circle.fill",
-                    color: .red
+                    color: .currentError
                 )
                 
                 StatCard(
                     title: "Streaks",
                     value: "\(activeStreaks)",
                     icon: "flame.fill",
-                    color: .orange
+                    color: .currentWarning
                 )
                 
                 StatCard(
                     title: "Today",
                     value: "\(todayCompleted)/\(totalMetrics)",
                     icon: "calendar",
-                    color: .blue
+                    color: .currentPrimary
                 )
             }
             .padding(.horizontal, 16)
         }
         .padding(.bottom, 16)
-        .background(Color(.systemGray6))
+        .background(Color.currentBackground)
         .onAppear {
             logger.debug("StatsSectionView displayed - Habits: \(totalHabits), Vices: \(totalVices), Streaks: \(activeStreaks), Today: \(todayCompleted)/\(totalMetrics)", category: .ui)
         }

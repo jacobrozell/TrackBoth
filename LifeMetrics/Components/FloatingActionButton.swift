@@ -23,7 +23,7 @@ struct FloatingActionButton: View {
                         .frame(width: 56, height: 56)
                         .background(
                             LinearGradient(
-                                colors: [Color.accentColor, Color.accentColor.opacity(0.8)],
+                                colors: [Color.currentPrimary, Color.currentPrimary.opacity(0.8)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )

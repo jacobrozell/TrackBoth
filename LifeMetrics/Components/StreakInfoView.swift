@@ -36,33 +36,34 @@ struct StreakInfoView: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Streak Stats")
                 .font(.headline)
+                .foregroundColor(Color.currentText)
             
             HStack(spacing: 20) {
                 VStack(alignment: .leading) {
                     Text("Current")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                     Text("\(currentStreak)")
                         .font(.title)
                         .fontWeight(.bold)
-                        .foregroundColor(.orange)
+                        .foregroundColor(Color.currentWarning)
                 }
                 
                 VStack(alignment: .leading) {
                     Text("Longest")
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                     Text("\(longestStreak)")
                         .font(.title)
                         .fontWeight(.bold)
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color.currentPrimary)
                 }
                 
                 Spacer()
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.currentBackground)
         .cornerRadius(12)
     }
 }

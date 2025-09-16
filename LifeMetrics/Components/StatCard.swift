@@ -8,45 +8,70 @@ struct StatCard: View {
     let color: Color
     
     var body: some View {
-        VStack(spacing: 12) {
-            // Icon with background circle
+        VStack(spacing: 16) {
+            // Icon with modern gradient background
             ZStack {
                 Circle()
-                    .fill(color.opacity(0.15))
-                    .frame(width: 40, height: 40)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                color.opacity(0.2),
+                                color.opacity(0.1)
+                            ]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 48, height: 48)
                 
                 Image(systemName: icon)
-                    .font(.title3)
+                    .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundColor(color)
             }
             
-            // Value with emphasis
+            // Value with modern typography
             Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-                .minimumScaleFactor(0.8)
+                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .foregroundColor(Color.currentText)
+                .minimumScaleFactor(0.7)
             
-            // Title
+            // Title with improved styling
             Text(title)
-                .font(.caption)
-                .fontWeight(.medium)
-                .foregroundColor(.secondary)
+                .font(.system(size: 11, weight: .medium, design: .default))
+                .foregroundColor(Color.currentSecondaryText)
                 .textCase(.uppercase)
-                .tracking(0.5)
+                .tracking(0.8)
+                .frame(height: 16)
+                .minimumScaleFactor(0.8)
+                .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .padding(.horizontal, 12)
+        .padding(.vertical, 20)
+        .padding(.horizontal, 16)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color.currentSecondaryBackground)
+                .shadow(
+                    color: Color.black.opacity(0.06),
+                    radius: 8,
+                    x: 0,
+                    y: 4
+                )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(color.opacity(0.2), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            color.opacity(0.3),
+                            color.opacity(0.1)
+                        ]),
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    ),
+                    lineWidth: 1.5
+                )
         )
     }
 }

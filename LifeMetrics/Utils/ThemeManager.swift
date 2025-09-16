@@ -6,6 +6,7 @@ class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
     
     @Published var currentTheme: Theme = .system
+    @Published var currentAppTheme: AppTheme = .default
     
     private init() {
         // Load saved theme from UserDefaults
@@ -16,6 +17,15 @@ class ThemeManager: ObservableObject {
         } else {
             logger.info("Using default theme - Theme: \(currentTheme.rawValue)")
         }
+        
+        // Load saved app theme from UserDefaults
+        if let savedAppTheme = UserDefaults.standard.string(forKey: "selectedAppTheme"),
+           let appTheme = AppTheme.allThemes.first(where: { $0.name == savedAppTheme }) {
+            currentAppTheme = appTheme
+            logger.info("App theme loaded from UserDefaults - Theme: \(appTheme.name)")
+        } else {
+            logger.info("Using default app theme - Theme: \(currentAppTheme.name)")
+        }
     }
     
     func updateTheme(_ theme: Theme) {
@@ -23,9 +33,27 @@ class ThemeManager: ObservableObject {
         currentTheme = theme
         UserDefaults.standard.set(theme.rawValue, forKey: "selectedTheme")
     }
+    
+    func updateAppTheme(_ appTheme: AppTheme) {
+        logger.logUserAction("App theme updated", details: "From \(currentAppTheme.name) to \(appTheme.name)")
+        currentAppTheme = appTheme
+        UserDefaults.standard.set(appTheme.name, forKey: "selectedAppTheme")
+    }
+    
+    /// Gets the current effective theme colors based on system appearance
+    var effectiveTheme: AppTheme {
+        switch currentTheme {
+        case .light:
+            return currentAppTheme
+        case .dark:
+            return currentAppTheme
+        case .system:
+            return currentAppTheme
+        }
+    }
 }
 
-// MARK: - Theme Colors Extension
+// MARK: - Color Extensions
 extension Color {
     // Background Colors
     static let appBackgroundPrimary = Color("BackgroundPrimary")
@@ -35,29 +63,120 @@ extension Color {
     static let appTextPrimary = Color("TextPrimary")
     static let appTextSecondary = Color("TextSecondary")
     
-    // Accent Colors (using system colors that adapt to theme)
-    static let accentBlue = Color.blue
-    static let accentGreen = Color.green
-    static let accentRed = Color.red
-    static let accentOrange = Color.orange
-    static let accentPurple = Color.purple
+    // Main Theme Colors (semantic colors that adapt to theme)
+    static let assetThemePrimary = Color("ThemePrimary") // Deep blue - main brand color
+    static let assetThemeSecondary = Color("ThemeSecondary") // Teal - secondary actions
+    static let assetThemeSuccess = Color("ThemeSuccess") // Green - success states
+    static let assetThemeWarning = Color("ThemeWarning") // Orange - warnings
+    static let assetThemeError = Color("ThemeError") // Red - errors/danger
+    static let assetThemeInfo = Color("ThemeInfo") // Cyan - informational
+    static let assetThemeAccent = Color("ThemeAccent") // Purple - accent/highlight
+    
+    // Legacy Accent Colors (keeping for backward compatibility)
+    static let assetAccentBlue = Color.blue
+    static let assetAccentGreen = Color.green
+    static let assetAccentRed = Color.red
+    static let assetAccentOrange = Color("AccentOrange") // Custom orange from colorset
+    static let assetAccentPurple = Color("AccentPurple") // Custom purple from colorset
+    static let assetAccentTeal = Color("AccentTeal") // Custom teal from colorset
+    static let assetAccentPink = Color("AccentPink") // Custom pink from colorset
+    static let assetAccentCyan = Color("AccentCyan") // Custom cyan from colorset
+    static let assetAccentIndigo = Color("AccentIndigo") // Custom indigo from colorset
+    
+    // MARK: - Dynamic Theme Colors
+    /// Gets colors from the current app theme
+    static var currentTheme: AppTheme {
+        ThemeManager.shared.effectiveTheme
+    }
+    
+    static var currentPrimary: Color {
+        ThemeManager.shared.effectiveTheme.primaryColor
+    }
+    
+    static var currentSecondary: Color {
+        ThemeManager.shared.effectiveTheme.secondaryColor
+    }
+    
+    static var currentBackground: Color {
+        ThemeManager.shared.effectiveTheme.backgroundColor
+    }
+    
+    static var currentSecondaryBackground: Color {
+        ThemeManager.shared.effectiveTheme.secondaryBackgroundColor
+    }
+    
+    static var currentText: Color {
+        ThemeManager.shared.effectiveTheme.textColor
+    }
+    
+    static var currentSecondaryText: Color {
+        ThemeManager.shared.effectiveTheme.secondaryTextColor
+    }
+    
+    static var currentAccent: Color {
+        ThemeManager.shared.effectiveTheme.accentColor
+    }
+    
+    static var currentSuccess: Color {
+        ThemeManager.shared.effectiveTheme.successColor
+    }
+    
+    static var currentWarning: Color {
+        ThemeManager.shared.effectiveTheme.warningColor
+    }
+    
+    static var currentError: Color {
+        ThemeManager.shared.effectiveTheme.errorColor
+    }
+    
+    static var currentInfo: Color {
+        ThemeManager.shared.effectiveTheme.infoColor
+    }
 }
 
 // MARK: - View Modifiers for Themed Colors
 extension View {
     func themedBackground() -> some View {
-        self.background(Color.appBackgroundPrimary)
+        self.background(Color.currentBackground)
     }
     
     func themedSecondaryBackground() -> some View {
-        self.background(Color.appBackgroundSecondary)
+        self.background(Color.currentSecondaryBackground)
     }
     
     func themedPrimaryText() -> some View {
-        self.foregroundColor(Color.appTextPrimary)
+        self.foregroundColor(Color.currentText)
     }
     
     func themedSecondaryText() -> some View {
-        self.foregroundColor(Color.appTextSecondary)
+        self.foregroundColor(Color.currentSecondaryText)
+    }
+    
+    func themedPrimary() -> some View {
+        self.foregroundColor(Color.currentPrimary)
+    }
+    
+    func themedSecondary() -> some View {
+        self.foregroundColor(Color.currentSecondary)
+    }
+    
+    func themedAccent() -> some View {
+        self.foregroundColor(Color.currentAccent)
+    }
+    
+    func themedSuccess() -> some View {
+        self.foregroundColor(Color.currentSuccess)
+    }
+    
+    func themedWarning() -> some View {
+        self.foregroundColor(Color.currentWarning)
+    }
+    
+    func themedError() -> some View {
+        self.foregroundColor(Color.currentError)
+    }
+    
+    func themedInfo() -> some View {
+        self.foregroundColor(Color.currentInfo)
     }
 }

@@ -43,12 +43,13 @@ struct EntriesListView: View {
                 Text("Recent Entries")
                     .font(.headline)
                     .fontWeight(.semibold)
+                    .foregroundColor(.currentText)
                 
                 Spacer()
                 
                 Text("\(filteredEntries.count) entries")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
             }
             .padding(.horizontal)
             .padding(.top)
@@ -57,11 +58,11 @@ struct EntriesListView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "list.bullet")
                         .font(.system(size: 40))
-                        .foregroundColor(.gray)
+                        .foregroundColor(.currentSecondaryText)
                     
                     Text("No entries found")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 40)

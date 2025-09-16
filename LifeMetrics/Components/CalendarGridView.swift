@@ -50,6 +50,7 @@ struct CalendarGridView: View {
                     }
                 } label: {
                     Image(systemName: "chevron.left")
+                        .foregroundColor(.currentPrimary)
                 }
                 
                 Spacer()
@@ -57,6 +58,7 @@ struct CalendarGridView: View {
                 Text(dateFormatter.string(from: currentMonth))
                     .font(.title2)
                     .fontWeight(.semibold)
+                    .foregroundColor(.currentText)
                 
                 Spacer()
                 
@@ -66,6 +68,7 @@ struct CalendarGridView: View {
                     }
                 } label: {
                     Image(systemName: "chevron.right")
+                        .foregroundColor(.currentPrimary)
                 }
             }
             .padding()
@@ -76,7 +79,7 @@ struct CalendarGridView: View {
                     Text(day)
                         .font(.caption)
                         .fontWeight(.medium)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .frame(maxWidth: .infinity)
                 }
             }

@@ -49,14 +49,15 @@ struct HeatmapView: View {
             HStack {
                 Text(heatmapTitle)
                     .font(.headline)
+                    .foregroundColor(.currentText)
                 Spacer()
                 if completedDays < 7 {
                     Text("Building consistency...")
                         .font(.caption)
-                        .foregroundColor(.orange)
+                        .foregroundColor(.currentWarning)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.orange.opacity(0.1))
+                        .background(Color.currentWarning.opacity(0.1))
                         .cornerRadius(8)
                 }
             }
@@ -65,10 +66,10 @@ struct HeatmapView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "calendar")
                         .font(.system(size: 40))
-                        .foregroundColor(.gray.opacity(0.6))
+                        .foregroundColor(.currentSecondaryText.opacity(0.6))
                     
                     Text(emptyStateMessage)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .frame(height: 200)
@@ -77,7 +78,7 @@ struct HeatmapView: View {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 3), count: 13), spacing: 3) {
                         ForEach(heatmapData) { data in
                             Rectangle()
-                                .fill(data.completed ? Color.green : Color.gray.opacity(0.3))
+                                .fill(data.completed ? Color.currentSuccess : Color.currentSecondaryText.opacity(0.3))
                                 .frame(height: 15)
                                 .cornerRadius(3)
                         }
@@ -90,19 +91,19 @@ struct HeatmapView: View {
                     HStack(spacing: 16) {
                         HStack {
                             Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
+                                .foregroundColor(.currentSuccess)
                             Text("\(completedDays) days")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                         }
                         
                         if completedDays > 0 {
                             HStack {
                                 Image(systemName: "percent")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.currentPrimary)
                                 Text("\(Int(Double(completedDays) / Double(heatmapData.count) * 100))% consistency")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.currentSecondaryText)
                             }
                         }
                         
@@ -112,7 +113,7 @@ struct HeatmapView: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.currentBackground)
         .cornerRadius(12)
         .onAppear {
             animateChart = true

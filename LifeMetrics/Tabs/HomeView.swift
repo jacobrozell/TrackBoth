@@ -48,54 +48,21 @@ struct HomeView: View {
     
     // MARK: - Body
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 GeometryReader { geometry in
                     if metrics.isEmpty {
-                        VStack(spacing: 32) {
-                            VStack(spacing: 16) {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.blue.opacity(0.1))
-                                        .frame(width: 120, height: 120)
-                                    
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.system(size: 50))
-                                        .foregroundColor(.blue)
-                                }
-                                
-                                VStack(spacing: 8) {
-                                    Text("No Habits Yet")
-                                        .font(.title2)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.primary)
-                                    
-                                    Text("Start tracking your habits and vices to build a better you")
-                                        .font(.body)
-                                        .foregroundColor(.secondary)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal, 32)
-                                }
-                            }
-                            
-                            Button {
+                        EmptyStateView(
+                            icon: "plus.circle.fill",
+                            title: "No Habits Yet",
+                            subtitle: "Start tracking your habits and vices to build a better you",
+                            actionTitle: "Add Your First Habit",
+                            action: {
                                 logger.logUserAction("Add first habit button tapped")
                                 viewModel.showAddMetric()
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "plus.circle.fill")
-                                    Text("Add Your First Habit")
-                                        .fontWeight(.semibold)
-                                }
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 24)
-                                .padding(.vertical, 12)
-                                .background(Color.blue)
-                                .cornerRadius(25)
                             }
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color(.systemBackground))
+                        )
+                        .background(Color.currentBackground)
                     } else {
                         if geometry.size.width > geometry.size.height {
                             // Landscape layout
@@ -109,7 +76,7 @@ struct HomeView: View {
                                             viewModel.goToPreviousDay()
                                         } label: {
                                             Image(systemName: "chevron.left")
-                                                .foregroundColor(canGoBack ? .blue : .gray)
+                                                .foregroundColor(canGoBack ? Color.currentPrimary : Color.currentSecondaryText)
                                         }
                                         .disabled(!canGoBack)
                                         
@@ -122,10 +89,10 @@ struct HomeView: View {
                                             VStack(spacing: 2) {
                                                 Text(isToday ? "Today" : DateFormatter.dayFormatter.string(from: viewModel.selectedDate))
                                                     .font(.headline)
-                                                    .foregroundColor(.primary)
+                                                    .foregroundColor(Color.currentText)
                                                 Text(DateFormatter.dateFormatter.string(from: viewModel.selectedDate))
                                                     .font(.caption)
-                                                    .foregroundColor(.secondary)
+                                                    .foregroundColor(Color.currentSecondaryText)
                                             }
                                         }
                                         
@@ -136,8 +103,9 @@ struct HomeView: View {
                                             viewModel.goToNextDay()
                                         } label: {
                                             Image(systemName: "chevron.right")
-                                                .foregroundColor(.blue)
+                                                .foregroundColor(viewModel.canGoForward ? Color.currentPrimary : Color.currentSecondaryText)
                                         }
+                                        .disabled(!viewModel.canGoForward)
                                     }
                                     .padding(.horizontal, 20)
                                     .padding(.top, 8)
@@ -151,7 +119,7 @@ struct HomeView: View {
                                                 viewModel.goToToday()
                                             }
                                             .font(.caption)
-                                            .foregroundColor(.blue)
+                                            .foregroundColor(Color.currentPrimary)
                                         }
                                         .padding(.horizontal, 16)
                                     }
@@ -163,14 +131,14 @@ struct HomeView: View {
                                                 title: "Habits",
                                                 value: "\(totalHabits)",
                                                 icon: "checkmark.circle.fill",
-                                                color: .green
+                                                color: Color.currentSuccess
                                             )
                                             
                                             StatCard(
                                                 title: "Vices",
                                                 value: "\(totalVices)",
                                                 icon: "xmark.circle.fill",
-                                                color: .red
+                                                color: Color.currentError
                                             )
                                         }
                                         
@@ -179,14 +147,14 @@ struct HomeView: View {
                                                 title: "Streaks",
                                                 value: "\(activeStreaks)",
                                                 icon: "flame.fill",
-                                                color: .orange
+                                                color: Color.currentWarning
                                             )
                                             
                                             StatCard(
                                                 title: "Today",
                                                 value: "\(todayCompleted)/\(metrics.count)",
                                                 icon: "calendar",
-                                                color: .blue
+                                                color: Color.currentPrimary
                                             )
                                         }
                                     }
@@ -195,7 +163,7 @@ struct HomeView: View {
                                     Spacer()
                                 }
                                 .frame(width: min(280, geometry.size.width * 0.4))
-                                .background(Color(.systemGray6))
+                                .background(Color.currentSecondaryBackground)
                                 
                                 Divider()
                                     .frame(height: geometry.size.height)
@@ -241,7 +209,7 @@ struct HomeView: View {
                                             viewModel.goToPreviousDay()
                                         } label: {
                                             Image(systemName: "chevron.left")
-                                                .foregroundColor(canGoBack ? .blue : .gray)
+                                                .foregroundColor(canGoBack ? Color.currentPrimary : Color.currentSecondaryText)
                                         }
                                         .disabled(!canGoBack)
                                         
@@ -254,10 +222,10 @@ struct HomeView: View {
                                             VStack(spacing: 2) {
                                                 Text(isToday ? "Today" : DateFormatter.dayFormatter.string(from: viewModel.selectedDate))
                                                     .font(.headline)
-                                                    .foregroundColor(.primary)
+                                                    .foregroundColor(Color.currentText)
                                                 Text(DateFormatter.dateFormatter.string(from: viewModel.selectedDate))
                                                     .font(.caption)
-                                                    .foregroundColor(.secondary)
+                                                    .foregroundColor(Color.currentSecondaryText)
                                             }
                                         }
                                         
@@ -268,8 +236,9 @@ struct HomeView: View {
                                             viewModel.goToNextDay()
                                         } label: {
                                             Image(systemName: "chevron.right")
-                                                .foregroundColor(.blue)
+                                                .foregroundColor(viewModel.canGoForward ? Color.currentPrimary : Color.currentSecondaryText)
                                         }
+                                        .disabled(!viewModel.canGoForward)
                                     }
                                     .padding(.horizontal, 20)
                                     .padding(.top, 8)
@@ -283,7 +252,7 @@ struct HomeView: View {
                                                 viewModel.goToToday()
                                             }
                                             .font(.caption)
-                                            .foregroundColor(.blue)
+                                            .foregroundColor(Color.currentPrimary)
                                         }
                                         .padding(.horizontal, 16)
                                     }
@@ -294,34 +263,34 @@ struct HomeView: View {
                                             title: "Habits",
                                             value: "\(totalHabits)",
                                             icon: "checkmark.circle.fill",
-                                            color: .green
+                                            color: Color.currentSuccess
                                         )
                                         
                                         StatCard(
                                             title: "Vices",
                                             value: "\(totalVices)",
                                             icon: "xmark.circle.fill",
-                                            color: .red
+                                            color: Color.currentError
                                         )
                                         
                                         StatCard(
                                             title: "Streaks",
                                             value: "\(activeStreaks)",
                                             icon: "flame.fill",
-                                            color: .orange
+                                            color: Color.currentWarning
                                         )
                                         
                                         StatCard(
                                             title: "Today",
                                             value: "\(todayCompleted)/\(metrics.count)",
                                             icon: "calendar",
-                                            color: .blue
+                                            color: Color.currentPrimary
                                         )
                                     }
                                     .padding(.horizontal, 16)
                                 }
                                 .padding(.bottom, 16)
-                                .background(Color(.systemGray6))
+                                .background(Color.currentSecondaryBackground)
                                 
                                 // Habits List
                                 ScrollView {

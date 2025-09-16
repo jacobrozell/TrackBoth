@@ -34,6 +34,7 @@
 		0B9C30FC2E73C64D0089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				AppTheme.swift,
 				ChartModels.swift,
 				EntryTypeFilter.swift,
 				Enums.swift,
@@ -47,20 +48,14 @@
 		0B9C31112E73C6590089A5FD /* Exceptions for "Views" folder in "LifeMetrics" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AddGoalView.swift,
-				AddMetricView.swift,
-				AddMotivationView.swift,
-				ChartsView.swift,
-				ContentView.swift,
-				EditEntryView.swift,
-				EditGoalView.swift,
-				EditMetricView.swift,
-				GoalsView.swift,
-				HistoryView.swift,
-				HomeView.swift,
-				MotivationView.swift,
+				AddViews/AddGoalView.swift,
+				AddViews/AddMetricView.swift,
+				AddViews/AddMotivationView.swift,
+				EditViews/EditEntryView.swift,
+				EditViews/EditGoalView.swift,
+				EditViews/EditMetricView.swift,
 				OnboardingView.swift,
-				SettingsView.swift,
+				ThemeSelectionView.swift,
 			);
 			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
 		};
@@ -102,6 +97,19 @@
 			);
 			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
 		};
+		0B9C31F42E7915660089A5FD /* Exceptions for "Tabs" folder in "LifeMetrics" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ChartsView.swift,
+				ContentView.swift,
+				GoalsView.swift,
+				HistoryView.swift,
+				HomeView.swift,
+				MotivationView.swift,
+				SettingsView.swift,
+			);
+			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -111,11 +119,6 @@
 				0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */,
 			);
 			path = Components;
-			sourceTree = "<group>";
-		};
-		0B9C2DA22E735AE50089A5FD /* Extensions */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		0B9C2DA72E735AE50089A5FD /* Models */ = {
@@ -147,6 +150,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		0B9C31EC2E7915660089A5FD /* Tabs */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0B9C31F42E7915660089A5FD /* Exceptions for "Tabs" folder in "LifeMetrics" target */,
+			);
+			path = Tabs;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -163,8 +174,8 @@
 		0B9C2CA82E714E630089A5FD = {
 			isa = PBXGroup;
 			children = (
+				0B9C31EC2E7915660089A5FD /* Tabs */,
 				0B9C2DA12E735AE50089A5FD /* Components */,
-				0B9C2DA22E735AE50089A5FD /* Extensions */,
 				0B9C2DA72E735AE50089A5FD /* Models */,
 				0B9C2DAF2E735AE50089A5FD /* Utils */,
 				0B9C2DB62E735AE50089A5FD /* ViewModels */,
@@ -388,8 +399,11 @@
 				CODE_SIGN_ENTITLEMENTS = LifeMetrics.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Life Metrics";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -400,11 +414,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jacobrozell.LifeMetrics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -425,8 +439,11 @@
 				CODE_SIGN_ENTITLEMENTS = LifeMetrics.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Life Metrics";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -437,11 +454,11 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jacobrozell.LifeMetrics;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;

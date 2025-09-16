@@ -151,6 +151,11 @@ class CalendarHelper {
         return calendar.isDate(date, equalTo: Date(), toGranularity: .weekOfYear)
     }
     
+    /// Check if two dates are in the same week
+    static func isSameWeek(_ date1: Date, _ date2: Date) -> Bool {
+        return calendar.isDate(date1, equalTo: date2, toGranularity: .weekOfYear)
+    }
+    
     /// Check if a date is in the current month
     static func isInCurrentMonth(_ date: Date) -> Bool {
         return calendar.isDate(date, equalTo: Date(), toGranularity: .month)

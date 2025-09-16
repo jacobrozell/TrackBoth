@@ -27,7 +27,7 @@ struct MotivationalInsightsView: View {
                 value: "\(currentStreak) days",
                 description: streakDescription(currentStreak),
                 icon: streakIcon,
-                color: .orange
+                color: .currentWarning
             ))
         }
         
@@ -40,7 +40,7 @@ struct MotivationalInsightsView: View {
                 value: "\(weeklyCompletion) \(weeklyValueLabel)",
                 description: weeklyDescription(weeklyCompletion),
                 icon: weeklyIcon,
-                color: .green
+                color: .currentSuccess
             ))
         }
         
@@ -52,7 +52,7 @@ struct MotivationalInsightsView: View {
                 value: "\(Int(successRate * 100))%",
                 description: consistencyDescription(successRate),
                 icon: "percent",
-                color: .blue
+                color: .currentPrimary
             ))
         }
         
@@ -65,7 +65,7 @@ struct MotivationalInsightsView: View {
                 value: "\(bestDay.count) \(bestDayValueLabel)",
                 description: "On \(bestDay.dayName)",
                 icon: "star.fill",
-                color: .yellow
+                color: .currentWarning
             ))
         }
         
@@ -290,19 +290,20 @@ struct MotivationalInsightsView: View {
             HStack {
                 Text("Your Insights")
                     .font(.headline)
+                    .foregroundColor(.currentText)
                 Spacer()
                 Image(systemName: "lightbulb.fill")
-                    .foregroundColor(.yellow)
+                    .foregroundColor(.currentWarning)
             }
             
             if insights.isEmpty {
                 VStack(spacing: 12) {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .font(.system(size: 40))
-                        .foregroundColor(.gray.opacity(0.6))
+                        .foregroundColor(.currentSecondaryText.opacity(0.6))
                     
                     Text("Start tracking to unlock insights")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .frame(height: 120)
@@ -318,7 +319,7 @@ struct MotivationalInsightsView: View {
             }
         }
         .padding()
-        .background(Color(.systemGray6))
+        .background(Color.currentBackground)
         .cornerRadius(12)
         .onAppear {
             animateInsights = true
@@ -341,20 +342,20 @@ struct InsightCard: View {
             
             Text(insight.title)
                 .font(.caption)
-                .foregroundColor(.secondary)
+                .foregroundColor(.currentSecondaryText)
             
             Text(insight.value)
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
+                .foregroundColor(.currentText)
             
             Text(insight.description)
                 .font(.caption2)
-                .foregroundColor(.secondary)
+                .foregroundColor(.currentSecondaryText)
                 .multilineTextAlignment(.leading)
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(8)
         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
     }

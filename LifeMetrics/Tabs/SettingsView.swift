@@ -71,7 +71,7 @@ struct SettingsView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 // Data Management Section
                 Section("Data Management") {
@@ -80,21 +80,21 @@ struct SettingsView: View {
                         exportData = generateExportData()
                         showingExportSheet = true
                     }
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color.currentPrimary)
                     
-                    if !metrics.isEmpty {
+                    if !metrics.isEmpty && DemoDataGenerator.hasDemoData() {
                         Button("Clear Demo Data") {
                             logger.logUserAction("Clear demo data button tapped")
                             DemoDataGenerator.clearDemoData(modelContext: modelContext)
                         }
-                        .foregroundColor(.orange)
+                        .foregroundColor(Color.currentWarning)
                     }
                     
                     Button("Delete All Data") {
                         logger.logUserAction("Delete all data button tapped")
                         showingDeleteConfirmation = true
                     }
-                    .foregroundColor(.red)
+                    .foregroundColor(Color.currentError)
                 }
                 
                 // iCloud Backup Section
@@ -103,14 +103,14 @@ struct SettingsView: View {
                         logger.logUserAction("Backup to iCloud button tapped")
                         showingBackupSheet = true
                     }
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color.currentPrimary)
                     .disabled(isBackingUp)
                     
                     Button("Restore from iCloud") {
                         logger.logUserAction("Restore from iCloud button tapped")
                         showingRestoreSheet = true
                     }
-                    .foregroundColor(.green)
+                    .foregroundColor(Color.currentSuccess)
                     .disabled(isRestoring)
                     
                     if let backupInfo = backupInfo {
@@ -118,7 +118,7 @@ struct SettingsView: View {
                             Text("Last Backup")
                             Spacer()
                             Text(backupInfo.timestamp, style: .relative)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color.currentSecondaryText)
                         }
                     }
                 }
@@ -161,12 +161,12 @@ struct SettingsView: View {
                     Button("Share App") {
                         showingShareSheet = true
                     }
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color.currentPrimary)
                     
                     Button("View Onboarding Again") {
                         showOnboardingAgain()
                     }
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color.currentPrimary)
                 }
                 
                 // App Information Section
@@ -175,42 +175,42 @@ struct SettingsView: View {
                         Text("Version")
                         Spacer()
                         Text(appVersion)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                     
                     HStack {
                         Text("Total Metrics")
                         Spacer()
                         Text("\(metrics.count)")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
 
                     HStack {
                         Text("Total Habits")
                         Spacer()
                         Text("\(metrics.filter { $0.safeHabitType == .positive }.count)")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                     
                     HStack {
                         Text("Total Vices")
                         Spacer()
                         Text("\(metrics.filter { $0.safeHabitType == .vice }.count)")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
 
                     HStack {
                         Text("Total Entries")
                         Spacer()
                         Text("\(entries.count)")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                     
                     HStack {
                         Text("Date Joined")
                         Spacer()
                         Text(dateJoinedText)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                     
                     // Goals are tracked per Metric; no separate count
@@ -220,31 +220,31 @@ struct SettingsView: View {
                 Section("Coming Soon") {
                     HStack {
                         Image(systemName: "app.badge")
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.currentSecondaryText)
                         Text("Custom App Icons")
                         Spacer()
                         Text("Soon")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                             .font(.caption)
                     }
                     
                     HStack {
                         Image(systemName: "heart.fill")
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.currentSecondaryText)
                         Text("Donate")
                         Spacer()
                         Text("Soon")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                             .font(.caption)
                     }
                     
                     HStack {
                         Image(systemName: "app.badge")
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.currentSecondaryText)
                         Text("Custom App Icons")
                         Spacer()
                         Text("Soon")
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                             .font(.caption)
                     }
                     
@@ -257,7 +257,7 @@ struct SettingsView: View {
                         Text("Local Time")
                         Spacer()
                         Text(currentTime, style: .time)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                             .monospacedDigit()
                     }
                     
@@ -265,7 +265,7 @@ struct SettingsView: View {
                         Text("Date")
                         Spacer()
                         Text(currentTime, style: .date)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                 }
             }

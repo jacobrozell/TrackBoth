@@ -11,24 +11,24 @@ struct PrimaryMotivationCardView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(.red)
+                            .foregroundColor(.currentError)
                             .font(.system(size: 16, weight: .medium))
                             .frame(width: 20)
                         
                         Text(metric.name)
                             .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.primary)
+                            .foregroundColor(.currentText)
                         
                         // Star indicator for primary motivation
                         Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
+                            .foregroundColor(.currentWarning)
                             .font(.system(size: 14))
-                            .shadow(color: .yellow.opacity(0.3), radius: 2)
+                            .shadow(color: .currentWarning.opacity(0.3), radius: 2)
                     }
                     
                     Text("Primary Motivation")
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .padding(.leading, 28) // Align with metric name
                 }
                 
@@ -40,7 +40,7 @@ struct PrimaryMotivationCardView: View {
             // Primary motivation text with better typography
             Text(metric.primaryMotivation ?? "")
                 .font(.system(size: 16, weight: .regular))
-                .foregroundColor(.primary)
+                .foregroundColor(.currentText)
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4)
                 .padding(.horizontal, 20)
@@ -48,20 +48,20 @@ struct PrimaryMotivationCardView: View {
             
             // Bottom accent with yellow for primary motivations
             Rectangle()
-                .fill(Color.yellow.opacity(0.4))
+                .fill(Color.currentWarning.opacity(0.4))
                 .frame(height: 4)
                 .cornerRadius(2)
         }
         .background(
             RoundedRectangle(cornerRadius: 20)
-                .fill(LinearGradient(colors: [Color.yellow.opacity(0.15), Color.yellow.opacity(0.05)], startPoint: .top, endPoint: .bottom))
+                .fill(LinearGradient(colors: [Color.currentWarning.opacity(0.15), Color.currentWarning.opacity(0.05)], startPoint: .top, endPoint: .bottom))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.yellow.opacity(0.4), lineWidth: 2)
+                .stroke(Color.currentWarning.opacity(0.4), lineWidth: 2)
         )
         .shadow(
-            color: .yellow.opacity(0.2), 
+            color: .currentWarning.opacity(0.2), 
             radius: 12, 
             x: 0, 
             y: 4

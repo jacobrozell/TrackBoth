@@ -21,15 +21,16 @@ struct BackupSheet: View {
                 VStack(spacing: 12) {
                     Image(systemName: "icloud.and.arrow.up")
                         .font(.system(size: 50))
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color.currentPrimary)
                     
                     Text("Backup to iCloud")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(Color.currentText)
                     
                     Text("Your data will be securely backed up to iCloud and can be restored on any device.")
                         .font(.body)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .padding(.top)
@@ -39,6 +40,7 @@ struct BackupSheet: View {
                     HStack {
                         Text("Data to Backup:")
                             .font(.headline)
+                            .foregroundColor(Color.currentText)
                         Spacer()
                     }
                     
@@ -47,33 +49,33 @@ struct BackupSheet: View {
                             icon: "list.bullet",
                             title: "Habits & Vices",
                             count: metrics.count,
-                            color: .blue
+                            color: .currentPrimary
                         )
                         
                         DataSummaryRow(
                             icon: "calendar",
                             title: "Entries",
                             count: entries.count,
-                            color: .green
+                            color: .currentSuccess
                         )
                         
                         DataSummaryRow(
                             icon: "star.fill",
                             title: "Starred Entries",
                             count: entries.filter { $0.safeStarred }.count,
-                            color: .yellow
+                            color: .currentWarning
                         )
                         
                         DataSummaryRow(
                             icon: "number",
                             title: "Quantity Entries",
                             count: entries.filter { $0.hasQuantity }.count,
-                            color: .orange
+                            color: .currentAccent
                         )
                     }
                 }
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color.currentBackground)
                 .cornerRadius(12)
                 
                 // Progress
@@ -84,7 +86,7 @@ struct BackupSheet: View {
                         
                         Text(backupProgress)
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                 }
                 
@@ -92,10 +94,10 @@ struct BackupSheet: View {
                 if let error = backupError {
                     Text(error)
                         .font(.body)
-                        .foregroundColor(.red)
+                        .foregroundColor(Color.currentError)
                         .multilineTextAlignment(.center)
                         .padding()
-                        .background(Color.red.opacity(0.1))
+                        .background(Color.currentError.opacity(0.1))
                         .cornerRadius(8)
                 }
                 
@@ -187,13 +189,14 @@ struct DataSummaryRow: View {
             
             Text(title)
                 .font(.body)
+                .foregroundColor(.currentText)
             
             Spacer()
             
             Text("\(count)")
                 .font(.body)
                 .fontWeight(.medium)
-                .foregroundColor(.secondary)
+                .foregroundColor(.currentSecondaryText)
         }
     }
 }

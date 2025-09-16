@@ -65,24 +65,25 @@ struct UnifiedMetricRowView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                            .foregroundColor(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
                             .font(.title3)
                         
                         Text(metric.name)
                             .font(.title2)
                             .fontWeight(.semibold)
+                            .foregroundColor(Color.currentText)
                         
                         // Quantity indicator (only if quantity support is enabled)
                         if showQuantitySupport, let quantityString = selectedDateEntry?.quantityString {
                             Text(quantityString)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                                .foregroundColor(metric.safeHabitType == .positive ? .blue : .orange)
+                                .foregroundColor(metric.safeHabitType == .positive ? Color.currentPrimary : Color.currentWarning)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .fill((metric.safeHabitType == .positive ? Color.blue : Color.orange).opacity(0.2))
+                                        .fill((metric.safeHabitType == .positive ? Color.currentPrimary : Color.currentWarning).opacity(0.2))
                                 )
                         }
                     }
@@ -93,20 +94,20 @@ struct UnifiedMetricRowView: View {
                             if streak > 0 {
                                 HStack(spacing: 4) {
                                     Image(systemName: "flame.fill")
-                                        .foregroundColor(.orange)
+                                        .foregroundColor(Color.currentWarning)
                                         .font(.caption)
                                     Text(metric.safeHabitType == .positive ? 
                                          "\(streak) day streak" : 
                                          "\(streak) days clean")
                                         .font(.caption)
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(Color.currentSecondaryText)
                                 }
                             }
                             
                             // Goal progress
                             HStack(spacing: 4) {
                                 Image(systemName: "target")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color.currentPrimary)
                                     .font(.caption)
                                 Text("\(goalProgress.current)/\(goalProgress.target)")
                                     .font(.caption)
@@ -117,7 +118,7 @@ struct UnifiedMetricRowView: View {
                         // Simple streak display for basic mode
                         HStack {
                             Image(systemName: "flame.fill")
-                                .foregroundColor(.orange)
+                                .foregroundColor(Color.currentWarning)
                             Text(metric.safeHabitType == .positive ? 
                                  "\(streak) day streak" : 
                                  "\(streak) days clean")
@@ -136,7 +137,7 @@ struct UnifiedMetricRowView: View {
                 } label: {
                     Image(systemName: selectedDateEntry?.value == true ? "checkmark.circle.fill" : "circle")
                         .font(.title)
-                        .foregroundColor(selectedDateEntry?.value == true ? .green : .gray)
+                        .foregroundColor(selectedDateEntry?.value == true ? Color.currentSuccess : Color.currentSecondaryText)
                 }
             }
             
@@ -145,7 +146,7 @@ struct UnifiedMetricRowView: View {
                 HStack {
                     Text(CalendarHelper.isSameDay(selectedDate, Date()) ? "Today" : "Selected Day")
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundColor(Color.currentText)
                     
                     Spacer()
                     
@@ -153,12 +154,12 @@ struct UnifiedMetricRowView: View {
                         Text(selectedDateEntry?.value == true ? "Done" : "Not Done")
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(selectedDateEntry?.value == true ? .green : .secondary)
+                            .foregroundColor(selectedDateEntry?.value == true ? Color.currentSuccess : Color.currentSecondaryText)
                     } else {
                         Text(selectedDateEntry?.value == false ? "Avoided" : "Not Avoided")
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(selectedDateEntry?.value == false ? .green : .red)
+                            .foregroundColor(selectedDateEntry?.value == false ? Color.currentSuccess : Color.currentError)
                     }
                 }
                 
@@ -169,7 +170,7 @@ struct UnifiedMetricRowView: View {
                             Text("Details")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                                .foregroundColor(.primary)
+                                .foregroundColor(Color.currentText)
                             
                             Spacer()
                             
@@ -180,7 +181,7 @@ struct UnifiedMetricRowView: View {
                             } label: {
                                 Image(systemName: "pencil")
                                     .font(.caption)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color.currentPrimary)
                             }
                         }
                         
@@ -195,14 +196,14 @@ struct UnifiedMetricRowView: View {
                                         isEditingDetails = false
                                         editingDetailsText = ""
                                     }
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.currentSecondaryText)
                                     
                                     Spacer()
                                     
                                     Button("Save") {
                                         saveDetails()
                                     }
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color.currentPrimary)
                                     .fontWeight(.medium)
                                 }
                             }
@@ -210,18 +211,18 @@ struct UnifiedMetricRowView: View {
                             if let details = selectedDateEntry?.details, !details.isEmpty {
                                 Text(details)
                                     .font(.subheadline)
-                                    .foregroundColor(.primary)
+                                    .foregroundColor(Color.currentText)
                                     .padding(.vertical, 4)
                             } else if let recentDetails = recentDetails {
                                 Text(recentDetails)
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.currentSecondaryText)
                                     .italic()
                                     .padding(.vertical, 4)
                             } else {
                                 Text("Tap to add details")
                                     .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.currentSecondaryText)
                                     .italic()
                                     .padding(.vertical, 4)
                             }
@@ -236,7 +237,7 @@ struct UnifiedMetricRowView: View {
                             Text("Quantity")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                                .foregroundColor(.primary)
+                                .foregroundColor(Color.currentText)
                             
                             Spacer()
                             
@@ -246,19 +247,19 @@ struct UnifiedMetricRowView: View {
                             } label: {
                                 Image(systemName: "plus.circle")
                                     .font(.caption)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color.currentPrimary)
                             }
                         }
                         
                         if let quantityString = selectedDateEntry?.quantityString {
                             Text(quantityString)
                                 .font(.subheadline)
-                                .foregroundColor(.primary)
+                                .foregroundColor(Color.currentText)
                                 .padding(.vertical, 4)
                         } else {
                             Text("Tap to add quantity")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                                 .italic()
                                 .padding(.vertical, 4)
                         }
@@ -271,7 +272,7 @@ struct UnifiedMetricRowView: View {
                         Text("Motivation")
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(.primary)
+                            .foregroundColor(Color.currentText)
                         
                         Spacer()
                         
@@ -282,7 +283,7 @@ struct UnifiedMetricRowView: View {
                         } label: {
                             Image(systemName: "heart")
                                 .font(.caption)
-                                .foregroundColor(.pink)
+                                .foregroundColor(Color.currentAccent)
                         }
                     }
                     
@@ -297,14 +298,14 @@ struct UnifiedMetricRowView: View {
                                     isEditingMotivation = false
                                     editingMotivationText = ""
                                 }
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                                 
                                 Spacer()
                                 
                                 Button("Save") {
                                     saveMotivation()
                                 }
-                                .foregroundColor(.pink)
+                                .foregroundColor(Color.currentAccent)
                                 .fontWeight(.medium)
                             }
                         }
@@ -312,18 +313,18 @@ struct UnifiedMetricRowView: View {
                         if let motivation = selectedDateEntry?.motivation, !motivation.isEmpty {
                             Text(motivation)
                                 .font(.subheadline)
-                                .foregroundColor(.primary)
+                                .foregroundColor(Color.currentText)
                                 .padding(.vertical, 4)
                         } else if let primaryMotivation = metric.primaryMotivation, !primaryMotivation.isEmpty {
                             Text(primaryMotivation)
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                                 .italic()
                                 .padding(.vertical, 4)
                         } else {
                             Text("Tap to add motivation")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                                 .italic()
                                 .padding(.vertical, 4)
                         }
@@ -332,7 +333,7 @@ struct UnifiedMetricRowView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
         .sheet(isPresented: $showingQuantityInput) {

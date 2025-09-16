@@ -23,15 +23,16 @@ struct RestoreSheet: View {
                 VStack(spacing: 12) {
                     Image(systemName: "icloud.and.arrow.down")
                         .font(.system(size: 50))
-                        .foregroundColor(.green)
+                        .foregroundColor(Color.currentSuccess)
                     
                     Text("Restore from iCloud")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(Color.currentText)
                     
                     Text("Restore your data from the latest iCloud backup. This will replace all current data.")
                         .font(.body)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 .padding(.top)
@@ -44,7 +45,7 @@ struct RestoreSheet: View {
                         
                         Text("Checking for backups...")
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                 } else if let backupInfo = backupInfo {
                     // Backup Info
@@ -52,39 +53,43 @@ struct RestoreSheet: View {
                         HStack {
                             Text("Available Backup:")
                                 .font(.headline)
+                                .foregroundColor(Color.currentText)
                             Spacer()
                         }
                         
                         VStack(spacing: 12) {
                             HStack {
                                 Image(systemName: "calendar")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.currentPrimary)
                                 Text("Backup Date")
+                                    .foregroundColor(Color.currentText)
                                 Spacer()
                                 Text(backupInfo.timestamp, style: .date)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.currentSecondaryText)
                             }
                             
                             HStack {
                                 Image(systemName: "clock")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.currentPrimary)
                                 Text("Backup Time")
+                                    .foregroundColor(Color.currentText)
                                 Spacer()
                                 Text(backupInfo.timestamp, style: .time)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.currentSecondaryText)
                             }
                             
                             HStack {
                                 Image(systemName: "info.circle")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(.currentPrimary)
                                 Text("Version")
+                                    .foregroundColor(Color.currentText)
                                 Spacer()
                                 Text(backupInfo.version)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.currentSecondaryText)
                             }
                         }
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color.currentBackground)
                         .cornerRadius(12)
                     }
                 } else {
@@ -92,14 +97,15 @@ struct RestoreSheet: View {
                     VStack(spacing: 16) {
                         Image(systemName: "exclamationmark.triangle")
                             .font(.system(size: 40))
-                            .foregroundColor(.orange)
+                            .foregroundColor(.currentWarning)
                         
                         Text("No Backup Found")
                             .font(.headline)
+                            .foregroundColor(Color.currentText)
                         
                         Text("No iCloud backup was found. Please create a backup first.")
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                             .multilineTextAlignment(.center)
                     }
                 }
@@ -112,7 +118,7 @@ struct RestoreSheet: View {
                         
                         Text(restoreProgress)
                             .font(.body)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                 }
                 
@@ -120,10 +126,10 @@ struct RestoreSheet: View {
                 if let error = backupError {
                     Text(error)
                         .font(.body)
-                        .foregroundColor(.red)
+                        .foregroundColor(Color.currentError)
                         .multilineTextAlignment(.center)
                         .padding()
-                        .background(Color.red.opacity(0.1))
+                        .background(Color.currentError.opacity(0.1))
                         .cornerRadius(8)
                 }
                 

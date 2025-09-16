@@ -123,6 +123,66 @@ class GoalsViewModel {
         }
     }
     
+    /// Habits with goals
+    func habitsWithGoals(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = metricsWithGoals(metrics).filter { $0.safeHabitType == .positive }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Habits with goals calculation", duration: duration)
+        logger.debug("Habits with goals calculated: \(result.count)", category: .business)
+        return result
+    }
+    
+    /// Vices with goals
+    func vicesWithGoals(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = metricsWithGoals(metrics).filter { $0.safeHabitType == .vice }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Vices with goals calculation", duration: duration)
+        logger.debug("Vices with goals calculated: \(result.count)", category: .business)
+        return result
+    }
+    
+    /// Habits with boolean goals
+    func habitsWithBooleanGoals(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = habitsWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .boolean, in: $0) }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Habits with boolean goals calculation", duration: duration)
+        logger.debug("Habits with boolean goals calculated: \(result.count)", category: .business)
+        return result
+    }
+    
+    /// Vices with boolean goals
+    func vicesWithBooleanGoals(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = vicesWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .boolean, in: $0) }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Vices with boolean goals calculation", duration: duration)
+        logger.debug("Vices with boolean goals calculated: \(result.count)", category: .business)
+        return result
+    }
+    
+    /// Habits with quantity goals
+    func habitsWithQuantityGoals(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = habitsWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .quantity, in: $0) }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Habits with quantity goals calculation", duration: duration)
+        logger.debug("Habits with quantity goals calculated: \(result.count)", category: .business)
+        return result
+    }
+    
+    /// Vices with quantity goals
+    func vicesWithQuantityGoals(_ metrics: [Metric]) -> [Metric] {
+        let startTime = Date()
+        let result = vicesWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .quantity, in: $0) }
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("Vices with quantity goals calculation", duration: duration)
+        logger.debug("Vices with quantity goals calculated: \(result.count)", category: .business)
+        return result
+    }
+    
     // MARK: - Actions
     /// Show add goal sheet
     func showAddGoal() {

@@ -39,19 +39,20 @@ struct GoalHistoryView: View {
                 VStack(spacing: 8) {
                     HStack {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
                             .font(.title2)
                         
                         Text(metric.name)
                             .font(.title2)
                             .fontWeight(.bold)
+                            .foregroundColor(.currentText)
                         
                         Spacer()
                     }
                     
                     Text("Goal History")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                 }
                 .padding(.horizontal, 16)
                 
@@ -60,6 +61,7 @@ struct GoalHistoryView: View {
                     HStack {
                         Text("View Periods")
                             .font(.headline)
+                            .foregroundColor(.currentText)
                         Spacer()
                     }
                     
@@ -153,13 +155,13 @@ struct HistoricalPeriodCard: View {
             // Status indicator
             VStack(spacing: 4) {
                 Image(systemName: period.wasAchieved ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundColor(period.wasAchieved ? .green : .red)
+                    .foregroundColor(period.wasAchieved ? .currentSuccess : .currentError)
                     .font(.title2)
                 
                 Text(period.wasAchieved ? "✓" : "✗")
                     .font(.caption2)
                     .fontWeight(.bold)
-                    .foregroundColor(period.wasAchieved ? .green : .red)
+                    .foregroundColor(period.wasAchieved ? .currentSuccess : .currentError)
             }
             
             // Period info
@@ -167,10 +169,11 @@ struct HistoricalPeriodCard: View {
                 Text(period.periodDescription)
                     .font(.subheadline)
                     .fontWeight(.medium)
+                    .foregroundColor(.currentText)
                 
                 Text("\(period.progress)/\(period.target) days")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
             }
             
             Spacer()
@@ -179,21 +182,21 @@ struct HistoricalPeriodCard: View {
             VStack(alignment: .trailing, spacing: 4) {
                 let percentage = Double(period.progress) / Double(period.target)
                 ProgressView(value: percentage, total: 1.0)
-                    .progressViewStyle(LinearProgressViewStyle(tint: period.wasAchieved ? .green : .red))
+                    .progressViewStyle(LinearProgressViewStyle(tint: period.wasAchieved ? .currentSuccess : .currentError))
                     .frame(width: 80)
                 
                 Text("\(Int(percentage * 100))%")
                     .font(.caption2)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
             }
         }
         .padding(16)
-        .background(Color(.systemBackground))
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(period.wasAchieved ? Color.green.opacity(0.3) : Color.red.opacity(0.3), lineWidth: 1)
+                .stroke(period.wasAchieved ? Color.currentSuccess.opacity(0.3) : Color.currentError.opacity(0.3), lineWidth: 1)
         )
     }
 }
@@ -210,11 +213,12 @@ struct QuantityGoalHistoryView: View {
                 Text("Quantity Goal History")
                     .font(.title2)
                     .fontWeight(.bold)
+                    .foregroundColor(.currentText)
                     .padding()
                 
                 Text("Coming Soon")
                     .font(.body)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
                 
                 Spacer()
             }

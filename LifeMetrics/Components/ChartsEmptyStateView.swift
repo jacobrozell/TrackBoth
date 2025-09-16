@@ -12,37 +12,39 @@ struct ChartsEmptyStateView: View {
                 VStack(spacing: 12) {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .font(.system(size: 50))
-                        .foregroundStyle(.blue.gradient)
+                        .foregroundStyle(Color.currentPrimary.gradient)
                         .scaleEffect(animateChart ? 1.1 : 1.0)
                         .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: animateChart)
                     
                     Text("Your Journey Starts Here")
                         .font(.title2)
                         .fontWeight(.bold)
+                        .foregroundColor(.currentText)
                     
                     Text("Track your habits and watch your progress unfold")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
                 
                 // Sample Charts Preview
                 VStack(spacing: 20) {
-                    Text("See wThe rarely / sometimes / buttons are not selectablehat's possible")
+                    Text("See what's possible")
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.currentText)
                     
                     // Sample Line Chart
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
                             Text("30-Day Progress")
                                 .font(.headline)
+                                .foregroundColor(.currentText)
                             Spacer()
                             Text("Sample Data")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color(.systemGray5))
+                                .background(Color.currentSecondaryBackground)
                                 .cornerRadius(8)
                         }
                         
@@ -51,19 +53,19 @@ struct ChartsEmptyStateView: View {
                                 x: .value("Day", dataPoint.day),
                                 y: .value("Habits", dataPoint.habits)
                             )
-                            .foregroundStyle(.blue)
+                            .foregroundStyle(Color.currentPrimary)
                             .lineStyle(StrokeStyle(lineWidth: 3))
                             
                             AreaMark(
                                 x: .value("Day", dataPoint.day),
                                 y: .value("Habits", dataPoint.habits)
                             )
-                            .foregroundStyle(.blue.opacity(0.2))
+                            .foregroundStyle(Color.currentPrimary.opacity(0.2))
                         }
                         .frame(height: 150)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.currentBackground)
                     .cornerRadius(12)
                     
                     // Sample Heatmap
@@ -71,20 +73,21 @@ struct ChartsEmptyStateView: View {
                         HStack {
                             Text("Consistency Heatmap")
                                 .font(.headline)
+                                .foregroundColor(.currentText)
                             Spacer()
                             Text("Sample Data")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(.currentSecondaryText)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
-                                .background(Color(.systemGray5))
+                                .background(Color.currentSecondaryBackground)
                                 .cornerRadius(8)
                         }
                         
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 3), count: 13), spacing: 3) {
                             ForEach(sampleHeatmapData) { data in
                                 Rectangle()
-                                    .fill(data.completed ? Color.green : Color.gray.opacity(0.3))
+                                    .fill(data.completed ? Color.currentSuccess : Color.currentSecondaryText.opacity(0.3))
                                     .frame(height: 15)
                                     .cornerRadius(3)
                             }
@@ -92,7 +95,7 @@ struct ChartsEmptyStateView: View {
                         .frame(height: 120)
                     }
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color.currentBackground)
                     .cornerRadius(12)
                 }
                 
@@ -101,6 +104,7 @@ struct ChartsEmptyStateView: View {
                     Text("Every expert was once a beginner")
                         .font(.title3)
                         .fontWeight(.semibold)
+                        .foregroundColor(.currentText)
                         .multilineTextAlignment(.center)
                     
                     VStack(spacing: 12) {
@@ -117,9 +121,10 @@ struct ChartsEmptyStateView: View {
                 VStack(spacing: 12) {
                     Text("Ready to start your journey?")
                         .font(.headline)
+                        .foregroundColor(.currentText)
                     
                     Text("Add your first habit or vice to begin tracking")
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
             }
@@ -165,15 +170,17 @@ struct FeatureRow: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title2)
+            // TODO
                 .foregroundStyle(.blue.gradient)
                 .frame(width: 30)
             
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.headline)
+                    .foregroundColor(.currentText)
                 Text(description)
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.currentSecondaryText)
             }
             
             Spacer()

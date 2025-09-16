@@ -4,6 +4,7 @@ import SwiftUI
 struct WeeklyDateNavigationView: View {
     @Binding var selectedDate: Date
     let canGoBack: Bool
+    let canGoForward: Bool
     let isCurrentWeek: Bool
     
     var body: some View {
@@ -14,7 +15,7 @@ struct WeeklyDateNavigationView: View {
                 }
             } label: {
                 Image(systemName: "chevron.left")
-                    .foregroundColor(canGoBack ? .blue : .gray)
+                    .foregroundColor(canGoBack ? .currentPrimary : .currentSecondaryText)
             }
             .disabled(!canGoBack)
             
@@ -26,21 +27,24 @@ struct WeeklyDateNavigationView: View {
                 VStack(spacing: 2) {
                     Text(weekDisplayText)
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.currentText)
                     Text(weekRangeText)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.currentSecondaryText)
                 }
             }
             
             Spacer()
             
             Button {
-                selectedDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: selectedDate) ?? selectedDate
+                if canGoForward {
+                    selectedDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: selectedDate) ?? selectedDate
+                }
             } label: {
                 Image(systemName: "chevron.right")
-                    .foregroundColor(.blue)
+                    .foregroundColor(canGoForward ? .currentPrimary : .currentSecondaryText)
             }
+            .disabled(!canGoForward)
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)

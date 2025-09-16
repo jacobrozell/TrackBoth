@@ -1,25 +1,23 @@
 import SwiftUI
 import SwiftData
 
-struct EditMetricView: View {
-    @Environment(\.dismiss) private var dismiss
+struct AddMetricView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var entries: [MetricEntry]
-    @State var metric: Metric
-    @State private var name: String = ""
-    @State private var habitType: HabitType = .positive
-    @State private var goalPeriod: GoalPeriod = .monthly
+    @Environment(\.dismiss) private var dismiss
+    @State private var metricName = ""
+    @State private var selectedHabitType: HabitType = .positive
+    @State private var primaryMotivation = ""
+    @State private var selectedGoalPeriod: GoalPeriod = .monthly
     @State private var goalTarget: Int = 20
-    @State private var primaryMotivation: String = ""
     
-    private var maxTargetForEditPeriod: Int {
-        goalPeriod.maxDays
+    private var maxTargetForPeriod: Int {
+        selectedGoalPeriod.maxDays
     }
     
-    private var quickPresetsForEdit: [QuickPreset] {
-        let isVice = habitType == .vice
+    private var quickPresets: [QuickPreset] {
+        let isVice = selectedHabitType == .vice
         
-        switch goalPeriod {
+        switch selectedGoalPeriod {
         case .weekly:
             return isVice ? [
                 QuickPreset(title: "Never", target: 0),
@@ -70,27 +68,22 @@ struct EditMetricView: View {
             ]
         }
     }
-
-    init(metric: Metric) {
-        _metric = State(initialValue: metric)
-        _name = State(initialValue: metric.name)
-        _habitType = State(initialValue: metric.safeHabitType)
-        _goalPeriod = State(initialValue: metric.booleanGoals.first?.period ?? .monthly)
-        _goalTarget = State(initialValue: metric.booleanGoals.first?.target ?? 20)
-        _primaryMotivation = State(initialValue: metric.primaryMotivation ?? "")
-    }
-
+    
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
-                    TextField("Habit name", text: $name)
+                    TextField("Habit name", text: $metricName)
                 } header: {
                     Text("Habit Name")
+                } footer: {
+                    Text(selectedHabitType == .positive ? 
+                         "Enter a name for your positive habit (e.g., 'Exercise', 'Read', 'Meditate')" :
+                         "Enter a name for the habit you want to avoid (e.g., 'Smoking', 'Junk Food', 'Social Media')")
                 }
-
+                
                 Section {
-                    Picker("Habit Type", selection: $habitType) {
+                    Picker("Habit Type", selection: $selectedHabitType) {
                         ForEach(HabitType.allCases, id: \.self) { type in
                             Text(type.displayName).tag(type)
                         }
@@ -98,12 +91,20 @@ struct EditMetricView: View {
                     .pickerStyle(.segmented)
                 } header: {
                     Text("Habit Type")
+                } footer: {
+                    HStack {
+                        Image(systemName: selectedHabitType.icon)
+                            .foregroundColor(selectedHabitType == .positive ? Color.currentSuccess : Color.currentError)
+                        Text(selectedHabitType == .positive ? 
+                             "Track days when you successfully do this positive habit" :
+                             "Track days when you successfully avoid this vice")
+                    }
                 }
-
+                
                 // Primary motivation section
                 Section {
                     TextField(
-                        habitType == .vice ? "Why do you want to avoid this?" : "What motivates you to do this?",
+                        selectedHabitType == .vice ? "Why do you want to avoid this?" : "What motivates you to do this?",
                         text: $primaryMotivation, 
                         axis: .vertical
                     )
@@ -111,44 +112,62 @@ struct EditMetricView: View {
                 } header: {
                     Text("Primary Motivation")
                 } footer: {
-                    Text(habitType == .vice ? 
-                         "Your main reason for avoiding this vice. Used to keep you focused." :
-                         "Your main motivation for doing this habit. Helps keep you focused on your goals.")
+                    Text(selectedHabitType == .vice ? 
+                         "This will be your main reason for avoiding this vice. You can add more motivations later." :
+                         "This will be your main motivation for doing this habit. Helps keep you focused on your goals.")
                 }
-
+                
+                // Target section (embedded into habit)
                 Section {
-                    Picker("Period", selection: $goalPeriod) {
+                    Picker("Period", selection: $selectedGoalPeriod) {
                         ForEach(GoalPeriod.allCases, id: \.self) { period in
                             Text(period.displayName).tag(period)
                         }
                     }
                     .pickerStyle(.segmented)
+                    .onChange(of: selectedGoalPeriod) { _, newPeriod in
+                        // Reset goal target to a reasonable default when period changes
+                        let maxDays = newPeriod.maxDays
+                        if goalTarget > maxDays {
+                            // Set to a reasonable default based on period
+                            switch newPeriod {
+                            case .weekly:
+                                goalTarget = selectedHabitType == .vice ? 2 : 5
+                            case .biWeekly:
+                                goalTarget = selectedHabitType == .vice ? 4 : 10
+                            case .monthly:
+                                goalTarget = selectedHabitType == .vice ? 8 : 20
+                            case .yearly:
+                                goalTarget = selectedHabitType == .vice ? 50 : 200
+                            }
+                        }
+                    }
 
                     // Improved goal target selection
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text(habitType == .vice ? "Max Days" : "Target Days")
+                            Text(selectedHabitType == .vice ? "Max Days" : "Target Days")
                                 .font(.headline)
                             Spacer()
                             Text("\(goalTarget)")
                                 .font(.headline)
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color.currentPrimary)
                         }
                         
                         Slider(value: Binding(
                             get: { Double(goalTarget) },
                             set: { goalTarget = Int($0) }
-                        ), in: 1.0...Double(maxTargetForEditPeriod), step: 1.0)
-                        .accentColor(.blue)
+                        ), in: 1.0...Double(maxTargetForPeriod), step: 1.0)
+                        .accentColor(Color.currentPrimary)
                         
                         HStack {
                             Text("1")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color.currentSecondaryText)
                             Spacer()
-                            Text("\(maxTargetForEditPeriod)")
+                            Text("\(maxTargetForPeriod)")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color.currentSecondaryText)
                         }
                         
                         // Quick preset buttons with enhanced styling
@@ -156,20 +175,20 @@ struct EditMetricView: View {
                             Text("Quick Presets")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color.currentSecondaryText)
                             
                             LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
-                                ForEach(quickPresetsForEdit, id: \.title) { preset in
+                                ForEach(quickPresets, id: \.title) { preset in
                                     Button(action: {
                                         goalTarget = preset.target
                                     }) {
                                         VStack(spacing: 4) {
                                             Text(preset.title)
                                                 .font(.system(size: 14, weight: .medium))
-                                                .foregroundColor(.primary)
+                                                .foregroundColor(Color.currentText)
                                             Text("\(preset.target) days")
                                                 .font(.caption)
-                                                .foregroundColor(.secondary)
+                                                .foregroundColor(Color.currentSecondaryText)
                                         }
                                         .frame(maxWidth: .infinity)
                                         .padding(.vertical, 12)
@@ -177,14 +196,14 @@ struct EditMetricView: View {
                                         .background(
                                             RoundedRectangle(cornerRadius: 12)
                                                 .fill(goalTarget == preset.target ? 
-                                                    Color.blue.opacity(0.2) : 
-                                                    Color(.systemGray6))
+                                                    Color.currentPrimary.opacity(0.2) : 
+                                                    Color.currentSecondaryBackground)
                                         )
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 12)
                                                 .stroke(goalTarget == preset.target ? 
-                                                    Color.blue : 
-                                                    Color(.systemGray4), lineWidth: goalTarget == preset.target ? 2 : 1)
+                                                    Color.currentPrimary : 
+                                                    Color.currentSecondaryBackground, lineWidth: goalTarget == preset.target ? 2 : 1)
                                         )
                                     }
                                     .buttonStyle(PlainButtonStyle())
@@ -193,46 +212,56 @@ struct EditMetricView: View {
                         }
                     }
                 } header: {
-                    Text(habitType == .vice ? "Target (Maximum Days)" : "Target (Days)")
+                    Text(selectedHabitType == .vice ? "Target (Maximum Days)" : "Target (Days)")
+                } footer: {
+                    Text(selectedHabitType == .vice ?
+                         "Maximum number of days you'll allow yourself to do this vice per \(selectedGoalPeriod.displayName.lowercased())." :
+                         "How many days do you want to do this habit per \(selectedGoalPeriod.displayName.lowercased())?")
                 }
+
             }
-            .navigationTitle("Edit Habit")
+            .navigationTitle("Add Habit")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel") {
+                        dismiss()
+                    }
                 }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") { saveChanges() }
+                    Button("Save") {
+                        saveMetric()
+                    }
+                    .disabled(metricName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
-            }
-            .onAppear {
-                // Primary motivation is already loaded from metric.primaryMotivation in init
             }
         }
     }
-
-    private func saveChanges() {
-        metric.name = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        metric.habitType = habitType
-        let trimmedMotivation = primaryMotivation.trimmingCharacters(in: .whitespacesAndNewlines)
-        metric.primaryMotivation = trimmedMotivation.isEmpty ? nil : trimmedMotivation
+    
+    private func saveMetric() {
+        let trimmedName = metricName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty else { return }
         
-        // Update or create boolean goal
-        if let existingGoal = metric.booleanGoals.first {
-            existingGoal.period = goalPeriod
-            existingGoal.target = goalTarget
-        } else {
-            let newGoal = Goal(
-                goalType: .boolean,
-                period: goalPeriod,
-                target: goalTarget
-            )
-            newGoal.metric = metric
-            metric.goals?.append(newGoal)
-            modelContext.insert(newGoal)
-        }
-
+        let trimmedMotivation = primaryMotivation.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        let metric = Metric(
+            name: trimmedName,
+            habitType: selectedHabitType,
+            primaryMotivation: trimmedMotivation.isEmpty ? nil : trimmedMotivation
+        )
+        modelContext.insert(metric)
+        
+        // Create a boolean goal for the metric
+        let goal = Goal(
+            goalType: .boolean,
+            period: selectedGoalPeriod,
+            target: goalTarget
+        )
+        goal.metric = metric
+        metric.goals?.append(goal)
+        modelContext.insert(goal)
+        
         try? modelContext.save()
         dismiss()
     }

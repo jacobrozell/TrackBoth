@@ -11,7 +11,7 @@ struct OnboardingView: View {
         ZStack {
             // Background gradient
             LinearGradient(
-                colors: [Color.blue.opacity(0.1), Color.purple.opacity(0.1)],
+                colors: [Color.currentPrimary.opacity(0.1), Color.currentAccent.opacity(0.1)],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
@@ -34,7 +34,7 @@ struct OnboardingView: View {
                     HStack(spacing: 8) {
                         ForEach(pages.indices, id: \.self) { index in
                             Circle()
-                                .fill(currentPage == index ? Color.accentColor : Color.gray.opacity(0.3))
+                                .fill(currentPage == index ? Color.currentAccent : Color.currentSecondaryText.opacity(0.3))
                                 .frame(width: 8, height: 8)
                                 .scaleEffect(currentPage == index ? 1.2 : 1.0)
                                 .animation(.easeInOut(duration: 0.2), value: currentPage)
@@ -107,12 +107,12 @@ struct OnboardingPageView: View {
             VStack(spacing: 16) {
                 Text(page.title)
                     .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color.currentText)
                     .multilineTextAlignment(.center)
                 
                 Text(page.description)
                     .font(.system(size: 18, weight: .regular))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color.currentSecondaryText)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
                     .padding(.horizontal, 20)
@@ -136,7 +136,7 @@ struct OnboardingPage {
             title: "Welcome to QuickLog",
             description: "Track your habits and vices with simple yes/no logging. Build streaks, set goals, and visualize your progress over time.",
             icon: "house.fill",
-            color: .blue
+            color: Color.currentPrimary
         ),
         OnboardingPage(
             title: "Home Tab",
@@ -154,7 +154,7 @@ struct OnboardingPage {
             title: "Goals Tab",
             description: "Set monthly and yearly targets for your habits. Track progress with visual indicators and stay motivated to reach your goals.",
             icon: "target",
-            color: .purple
+            color: Color.currentAccent
         ),
         OnboardingPage(
             title: "Charts Tab",

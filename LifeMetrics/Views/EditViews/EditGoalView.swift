@@ -16,12 +16,12 @@ struct EditGoalView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     HStack {
                         Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .green : .red)
+                            .foregroundColor(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
                         Text(metric.name)
                             .font(.headline)
                     }
@@ -36,6 +36,12 @@ struct EditGoalView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    .onChange(of: selectedPeriod) { _, newPeriod in
+                        // Clamp customTarget to new period's bounds when period changes
+                        if customTarget > newPeriod.maxDays {
+                            customTarget = newPeriod.maxDays
+                        }
+                    }
                 } header: {
                     Text("Goal Period")
                 }
@@ -48,23 +54,23 @@ struct EditGoalView: View {
                             Spacer()
                             Text("\(customTarget) days")
                                 .font(.headline)
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color.currentPrimary)
                         }
                         
                         Slider(value: Binding(
                             get: { Double(customTarget) },
                             set: { customTarget = Int($0) }
                         ), in: 1.0...Double(maxTarget), step: 1.0)
-                        .accentColor(.blue)
+                        .accentColor(Color.currentPrimary)
                         
                         HStack {
                             Text("1")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color.currentSecondaryText)
                             Spacer()
                             Text("\(maxTarget)")
                                 .font(.caption)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color.currentSecondaryText)
                         }
                     }
                 } header: {

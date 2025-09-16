@@ -5,6 +5,9 @@ import SwiftData
 struct DemoDataGenerator {
     
     static func generateDemoData(modelContext: ModelContext) {
+        // Mark that demo data has been generated
+        UserDefaults.standard.set(true, forKey: "hasDemoData")
+        
         // Create demo metrics
         let demoMetrics = [
             Metric(name: "Morning Exercise", habitType: .positive),
@@ -12,7 +15,12 @@ struct DemoDataGenerator {
             Metric(name: "Meditation", habitType: .positive),
             Metric(name: "Drink Water", habitType: .positive),
             Metric(name: "Social Media", habitType: .vice),
-            Metric(name: "Late Night Snacks", habitType: .vice)
+            Metric(name: "Late Night Snacks", habitType: .vice),
+            // Quantity-type metrics for testing quantity charts
+            Metric(name: "Steps Walked", habitType: .positive),
+            Metric(name: "Pages Read", habitType: .positive),
+            Metric(name: "Cigarettes Smoked", habitType: .vice),
+            Metric(name: "Cups of Coffee", habitType: .vice)
         ]
         
         // Insert metrics
@@ -36,10 +44,15 @@ struct DemoDataGenerator {
                 )
                 
                 if shouldComplete {
+                    // Generate quantity data for quantity-type metrics
+                    let (quantity, unit) = generateQuantityData(for: metric)
+                    
                     let entry = MetricEntry(
                         metricID: metric.id,
                         date: currentDate,
-                        value: true
+                        value: true,
+                        quantity: quantity,
+                        unit: unit
                     )
                     modelContext.insert(entry)
                 }
@@ -100,6 +113,14 @@ struct DemoDataGenerator {
             baseProbability *= 1.1 // Social media is tempting
         case "Late Night Snacks":
             baseProbability *= 0.9 // Snacks are moderately tempting
+        case "Steps Walked":
+            baseProbability *= 1.0 // Moderate difficulty
+        case "Pages Read":
+            baseProbability *= 0.9 // Reading pages requires effort
+        case "Cigarettes Smoked":
+            baseProbability *= 0.8 // Smoking is a vice to avoid
+        case "Cups of Coffee":
+            baseProbability *= 1.2 // Coffee is tempting but trackable
         default:
             break
         }
@@ -114,7 +135,26 @@ struct DemoDataGenerator {
         return Double.random(in: 0...1) < baseProbability
     }
     
+    private static func generateQuantityData(for metric: Metric) -> (Int?, String?) {
+        switch metric.name {
+        case "Steps Walked":
+            return (Int.random(in: 3000...15000), "steps")
+        case "Pages Read":
+            return (Int.random(in: 5...50), "pages")
+        case "Cigarettes Smoked":
+            return (Int.random(in: 1...20), "cigarettes")
+        case "Cups of Coffee":
+            return (Int.random(in: 1...8), "cups")
+        default:
+            // For boolean-type metrics, return nil for quantity
+            return (nil, nil)
+        }
+    }
+    
     static func clearDemoData(modelContext: ModelContext) {
+        // Clear the demo data flag
+        UserDefaults.standard.set(false, forKey: "hasDemoData")
+        
         // Delete all metrics and entries
         do {
             try modelContext.delete(model: Metric.self)
@@ -123,5 +163,9 @@ struct DemoDataGenerator {
         } catch {
             print("Error clearing demo data: \(error)")
         }
+    }
+    
+    static func hasDemoData() -> Bool {
+        return UserDefaults.standard.bool(forKey: "hasDemoData")
     }
 }
