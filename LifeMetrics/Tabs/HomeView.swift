@@ -324,8 +324,26 @@ struct HomeView: View {
                         }
                     }
                 }
-                .navigationTitle("QuickLog")
+                .navigationTitle("TrackBoth")
                 .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        if metrics.isEmpty {
+                            Button("Try Demo Data") {
+                                logger.logUserAction("Generate demo data")
+                                DemoDataGenerator.generateDemoData(modelContext: modelContext)
+                            }
+                            .font(.caption)
+                            .foregroundColor(Color.currentPrimary)
+                        } else if DemoDataGenerator.hasDemoData() {
+                            Button("Undo Demo Data") {
+                                logger.logUserAction("Clear demo data")
+                                DemoDataGenerator.clearDemoData(modelContext: modelContext)
+                            }
+                            .font(.caption)
+                            .foregroundColor(Color.currentWarning)
+                        }
+                    }
+                    
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
                             logger.logUserAction("Settings button tapped")

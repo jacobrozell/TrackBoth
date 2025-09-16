@@ -25,8 +25,8 @@ struct LogHabitIntent: AppIntent {
 // MARK: - Open App Intent
 /// App Intent for opening the main app
 struct OpenAppIntent: AppIntent {
-    static var title: LocalizedStringResource = "Open QuickLog"
-    static var description: IntentDescription = "Open the QuickLog app"
+    static var title: LocalizedStringResource = "Open TrackBoth"
+    static var description: IntentDescription = "Open the TrackBoth app"
     
     func perform() async throws -> some IntentResult & OpensIntent {
         logger.logUserAction("Open app intent")
@@ -38,7 +38,7 @@ struct OpenAppIntent: AppIntent {
 /// App Intent for opening the Charts view
 struct OpenChartsIntent: AppIntent {
     static var title: LocalizedStringResource = "Open Charts"
-    static var description: IntentDescription = "Open the Charts view in QuickLog"
+    static var description: IntentDescription = "Open the Charts view in TrackBoth"
     
     func perform() async throws -> some IntentResult & OpensIntent {
         return .result(opensIntent: true)
@@ -49,7 +49,7 @@ struct OpenChartsIntent: AppIntent {
 /// App Intent for opening the Goals view
 struct OpenGoalsIntent: AppIntent {
     static var title: LocalizedStringResource = "Open Goals"
-    static var description: IntentDescription = "Open the Goals view in QuickLog"
+    static var description: IntentDescription = "Open the Goals view in TrackBoth"
     
     func perform() async throws -> some IntentResult & OpensIntent {
         return .result(opensIntent: true)

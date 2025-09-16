@@ -135,7 +135,7 @@ class iCloudBackupService {
         logger.info("Uploading backup to iCloud - Timestamp: \(DateFormatter.dateFormatter.string(from: backupData.timestamp))", category: .network)
         let startTime = Date()
         
-        let record = CKRecord(recordType: "QuickLogBackup")
+        let record = CKRecord(recordType: "TrackBothBackup")
         record["timestamp"] = backupData.timestamp
         record["version"] = backupData.version
         
@@ -153,7 +153,7 @@ class iCloudBackupService {
     
     /// Download latest backup from iCloud
     func downloadLatestBackup() async throws -> BackupData {
-        let query = CKQuery(recordType: "QuickLogBackup", predicate: NSPredicate(value: true))
+        let query = CKQuery(recordType: "TrackBothBackup", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         
         let results = try await database.records(matching: query)
@@ -249,7 +249,7 @@ class iCloudBackupService {
     
     /// Get backup info
     func getBackupInfo() async throws -> BackupInfo {
-        let query = CKQuery(recordType: "QuickLogBackup", predicate: NSPredicate(value: true))
+        let query = CKQuery(recordType: "TrackBothBackup", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         
         let results = try await database.records(matching: query)

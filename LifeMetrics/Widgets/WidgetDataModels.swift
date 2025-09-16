@@ -9,8 +9,8 @@ import SwiftData
 class WidgetDataManager {
     static let shared = WidgetDataManager()
     
-    private let appGroupIdentifier = "group.com.quicklog.app"
-    private let userDefaults = UserDefaults(suiteName: "group.com.quicklog.app")
+    private let appGroupIdentifier = "group.com.trackboth.app"
+    private let userDefaults = UserDefaults(suiteName: "group.com.trackboth.app")
     
     private init() {}
     
@@ -20,7 +20,7 @@ class WidgetDataManager {
     func saveMetrics(_ metrics: [Metric]) {
         logger.info("Saving metrics data for widget - Count: \(metrics.count)", category: .widget)
         let widgetMetrics = metrics.map { metric in
-            QuickLogEntry.WidgetMetric(
+            TrackBothEntry.WidgetMetric(
                 id: metric.id.uuidString,
                 name: metric.name,
                 habitType: metric.safeHabitType.rawValue,
@@ -38,7 +38,7 @@ class WidgetDataManager {
     func saveEntries(_ entries: [MetricEntry]) {
         logger.info("Saving entries data for widget - Count: \(entries.count)", category: .widget)
         let widgetEntries = entries.map { entry in
-            QuickLogEntry.WidgetEntry(
+            TrackBothEntry.WidgetEntry(
                 metricID: entry.metricID.uuidString,
                 value: entry.value,
                 quantity: entry.quantity,
@@ -54,7 +54,7 @@ class WidgetDataManager {
     /// Save streaks data for widget
     func saveStreaks(_ streaks: [WidgetStreakData]) {
         let widgetStreaks = streaks.map { streak in
-            QuickLogEntry.WidgetStreak(
+            TrackBothEntry.WidgetStreak(
                 metricID: streak.metricID.uuidString,
                 currentStreak: streak.currentStreak,
                 longestStreak: streak.longestStreak
@@ -69,7 +69,7 @@ class WidgetDataManager {
     /// Save goals data for widget
     func saveGoals(_ goals: [WidgetGoalData]) {
         let widgetGoals = goals.map { goal in
-            QuickLogEntry.WidgetGoal(
+            TrackBothEntry.WidgetGoal(
                 metricID: goal.metricID.uuidString,
                 name: goal.name,
                 progress: goal.progress,
@@ -86,36 +86,36 @@ class WidgetDataManager {
     // MARK: - Data Retrieval
     
     /// Load metrics data for widget
-    func loadMetrics() -> [QuickLogEntry.WidgetMetric] {
+    func loadMetrics() -> [TrackBothEntry.WidgetMetric] {
         guard let data = userDefaults?.data(forKey: "widget_metrics"),
-              let metrics = try? JSONDecoder().decode([QuickLogEntry.WidgetMetric].self, from: data) else {
+              let metrics = try? JSONDecoder().decode([TrackBothEntry.WidgetMetric].self, from: data) else {
             return []
         }
         return metrics
     }
     
     /// Load entries data for widget
-    func loadEntries() -> [QuickLogEntry.WidgetEntry] {
+    func loadEntries() -> [TrackBothEntry.WidgetEntry] {
         guard let data = userDefaults?.data(forKey: "widget_entries"),
-              let entries = try? JSONDecoder().decode([QuickLogEntry.WidgetEntry].self, from: data) else {
+              let entries = try? JSONDecoder().decode([TrackBothEntry.WidgetEntry].self, from: data) else {
             return []
         }
         return entries
     }
     
     /// Load streaks data for widget
-    func loadStreaks() -> [QuickLogEntry.WidgetStreak] {
+    func loadStreaks() -> [TrackBothEntry.WidgetStreak] {
         guard let data = userDefaults?.data(forKey: "widget_streaks"),
-              let streaks = try? JSONDecoder().decode([QuickLogEntry.WidgetStreak].self, from: data) else {
+              let streaks = try? JSONDecoder().decode([TrackBothEntry.WidgetStreak].self, from: data) else {
             return []
         }
         return streaks
     }
     
     /// Load goals data for widget
-    func loadGoals() -> [QuickLogEntry.WidgetGoal] {
+    func loadGoals() -> [TrackBothEntry.WidgetGoal] {
         guard let data = userDefaults?.data(forKey: "widget_goals"),
-              let goals = try? JSONDecoder().decode([QuickLogEntry.WidgetGoal].self, from: data) else {
+              let goals = try? JSONDecoder().decode([TrackBothEntry.WidgetGoal].self, from: data) else {
             return []
         }
         return goals
@@ -142,9 +142,9 @@ struct WidgetGoalData {
     let period: GoalPeriod
 }
 
-// MARK: - Widget Entry (Moved from QuickLogWidget.swift)
+// MARK: - Widget Entry (Moved from TrackBothWidget.swift)
 /// Timeline entry containing widget data
-struct QuickLogEntry: TimelineEntry {
+struct TrackBothEntry: TimelineEntry {
     let date: Date
     let metrics: [WidgetMetric]
     let todaysEntries: [WidgetEntry]

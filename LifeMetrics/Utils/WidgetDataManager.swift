@@ -7,8 +7,8 @@ import WidgetKit
 class WidgetDataManager {
     static let shared = WidgetDataManager()
     
-    private let appGroupIdentifier = "group.com.quicklog.app"
-    private let userDefaults = UserDefaults(suiteName: "group.com.quicklog.app")
+    private let appGroupIdentifier = "group.com.trackboth.app"
+    private let userDefaults = UserDefaults(suiteName: "group.com.trackboth.app")
     
     private init() {}
     

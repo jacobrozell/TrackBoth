@@ -7,23 +7,53 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B9C2D872E734AAB0089A5FD /* LifeMetricsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C2D642E734AAB0089A5FD /* LifeMetricsApp.swift */; };
+		0B9C2D872E734AAB0089A5FD /* TrackBothApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C2D642E734AAB0089A5FD /* TrackBothApp.swift */; };
 		0B9C2D8E2E734AAB0089A5FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B9C2D622E734AAB0089A5FD /* Assets.xcassets */; };
 		0B9C31DE2E7912350089A5FD /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C31D22E7912350089A5FD /* OnboardingView.swift */; };
 		0B9C31F22E7915660089A5FD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C31E62E7915660089A5FD /* ContentView.swift */; };
+		0B9C31FF2E7916A00089A5FD /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9C31FE2E7916A00089A5FD /* WidgetKit.framework */; };
+		0B9C32012E7916A00089A5FD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9C32002E7916A00089A5FD /* SwiftUI.framework */; };
+		0B9C32122E7916A20089A5FD /* TrackBoth-WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		0B9C32102E7916A20089A5FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0B9C2CA92E714E630089A5FD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0B9C31FB2E7916A00089A5FD;
+			remoteInfo = "TrackBoth-WidgetExtension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0B9C32172E7916A20089A5FD /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0B9C32122E7916A20089A5FD /* TrackBoth-WidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		0B9C2CB12E714E630089A5FD /* LifeMetrics.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LifeMetrics.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B9C2CB12E714E630089A5FD /* TrackBoth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackBoth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9C2D622E734AAB0089A5FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0B9C2D632E734AAB0089A5FD /* LifeMetrics.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LifeMetrics.entitlements; sourceTree = "<group>"; };
-		0B9C2D642E734AAB0089A5FD /* LifeMetricsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeMetricsApp.swift; sourceTree = "<group>"; };
+		0B9C2D632E734AAB0089A5FD /* TrackBoth.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TrackBoth.entitlements; sourceTree = "<group>"; };
+		0B9C2D642E734AAB0089A5FD /* TrackBothApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackBothApp.swift; sourceTree = "<group>"; };
 		0B9C31D22E7912350089A5FD /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		0B9C31E62E7915660089A5FD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "TrackBoth-WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0B9C31FE2E7916A00089A5FD /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		0B9C32002E7916A00089A5FD /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0B9C2DEB2E735AE50089A5FD /* Exceptions for "ViewModels" folder in "LifeMetrics" target */ = {
+		0B9C2DEB2E735AE50089A5FD /* Exceptions for "ViewModels" folder in "TrackBoth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				ChartsViewModel.swift,
@@ -33,9 +63,9 @@
 				MotivationViewModel.swift,
 				SettingsViewModel.swift,
 			);
-			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
 		};
-		0B9C30FC2E73C64D0089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */ = {
+		0B9C30FC2E73C64D0089A5FD /* Exceptions for "Models" folder in "TrackBoth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AppTheme.swift,
@@ -47,9 +77,9 @@
 				MetricEntry.swift,
 				QuickPreset.swift,
 			);
-			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
 		};
-		0B9C31112E73C6590089A5FD /* Exceptions for "Views" folder in "LifeMetrics" target */ = {
+		0B9C31112E73C6590089A5FD /* Exceptions for "Views" folder in "TrackBoth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				AddViews/AddGoalView.swift,
@@ -60,9 +90,9 @@
 				EditViews/EditMetricView.swift,
 				ThemeSelectionView.swift,
 			);
-			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
 		};
-		0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */ = {
+		0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "TrackBoth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				BackupSheet.swift,
@@ -98,9 +128,9 @@
 				StreakInfoView.swift,
 				UnifiedMetricRowView.swift,
 			);
-			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
 		};
-		0B9C31F42E7915660089A5FD /* Exceptions for "Tabs" folder in "LifeMetrics" target */ = {
+		0B9C31F42E7915660089A5FD /* Exceptions for "Tabs" folder in "TrackBoth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				ChartsView.swift,
@@ -110,7 +140,14 @@
 				MotivationView.swift,
 				SettingsView.swift,
 			);
-			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
+			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
+		};
+		0B9C32162E7916A20089A5FD /* Exceptions for "TrackBoth-Widget" folder in "TrackBoth-WidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0B9C31FB2E7916A00089A5FD /* TrackBoth-WidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -118,7 +155,7 @@
 		0B9C2DA12E735AE50089A5FD /* Components */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "LifeMetrics" target */,
+				0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "TrackBoth" target */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -126,7 +163,7 @@
 		0B9C2DA72E735AE50089A5FD /* Models */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C30FC2E73C64D0089A5FD /* Exceptions for "Models" folder in "LifeMetrics" target */,
+				0B9C30FC2E73C64D0089A5FD /* Exceptions for "Models" folder in "TrackBoth" target */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -139,7 +176,7 @@
 		0B9C2DB62E735AE50089A5FD /* ViewModels */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C2DEB2E735AE50089A5FD /* Exceptions for "ViewModels" folder in "LifeMetrics" target */,
+				0B9C2DEB2E735AE50089A5FD /* Exceptions for "ViewModels" folder in "TrackBoth" target */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -147,7 +184,7 @@
 		0B9C2DBF2E735AE50089A5FD /* Views */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C31112E73C6590089A5FD /* Exceptions for "Views" folder in "LifeMetrics" target */,
+				0B9C31112E73C6590089A5FD /* Exceptions for "Views" folder in "TrackBoth" target */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -155,9 +192,17 @@
 		0B9C31EC2E7915660089A5FD /* Tabs */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C31F42E7915660089A5FD /* Exceptions for "Tabs" folder in "LifeMetrics" target */,
+				0B9C31F42E7915660089A5FD /* Exceptions for "Tabs" folder in "TrackBoth" target */,
 			);
 			path = Tabs;
+			sourceTree = "<group>";
+		};
+		0B9C32022E7916A00089A5FD /* TrackBoth-Widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0B9C32162E7916A20089A5FD /* Exceptions for "TrackBoth-Widget" folder in "TrackBoth-WidgetExtension" target */,
+			);
+			path = "TrackBoth-Widget";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -167,6 +212,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0B9C31F92E7916A00089A5FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0B9C32012E7916A00089A5FD /* SwiftUI.framework in Frameworks */,
+				0B9C31FF2E7916A00089A5FD /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -185,8 +239,10 @@
 				0B9C2DB62E735AE50089A5FD /* ViewModels */,
 				0B9C2DBF2E735AE50089A5FD /* Views */,
 				0B9C2D622E734AAB0089A5FD /* Assets.xcassets */,
-				0B9C2D632E734AAB0089A5FD /* LifeMetrics.entitlements */,
-				0B9C2D642E734AAB0089A5FD /* LifeMetricsApp.swift */,
+				0B9C2D632E734AAB0089A5FD /* TrackBoth.entitlements */,
+				0B9C2D642E734AAB0089A5FD /* TrackBothApp.swift */,
+				0B9C32022E7916A00089A5FD /* TrackBoth-Widget */,
+				0B9C31FD2E7916A00089A5FD /* Frameworks */,
 				0B9C2CB22E714E630089A5FD /* Products */,
 			);
 			sourceTree = "<group>";
@@ -194,35 +250,69 @@
 		0B9C2CB22E714E630089A5FD /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				0B9C2CB12E714E630089A5FD /* LifeMetrics.app */,
+				0B9C2CB12E714E630089A5FD /* TrackBoth.app */,
+				0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0B9C31FD2E7916A00089A5FD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0B9C31FE2E7916A00089A5FD /* WidgetKit.framework */,
+				0B9C32002E7916A00089A5FD /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		0B9C2CB02E714E630089A5FD /* LifeMetrics */ = {
+		0B9C2CB02E714E630089A5FD /* TrackBoth */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 0B9C2CBF2E714E650089A5FD /* Build configuration list for PBXNativeTarget "LifeMetrics" */;
+			buildConfigurationList = 0B9C2CBF2E714E650089A5FD /* Build configuration list for PBXNativeTarget "TrackBoth" */;
 			buildPhases = (
 				0B9C2CAD2E714E630089A5FD /* Sources */,
 				0B9C2CAE2E714E630089A5FD /* Frameworks */,
 				0B9C2CAF2E714E630089A5FD /* Resources */,
+				0B9C32172E7916A20089A5FD /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0B9C32112E7916A20089A5FD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				0B9C2DAF2E735AE50089A5FD /* Utils */,
+			);
+			name = TrackBoth;
+			packageProductDependencies = (
+			);
+			productName = LifeMetrics;
+			productReference = 0B9C2CB12E714E630089A5FD /* TrackBoth.app */;
+			productType = "com.apple.product-type.application";
+		};
+		0B9C31FB2E7916A00089A5FD /* TrackBoth-WidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0B9C32132E7916A20089A5FD /* Build configuration list for PBXNativeTarget "TrackBoth-WidgetExtension" */;
+			buildPhases = (
+				0B9C31F82E7916A00089A5FD /* Sources */,
+				0B9C31F92E7916A00089A5FD /* Frameworks */,
+				0B9C31FA2E7916A00089A5FD /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				0B9C2DAF2E735AE50089A5FD /* Utils */,
+				0B9C32022E7916A00089A5FD /* TrackBoth-Widget */,
 			);
-			name = LifeMetrics;
+			name = "TrackBoth-WidgetExtension";
 			packageProductDependencies = (
 			);
-			productName = LifeMetrics;
-			productReference = 0B9C2CB12E714E630089A5FD /* LifeMetrics.app */;
-			productType = "com.apple.product-type.application";
+			productName = "TrackBoth-WidgetExtension";
+			productReference = 0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -237,9 +327,12 @@
 					0B9C2CB02E714E630089A5FD = {
 						CreatedOnToolsVersion = 16.4;
 					};
+					0B9C31FB2E7916A00089A5FD = {
+						CreatedOnToolsVersion = 16.4;
+					};
 				};
 			};
-			buildConfigurationList = 0B9C2CAC2E714E630089A5FD /* Build configuration list for PBXProject "LifeMetrics" */;
+			buildConfigurationList = 0B9C2CAC2E714E630089A5FD /* Build configuration list for PBXProject "TrackBoth" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -253,7 +346,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				0B9C2CB02E714E630089A5FD /* LifeMetrics */,
+				0B9C2CB02E714E630089A5FD /* TrackBoth */,
+				0B9C31FB2E7916A00089A5FD /* TrackBoth-WidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -267,6 +361,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0B9C31FA2E7916A00089A5FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -274,13 +375,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0B9C2D872E734AAB0089A5FD /* LifeMetricsApp.swift in Sources */,
+				0B9C2D872E734AAB0089A5FD /* TrackBothApp.swift in Sources */,
 				0B9C31DE2E7912350089A5FD /* OnboardingView.swift in Sources */,
 				0B9C31F22E7915660089A5FD /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		0B9C31F82E7916A00089A5FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0B9C32112E7916A20089A5FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0B9C31FB2E7916A00089A5FD /* TrackBoth-WidgetExtension */;
+			targetProxy = 0B9C32102E7916A20089A5FD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		0B9C2CBD2E714E650089A5FD /* Debug */ = {
@@ -402,13 +518,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LifeMetrics.entitlements;
+				CODE_SIGN_ENTITLEMENTS = TrackBoth.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Life Metrics";
+				INFOPLIST_KEY_CFBundleDisplayName = TrackBoth;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -425,7 +541,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jacobrozell.LifeMetrics;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jacobrozell.TrackBoth;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -442,13 +558,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = LifeMetrics.entitlements;
+				CODE_SIGN_ENTITLEMENTS = TrackBoth.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Life Metrics";
+				INFOPLIST_KEY_CFBundleDisplayName = TrackBoth;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -465,7 +581,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.jacobrozell.LifeMetrics;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jacobrozell.TrackBoth;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = auto;
@@ -477,10 +593,69 @@
 			};
 			name = Release;
 		};
+		0B9C32142E7916A20089A5FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7JT2JB89AV;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "TrackBoth-Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "TrackBoth-Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jacobrozell.TrackBoth.TrackBoth-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0B9C32152E7916A20089A5FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 7JT2JB89AV;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = "TrackBoth-Widget/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "TrackBoth-Widget";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.jacobrozell.TrackBoth.TrackBoth-Widget";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		0B9C2CAC2E714E630089A5FD /* Build configuration list for PBXProject "LifeMetrics" */ = {
+		0B9C2CAC2E714E630089A5FD /* Build configuration list for PBXProject "TrackBoth" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0B9C2CBD2E714E650089A5FD /* Debug */,
@@ -489,11 +664,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		0B9C2CBF2E714E650089A5FD /* Build configuration list for PBXNativeTarget "LifeMetrics" */ = {
+		0B9C2CBF2E714E650089A5FD /* Build configuration list for PBXNativeTarget "TrackBoth" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				0B9C2CC02E714E650089A5FD /* Debug */,
 				0B9C2CC12E714E650089A5FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		0B9C32132E7916A20089A5FD /* Build configuration list for PBXNativeTarget "TrackBoth-WidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B9C32142E7916A20089A5FD /* Debug */,
+				0B9C32152E7916A20089A5FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -100,18 +100,18 @@ struct ContentView: View {
 
 // MARK: - Widget Setup Instructions
 /*
-To set up widgets in your QuickLog app:
+To set up widgets in your TrackBoth app:
 
 1. Add Widget Extension Target:
    - File → New → Target
    - Select "Widget Extension"
-   - Name: "QuickLogWidget"
+   - Name: "TrackBothWidget"
    - Include Configuration Intent: No
 
 2. Add App Groups:
    - Select main app target
    - Signing & Capabilities → + Capability → App Groups
-   - Add group: "group.com.quicklog.app"
+   - Add group: "group.com.trackboth.app"
    - Repeat for widget extension target
 
 3. Copy Widget Files:
@@ -129,6 +129,6 @@ To set up widgets in your QuickLog app:
 
 6. Test Widgets:
    - Build and run on device
-   - Long press home screen → + → QuickLog
+   - Long press home screen → + → TrackBoth
    - Add widgets and test interactions
 */

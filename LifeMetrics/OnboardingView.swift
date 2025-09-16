@@ -133,7 +133,7 @@ struct OnboardingPage {
     
     static let allPages: [OnboardingPage] = [
         OnboardingPage(
-            title: "Welcome to QuickLog",
+            title: "Welcome to TrackBoth",
             description: "Track your habits and vices with simple yes/no logging. Build streaks, set goals, and visualize your progress over time.",
             icon: "house.fill",
             color: Color.currentPrimary

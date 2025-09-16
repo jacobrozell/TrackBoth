@@ -2,17 +2,17 @@ import WidgetKit
 import SwiftUI
 import SwiftData
 
-// MARK: - QuickLog Widget
-/// Main widget configuration for QuickLog
-struct QuickLogWidget: Widget {
-    let kind: String = "QuickLogWidget"
+// MARK: - TrackBoth Widget
+/// Main widget configuration for TrackBoth
+struct TrackBothWidget: Widget {
+    let kind: String = "TrackBothWidget"
     
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: QuickLogTimelineProvider()) { entry in
-            QuickLogWidgetView(entry: entry)
+        StaticConfiguration(kind: kind, provider: TrackBothTimelineProvider()) { entry in
+            TrackBothWidgetView(entry: entry)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("QuickLog")
+        .configurationDisplayName("TrackBoth")
         .description("Track your habits and vices at a glance")
         .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
     }
@@ -20,7 +20,7 @@ struct QuickLogWidget: Widget {
 
 // MARK: - Widget Entry
 /// Timeline entry containing widget data
-struct QuickLogEntry: TimelineEntry {
+struct TrackBothEntry: TimelineEntry {
     let date: Date
     let metrics: [WidgetMetricData]
     let todaysEntries: [WidgetEntryData]
@@ -30,9 +30,9 @@ struct QuickLogEntry: TimelineEntry {
 
 // MARK: - Timeline Provider
 /// Provides timeline entries for the widget
-struct QuickLogTimelineProvider: TimelineProvider {
-    func placeholder(in context: Context) -> QuickLogEntry {
-        QuickLogEntry(
+struct TrackBothTimelineProvider: TimelineProvider {
+    func placeholder(in context: Context) -> TrackBothEntry {
+        TrackBothEntry(
             date: Date(),
             metrics: [
                 WidgetMetricData(id: "1", name: "Exercise", habitType: "positive", isCompletedToday: true, streak: 5),
@@ -44,13 +44,13 @@ struct QuickLogTimelineProvider: TimelineProvider {
         )
     }
     
-    func getSnapshot(in context: Context, completion: @escaping (QuickLogEntry) -> ()) {
+    func getSnapshot(in context: Context, completion: @escaping (TrackBothEntry) -> ()) {
         logger.debug("Widget snapshot requested", category: .widget)
         // For preview/snapshot, return placeholder data
         completion(placeholder(in: context))
     }
     
-    func getTimeline(in context: Context, completion: @escaping (Timeline<QuickLogEntry>) -> ()) {
+    func getTimeline(in context: Context, completion: @escaping (Timeline<TrackBothEntry>) -> ()) {
         logger.info("Widget timeline requested", category: .widget)
         let startTime = Date()
         
@@ -68,7 +68,7 @@ struct QuickLogTimelineProvider: TimelineProvider {
         completion(timeline)
     }
     
-    private func loadWidgetData() -> QuickLogEntry {
+    private func loadWidgetData() -> TrackBothEntry {
         // Load data from the shared App Groups container
         let dataManager = WidgetDataManager.shared
         let metrics = dataManager.loadMetrics()
@@ -76,7 +76,7 @@ struct QuickLogTimelineProvider: TimelineProvider {
         let streaks = dataManager.loadStreaks()
         let goals = dataManager.loadGoals()
         
-        return QuickLogEntry(
+        return TrackBothEntry(
             date: Date(),
             metrics: metrics,
             todaysEntries: entries,
@@ -88,8 +88,8 @@ struct QuickLogTimelineProvider: TimelineProvider {
 
 // MARK: - Widget View
 /// Main widget view that adapts to different sizes
-struct QuickLogWidgetView: View {
-    let entry: QuickLogEntry
+struct TrackBothWidgetView: View {
+    let entry: TrackBothEntry
     @Environment(\.widgetFamily) var family
     
     var body: some View {
@@ -108,7 +108,7 @@ struct QuickLogWidgetView: View {
 
 // MARK: - Small Widget (2x2)
 struct SmallWidgetView: View {
-    let entry: QuickLogEntry
+    let entry: TrackBothEntry
     
     var body: some View {
         VStack(spacing: 8) {
@@ -116,7 +116,7 @@ struct SmallWidgetView: View {
             HStack {
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .foregroundColor(.blue)
-                Text("QuickLog")
+                Text("TrackBoth")
                     .font(.caption)
                     .fontWeight(.semibold)
                 Spacer()
@@ -148,7 +148,7 @@ struct SmallWidgetView: View {
 
 // MARK: - Medium Widget (4x2)
 struct MediumWidgetView: View {
-    let entry: QuickLogEntry
+    let entry: TrackBothEntry
     
     var body: some View {
         HStack(spacing: 12) {
@@ -157,7 +157,7 @@ struct MediumWidgetView: View {
                 HStack {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .foregroundColor(.blue)
-                    Text("QuickLog")
+                    Text("TrackBoth")
                         .font(.headline)
                     Spacer()
                 }
@@ -208,7 +208,7 @@ struct MediumWidgetView: View {
 
 // MARK: - Large Widget (4x4)
 struct LargeWidgetView: View {
-    let entry: QuickLogEntry
+    let entry: TrackBothEntry
     
     var body: some View {
         VStack(spacing: 12) {
@@ -216,7 +216,7 @@ struct LargeWidgetView: View {
             HStack {
                 Image(systemName: "chart.line.uptrend.xyaxis")
                     .foregroundColor(.blue)
-                Text("QuickLog Dashboard")
+                Text("TrackBoth Dashboard")
                     .font(.headline)
                 Spacer()
                 Text(entry.date, style: .date)
@@ -295,17 +295,17 @@ struct LargeWidgetView: View {
 
 // MARK: - Widget Bundle
 @main
-struct QuickLogWidgetBundle: WidgetBundle {
+struct TrackBothWidgetBundle: WidgetBundle {
     var body: some Widget {
-        QuickLogWidget()
+        TrackBothWidget()
     }
 }
 
 // MARK: - Preview
 #Preview(as: .systemSmall) {
-    QuickLogWidget()
+    TrackBothWidget()
 } timeline: {
-    QuickLogEntry(
+    TrackBothEntry(
         date: Date(),
         metrics: [
             WidgetMetricData(id: "1", name: "Exercise", habitType: "positive", isCompletedToday: true, streak: 5),

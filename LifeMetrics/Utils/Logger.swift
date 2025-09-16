@@ -1,6 +1,6 @@
 //
 //  Logger.swift
-//  LifeMetrics
+//  TrackBoth
 //
 //  Created by Jacob Rozell on 12/19/24.
 //
@@ -47,7 +47,7 @@ enum LogCategory: String, CaseIterable {
 class Logger {
     static let shared = Logger()
     
-    private let subsystem = "com.jacobrozell.QuickLog"
+    private let subsystem = "com.jacobrozell.TrackBoth"
     private var loggers: [LogCategory: OSLog] = [:]
     
     private init() {

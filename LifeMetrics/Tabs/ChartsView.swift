@@ -170,7 +170,7 @@ struct ChartsView: View {
             }
         case .pdf:
             // For PDF, use temporary file
-            let fileName = "QuickLog_Chart_\(Date().timeIntervalSince1970).pdf"
+            let fileName = "TrackBoth_Chart_\(Date().timeIntervalSince1970).pdf"
             let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             
             do {
@@ -189,7 +189,7 @@ struct ChartsView: View {
         do {
             let tempFiles = try FileManager.default.contentsOfDirectory(at: tempDir, includingPropertiesForKeys: nil)
             for file in tempFiles {
-                if file.lastPathComponent.hasPrefix("QuickLog_Chart_") && file.pathExtension == "pdf" {
+                if file.lastPathComponent.hasPrefix("TrackBoth_Chart_") && file.pathExtension == "pdf" {
                     try FileManager.default.removeItem(at: file)
                     logger.info("Cleaned up temporary PDF file: \(file.lastPathComponent)", category: .ui)
                 }

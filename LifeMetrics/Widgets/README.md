@@ -1,7 +1,7 @@
-# 🏠 QuickLog Home Screen Widgets
+# 🏠 TrackBoth Home Screen Widgets
 
 ## Overview
-QuickLog widgets provide quick access to habit tracking directly from the home screen, allowing users to log habits and view progress without opening the app.
+TrackBoth widgets provide quick access to habit tracking directly from the home screen, allowing users to log habits and view progress without opening the app.
 
 ## Widget Types
 
@@ -34,7 +34,7 @@ QuickLog widgets provide quick access to habit tracking directly from the home s
 ### App Groups Setup
 1. Add App Groups capability to main app target
 2. Add App Groups capability to widget extension target
-3. Use shared container: `group.com.quicklog.app`
+3. Use shared container: `group.com.trackboth.app`
 
 ### Data Sharing
 - **UserDefaults**: Shared container for widget data
@@ -74,13 +74,13 @@ struct WidgetEntry {
 ### 1. Create Widget Extension Target
 1. File → New → Target
 2. Select "Widget Extension"
-3. Name: "QuickLogWidget"
+3. Name: "TrackBothWidget"
 4. Include Configuration Intent: No
 
 ### 2. Add App Groups
 1. Select main app target
 2. Signing & Capabilities → + Capability → App Groups
-3. Add group: `group.com.quicklog.app`
+3. Add group: `group.com.trackboth.app`
 4. Repeat for widget extension target
 
 ### 3. Configure Info.plist

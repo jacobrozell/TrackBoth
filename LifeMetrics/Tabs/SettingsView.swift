@@ -24,7 +24,6 @@ struct SettingsView: View {
     @State private var isRestoring = false
     @State private var backupError: String?
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
-    @AppStorage("selectedTheme") private var selectedTheme: String = Theme.system.rawValue
     @State private var currentTime = Date()
     @StateObject private var themeManager = ThemeManager.shared
     
@@ -52,7 +51,7 @@ struct SettingsView: View {
         let totalEntries = entries.count
         
         return """
-        📱 Check out QuickLog - my habit tracking app!
+        📱 Check out TrackBoth - my habit tracking app!
         
         I've been using it to track \(totalHabits) positive habits and \(totalVices) vices, with \(totalEntries) total entries logged.
         
@@ -66,7 +65,7 @@ struct SettingsView: View {
         
         Perfect for building better habits and breaking bad ones! 🎯
         
-        #HabitTracking #PersonalDevelopment #QuickLog
+        #HabitTracking #PersonalDevelopment #TrackBoth
         """
     }
     
@@ -139,21 +138,45 @@ struct SettingsView: View {
                 
                 // Theme Settings Section
                 Section("Appearance") {
-                    Picker("Theme", selection: $selectedTheme) {
-                        ForEach(Theme.allCases, id: \.rawValue) { theme in
-                            HStack {
-                                Image(systemName: theme.icon)
-                                Text(theme.displayName)
+                    // App Theme Selection
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("App Theme")
+                            .font(.headline)
+                            .themedPrimaryText()
+                        
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                ForEach(AppTheme.allThemes, id: \.name) { theme in
+                                    CompactThemeCard(
+                                        theme: theme,
+                                        isSelected: themeManager.currentAppTheme.name == theme.name
+                                    ) {
+                                        themeManager.updateAppTheme(theme)
+                                    }
+                                }
                             }
-                            .tag(theme.rawValue)
+                            .padding(.horizontal)
                         }
                     }
-                    .pickerStyle(.menu)
-                    .onChange(of: selectedTheme) { _, newValue in
-                        if let theme = Theme(rawValue: newValue) {
-                            themeManager.updateTheme(theme)
-                        }
+                    .padding(.vertical, 8)
+                    
+                    // Theme Preview
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Preview")
+                            .font(.subheadline)
+                            .themedSecondaryText()
+                        
+                        themeManager.currentAppTheme.preview()
+                            .frame(maxWidth: .infinity)
                     }
+                    .padding(.vertical, 8)
+                    
+                    // Theme Reset Option
+                    Button("Reset to Default Theme") {
+                        logger.logUserAction("Reset theme button tapped")
+                        themeManager.updateAppTheme(.default)
+                    }
+                    .foregroundColor(Color.currentWarning)
                 }
                 
                 // Help & Support Section
