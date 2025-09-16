@@ -31,17 +31,17 @@ struct ContentView: View {
                         }
                         .tag(1)
 
-                    ChartsView()
-                        .tabItem {
-                            Image(systemName: "chart.line.uptrend.xyaxis")
-                            Text("Charts")
-                        }
-                        .tag(2)
-
                     MotivationView()
                         .tabItem {
                             Image(systemName: "heart.fill")
                             Text("Motivation")
+                        }
+                        .tag(2)
+
+                    ChartsView()
+                        .tabItem {
+                            Image(systemName: "chart.line.uptrend.xyaxis")
+                            Text("Charts")
                         }
                         .tag(3)
 
@@ -51,13 +51,6 @@ struct ContentView: View {
                             Text("History")
                         }
                         .tag(4)
-
-                    SettingsView()
-                        .tabItem {
-                            Image(systemName: "gearshape.fill")
-                            Text("Settings")
-                        }
-                        .tag(5)
                 }
                 .themedBackground()
                 .onChange(of: selectedTab) { oldValue, newValue in

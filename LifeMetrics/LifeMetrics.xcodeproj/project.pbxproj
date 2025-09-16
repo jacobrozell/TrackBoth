@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0B9C2D872E734AAB0089A5FD /* LifeMetricsApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C2D642E734AAB0089A5FD /* LifeMetricsApp.swift */; };
 		0B9C2D8E2E734AAB0089A5FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B9C2D622E734AAB0089A5FD /* Assets.xcassets */; };
+		0B9C31DE2E7912350089A5FD /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C31D22E7912350089A5FD /* OnboardingView.swift */; };
+		0B9C31F22E7915660089A5FD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C31E62E7915660089A5FD /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -16,6 +18,8 @@
 		0B9C2D622E734AAB0089A5FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0B9C2D632E734AAB0089A5FD /* LifeMetrics.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LifeMetrics.entitlements; sourceTree = "<group>"; };
 		0B9C2D642E734AAB0089A5FD /* LifeMetricsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LifeMetricsApp.swift; sourceTree = "<group>"; };
+		0B9C31D22E7912350089A5FD /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		0B9C31E62E7915660089A5FD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,7 +58,6 @@
 				EditViews/EditEntryView.swift,
 				EditViews/EditGoalView.swift,
 				EditViews/EditMetricView.swift,
-				OnboardingView.swift,
 				ThemeSelectionView.swift,
 			);
 			target = 0B9C2CB02E714E630089A5FD /* LifeMetrics */;
@@ -101,7 +104,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				ChartsView.swift,
-				ContentView.swift,
 				GoalsView.swift,
 				HistoryView.swift,
 				HomeView.swift,
@@ -174,6 +176,8 @@
 		0B9C2CA82E714E630089A5FD = {
 			isa = PBXGroup;
 			children = (
+				0B9C31D22E7912350089A5FD /* OnboardingView.swift */,
+				0B9C31E62E7915660089A5FD /* ContentView.swift */,
 				0B9C31EC2E7915660089A5FD /* Tabs */,
 				0B9C2DA12E735AE50089A5FD /* Components */,
 				0B9C2DA72E735AE50089A5FD /* Models */,
@@ -271,6 +275,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9C2D872E734AAB0089A5FD /* LifeMetricsApp.swift in Sources */,
+				0B9C31DE2E7912350089A5FD /* OnboardingView.swift in Sources */,
+				0B9C31F22E7915660089A5FD /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
