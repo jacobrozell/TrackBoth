@@ -16,7 +16,7 @@ struct QuantityInputSheet: View {
     
     // Common units for different habit types
     private var commonUnits: [String] {
-        switch metric.safeHabitType {
+        switch metric.habitType {
         case .positive:
             return ["times", "minutes", "hours", "pages", "glasses", "servings", "sets", "reps"]
         case .vice:
@@ -25,7 +25,7 @@ struct QuantityInputSheet: View {
     }
     
     private var isVice: Bool {
-        metric.safeHabitType == .vice
+        metric.habitType == .vice
     }
     
     private var maxQuantity: Int {
@@ -50,7 +50,7 @@ struct QuantityInputSheet: View {
                 // Header with habit info
                 VStack(spacing: 8) {
                     HStack {
-                        Image(systemName: metric.safeHabitType.icon)
+                        Image(systemName: metric.habitType.icon)
                             .foregroundColor(isVice ? .currentError : .currentSuccess)
                             .font(.title2)
                         

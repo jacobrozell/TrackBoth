@@ -37,7 +37,7 @@ struct AddMotivationView: View {
                             Text("Choose a vice to motivate against").tag(nil as Metric?)
                             ForEach(metrics) { metric in
                                 HStack(spacing: 12) {
-                                    Image(systemName: metric.safeHabitType.icon)
+                                    Image(systemName: metric.habitType.icon)
                                         .foregroundColor(Color.currentError)
                                         .font(.system(size: 16))
                                         .frame(width: 20)

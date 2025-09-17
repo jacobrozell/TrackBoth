@@ -21,7 +21,7 @@ struct BarChartView: View {
                 // For positive habits: count when value == true (completed)
                 // For vices: count when value == false (avoided)
                 let metric = metrics.first { $0.id == entry.metricID }
-                let isVice = metric?.safeHabitType == .vice
+                let isVice = metric?.habitType == .vice
                 let shouldCount = isVice ? !entry.value : entry.value
                 
                 if shouldCount {
@@ -56,7 +56,7 @@ struct BarChartView: View {
         case .all:
             return "Weekly Progress"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "Weekly Avoidance" : "Weekly Completion"
+            return metric.habitType == .vice ? "Weekly Avoidance" : "Weekly Completion"
         }
     }
     
@@ -69,7 +69,7 @@ struct BarChartView: View {
         case .all:
             return "Track habits to see weekly patterns"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "Avoid this vice to see weekly patterns" : "Complete this habit to see weekly patterns"
+            return metric.habitType == .vice ? "Avoid this vice to see weekly patterns" : "Complete this habit to see weekly patterns"
         }
     }
     

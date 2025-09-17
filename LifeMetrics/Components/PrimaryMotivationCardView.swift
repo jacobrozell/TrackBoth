@@ -10,7 +10,7 @@ struct PrimaryMotivationCardView: View {
                 // Metric info with improved layout
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 8) {
-                        Image(systemName: metric.safeHabitType.icon)
+                        Image(systemName: metric.habitType.icon)
                             .foregroundColor(.currentError)
                             .font(.system(size: 16, weight: .medium))
                             .frame(width: 20)

@@ -19,8 +19,8 @@ struct MultiGoalCardView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
+                        Image(systemName: metric.habitType.icon)
+                            .foregroundColor(metric.habitType == .positive ? .currentSuccess : .currentError)
                             .font(.title3)
                         
                         Text(metric.name)

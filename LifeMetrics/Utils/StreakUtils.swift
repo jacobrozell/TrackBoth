@@ -5,8 +5,7 @@ struct StreakUtils {
     
     /// Calculate current streak for a metric
     static func calculateCurrentStreak(for metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> Int {
-        let startTime = Date()
-        let isVice = metric.safeHabitType == .vice
+        let isVice = metric.habitType == .vice
         
         // For positive habits: count consecutive days with value == true
         // For vices: count consecutive days with value == false
@@ -44,14 +43,8 @@ struct StreakUtils {
                     }
                 }
             } else {
-                // No entry
-                if isVice {
-                    // Missing means avoided for vices → extend streak
-                    streak += 1
-                } else {
-                    // Missing means not done for habits → break streak
-                    break
-                }
+                // No entry found - this breaks the streak
+                break
             }
 
             guard let previousDay = calendar.date(byAdding: .day, value: -1, to: dayCursor) else { break }
@@ -63,8 +56,7 @@ struct StreakUtils {
     
     /// Calculate longest streak for a metric
     static func calculateLongestStreak(for metric: Metric, entries: [MetricEntry]) -> Int {
-        let startTime = Date()
-        let isVice = metric.safeHabitType == .vice
+        let isVice = metric.habitType == .vice
         
         let sortedEntries = entries
             .filter { $0.metricID == metric.id && $0.value == !isVice }

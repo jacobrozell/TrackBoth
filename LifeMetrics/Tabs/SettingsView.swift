@@ -45,8 +45,8 @@ struct SettingsView: View {
     }
     
     private var shareAppContent: String {
-        let totalHabits = metrics.filter { $0.safeHabitType == .positive }.count
-        let totalVices = metrics.filter { $0.safeHabitType == .vice }.count
+        let totalHabits = metrics.filter { $0.habitType == .positive }.count
+        let totalVices = metrics.filter { $0.habitType == .vice }.count
         logger.debug("Share app content calculated - Habits: \(totalHabits), Vices: \(totalVices)", category: .business)
         let totalEntries = entries.count
         
@@ -211,14 +211,14 @@ struct SettingsView: View {
                     HStack {
                         Text("Total Habits")
                         Spacer()
-                        Text("\(metrics.filter { $0.safeHabitType == .positive }.count)")
+                        Text("\(metrics.filter { $0.habitType == .positive }.count)")
                             .foregroundColor(Color.currentSecondaryText)
                     }
                     
                     HStack {
                         Text("Total Vices")
                         Spacer()
-                        Text("\(metrics.filter { $0.safeHabitType == .vice }.count)")
+                        Text("\(metrics.filter { $0.habitType == .vice }.count)")
                             .foregroundColor(Color.currentSecondaryText)
                     }
 
@@ -361,7 +361,7 @@ struct SettingsView: View {
                     id: metric.id.uuidString,
                     name: metric.name,
                     createdAt: metric.createdAt,
-                    habitType: metric.safeHabitType.rawValue
+                    habitType: metric.habitType.rawValue
                 )
             },
             entries: entries.map { entry in

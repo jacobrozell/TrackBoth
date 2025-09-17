@@ -16,8 +16,8 @@ struct EnhancedGoalCardView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
+                        Image(systemName: metric.habitType.icon)
+                            .foregroundColor(metric.habitType == .positive ? .currentSuccess : .currentError)
                             .font(.title3)
                         
                         Text(metric.name)
@@ -203,7 +203,7 @@ struct EnhancedGoalCardView: View {
             return "No goal set"
         }
         
-        if metric.safeHabitType == .vice {
+        if metric.habitType == .vice {
             return "Max \(goal.target) days per \(goal.period.displayName.lowercased())"
         } else {
             return "\(goal.target) days per \(goal.period.displayName.lowercased())"
@@ -285,8 +285,8 @@ struct QuantityGoalCardView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
+                        Image(systemName: metric.habitType.icon)
+                            .foregroundColor(metric.habitType == .positive ? .currentSuccess : .currentError)
                             .font(.title3)
                         
                         Text(metric.name)

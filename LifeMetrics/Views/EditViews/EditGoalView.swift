@@ -20,8 +20,8 @@ struct EditGoalView: View {
             Form {
                 Section {
                     HStack {
-                        Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
+                        Image(systemName: metric.habitType.icon)
+                            .foregroundColor(metric.habitType == .positive ? Color.currentSuccess : Color.currentError)
                         Text(metric.name)
                             .font(.headline)
                     }
@@ -102,7 +102,7 @@ struct EditGoalView: View {
     }
     
     private var goalExplanationText: String {
-        if metric.safeHabitType == .positive {
+        if metric.habitType == .positive {
             return "How many days do you want to do this habit per \(selectedPeriod.displayName.lowercased())?"
         } else {
             return "Maximum number of days you'll allow yourself to do this vice per \(selectedPeriod.displayName.lowercased())"

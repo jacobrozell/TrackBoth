@@ -25,7 +25,7 @@ struct EditableEntryCell: View {
     }
     
     private var isVice: Bool {
-        metric?.safeHabitType == .vice
+        metric?.habitType == .vice
     }
     
     var body: some View {

@@ -64,8 +64,8 @@ struct UnifiedMetricRowView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack {
-                        Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
+                        Image(systemName: metric.habitType.icon)
+                            .foregroundColor(metric.habitType == .positive ? Color.currentSuccess : Color.currentError)
                             .font(.title3)
                         
                         Text(metric.name)
@@ -78,12 +78,12 @@ struct UnifiedMetricRowView: View {
                             Text(quantityString)
                                 .font(.subheadline)
                                 .fontWeight(.medium)
-                                .foregroundColor(metric.safeHabitType == .positive ? Color.currentPrimary : Color.currentWarning)
+                                .foregroundColor(metric.habitType == .positive ? Color.currentPrimary : Color.currentWarning)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .fill((metric.safeHabitType == .positive ? Color.currentPrimary : Color.currentWarning).opacity(0.2))
+                                        .fill((metric.habitType == .positive ? Color.currentPrimary : Color.currentWarning).opacity(0.2))
                                 )
                         }
                     }
@@ -96,7 +96,7 @@ struct UnifiedMetricRowView: View {
                                     Image(systemName: "flame.fill")
                                         .foregroundColor(Color.currentWarning)
                                         .font(.caption)
-                                    Text(metric.safeHabitType == .positive ? 
+                                    Text(metric.habitType == .positive ? 
                                          "\(streak) day streak" : 
                                          "\(streak) days clean")
                                         .font(.caption)
@@ -119,7 +119,7 @@ struct UnifiedMetricRowView: View {
                         HStack {
                             Image(systemName: "flame.fill")
                                 .foregroundColor(Color.currentWarning)
-                            Text(metric.safeHabitType == .positive ? 
+                            Text(metric.habitType == .positive ? 
                                  "\(streak) day streak" : 
                                  "\(streak) days clean")
                                 .font(.subheadline)
@@ -135,7 +135,7 @@ struct UnifiedMetricRowView: View {
                     logger.logUserAction("Toggle metric completion", details: "Metric: \(metric.name)")
                     toggleSelectedDateEntry()
                 } label: {
-                    let isCompleted = selectedDateEntry?.value == true
+                    let isCompleted = isMetricCompleted()
                     Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                         .font(.title)
                         .foregroundColor(isCompleted ? Color.currentSuccess : Color.currentSecondaryText)
@@ -151,7 +151,7 @@ struct UnifiedMetricRowView: View {
                     
                     Spacer()
                     
-                    if metric.safeHabitType == .positive {
+                    if metric.habitType == .positive {
                         let done = selectedDateEntry?.value == true
                         Text(done ? "Done" : "Not Done")
                             .font(.subheadline)
@@ -168,7 +168,7 @@ struct UnifiedMetricRowView: View {
                 }
                 
                 // Details section for positive habits
-                if metric.safeHabitType == .positive {
+                if metric.habitType == .positive {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             Text("Details")
@@ -349,23 +349,36 @@ struct UnifiedMetricRowView: View {
     }
     
     // MARK: - Private Methods
+    private func isMetricCompleted() -> Bool {
+        // Only count as completed if metric has entries
+        guard entries.contains(where: { $0.metricID == metric.id }) else { return false }
+        
+        let isVice = metric.habitType == .vice
+        if isVice {
+            // For vices, completed when explicitly logged as avoided (value == false)
+            return selectedDateEntry?.value == false
+        } else {
+            // For habits, completed when explicitly logged as done (value == true)
+            return selectedDateEntry?.value == true
+        }
+    }
+    
     private func toggleSelectedDateEntry() {
         let startOfDay = CalendarHelper.startOfDay(for: selectedDate)
         
-        if let existingEntry = selectedDateEntry {
-            // Toggle existing entry
-            existingEntry.value.toggle()
-            logger.debug("Toggled existing entry for \(metric.name) on \(DateFormatter.dateFormatter.string(from: selectedDate))", category: .data)
-        } else {
-            // Create new entry
-            let newEntry = MetricEntry(
-                metricID: metric.id,
-                date: startOfDay,
-                value: true
-            )
-            modelContext.insert(newEntry)
-            logger.debug("Created new entry for \(metric.name) on \(DateFormatter.dateFormatter.string(from: selectedDate))", category: .data)
-        }
+        // Use getOrCreate to handle both existing and new entries
+        let entry = MetricEntry.getOrCreate(
+            for: metric.id,
+            date: startOfDay,
+            in: modelContext,
+            entries: entries,
+            metric: metric
+        )
+        
+        // Toggle the entry value
+        let oldValue = entry.value
+        entry.value.toggle()
+        logger.debug("Toggled entry for \(metric.name) on \(DateFormatter.dateFormatter.string(from: selectedDate)) - From: \(oldValue) to \(entry.value)", category: .data)
         
         do {
             try modelContext.save()
@@ -378,17 +391,15 @@ struct UnifiedMetricRowView: View {
     private func saveDetails() {
         let startOfDay = CalendarHelper.startOfDay(for: selectedDate)
         
-        if let existingEntry = selectedDateEntry {
-            existingEntry.details = editingDetailsText.isEmpty ? nil : editingDetailsText
-        } else {
-            let newEntry = MetricEntry(
-                metricID: metric.id,
-                date: startOfDay,
-                value: false,
-                details: editingDetailsText.isEmpty ? nil : editingDetailsText
-            )
-            modelContext.insert(newEntry)
-        }
+        let entry = MetricEntry.getOrCreate(
+            for: metric.id,
+            date: startOfDay,
+            in: modelContext,
+            entries: entries,
+            metric: metric
+        )
+        
+        entry.details = editingDetailsText.isEmpty ? nil : editingDetailsText
         
         do {
             try modelContext.save()
@@ -403,17 +414,15 @@ struct UnifiedMetricRowView: View {
     private func saveMotivation() {
         let startOfDay = CalendarHelper.startOfDay(for: selectedDate)
         
-        if let existingEntry = selectedDateEntry {
-            existingEntry.motivation = editingMotivationText.isEmpty ? nil : editingMotivationText
-        } else {
-            let newEntry = MetricEntry(
-                metricID: metric.id,
-                date: startOfDay,
-                value: false,
-                motivation: editingMotivationText.isEmpty ? nil : editingMotivationText
-            )
-            modelContext.insert(newEntry)
-        }
+        let entry = MetricEntry.getOrCreate(
+            for: metric.id,
+            date: startOfDay,
+            in: modelContext,
+            entries: entries,
+            metric: metric
+        )
+        
+        entry.motivation = editingMotivationText.isEmpty ? nil : editingMotivationText
         
         do {
             try modelContext.save()

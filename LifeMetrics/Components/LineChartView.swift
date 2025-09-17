@@ -26,7 +26,7 @@ struct LineChartView: View {
             // Count successful completions/avoidances for this day
             let successfulEntries = dayEntries.filter { entry in
                 let metric = metrics.first { $0.id == entry.metricID }
-                let isVice = metric?.safeHabitType == .vice
+                let isVice = metric?.habitType == .vice
                 // For positive habits: count when value == true (completed)
                 // For vices: count when value == false (avoided)
                 return isVice ? !entry.value : entry.value
@@ -60,7 +60,7 @@ struct LineChartView: View {
         case .all:
             return "30-Day Progress Trend"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "30-Day Avoidance Trend" : "30-Day Completion Trend"
+            return metric.habitType == .vice ? "30-Day Avoidance Trend" : "30-Day Completion Trend"
         }
     }
     
@@ -73,7 +73,7 @@ struct LineChartView: View {
         case .all:
             return "Start tracking to see your progress"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "Avoid this vice to see your progress" : "Complete this habit to see your progress"
+            return metric.habitType == .vice ? "Avoid this vice to see your progress" : "Complete this habit to see your progress"
         }
     }
     

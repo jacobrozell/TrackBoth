@@ -6,7 +6,15 @@ struct GoalUtils {
     /// Calculate goal progress for a specific goal
     static func calculateGoalProgress(for goal: Goal, metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> (current: Double, target: Double, percentage: Double, unit: String) {
         let startTime = Date()
-        let isVice = metric.safeHabitType == .vice
+        
+        // If metric has no entries, return zero progress
+        if !entries.contains(where: { $0.metricID == metric.id }) {
+            let target = Double(goal.target)
+            let unit = goal.goalType == .boolean ? "days" : "times"
+            return (current: 0.0, target: target, percentage: 0.0, unit: unit)
+        }
+        
+        let isVice = metric.habitType == .vice
         
         let startOfPeriod = CalendarHelper.startOfPeriod(goal.period, for: selectedDate)
         let endOfPeriod = CalendarHelper.endOfPeriod(goal.period, for: selectedDate)
@@ -26,9 +34,7 @@ struct GoalUtils {
             let successfulDays = relevantEntries.filter { entry in
                 entry.value == !isVice
             }.count
-            
-            let actualDaysInPeriod = goal.period.actualDaysInPeriod(for: selectedDate)
-            let effectiveTarget = min(goal.target, actualDaysInPeriod)
+
             current = Double(successfulDays)
             unit = "days"
         } else {
@@ -70,7 +76,7 @@ struct GoalUtils {
     
     /// Calculate goal progress for a specific historical period
     static func calculateHistoricalGoalProgress(for goal: Goal, metric: Metric, entries: [MetricEntry], periodStart: Date, periodEnd: Date) -> (current: Double, target: Double, percentage: Double, wasAchieved: Bool, unit: String) {
-        let isVice = metric.safeHabitType == .vice
+        let isVice = metric.habitType == .vice
         
         let relevantEntries = entries.filter { entry in
             entry.metricID == metric.id &&
@@ -122,7 +128,7 @@ struct GoalUtils {
     
     /// Get goal status text for a specific goal
     static func getGoalStatusText(for goal: Goal, metric: Metric, progress: (current: Double, target: Double, percentage: Double, unit: String)) -> String {
-        let isVice = metric.safeHabitType == .vice
+        let isVice = metric.habitType == .vice
         
         if progress.current >= progress.target {
             return "Goal achieved! 🎉"

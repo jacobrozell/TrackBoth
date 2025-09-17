@@ -38,8 +38,8 @@ struct GoalHistoryView: View {
                 // Header
                 VStack(spacing: 8) {
                     HStack {
-                        Image(systemName: metric.safeHabitType.icon)
-                            .foregroundColor(metric.safeHabitType == .positive ? .currentSuccess : .currentError)
+                        Image(systemName: metric.habitType.icon)
+                            .foregroundColor(metric.habitType == .positive ? .currentSuccess : .currentError)
                             .font(.title2)
                         
                         Text(metric.name)
@@ -119,7 +119,7 @@ struct GoalHistoryView: View {
                 entry.date <= endDate
             }
             
-            let progress = calculateProgress(for: periodEntries, target: goal.target, isVice: metric.safeHabitType == .vice)
+            let progress = calculateProgress(for: periodEntries, target: goal.target, isVice: metric.habitType == .vice)
             
             periods.append(HistoricalPeriod(
                 startDate: startDate,

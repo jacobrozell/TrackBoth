@@ -37,8 +37,8 @@ struct AddGoalView: View {
                             Text("Choose a habit...").tag(nil as Metric?)
                             ForEach(metricsWithoutGoals, id: \.id) { metric in
                                 HStack {
-                                    Image(systemName: metric.safeHabitType.icon)
-                                        .foregroundColor(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
+                                    Image(systemName: metric.habitType.icon)
+                                        .foregroundColor(metric.habitType == .positive ? Color.currentSuccess : Color.currentError)
                                     Text(metric.name)
                                 }
                                 .tag(metric as Metric?)
@@ -55,8 +55,8 @@ struct AddGoalView: View {
                     // Show selected metric info
                     Section {
                         HStack {
-                            Image(systemName: effectiveSelectedMetric!.safeHabitType.icon)
-                                .foregroundColor(effectiveSelectedMetric!.safeHabitType == .positive ? .green : .red)
+                            Image(systemName: effectiveSelectedMetric!.habitType.icon)
+                                .foregroundColor(effectiveSelectedMetric!.habitType == .positive ? .green : .red)
                             Text(effectiveSelectedMetric!.name)
                                 .font(.headline)
                         }
@@ -167,7 +167,7 @@ struct AddGoalView: View {
     private var commonUnits: [String] {
         guard let metric = effectiveSelectedMetric else { return ["times", "minutes", "hours", "pages", "glasses", "servings", "sets", "reps"] }
         
-        switch metric.safeHabitType {
+        switch metric.habitType {
         case .positive:
             return ["times", "minutes", "hours", "pages", "glasses", "servings", "sets", "reps"]
         case .vice:
@@ -178,7 +178,7 @@ struct AddGoalView: View {
     private var goalExplanationText: String {
         guard let metric = effectiveSelectedMetric else { return "" }
         
-        if metric.safeHabitType == .positive {
+        if metric.habitType == .positive {
             return "Track how many days you successfully do this habit"
         } else {
             return "Track how many days you successfully avoid this vice"
@@ -404,7 +404,7 @@ struct AddGoalView: View {
     private var availablePresets: [GoalPreset] {
         guard let metric = effectiveSelectedMetric else { return [] }
         
-        let isVice = metric.safeHabitType == .vice
+        let isVice = metric.habitType == .vice
         
         return getBooleanPresets(for: selectedPeriod, isVice: isVice)
     }
@@ -417,7 +417,7 @@ struct AddGoalView: View {
     private var availableQuantityPresets: [QuantityPreset] {
         guard let metric = effectiveSelectedMetric else { return [] }
         
-        let isVice = metric.safeHabitType == .vice
+        let isVice = metric.habitType == .vice
         
         return getQuantityPresets(for: quantityGoalType, isVice: isVice)
     }

@@ -110,7 +110,7 @@ enum MetricFilter: Hashable {
         case .all: return "square.grid.2x2"
         case .allHabits: return "checkmark.circle.fill"
         case .allVices: return "xmark.circle.fill"
-        case .specific(let metric): return metric.safeHabitType.icon
+        case .specific(let metric): return metric.habitType.icon
         }
     }
     
@@ -119,7 +119,7 @@ enum MetricFilter: Hashable {
         case .all: return "blue"
         case .allHabits: return "green"
         case .allVices: return "red"
-        case .specific(let metric): return metric.safeHabitType.color
+        case .specific(let metric): return metric.habitType.color
         }
     }
 }

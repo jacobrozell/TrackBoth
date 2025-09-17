@@ -15,9 +15,10 @@ class MetricEntry {
     var details: String?
     var quantity: Int?
     var unit: String?
+    var hasBeenLogged: Bool = false // Tracks if this specific entry has been logged
     
     // MARK: - Initialization
-    init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil, quantity: Int? = nil, unit: String? = nil) {
+    init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil, quantity: Int? = nil, unit: String? = nil, hasBeenLogged: Bool = false) {
         logger.debug("Creating new MetricEntry - MetricID: \(metricID.uuidString), Date: \(DateFormatter.dateFormatter.string(from: date)), Value: \(value)", category: .data)
         
         self.metricID = metricID
@@ -28,6 +29,7 @@ class MetricEntry {
         self.details = details
         self.quantity = quantity
         self.unit = unit
+        self.hasBeenLogged = hasBeenLogged
     }
     
     // MARK: - Computed Properties
@@ -58,7 +60,7 @@ class MetricEntry {
     
     // MARK: - Static Methods
     /// Get existing entry or create new one for a specific metric and date
-    static func getOrCreate(for metricID: UUID, date: Date, in context: ModelContext, entries: [MetricEntry]) -> MetricEntry {
+    static func getOrCreate(for metricID: UUID, date: Date, in context: ModelContext, entries: [MetricEntry], metric: Metric? = nil) -> MetricEntry {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: date)
         
@@ -70,8 +72,9 @@ class MetricEntry {
         }
         
         // Create new entry
-        let newEntry = MetricEntry(metricID: metricID, date: startOfDay, value: false)
+        let newEntry = MetricEntry(metricID: metricID, date: startOfDay, value: false, hasBeenLogged: true)
         context.insert(newEntry)
+        
         return newEntry
     }
 }
@@ -79,6 +82,7 @@ class MetricEntry {
 // MARK: - Entry Management Utilities
 extension MetricEntry {
     /// Updates or creates an entry for a specific metric and date
+    @discardableResult
     static func updateOrCreate(
         for metricID: UUID, 
         date: Date, 
@@ -89,9 +93,10 @@ extension MetricEntry {
         quantity: Int? = nil,
         unit: String? = nil,
         in context: ModelContext,
-        entries: [MetricEntry]
+        entries: [MetricEntry],
+        metric: Metric? = nil
     ) -> MetricEntry {
-        let entry = getOrCreate(for: metricID, date: date, in: context, entries: entries)
+        let entry = getOrCreate(for: metricID, date: date, in: context, entries: entries, metric: metric)
         
         // Update fields if provided
         if let value = value {

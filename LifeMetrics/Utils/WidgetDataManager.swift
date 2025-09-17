@@ -23,7 +23,7 @@ class WidgetDataManager {
             WidgetMetricData(
                 id: metric.id.uuidString,
                 name: metric.name,
-                habitType: metric.safeHabitType.rawValue,
+                habitType: metric.habitType.rawValue,
                 isCompletedToday: false, // This would be calculated
                 streak: 0 // This would be calculated
             )

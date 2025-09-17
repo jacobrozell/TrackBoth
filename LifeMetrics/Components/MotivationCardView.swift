@@ -33,7 +33,7 @@ struct MotivationCardView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     if let metric = metric {
                         HStack(spacing: 8) {
-                            Image(systemName: metric.safeHabitType.icon)
+                            Image(systemName: metric.habitType.icon)
                                 .foregroundColor(.currentError)
                                 .font(.system(size: 16, weight: .medium))
                                 .frame(width: 20)

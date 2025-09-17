@@ -89,7 +89,7 @@ class iCloudBackupService {
                 id: metric.id.uuidString,
                 name: metric.name,
                 createdAt: metric.createdAt,
-                habitType: metric.habitType?.rawValue,
+                habitType: metric.habitType.rawValue,
                 primaryMotivation: metric.primaryMotivation,
                 goals: backupGoals
             )

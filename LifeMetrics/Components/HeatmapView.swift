@@ -25,7 +25,7 @@ struct HeatmapView: View {
             // For vices: count when value == false (avoided)
             let hasSuccessfulEntry = dayEntries.contains { entry in
                 let metric = metrics.first { $0.id == entry.metricID }
-                let isVice = metric?.safeHabitType == .vice
+                let isVice = metric?.habitType == .vice
                 return isVice ? !entry.value : entry.value
             }
             
@@ -133,7 +133,7 @@ struct HeatmapView: View {
         case .all:
             return "90-Day Progress Heatmap"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "90-Day Avoidance Heatmap" : "90-Day Completion Heatmap"
+            return metric.habitType == .vice ? "90-Day Avoidance Heatmap" : "90-Day Completion Heatmap"
         }
     }
     
@@ -146,7 +146,7 @@ struct HeatmapView: View {
         case .all:
             return "Start tracking to build your consistency map"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "Avoid this vice to build your consistency map" : "Complete this habit to build your consistency map"
+            return metric.habitType == .vice ? "Avoid this vice to build your consistency map" : "Complete this habit to build your consistency map"
         }
     }
 }

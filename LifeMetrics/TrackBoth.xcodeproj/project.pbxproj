@@ -137,7 +137,6 @@
 				GoalsView.swift,
 				HistoryView.swift,
 				HomeView.swift,
-				HomeView2.swift,
 				MotivationView.swift,
 				SettingsView.swift,
 			);
@@ -600,7 +599,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "TrackBoth-Widget/Info.plist";
@@ -629,7 +628,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "TrackBoth-Widget/Info.plist";

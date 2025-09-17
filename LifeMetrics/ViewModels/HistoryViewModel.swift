@@ -26,9 +26,9 @@ class HistoryViewModel {
         case .all:
             break
         case .allHabits:
-            filtered = filtered.filter { $0.safeHabitType == .positive }
+            filtered = filtered.filter { $0.habitType == .positive }
         case .allVices:
-            filtered = filtered.filter { $0.safeHabitType == .vice }
+            filtered = filtered.filter { $0.habitType == .vice }
         case .specific(let metric):
             filtered = [metric]
         }
@@ -71,7 +71,6 @@ class HistoryViewModel {
     
     /// Get entries grouped by month for calendar view
     func entriesGroupedByMonth(_ entries: [MetricEntry], metrics: [Metric]) -> [String: [MetricEntry]] {
-        let calendar = Calendar.current
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM"
         
@@ -109,9 +108,9 @@ class HistoryViewModel {
             case .all:
                 return true
             case .allHabits:
-                return metrics.first { $0.id == entry.metricID }?.safeHabitType == .positive
+                return metrics.first { $0.id == entry.metricID }?.habitType == .positive
             case .allVices:
-                return metrics.first { $0.id == entry.metricID }?.safeHabitType == .vice
+                return metrics.first { $0.id == entry.metricID }?.habitType == .vice
             case .specific(let metric):
                 return entry.metricID == metric.id
             }

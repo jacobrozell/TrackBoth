@@ -74,7 +74,7 @@ struct EditMetricView: View {
     init(metric: Metric) {
         _metric = State(initialValue: metric)
         _name = State(initialValue: metric.name)
-        _habitType = State(initialValue: metric.safeHabitType)
+        _habitType = State(initialValue: metric.habitType)
         _goalPeriod = State(initialValue: metric.booleanGoals.first?.period ?? .monthly)
         _goalTarget = State(initialValue: metric.booleanGoals.first?.target ?? 20)
         _primaryMotivation = State(initialValue: metric.primaryMotivation ?? "")

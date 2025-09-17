@@ -21,7 +21,6 @@ struct CalendarGridView: View {
     private var monthDays: [Date] {
         guard let monthInterval = calendar.dateInterval(of: .month, for: currentMonth) else { return [] }
         
-        let startOfMonth = monthInterval.start
         let endOfMonth = monthInterval.end
         
         // Get the calendar start date using CalendarHelper

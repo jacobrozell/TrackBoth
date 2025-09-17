@@ -27,12 +27,12 @@ class SettingsViewModel {
     
     /// Number of positive habits
     func positiveHabits(_ metrics: [Metric]) -> Int {
-        metrics.filter { $0.safeHabitType == .positive }.count
+        metrics.filter { $0.habitType == .positive }.count
     }
     
     /// Number of vices
     func vices(_ metrics: [Metric]) -> Int {
-        metrics.filter { $0.safeHabitType == .vice }.count
+        metrics.filter { $0.habitType == .vice }.count
     }
     
     /// Number of metrics with goals
@@ -91,7 +91,7 @@ class SettingsViewModel {
         for entry in entries.sorted(by: { $0.date > $1.date }) {
             let metric = metrics.first { $0.id == entry.metricID }
             let metricName = metric?.name ?? "Unknown"
-            let habitType = metric?.safeHabitType.displayName ?? "Unknown"
+            let habitType = metric?.habitType.displayName ?? "Unknown"
             let dateString = DateFormatter.dateFormatter.string(from: entry.date)
             let value = entry.value ? "Yes" : "No"
             let motivation = entry.motivation?.replacingOccurrences(of: "\"", with: "\"\"") ?? ""
@@ -114,7 +114,7 @@ class SettingsViewModel {
         
         for metric in metrics.sorted(by: { $0.createdAt > $1.createdAt }) {
             let name = metric.name.replacingOccurrences(of: "\"", with: "\"\"")
-            let habitType = metric.safeHabitType.displayName
+            let habitType = metric.habitType.displayName
             let createdDate = DateFormatter.dateFormatter.string(from: metric.createdAt)
             let goalPeriod = metric.booleanGoals.first?.period.displayName ?? "None"
             let goalTarget = metric.booleanGoals.first?.target.description ?? "None"

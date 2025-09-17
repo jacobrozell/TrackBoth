@@ -17,9 +17,9 @@ struct QuantityChartView: View {
             case .all:
                 return true
             case .allHabits:
-                return metrics.first { $0.id == entry.metricID }?.safeHabitType == .positive
+                return metrics.first { $0.id == entry.metricID }?.habitType == .positive
             case .allVices:
-                return metrics.first { $0.id == entry.metricID }?.safeHabitType == .vice
+                return metrics.first { $0.id == entry.metricID }?.habitType == .vice
             case .specific(let metric):
                 return entry.metricID == metric.id
             }
@@ -36,7 +36,7 @@ struct QuantityChartView: View {
                 quantity: quantity,
                 unit: entry.unit,
                 metricName: metric.name,
-                habitType: metric.safeHabitType
+                habitType: metric.habitType
             )
         }.sorted { $0.date < $1.date }
     }

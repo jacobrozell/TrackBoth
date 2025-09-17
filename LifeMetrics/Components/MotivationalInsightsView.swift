@@ -78,7 +78,7 @@ struct MotivationalInsightsView: View {
     
     private func isSuccessfulEntry(_ entry: MetricEntry) -> Bool {
         let metric = metrics.first { $0.id == entry.metricID }
-        let isVice = metric?.safeHabitType == .vice
+        let isVice = metric?.habitType == .vice
         // For positive habits: success when value == true (completed)
         // For vices: success when value == false (avoided)
         return isVice ? !entry.value : entry.value
@@ -93,7 +93,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return "Success Rate"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "Avoidance Rate" : "Completion Rate"
+            return metric.habitType == .vice ? "Avoidance Rate" : "Completion Rate"
         }
     }
     
@@ -106,7 +106,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return "Current Streak"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "Clean Streak" : "Current Streak"
+            return metric.habitType == .vice ? "Clean Streak" : "Current Streak"
         }
     }
     
@@ -119,7 +119,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return "flame.fill"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "shield.checkered" : "flame.fill"
+            return metric.habitType == .vice ? "shield.checkered" : "flame.fill"
         }
     }
     
@@ -131,7 +131,7 @@ struct MotivationalInsightsView: View {
             return "This Week"
         case .all:
             return "This Week"
-        case .specific(let metric):
+        case .specific(_):
             return "This Week"
         }
     }
@@ -145,7 +145,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return "successes"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "avoidances" : "habits"
+            return metric.habitType == .vice ? "avoidances" : "habits"
         }
     }
     
@@ -158,7 +158,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return "calendar.badge.checkmark"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "calendar.badge.minus" : "calendar.badge.checkmark"
+            return metric.habitType == .vice ? "calendar.badge.minus" : "calendar.badge.checkmark"
         }
     }
     
@@ -171,7 +171,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return "Best Day"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "Best Avoidance Day" : "Best Day"
+            return metric.habitType == .vice ? "Best Avoidance Day" : "Best Day"
         }
     }
     
@@ -184,7 +184,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return "successes"
         case .specific(let metric):
-            return metric.safeHabitType == .vice ? "avoidances" : "habits"
+            return metric.habitType == .vice ? "avoidances" : "habits"
         }
     }
     
@@ -208,7 +208,6 @@ struct MotivationalInsightsView: View {
     }
     
     private func findBestDay() -> (count: Int, dayName: String)? {
-        let calendar = Calendar.current
         let formatter = DateFormatter()
         formatter.dateFormat = "EEEE"
         
@@ -281,7 +280,7 @@ struct MotivationalInsightsView: View {
         case .all:
             return false
         case .specific(let metric):
-            return metric.safeHabitType == .vice
+            return metric.habitType == .vice
         }
     }
     

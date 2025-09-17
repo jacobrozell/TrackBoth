@@ -75,12 +75,12 @@ struct CalendarDayView: View {
                     // Focus on boolean status - if they did it (value = true), show success color
                     if entry.value {
                         Circle()
-                            .fill(metric.safeHabitType == .positive ? Color.currentSuccess : Color.currentError)
+                            .fill(metric.habitType == .positive ? Color.currentSuccess : Color.currentError)
                             .frame(width: 6, height: 6)
                     } else {
                         // For failed entries
                         Circle()
-                            .fill(metric.safeHabitType == .positive ? Color.currentError : Color.currentSuccess)
+                            .fill(metric.habitType == .positive ? Color.currentError : Color.currentSuccess)
                             .frame(width: 6, height: 6)
                     }
                 } else {

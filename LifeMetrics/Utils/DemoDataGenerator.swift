@@ -8,7 +8,7 @@ struct DemoDataGenerator {
         // Mark that demo data has been generated
         UserDefaults.standard.set(true, forKey: "hasDemoData")
         
-        // Create demo metrics
+        // Create demo metrics (all marked as logged since they will have entries)
         let demoMetrics = [
             Metric(name: "Morning Exercise", habitType: .positive),
             Metric(name: "Read 30 minutes", habitType: .positive),
@@ -75,7 +75,7 @@ struct DemoDataGenerator {
         
         // Base probability based on metric type
         var baseProbability: Double
-        switch metric.safeHabitType {
+        switch metric.habitType {
         case .positive:
             baseProbability = 0.6 // 60% base chance for habits
         case .vice:
@@ -84,7 +84,7 @@ struct DemoDataGenerator {
         
         // Adjust based on days since start (habits get easier, vices get harder to avoid)
         let progressFactor = Double(daysSinceStart) / 30.0
-        if metric.safeHabitType == .positive {
+        if metric.habitType == .positive {
             baseProbability += progressFactor * 0.2 // Habits get easier over time
         } else {
             baseProbability -= progressFactor * 0.1 // Vices get harder to avoid over time
@@ -92,7 +92,7 @@ struct DemoDataGenerator {
         
         // Weekend adjustment
         if dayOfWeek == 1 || dayOfWeek == 7 { // Sunday or Saturday
-            if metric.safeHabitType == .positive {
+            if metric.habitType == .positive {
                 baseProbability *= 0.8 // Habits are harder on weekends
             } else {
                 baseProbability *= 1.3 // Vices are more likely on weekends

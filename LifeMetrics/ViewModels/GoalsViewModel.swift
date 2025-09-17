@@ -126,7 +126,7 @@ class GoalsViewModel {
     /// Habits with goals
     func habitsWithGoals(_ metrics: [Metric]) -> [Metric] {
         let startTime = Date()
-        let result = metricsWithGoals(metrics).filter { $0.safeHabitType == .positive }
+        let result = metricsWithGoals(metrics).filter { $0.habitType == .positive }
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("Habits with goals calculation", duration: duration)
         logger.debug("Habits with goals calculated: \(result.count)", category: .business)
@@ -136,7 +136,7 @@ class GoalsViewModel {
     /// Vices with goals
     func vicesWithGoals(_ metrics: [Metric]) -> [Metric] {
         let startTime = Date()
-        let result = metricsWithGoals(metrics).filter { $0.safeHabitType == .vice }
+        let result = metricsWithGoals(metrics).filter { $0.habitType == .vice }
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("Vices with goals calculation", duration: duration)
         logger.debug("Vices with goals calculated: \(result.count)", category: .business)

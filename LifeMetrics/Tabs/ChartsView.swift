@@ -248,7 +248,7 @@ struct ChartsView: View {
             case .allHabits: return "30-Day Completion Trend"
             case .all: return "30-Day Progress Trend"
             case .specific(let metric):
-                return metric.safeHabitType == .vice ? "30-Day Avoidance Trend" : "30-Day Completion Trend"
+                return metric.habitType == .vice ? "30-Day Avoidance Trend" : "30-Day Completion Trend"
             }
         case .bar:
             switch viewModel.selectedFilter {
@@ -256,7 +256,7 @@ struct ChartsView: View {
             case .allHabits: return "Weekly Completion"
             case .all: return "Weekly Progress"
             case .specific(let metric):
-                return metric.safeHabitType == .vice ? "Weekly Avoidance" : "Weekly Completion"
+                return metric.habitType == .vice ? "Weekly Avoidance" : "Weekly Completion"
             }
         case .heatmap:
             switch viewModel.selectedFilter {
@@ -264,7 +264,7 @@ struct ChartsView: View {
             case .allHabits: return "90-Day Completion Heatmap"
             case .all: return "90-Day Progress Heatmap"
             case .specific(let metric):
-                return metric.safeHabitType == .vice ? "90-Day Avoidance Heatmap" : "90-Day Completion Heatmap"
+                return metric.habitType == .vice ? "90-Day Avoidance Heatmap" : "90-Day Completion Heatmap"
             }
         case .quantity:
             switch viewModel.selectedFilter {

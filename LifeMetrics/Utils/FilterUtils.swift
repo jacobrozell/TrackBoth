@@ -9,9 +9,9 @@ struct FilterUtils {
         case .all:
             return true
         case .allHabits:
-            return metrics.first { $0.id == entry.metricID }?.safeHabitType == .positive
+            return metrics.first { $0.id == entry.metricID }?.habitType == .positive
         case .allVices:
-            return metrics.first { $0.id == entry.metricID }?.safeHabitType == .vice
+            return metrics.first { $0.id == entry.metricID }?.habitType == .vice
         case .specific(let metric):
             return entry.metricID == metric.id
         }

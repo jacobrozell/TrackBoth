@@ -73,7 +73,7 @@ class MotivationViewModel {
     /// Vice metrics filtered from all metrics
     func viceMetrics(_ metrics: [Metric]) -> [Metric] {
         let startTime = Date()
-        let result = metrics.filter { $0.safeHabitType == .vice }
+        let result = metrics.filter { $0.habitType == .vice }
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("Vice metrics filtering", duration: duration)
         logger.debug("Vice metrics filtered: \(result.count) out of \(metrics.count)", category: .business)

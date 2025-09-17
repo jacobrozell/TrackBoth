@@ -9,7 +9,7 @@ class Metric {
     var id: UUID = UUID()
     var name: String = ""
     var createdAt: Date = Date()
-    var habitType: HabitType?
+    var habitType: HabitType = HabitType.positive
     var primaryMotivation: String? // Primary motivation set when creating the habit/vice
     
     // Relationship to goals (one metric can have multiple goals)
@@ -26,10 +26,6 @@ class Metric {
     }
     
     // MARK: - Computed Properties
-    /// Safely access habitType with default value
-    var safeHabitType: HabitType {
-        return habitType ?? .positive
-    }
     
     /// Get all boolean goals for this metric
     var booleanGoals: [Goal] {

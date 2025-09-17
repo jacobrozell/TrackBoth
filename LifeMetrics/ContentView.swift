@@ -17,7 +17,7 @@ struct ContentView: View {
                     }
             } else {
                 TabView(selection: $selectedTab) {
-                    HomeView2()
+                    HomeView()
                         .tabItem {
                             Image(systemName: "house.fill")
                             Text("Home")

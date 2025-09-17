@@ -23,9 +23,9 @@ class ChartsViewModel {
         case .all:
             result = metrics
         case .allHabits:
-            result = metrics.filter { $0.safeHabitType == .positive }
+            result = metrics.filter { $0.habitType == .positive }
         case .allVices:
-            result = metrics.filter { $0.safeHabitType == .vice }
+            result = metrics.filter { $0.habitType == .vice }
         case .specific(let metric):
             result = [metric]
         }
