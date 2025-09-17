@@ -94,44 +94,6 @@
 			);
 			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
 		};
-		0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "TrackBoth" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				BackupSheet.swift,
-				BarChartView.swift,
-				CalendarDayView.swift,
-				CalendarGridView.swift,
-				ChartContentView.swift,
-				ChartControlsView.swift,
-				ChartsEmptyStateView.swift,
-				DateNavigationView.swift,
-				DatePickerSheet.swift,
-				EditableEntryCell.swift,
-				EmptyStateView.swift,
-				EntriesListView.swift,
-				FilterButton.swift,
-				FloatingActionButton.swift,
-				GoalCardViews.swift,
-				GoalHistoryViews.swift,
-				GoalPresets.swift,
-				HeatmapView.swift,
-				LineChartView.swift,
-				MetricChipStyle.swift,
-				MotivationalInsightsView.swift,
-				MotivationCardView.swift,
-				MultiGoalViews.swift,
-				PresetButtons.swift,
-				PrimaryMotivationCardView.swift,
-				QuantityChartView.swift,
-				QuantityInputSheet.swift,
-				RestoreSheet.swift,
-				StatCard.swift,
-				StatsSectionView.swift,
-				StreakInfoView.swift,
-				UnifiedMetricRowView.swift,
-			);
-			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
-		};
 		0B9C31F42E7915660089A5FD /* Exceptions for "Tabs" folder in "TrackBoth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -151,13 +113,55 @@
 			);
 			target = 0B9C31FB2E7916A00089A5FD /* TrackBoth-WidgetExtension */;
 		};
+		0BD3346A2E7B4E1100EDDB19 /* Exceptions for "Components" folder in "TrackBoth" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				BackupSheet.swift,
+				BarChartView.swift,
+				CalendarDayView.swift,
+				CalendarGridView.swift,
+				ChartContentView.swift,
+				ChartControlsView.swift,
+				ChartsEmptyStateView.swift,
+				CompactMetricRow.swift,
+				DateNavigationView.swift,
+				DatePickerSheet.swift,
+				EditableEntryCell.swift,
+				EmptyStateView.swift,
+				EntriesListView.swift,
+				FilterButton.swift,
+				FloatingActionButton.swift,
+				GoalCardViews.swift,
+				GoalHistoryViews.swift,
+				GoalPresets.swift,
+				HeatmapView.swift,
+				HistoryEntryCardView.swift,
+				HistoryEntryDetailView.swift,
+				LineChartView.swift,
+				LoggingSheet.swift,
+				MetricChipStyle.swift,
+				MotivationalInsightsView.swift,
+				MotivationCardView.swift,
+				MultiGoalViews.swift,
+				PresetButtons.swift,
+				PrimaryMotivationCardView.swift,
+				QuantityChartView.swift,
+				QuantityInputSheet.swift,
+				RestoreSheet.swift,
+				StatCard.swift,
+				StatsSectionView.swift,
+				StreakInfoView.swift,
+				UnifiedMetricRowView.swift,
+			);
+			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		0B9C2DA12E735AE50089A5FD /* Components */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0B9C31362E73CB4C0089A5FD /* Exceptions for "Components" folder in "TrackBoth" target */,
+				0BD3346A2E7B4E1100EDDB19 /* Exceptions for "Components" folder in "TrackBoth" target */,
 			);
 			path = Components;
 			sourceTree = "<group>";
