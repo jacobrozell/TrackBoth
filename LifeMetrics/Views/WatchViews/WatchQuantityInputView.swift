@@ -46,14 +46,14 @@ struct WatchQuantityInputView: View {
                     
                     Text("How many \(unit)?")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                 }
                 .padding(.top, 8)
                 
                 // Quantity Display
                 Text("\(quantity)")
                     .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color.currentText)
                     .frame(height: 40)
                 
                 // Quick Preset Buttons
@@ -64,13 +64,13 @@ struct WatchQuantityInputView: View {
                             hapticFeedback()
                         }
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.primary)
+                        .foregroundColor(Color.currentText)
                         .frame(width: 50, height: 32)
                         .background(
                             RoundedRectangle(cornerRadius: 8)
-                                .fill(quantity == preset ? Color.blue : Color.gray.opacity(0.2))
+                                .fill(quantity == preset ? Color.currentPrimary : Color.currentSecondaryBackground)
                         )
-                        .foregroundColor(quantity == preset ? .white : .primary)
+                        .foregroundColor(quantity == preset ? .white : Color.currentText)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -85,7 +85,7 @@ struct WatchQuantityInputView: View {
                         Image(systemName: "chevron.right")
                             .font(.caption)
                     }
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color.currentPrimary)
                     .padding(.vertical, 8)
                 }
                 
@@ -97,7 +97,7 @@ struct WatchQuantityInputView: View {
                         dismiss()
                     }
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color.currentSecondaryText)
                     
                     Button("Save") {
                         saveQuantity()
@@ -107,7 +107,7 @@ struct WatchQuantityInputView: View {
                     .foregroundColor(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
-                    .background(Color.blue)
+                    .background(Color.currentPrimary)
                     .cornerRadius(8)
                 }
                 .padding(.bottom, 8)

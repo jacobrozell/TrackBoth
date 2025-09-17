@@ -31,21 +31,22 @@ struct ContentView: View {
                         }
                         .tag(1)
 
-                    MotivationsView2()
+                    MotivationsView()
                         .tabItem {
                             Image(systemName: "heart.fill")
                             Text("Motivation")
                         }
                         .tag(2)
 
-                    ChartsView()
-                        .tabItem {
-                            Image(systemName: "chart.line.uptrend.xyaxis")
-                            Text("Charts")
-                        }
-                        .tag(3)
+                    // TODO
+//                    ChartsView()
+//                        .tabItem {
+//                            Image(systemName: "chart.line.uptrend.xyaxis")
+//                            Text("Charts")
+//                        }
+//                        .tag(3)
 
-                    HistoryView()
+                    HistoryView2()
                         .tabItem {
                             Image(systemName: "calendar.badge.clock")
                             Text("History")
@@ -53,16 +54,6 @@ struct ContentView: View {
                         .tag(4)
                 }
                 .themedBackground()
-                .onAppear {
-                    // Configure tab bar appearance
-                    let appearance = UITabBarAppearance()
-                    appearance.configureWithOpaqueBackground()
-                    appearance.backgroundColor = UIColor(Color.currentSecondaryBackground)
-                    
-                    // Apply to all tab bar states
-                    UITabBar.appearance().standardAppearance = appearance
-                    UITabBar.appearance().scrollEdgeAppearance = appearance
-                }
                 .onChange(of: selectedTab) { oldValue, newValue in
                     let tabNames = ["Home", "Goals", "Charts", "Motivation", "History", "Settings"]
                     let tabName = newValue < tabNames.count ? tabNames[newValue] : "Unknown"

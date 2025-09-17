@@ -114,7 +114,7 @@ struct ChartsEmptyStateView: View {
                     }
                 }
                 .padding()
-                .background(Color(.systemGray6))
+                .background(Color.currentSecondaryBackground)
                 .cornerRadius(16)
                 
                 // Call to Action
@@ -170,8 +170,7 @@ struct FeatureRow: View {
         HStack(spacing: 12) {
             Image(systemName: icon)
                 .font(.title2)
-            // TODO
-                .foregroundStyle(.blue.gradient)
+                .foregroundStyle(Color.currentPrimary.gradient)
                 .frame(width: 30)
             
             VStack(alignment: .leading, spacing: 2) {

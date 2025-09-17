@@ -63,7 +63,7 @@ struct WatchWeeklySummaryView: View {
                         
                         Text("Past 7 days")
                             .font(.caption)
-                            .foregroundColor(.secondary)
+                            .foregroundColor(Color.currentSecondaryText)
                     }
                     .padding(.top, 8)
                     
@@ -114,7 +114,7 @@ struct WatchWeeklySummaryView: View {
                 
                 Text("\(Int(weeklyData.overallPercentage * 100))% Complete")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color.currentSecondaryText)
             }
             
             // Progress Bar
@@ -212,7 +212,7 @@ struct WeeklyMetricRowView: View {
             // Metric name
             Text(name)
                 .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.primary)
+                .foregroundColor(Color.currentText)
                 .lineLimit(1)
             
             Spacer()
@@ -220,7 +220,7 @@ struct WeeklyMetricRowView: View {
             // Completion count
             Text("\(completions)/\(maxPossible)")
                 .font(.system(size: 11, weight: .regular))
-                .foregroundColor(.secondary)
+                .foregroundColor(Color.currentSecondaryText)
             
             // Progress indicator
             Circle()

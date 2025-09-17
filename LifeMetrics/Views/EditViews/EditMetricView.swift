@@ -32,18 +32,6 @@ struct EditMetricView: View {
                 QuickPreset(title: "3 Days", target: 3),
                 QuickPreset(title: "Weekends", target: 2)
             ]
-        case .biWeekly:
-            return isVice ? [
-                QuickPreset(title: "Never", target: 0),
-                QuickPreset(title: "Rarely", target: 2),
-                QuickPreset(title: "Occasionally", target: 4),
-                QuickPreset(title: "Moderately", target: 6)
-            ] : [
-                QuickPreset(title: "Daily", target: 14),
-                QuickPreset(title: "5x Week", target: 10),
-                QuickPreset(title: "3x Week", target: 6),
-                QuickPreset(title: "Weekends", target: 4)
-            ]
         case .monthly:
             return isVice ? [
                 QuickPreset(title: "Never", target: 0),
@@ -131,8 +119,6 @@ struct EditMetricView: View {
                             switch newPeriod {
                             case .weekly:
                                 goalTarget = habitType == .vice ? 2 : 5
-                            case .biWeekly:
-                                goalTarget = habitType == .vice ? 4 : 10
                             case .monthly:
                                 goalTarget = habitType == .vice ? 8 : 20
                             case .yearly:

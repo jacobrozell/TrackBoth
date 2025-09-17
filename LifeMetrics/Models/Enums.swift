@@ -33,14 +33,12 @@ enum HabitType: String, CaseIterable, Codable {
 // MARK: - GoalPeriod Enum
 enum GoalPeriod: String, CaseIterable, Codable {
     case weekly = "weekly"
-    case biWeekly = "biweekly"
     case monthly = "monthly"
     case yearly = "yearly"
     
     var displayName: String {
         switch self {
         case .weekly: return "Weekly"
-        case .biWeekly: return "Bi-weekly"
         case .monthly: return "Monthly"
         case .yearly: return "Yearly"
         }
@@ -49,7 +47,6 @@ enum GoalPeriod: String, CaseIterable, Codable {
     var maxDays: Int {
         switch self {
         case .weekly: return 7
-        case .biWeekly: return 14
         case .monthly: return 31
         case .yearly: return 365
         }
@@ -63,8 +60,6 @@ enum GoalPeriod: String, CaseIterable, Codable {
         switch self {
         case .weekly:
             return 7
-        case .biWeekly:
-            return 14
         case .monthly:
             return calendar.range(of: .day, in: .month, for: now)?.count ?? 31
         case .yearly:
@@ -79,8 +74,6 @@ enum GoalPeriod: String, CaseIterable, Codable {
         switch self {
         case .weekly:
             return 7
-        case .biWeekly:
-            return 14
         case .monthly:
             return calendar.range(of: .day, in: .month, for: date)?.count ?? 31
         case .yearly:
@@ -120,6 +113,15 @@ enum MetricFilter: Hashable {
         case .allHabits: return "green"
         case .allVices: return "red"
         case .specific(let metric): return metric.habitType.color
+        }
+    }
+    
+    var id: String {
+        switch self {
+        case .all: return "all"
+        case .allHabits: return "allHabits"
+        case .allVices: return "allVices"
+        case .specific(let metric): return metric.id.uuidString
         }
     }
 }

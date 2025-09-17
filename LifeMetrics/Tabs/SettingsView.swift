@@ -292,6 +292,7 @@ struct SettingsView: View {
                     }
                 }
             }
+            .themedBackground()
             .navigationTitle("Settings")
             .onAppear {
                 logger.info("SettingsView appeared")

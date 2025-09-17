@@ -31,19 +31,6 @@ private let weeklyVicePresets = [
     GoalPreset(title: "Moderately", target: 3, description: "Max 3 days")
 ]
 
-private let biWeeklyHabitPresets = [
-    GoalPreset(title: "Daily", target: 14, description: "Every day"),
-    GoalPreset(title: "5x Week", target: 10, description: "5 days per week"),
-    GoalPreset(title: "3x Week", target: 6, description: "3 days per week"),
-    GoalPreset(title: "Weekends", target: 4, description: "Weekends only")
-]
-
-private let biWeeklyVicePresets = [
-    GoalPreset(title: "Never", target: 0, description: "Complete avoidance"),
-    GoalPreset(title: "Rarely", target: 2, description: "Max 2 days"),
-    GoalPreset(title: "Occasionally", target: 4, description: "Max 4 days"),
-    GoalPreset(title: "Moderately", target: 6, description: "Max 6 days")
-]
 
 private let monthlyHabitPresets = [
     GoalPreset(title: "Daily", target: 30, description: "Every day"),
@@ -125,8 +112,6 @@ func getBooleanPresets(for period: GoalPeriod, isVice: Bool) -> [GoalPreset] {
     switch period {
     case .weekly:
         return isVice ? weeklyVicePresets : weeklyHabitPresets
-    case .biWeekly:
-        return isVice ? biWeeklyVicePresets : biWeeklyHabitPresets
     case .monthly:
         return isVice ? monthlyVicePresets : monthlyHabitPresets
     case .yearly:

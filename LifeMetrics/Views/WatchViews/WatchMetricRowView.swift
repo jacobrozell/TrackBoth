@@ -41,18 +41,18 @@ struct WatchMetricRowView: View {
     private var iconColor: Color {
         switch metric.habitType {
         case .positive:
-            return isCompleted ? .green : .gray
+            return isCompleted ? Color.currentSuccess : Color.currentSecondaryText
         case .vice:
-            return isCompleted ? .red : .gray
+            return isCompleted ? Color.currentError : Color.currentSecondaryText
         }
     }
     
     private var backgroundColor: Color {
         if isPressed {
-            return Color.gray.opacity(0.3)
+            return Color.currentSecondaryBackground.opacity(0.5)
         } else if isCompleted {
             return metric.habitType == .positive ? 
-                Color.green.opacity(0.1) : Color.red.opacity(0.1)
+                Color.currentSuccess.opacity(0.1) : Color.currentError.opacity(0.1)
         } else {
             return Color.clear
         }
@@ -70,7 +70,7 @@ struct WatchMetricRowView: View {
                 // Metric name
                 Text(metric.name)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color.currentText)
                     .lineLimit(1)
                 
                 Spacer()
@@ -79,7 +79,7 @@ struct WatchMetricRowView: View {
                 if let quantityText = quantityText {
                     Text(quantityText)
                         .font(.system(size: 11, weight: .regular))
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                         .lineLimit(1)
                 }
             }

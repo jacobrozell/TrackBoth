@@ -1,49 +1,17 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - FilterType
-enum FilterType {
-    case all
-    case allHabits
-    case allVices
-    case metric(Metric)
-    
-    var displayName: String {
-        switch self {
-        case .all:
-            return "All"
-        case .allHabits:
-            return "All Habits"
-        case .allVices:
-            return "All Vices"
-        case .metric(let metric):
-            return metric.name
-        }
-    }
-    
-    var id: String {
-        switch self {
-        case .all:
-            return "all"
-        case .allHabits:
-            return "allHabits"
-        case .allVices:
-            return "allVices"
-        case .metric(let metric):
-            return metric.id.uuidString
-        }
-    }
-}
 
 // MARK: - MotivationsView2
 /// Redesigned Motivation view per motivation-view-redesign-spec
-struct MotivationsView2: View {
+struct MotivationsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
     @State private var viewModel = MotivationViewModel()
     @State private var showingAddMotivation = false
-    @State private var selectedFilter: FilterType = .all
+    @State private var selectedFilter: MetricFilter = .all
+    @StateObject private var themeManager = ThemeManager.shared
 
     // MARK: - Computed Properties
     private var filteredMetrics: [Metric] {
@@ -54,7 +22,7 @@ struct MotivationsView2: View {
             return metrics.filter { $0.habitType == .positive }
         case .allVices:
             return metrics.filter { $0.habitType == .vice }
-        case .metric(let selectedMetric):
+        case .specific(let selectedMetric):
             return [selectedMetric]
         }
     }
@@ -86,7 +54,7 @@ struct MotivationsView2: View {
         case .allVices:
             let viceMetricIDs = Set(metrics.filter { $0.habitType == .vice }.map { $0.id })
             result = filteredEntries.filter { viceMetricIDs.contains($0.metricID) }
-        case .metric(let selectedMetric):
+        case .specific(let selectedMetric):
             result = filteredEntries.filter { $0.metricID == selectedMetric.id }
         }
         
@@ -153,6 +121,7 @@ struct MotivationsView2: View {
 
                         rightPanel
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.currentBackground)
                             .overlay(alignment: .bottomTrailing) {
                                 FloatingActionButton {
                                     logger.logUserAction("Add motivation button tapped")
@@ -169,43 +138,42 @@ struct MotivationsView2: View {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 12) {
                                     // All filter
-                                    Button("All") {
+                                    ReactiveFilterButton(
+                                        title: "All",
+                                        isSelected: selectedFilter == .all
+                                    ) {
                                         selectedFilter = .all
                                     }
-                                    .buttonStyle(MetricChipStyle(isSelected: {
-                                        if case .all = selectedFilter { return true }
-                                        return false
-                                    }()))
                                     
                                     // All Habits filter
-                                    Button("All Habits") {
+                                    ReactiveFilterButton(
+                                        title: "All Habits",
+                                        isSelected: selectedFilter == .allHabits
+                                    ) {
                                         selectedFilter = .allHabits
                                     }
-                                    .buttonStyle(MetricChipStyle(isSelected: {
-                                        if case .allHabits = selectedFilter { return true }
-                                        return false
-                                    }()))
                                     
                                     // All Vices filter
-                                    Button("All Vices") {
+                                    ReactiveFilterButton(
+                                        title: "All Vices",
+                                        isSelected: selectedFilter == .allVices
+                                    ) {
                                         selectedFilter = .allVices
                                     }
-                                    .buttonStyle(MetricChipStyle(isSelected: {
-                                        if case .allVices = selectedFilter { return true }
-                                        return false
-                                    }()))
 
                                     // Individual metrics
                                     ForEach(metrics) { metric in
-                                        Button(metric.name) {
-                                            selectedFilter = .metric(metric)
+                                        ReactiveFilterButton(
+                                            title: metric.name,
+                                            isSelected: {
+                                                if case .specific(let selectedMetric) = selectedFilter {
+                                                    return selectedMetric.id == metric.id
+                                                }
+                                                return false
+                                            }()
+                                        ) {
+                                            selectedFilter = .specific(metric)
                                         }
-                                        .buttonStyle(MetricChipStyle(isSelected: {
-                                            if case .metric(let selectedMetric) = selectedFilter {
-                                                return selectedMetric.id == metric.id
-                                            }
-                                            return false
-                                        }()))
                                     }
                                 }
                                 .padding(.horizontal, 16)
@@ -258,6 +226,7 @@ struct MotivationsView2: View {
                     }
                 }
             }
+            .themedBackground()
             .navigationTitle("Motivation")
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -296,43 +265,42 @@ struct MotivationsView2: View {
 
                 VStack(spacing: 8) {
                     // All filter
-                    Button("All") {
+                    ReactiveFilterButton(
+                        title: "All",
+                        isSelected: selectedFilter == .all
+                    ) {
                         selectedFilter = .all
                     }
-                    .buttonStyle(MetricChipStyle(isSelected: {
-                        if case .all = selectedFilter { return true }
-                        return false
-                    }()))
                     
                     // All Habits filter
-                    Button("All Habits") {
+                    ReactiveFilterButton(
+                        title: "All Habits",
+                        isSelected: selectedFilter == .allHabits
+                    ) {
                         selectedFilter = .allHabits
                     }
-                    .buttonStyle(MetricChipStyle(isSelected: {
-                        if case .allHabits = selectedFilter { return true }
-                        return false
-                    }()))
                     
                     // All Vices filter
-                    Button("All Vices") {
+                    ReactiveFilterButton(
+                        title: "All Vices",
+                        isSelected: selectedFilter == .allVices
+                    ) {
                         selectedFilter = .allVices
                     }
-                    .buttonStyle(MetricChipStyle(isSelected: {
-                        if case .allVices = selectedFilter { return true }
-                        return false
-                    }()))
 
                     // Individual metrics
                     ForEach(metrics) { metric in
-                        Button(metric.name) {
-                            selectedFilter = .metric(metric)
+                        ReactiveFilterButton(
+                            title: metric.name,
+                            isSelected: {
+                                if case .specific(let selectedMetric) = selectedFilter {
+                                    return selectedMetric.id == metric.id
+                                }
+                                return false
+                            }()
+                        ) {
+                            selectedFilter = .specific(metric)
                         }
-                        .buttonStyle(MetricChipStyle(isSelected: {
-                            if case .metric(let selectedMetric) = selectedFilter {
-                                return selectedMetric.id == metric.id
-                            }
-                            return false
-                        }()))
                     }
                 }
             }
@@ -702,6 +670,6 @@ struct AddMotivationView2: View {
 }
 
 #Preview {
-    MotivationsView2()
+    MotivationsView()
         .modelContainer(for: [Metric.self, MetricEntry.self], inMemory: true)
 }

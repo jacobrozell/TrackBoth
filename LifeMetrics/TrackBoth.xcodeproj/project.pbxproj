@@ -137,10 +137,9 @@
 			membershipExceptions = (
 				ChartsView.swift,
 				GoalsView.swift,
-				GoalsView2.swift,
-				HistoryView.swift,
+				HistoryView2.swift,
 				HomeView.swift,
-				MotivationsView2.swift,
+				MotivationsView.swift,
 				SettingsView.swift,
 			);
 			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;

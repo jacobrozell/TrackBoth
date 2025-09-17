@@ -72,8 +72,6 @@ class CalendarHelper {
         switch period {
         case .weekly:
             return startOfWeek(for: date)
-        case .biWeekly:
-            return startOfBiWeek(for: date)
         case .monthly:
             return startOfMonth(for: date)
         case .yearly:
@@ -86,8 +84,6 @@ class CalendarHelper {
         switch period {
         case .weekly:
             return endOfWeek(for: date)
-        case .biWeekly:
-            return endOfBiWeek(for: date)
         case .monthly:
             return endOfMonth(for: date)
         case .yearly:

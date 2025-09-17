@@ -39,7 +39,7 @@ struct WatchUnitPickerView: View {
                     
                     Text("Select Unit:")
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                 }
                 .padding(.top, 8)
                 
@@ -54,21 +54,21 @@ struct WatchUnitPickerView: View {
                                 HStack {
                                     Text(unit.capitalized)
                                         .font(.subheadline)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(Color.currentText)
                                     
                                     Spacer()
                                     
                                     if selectedUnit == unit {
                                         Image(systemName: "checkmark")
                                             .font(.subheadline)
-                                            .foregroundColor(.blue)
+                                            .foregroundColor(Color.currentPrimary)
                                     }
                                 }
                                 .padding(.horizontal, 16)
                                 .padding(.vertical, 12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .fill(selectedUnit == unit ? Color.blue.opacity(0.1) : Color.clear)
+                                        .fill(selectedUnit == unit ? Color.currentPrimary.opacity(0.1) : Color.clear)
                                 )
                             }
                             .buttonStyle(PlainButtonStyle())
@@ -81,19 +81,19 @@ struct WatchUnitPickerView: View {
                             HStack {
                                 Text("Custom...")
                                     .font(.subheadline)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color.currentPrimary)
                                 
                                 Spacer()
                                 
                                 Image(systemName: "chevron.right")
                                     .font(.caption)
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color.currentPrimary)
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
-                                    .stroke(Color.blue, lineWidth: 1)
+                                    .stroke(Color.currentPrimary, lineWidth: 1)
                             )
                         }
                         .buttonStyle(PlainButtonStyle())

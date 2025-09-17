@@ -9,6 +9,7 @@ class GoalsViewModel {
     
     // MARK: - Properties
     var showingAddGoal = false
+    var showingSettings = false
     
     // MARK: - Computed Properties
     /// Metrics with goals set (boolean or quantity)
@@ -111,6 +112,16 @@ class GoalsViewModel {
         return GoalUtils.hasGoals(ofType: .quantity, in: metric)
     }
     
+    /// Check if metric has boolean goals set
+    func hasBooleanGoals(_ metric: Metric) -> Bool {
+        return GoalUtils.hasGoals(ofType: .boolean, in: metric)
+    }
+    
+    /// Check if metric has quantity goals set (alias for consistency)
+    func hasQuantityGoals(_ metric: Metric) -> Bool {
+        return GoalUtils.hasGoals(ofType: .quantity, in: metric)
+    }
+    
     /// Get metrics with quantity goals
     func metricsWithQuantityGoals(_ metrics: [Metric]) -> [Metric] {
         return metrics.filter { hasQuantityGoal($0) }
@@ -187,6 +198,11 @@ class GoalsViewModel {
     /// Show add goal sheet
     func showAddGoal() {
         showingAddGoal = true
+    }
+    
+    /// Show settings sheet
+    func showSettings() {
+        showingSettings = true
     }
     
     /// Create a new boolean goal for a metric

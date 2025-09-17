@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var showingLoggingSheetForMetric: Metric? = nil
     @State private var showingRowOptions: Bool = false
     @State private var hasDemoData: Bool = DemoDataGenerator.hasDemoData()
+    @StateObject private var themeManager = ThemeManager.shared
 
     // MARK: - Derived values
     private var weekDays: [Date] {
@@ -56,6 +57,7 @@ struct HomeView: View {
 
                         rightPanel
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.currentBackground)
                             .overlay(alignment: .bottomTrailing) {
                                 FloatingActionButton { viewModel.showAddMetric() }
                             }
@@ -93,6 +95,7 @@ struct HomeView: View {
                     }
                 }
             }
+            .themedBackground()
             .navigationTitle("TrackBoth")
             .toolbar {
                 if metrics.isEmpty || hasDemoData {

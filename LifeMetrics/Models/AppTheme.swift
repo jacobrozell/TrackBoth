@@ -39,7 +39,7 @@ struct AppTheme {
         backgroundColor: Color(red: 0.95, green: 0.98, blue: 1.0),
         secondaryBackgroundColor: Color(red: 0.9, green: 0.95, blue: 1.0),
         textColor: Color(red: 0.1, green: 0.2, blue: 0.3),
-        secondaryTextColor: Color(red: 0.4, green: 0.5, blue: 0.6),
+        secondaryTextColor: Color(red: 0.3, green: 0.4, blue: 0.5), // Improved contrast
         accentColor: Color(red: 0.2, green: 0.7, blue: 0.9),
         successColor: Color(red: 0.0, green: 0.7, blue: 0.4),
         warningColor: Color(red: 1.0, green: 0.6, blue: 0.0),
@@ -54,7 +54,7 @@ struct AppTheme {
         backgroundColor: Color(red: 0.95, green: 0.98, blue: 0.95),
         secondaryBackgroundColor: Color(red: 0.9, green: 0.95, blue: 0.9),
         textColor: Color(red: 0.1, green: 0.3, blue: 0.1),
-        secondaryTextColor: Color(red: 0.4, green: 0.5, blue: 0.4),
+        secondaryTextColor: Color(red: 0.3, green: 0.4, blue: 0.3), // Improved contrast
         accentColor: Color(red: 0.3, green: 0.8, blue: 0.4),
         successColor: Color(red: 0.0, green: 0.7, blue: 0.3),
         warningColor: Color(red: 0.9, green: 0.6, blue: 0.0),
@@ -69,7 +69,7 @@ struct AppTheme {
         backgroundColor: Color(red: 1.0, green: 0.98, blue: 0.95),
         secondaryBackgroundColor: Color(red: 1.0, green: 0.95, blue: 0.9),
         textColor: Color(red: 0.3, green: 0.2, blue: 0.1),
-        secondaryTextColor: Color(red: 0.6, green: 0.5, blue: 0.4),
+        secondaryTextColor: Color(red: 0.5, green: 0.4, blue: 0.3), // Improved contrast
         accentColor: Color(red: 1.0, green: 0.6, blue: 0.2),
         successColor: Color(red: 0.0, green: 0.7, blue: 0.3),
         warningColor: Color(red: 1.0, green: 0.7, blue: 0.0),
@@ -79,13 +79,13 @@ struct AppTheme {
     
     static let midnight = AppTheme(
         name: "Midnight",
-        primaryColor: Color(red: 0.2, green: 0.2, blue: 0.4),
-        secondaryColor: Color(red: 0.3, green: 0.3, blue: 0.6),
+        primaryColor: Color(red: 0.6, green: 0.6, blue: 0.9), // Brighter purple for better readability
+        secondaryColor: Color(red: 0.7, green: 0.7, blue: 0.95), // Lighter secondary
         backgroundColor: Color(red: 0.05, green: 0.05, blue: 0.1),
         secondaryBackgroundColor: Color(red: 0.1, green: 0.1, blue: 0.15),
         textColor: Color(red: 0.9, green: 0.9, blue: 0.95),
-        secondaryTextColor: Color(red: 0.6, green: 0.6, blue: 0.7),
-        accentColor: Color(red: 0.4, green: 0.4, blue: 0.8),
+        secondaryTextColor: Color(red: 0.7, green: 0.7, blue: 0.8),
+        accentColor: Color(red: 0.7, green: 0.7, blue: 0.9), // Brighter accent purple
         successColor: Color(red: 0.0, green: 0.7, blue: 0.4),
         warningColor: Color(red: 1.0, green: 0.6, blue: 0.0),
         errorColor: Color(red: 0.9, green: 0.3, blue: 0.3),

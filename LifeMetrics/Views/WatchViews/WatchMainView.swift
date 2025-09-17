@@ -96,7 +96,7 @@ struct WatchMainView: View {
         HStack {
             Text(selectedDate.formatted(.dateTime.weekday(.wide).month(.abbreviated).day()))
                 .font(.headline)
-                .foregroundColor(.primary)
+                .foregroundColor(Color.currentText)
             
             Spacer()
             
@@ -105,7 +105,7 @@ struct WatchMainView: View {
                     selectedDate = Date()
                 }
                 .font(.caption)
-                .foregroundColor(.blue)
+                .foregroundColor(Color.currentPrimary)
             }
         }
         .padding(.horizontal, 4)
@@ -174,7 +174,7 @@ struct WatchMainView: View {
         VStack(spacing: 4) {
             HStack {
                 Image(systemName: "chart.bar.fill")
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color.currentPrimary)
                 Text("\(todaySummary.completedHabits + todaySummary.completedVices)/\(todaySummary.totalHabits + todaySummary.totalVices) Complete")
                     .font(.caption)
                     .fontWeight(.medium)

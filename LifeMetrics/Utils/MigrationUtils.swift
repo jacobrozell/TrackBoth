@@ -25,23 +25,13 @@ struct MigrationUtils {
                     logger.debug("Updated entry for metric '\(entry.metricID)' to hasBeenLogged=true", category: .data)
                 }
             }
-            
-            // Ensure all entries have value = false by default (if not already set)
-            var updatedEntriesCount = 0
-            for entry in entries {
-                // SwiftData automatically handles default values, but we can verify
-                if entry.value == nil {
-                    entry.value = false
-                    updatedEntriesCount += 1
-                }
-            }
-            
+
             // Save changes
             try modelContext.save()
             
             let duration = Date().timeIntervalSince(startTime)
             logger.logPerformance("Logged status migration", duration: duration)
-            logger.info("Migration completed successfully - Updated \(updatedMetricsCount) metrics, \(updatedEntriesCount) entries", category: .data)
+            logger.info("Migration completed successfully - Updated \(updatedMetricsCount) metrics", category: .data)
             
         } catch {
             logger.error("Migration failed: \(error.localizedDescription)", category: .data)
@@ -51,10 +41,6 @@ struct MigrationUtils {
     /// Check if migration is needed
     static func needsMigration(in modelContext: ModelContext) -> Bool {
         do {
-            // Check if there are any metrics with hasBeenLogged = false that have entries
-            let metricsDescriptor = FetchDescriptor<Metric>()
-            let metrics = try modelContext.fetch(metricsDescriptor)
-            
             let entriesDescriptor = FetchDescriptor<MetricEntry>()
             let entries = try modelContext.fetch(entriesDescriptor)
             

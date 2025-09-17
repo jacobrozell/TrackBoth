@@ -28,7 +28,7 @@ struct WatchEmptyStateView: View {
             // Icon
             Image(systemName: icon)
                 .font(.system(size: 32, weight: .light))
-                .foregroundColor(.secondary)
+                .foregroundColor(Color.currentSecondaryText)
             
             // Title
             Text(title)
@@ -39,7 +39,7 @@ struct WatchEmptyStateView: View {
             // Message
             Text(message)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(Color.currentSecondaryText)
                 .multilineTextAlignment(.center)
                 .lineLimit(3)
             
@@ -53,7 +53,7 @@ struct WatchEmptyStateView: View {
                 .foregroundColor(.white)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
-                .background(Color.blue)
+                .background(Color.currentPrimary)
                 .cornerRadius(8)
             }
         }

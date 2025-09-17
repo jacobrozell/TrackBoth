@@ -7,7 +7,7 @@ struct CardModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding()
-            .background(Color(.systemBackground))
+            .background(Color.currentBackground)
             .cornerRadius(12)
             .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
     }
@@ -18,7 +18,7 @@ struct SectionModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding()
-            .background(Color(.systemGray6))
+            .background(Color.currentSecondaryBackground)
             .cornerRadius(12)
     }
 }
@@ -37,7 +37,7 @@ struct PrimaryButtonStyle: ButtonStyle {
         configuration.label
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(Color.accentColor)
+            .background(Color.currentPrimary)
             .foregroundColor(.white)
             .cornerRadius(8)
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
@@ -50,8 +50,8 @@ struct SecondaryButtonStyle: ButtonStyle {
         configuration.label
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(Color.gray.opacity(0.2))
-            .foregroundColor(.primary)
+            .background(Color.currentSecondaryBackground)
+            .foregroundColor(Color.currentText)
             .cornerRadius(8)
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }

@@ -1,8 +1,9 @@
 import SwiftUI
 import SwiftData
 
-// MARK: - GoalsView
-/// View for managing and tracking goal progress for habits and vices
+
+// MARK: - GoalsView2
+/// Redesigned Goals view following Home/Motivations design patterns
 struct GoalsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var metrics: [Metric]
@@ -10,118 +11,194 @@ struct GoalsView: View {
     @Query private var goals: [Goal]
     @State private var viewModel = GoalsViewModel()
     @State private var selectedDate = Date()
+    @State private var showingAddGoal = false
     @State private var showingAddMetric = false
+    @State private var selectedFilter: MetricFilter = .all
+    @StateObject private var themeManager = ThemeManager.shared
 
+    // MARK: - Computed Properties
+    private var filteredMetrics: [Metric] {
+        let metricsWithGoals = viewModel.metricsWithGoals(metrics)
+        
+        switch selectedFilter {
+        case .all:
+            return metricsWithGoals
+        case .allHabits:
+            return metricsWithGoals.filter { $0.habitType == .positive }
+        case .allVices:
+            return metricsWithGoals.filter { $0.habitType == .vice }
+        case .specific(let selectedMetric):
+            return metricsWithGoals.filter { $0.id == selectedMetric.id }
+        }
+    }
+    
+    private var booleanGoals: [Metric] {
+        filteredMetrics.filter { GoalUtils.hasGoals(ofType: .boolean, in: $0) }
+    }
+    
+    private var quantityGoals: [Metric] {
+        filteredMetrics.filter { GoalUtils.hasGoals(ofType: .quantity, in: $0) }
+    }
+    
+    private var habitsWithGoals: [Metric] {
+        filteredMetrics.filter { $0.habitType == .positive }
+    }
+    
+    private var vicesWithGoals: [Metric] {
+        filteredMetrics.filter { $0.habitType == .vice }
+    }
 
+    // MARK: - Body
     var body: some View {
         NavigationStack {
-            ZStack {
-                GeometryReader { geometry in
-                    if viewModel.metricsWithGoals(metrics).isEmpty {
-                        EmptyStateView(
-                            icon: metrics.isEmpty ? "plus.circle.fill" : "target",
-                            title: metrics.isEmpty ? "No Habits Yet" : "No Goals Set",
-                            subtitle: metrics.isEmpty ?
-                            "Create your first habit to start tracking your progress and building better routines" :
-                                "Create goals for your habits and vices to track your progress and stay motivated",
-                            actionTitle: metrics.isEmpty ? "Create Your First Habit" : "Create Your First Goal",
-                            action: {
-                                logger.logUserAction(metrics.isEmpty ? "Add habit button tapped" : "Add goal button tapped")
-                                if metrics.isEmpty {
-                                    showingAddMetric = true
-                                } else {
-                                    viewModel.showAddGoal()
-                                }
-                            })
-                        .background(Color.currentBackground)
-                        .onAppear {
-                            logger.info("GoalsView empty state displayed")
+            GeometryReader { geometry in
+                if metrics.isEmpty {
+                    EmptyStateView(
+                        icon: "plus.circle.fill",
+                        title: "No Habits Yet",
+                        subtitle: "Create your first habit to start tracking your progress and building better routines",
+                        actionTitle: "Create Your First Habit",
+                        action: {
+                            logger.logUserAction("Add habit button tapped from goals")
+                            showingAddMetric = true
                         }
-                    } else {
-                        if geometry.size.width > geometry.size.height {
-                            // Landscape layout
-                            HStack(spacing: 0) {
-                                // Left side - Date Navigation and Summary Stats
-                                VStack(spacing: 16) {
-                                    dateNavigationSection
-                                    summaryStatsSection
-                                    Spacer()
-                                }
-                                .frame(width: min(300, geometry.size.width * 0.35))
-                                .padding(.horizontal, 16)
-                                .background(Color.currentSecondaryBackground.opacity(0.3))
-                                
-                                Divider()
-                                    .frame(height: geometry.size.height)
-                                
-                                // Right side - Goals sections
-                                ScrollView {
-                                    VStack(spacing: 24) {
-                                        // Boolean Goals Sections
-                                        if !viewModel.habitsWithBooleanGoals(metrics).isEmpty || !viewModel.vicesWithBooleanGoals(metrics).isEmpty {
-                                            booleanGoalsSection
-                                        }
-                                        
-                                        // Quantity Goals Sections
-                                        if !viewModel.habitsWithQuantityGoals(metrics).isEmpty || !viewModel.vicesWithQuantityGoals(metrics).isEmpty {
-                                            quantityGoalsSection
-                                        }
-                                        
-                                        // Add Goal Button
-                                        addGoalButton
-                                    }
-                                    .padding(.horizontal, 16)
-                                    .padding(.bottom, 20)
+                    )
+                    .background(Color.currentBackground)
+                } else if viewModel.metricsWithGoals(metrics).isEmpty {
+                    EmptyStateView(
+                        icon: "target",
+                        title: "No Goals Set",
+                        subtitle: "Create goals for your habits and vices to track your progress and stay motivated",
+                        actionTitle: "Create Your First Goal",
+                        action: {
+                            logger.logUserAction("Add goal button tapped from empty state")
+                            showingAddGoal = true
+                        }
+                    )
+                    .background(Color.currentBackground)
+                } else if geometry.size.width > geometry.size.height {
+                    // Landscape layout
+                    HStack(spacing: 0) {
+                        leftPanel
+                            .background(Color.currentSecondaryBackground)
+
+                        Divider()
+
+                        rightPanel
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Color.currentBackground)
+                            .overlay(alignment: .bottomTrailing) {
+                                FloatingActionButton {
+                                    logger.logUserAction("Add goal button tapped")
+                                    showingAddGoal = true
                                 }
                             }
-                        } else {
-                            // Portrait layout
-                            ScrollView {
-                                VStack(spacing: 24) {
-                                    // Date Navigation Section
-                                    dateNavigationSection
-                                    
-                                    // Summary Stats Section
-                                    summaryStatsSection
-                                    
-                                    // Boolean Goals Sections
-                                    if !viewModel.habitsWithBooleanGoals(metrics).isEmpty || !viewModel.vicesWithBooleanGoals(metrics).isEmpty {
-                                        booleanGoalsSection
+                    }
+                } else {
+                    // Portrait layout
+                    VStack(spacing: 0) {
+                        // Filter chips
+                        if viewModel.metricsWithGoals(metrics).count > 0 {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    // All filter
+                                    ReactiveFilterButton(
+                                        title: "All",
+                                        isSelected: selectedFilter == .all
+                                    ) {
+                                        selectedFilter = .all
                                     }
                                     
-                                    // Quantity Goals Sections
-                                    if !viewModel.habitsWithQuantityGoals(metrics).isEmpty || !viewModel.vicesWithQuantityGoals(metrics).isEmpty {
-                                        quantityGoalsSection
+                                    // All Habits filter
+                                    ReactiveFilterButton(
+                                        title: "All Habits",
+                                        isSelected: selectedFilter == .allHabits
+                                    ) {
+                                        selectedFilter = .allHabits
                                     }
                                     
-                                    // Add Goal Button
-                                    addGoalButton
+                                    // All Vices filter
+                                    ReactiveFilterButton(
+                                        title: "All Vices",
+                                        isSelected: selectedFilter == .allVices
+                                    ) {
+                                        selectedFilter = .allVices
+                                    }
                                 }
                                 .padding(.horizontal, 16)
-                                .padding(.bottom, 20)
+                            }
+                            .padding(.vertical, 8)
+                            .background(Color.currentSecondaryBackground)
+                        }
+
+                        // Goals content
+                        ScrollView {
+                            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                                // Boolean Goals Section
+                                if !booleanGoals.isEmpty {
+                                    Section(header: sectionHeader(
+                                        title: "Boolean Goals",
+                                        icon: "target",
+                                        iconColor: Color.currentPrimary,
+                                        subtitle: "Complete or avoid goals"
+                                    )) {
+                                        ForEach(booleanGoals) { metric in
+                                            GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+                                        }
+                                    }
+                                }
+
+                                // Quantity Goals Section
+                                if !quantityGoals.isEmpty {
+                                    Section(header: sectionHeader(
+                                        title: "Quantity Goals",
+                                        icon: "chart.bar.fill",
+                                        iconColor: Color.currentAccent,
+                                        subtitle: "Track measurable progress"
+                                    )) {
+                                        ForEach(quantityGoals) { metric in
+                                            GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+                                        }
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                        }
+                        .overlay(alignment: .bottomTrailing) {
+                            FloatingActionButton {
+                                logger.logUserAction("Add goal button tapped")
+                                showingAddGoal = true
                             }
                         }
                     }
                 }
             }
+            .themedBackground()
             .navigationTitle("Goals")
-            .onAppear {
-                logger.info("GoalsView appeared")
-                logger.debug("Metrics with goals count: \(viewModel.metricsWithGoals(metrics).count)", category: .data)
-            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink {
-                        SettingsView()
+                    Button {
+                        viewModel.showSettings()
                     } label: {
                         Image(systemName: "gear")
                     }
                 }
             }
+            .onAppear {
+                logger.info("GoalsView2 appeared", category: .ui)
+                logger.debug("Goals data - Total metrics: \(metrics.count), Metrics with goals: \(viewModel.metricsWithGoals(metrics).count)", category: .ui)
+            }
             .sheet(isPresented: $viewModel.showingAddGoal) {
                 AddGoalView()
                     .onAppear {
                         logger.info("AddGoalView sheet presented")
+                    }
+            }
+            .sheet(isPresented: $viewModel.showingSettings) {
+                SettingsView()
+                    .onAppear {
+                        logger.info("SettingsView sheet presented")
                     }
             }
             .sheet(isPresented: $showingAddMetric) {
@@ -132,408 +209,280 @@ struct GoalsView: View {
             }
         }
     }
-    
-    
-    private var dateNavigationSection: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("Goal Period")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                Spacer()
-            }
-            
-            WeeklyDateNavigationView(
-                selectedDate: $selectedDate,
-                canGoBack: CalendarHelper.daysBetween(Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date(), CalendarHelper.startOfWeek(for: selectedDate)) < 30,
-                canGoForward: !CalendarHelper.isSameWeek(selectedDate, Date()),
-                isCurrentWeek: CalendarHelper.isSameWeek(selectedDate, Date())
-            )
-            
-            // Period info
-            HStack {
-                Text(periodDescription)
-                    .font(.subheadline)
-                    .foregroundColor(Color.currentSecondaryText)
-                Spacer()
-                if !CalendarHelper.isSameWeek(selectedDate, Date()) {
-                    Button("This Week") {
-                        logger.logUserAction("This Week button tapped")
-                        selectedDate = Date()
-                    }
-                    .font(.caption)
-                    .foregroundColor(Color.currentPrimary)
-                }
-            }
-        }
-        .padding(.top, 8)
-    }
-    
-    private var periodDescription: String {
-        let calendar = Calendar.current
-        let startOfWeek = CalendarHelper.startOfWeek(for: selectedDate)
-        let endOfWeek = CalendarHelper.endOfWeek(for: selectedDate)
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d"
-        
-        if calendar.isDate(selectedDate, inSameDayAs: Date()) {
-            return "Current week: \(formatter.string(from: startOfWeek)) - \(formatter.string(from: endOfWeek))"
-        } else {
-            return "Week of: \(formatter.string(from: startOfWeek)) - \(formatter.string(from: endOfWeek))"
-        }
-    }
-    
-    
-    private var summaryStatsSection: some View {
-        VStack(spacing: 16) {
-            HStack {
-                Text("Goal Overview")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                Spacer()
-            }
-            
-            VStack(spacing: 12) {
-                HStack(spacing: 16) {
-                    // Boolean Goals Summary
-                    SummaryCard(
-                        title: "Boolean Goals",
-                        count: viewModel.habitsWithBooleanGoals(metrics).count + viewModel.vicesWithBooleanGoals(metrics).count,
-                        completed: (viewModel.habitsWithBooleanGoals(metrics) + viewModel.vicesWithBooleanGoals(metrics)).filter { calculateProgress($0, for: selectedDate) >= 1.0 }.count,
-                        color: Color.currentPrimary,
-                        icon: "target"
-                    )
-                    
-                    // Quantity Goals Summary
-                    SummaryCard(
-                        title: "Quantity Goals",
-                        count: viewModel.habitsWithQuantityGoals(metrics).count + viewModel.vicesWithQuantityGoals(metrics).count,
-                        completed: (viewModel.habitsWithQuantityGoals(metrics) + viewModel.vicesWithQuantityGoals(metrics)).filter { calculateQuantityProgress(for: $0, for: selectedDate) >= 1.0 }.count,
-                        color: Color.currentAccent,
-                        icon: "chart.bar.fill"
-                    )
-                }
-                
-                HStack(spacing: 16) {
-                    // Habits Summary
-                    SummaryCard(
-                        title: "Habits",
-                        count: viewModel.habitsWithGoals(metrics).count,
-                        completed: viewModel.habitsWithGoals(metrics).filter { metric in
-                            if GoalUtils.hasGoals(ofType: .quantity, in: metric) {
-                                return calculateQuantityProgress(for: metric, for: selectedDate) >= 1.0
-                            } else {
-                                return calculateProgress(metric, for: selectedDate) >= 1.0
-                            }
-                        }.count,
-                        color: Color.currentSuccess,
-                        icon: "checkmark.circle.fill"
-                    )
-                    
-                    // Vices Summary
-                    SummaryCard(
-                        title: "Vices",
-                        count: viewModel.vicesWithGoals(metrics).count,
-                        completed: viewModel.vicesWithGoals(metrics).filter { metric in
-                            if GoalUtils.hasGoals(ofType: .quantity, in: metric) {
-                                return calculateQuantityProgress(for: metric, for: selectedDate) >= 1.0
-                            } else {
-                                return calculateProgress(metric, for: selectedDate) >= 1.0
-                            }
-                        }.count,
-                        color: Color.currentError,
-                        icon: "xmark.circle.fill"
-                    )
-                }
-            }
-        }
-        .padding(.top, 8)
-    }
-    
-    private var booleanGoalsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "target")
-                    .foregroundColor(Color.currentPrimary)
-                    .font(.title2)
-                
-                Text("Boolean Goals")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                
-                Spacer()
-                
-                Text("\(viewModel.habitsWithBooleanGoals(metrics).count + viewModel.vicesWithBooleanGoals(metrics).count)")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.currentPrimary)
-                    .cornerRadius(8)
-            }
-            
-            VStack(spacing: 16) {
-                // Boolean Habits
-                if !viewModel.habitsWithBooleanGoals(metrics).isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                                .font(.title3)
-                            
-                            Text("Positive Habits")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            Spacer()
-                            
-                            Text("\(viewModel.habitsWithBooleanGoals(metrics).count)")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.green)
-                                .cornerRadius(6)
-                        }
-                        
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.habitsWithBooleanGoals(metrics), id: \.id) { metric in
-                                MultiGoalCardView(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
-                            }
-                        }
-                    }
-                }
-                
-                // Boolean Vices
-                if !viewModel.vicesWithBooleanGoals(metrics).isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.red)
-                                .font(.title3)
-                            
-                            Text("Vices to Avoid")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            Spacer()
-                            
-                            Text("\(viewModel.vicesWithBooleanGoals(metrics).count)")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.red)
-                                .cornerRadius(6)
-                        }
-                        
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.vicesWithBooleanGoals(metrics), id: \.id) { metric in
-                                MultiGoalCardView(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    private var quantityGoalsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Image(systemName: "chart.bar.fill")
-                    .foregroundColor(.purple)
-                    .font(.title2)
-                
-                Text("Quantity Goals")
-                    .font(.title3)
-                    .fontWeight(.bold)
-                
-                Spacer()
-                
-                Text("\(viewModel.habitsWithQuantityGoals(metrics).count + viewModel.vicesWithQuantityGoals(metrics).count)")
-                    .font(.caption)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
-                    .background(Color.purple)
-                    .cornerRadius(8)
-            }
-            
-            VStack(spacing: 16) {
-                // Quantity Habits
-                if !viewModel.habitsWithQuantityGoals(metrics).isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
-                                .font(.title3)
-                            
-                            Text("Positive Habits")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            Spacer()
-                            
-                            Text("\(viewModel.habitsWithQuantityGoals(metrics).count)")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.green)
-                                .cornerRadius(6)
-                        }
-                        
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.habitsWithQuantityGoals(metrics), id: \.id) { metric in
-                                MultiGoalCardView(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
-                            }
-                        }
-                    }
-                }
-                
-                // Quantity Vices
-                if !viewModel.vicesWithQuantityGoals(metrics).isEmpty {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack {
-                            Image(systemName: "xmark.circle.fill")
-                                .foregroundColor(.red)
-                                .font(.title3)
-                            
-                            Text("Vices to Avoid")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                            
-                            Spacer()
-                            
-                            Text("\(viewModel.vicesWithQuantityGoals(metrics).count)")
-                                .font(.caption)
-                                .fontWeight(.semibold)
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 2)
-                                .background(Color.red)
-                                .cornerRadius(6)
-                        }
-                        
-                        LazyVStack(spacing: 12) {
-                            ForEach(viewModel.vicesWithQuantityGoals(metrics), id: \.id) { metric in
-                                MultiGoalCardView(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    private var addGoalButton: some View {
-        Button {
-            logger.logUserAction("Add goal floating button tapped")
-            viewModel.showAddGoal()
-        } label: {
-            HStack(spacing: 12) {
-                Image(systemName: "plus.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(Color.currentPrimary)
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Add New Goal")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(Color.currentPrimary)
-                    
-                    Text("Set a goal for any habit or vice")
-                        .font(.caption)
-                        .foregroundColor(Color.currentSecondaryText)
-                }
-                
-                Spacer()
-                
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(Color.currentPrimary)
-            }
-            .padding(16)
-            .background(Color.currentPrimary.opacity(0.05))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.currentPrimary.opacity(0.2), lineWidth: 1)
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    private func calculateProgress(_ metric: Metric, for date: Date = Date()) -> Double {
-        let progress = viewModel.goalProgress(for: metric, entries: entries, selectedDate: date)
-        return progress.percentage / 100.0
-    }
-    
-    private func calculateCurrentProgress(for metric: Metric, for date: Date = Date()) -> Int {
-        let progress = viewModel.goalProgress(for: metric, entries: entries, selectedDate: date)
-        return progress.current
-    }
-    
-    private func calculateQuantityProgress(for metric: Metric, for date: Date = Date()) -> Double {
-        let progress = viewModel.quantityGoalProgress(for: metric, entries: entries, selectedDate: date)
-        return progress.percentage
-    }
-}
 
-// MARK: - Summary Card Component
-struct SummaryCard: View {
-    let title: String
-    let count: Int
-    let completed: Int
-    let color: Color
-    let icon: String
-    
-    var body: some View {
+    // MARK: - Panels
+    private var leftPanel: some View {
         VStack(spacing: 12) {
-            HStack {
-                Image(systemName: icon)
-                    .foregroundColor(color)
-                    .font(.title2)
-                
-                Spacer()
-                
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("\(completed)/\(count)")
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(Color.currentText)
+            // Filter section
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Filter Goals")
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(Color.currentSecondaryText)
+
+                VStack(spacing: 8) {
+                    // All filter
+                    ReactiveFilterButton(
+                        title: "All",
+                        isSelected: selectedFilter == .all
+                    ) {
+                        selectedFilter = .all
+                    }
                     
-                    Text("Completed")
-                        .font(.caption)
-                        .foregroundColor(Color.currentSecondaryText)
+                    // All Habits filter
+                    ReactiveFilterButton(
+                        title: "All Habits",
+                        isSelected: selectedFilter == .allHabits
+                    ) {
+                        selectedFilter = .allHabits
+                    }
+                    
+                    // All Vices filter
+                    ReactiveFilterButton(
+                        title: "All Vices",
+                        isSelected: selectedFilter == .allVices
+                    ) {
+                        selectedFilter = .allVices
+                    }
                 }
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+
+            Spacer(minLength: 0)
+        }
+        .padding()
+    }
+
+    private var rightPanel: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                    // Boolean Goals Section
+                    if !booleanGoals.isEmpty {
+                        Section(header: sectionHeader(
+                            title: "Boolean Goals",
+                            icon: "target",
+                            iconColor: Color.currentPrimary,
+                            subtitle: "Complete or avoid goals"
+                        )) {
+                            ForEach(booleanGoals) { metric in
+                                GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+                            }
+                        }
+                    }
+
+                    // Quantity Goals Section
+                    if !quantityGoals.isEmpty {
+                        Section(header: sectionHeader(
+                            title: "Quantity Goals",
+                            icon: "chart.bar.fill",
+                            iconColor: Color.currentAccent,
+                            subtitle: "Track measurable progress"
+                        )) {
+                            ForEach(quantityGoals) { metric in
+                                GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+                            }
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+            }
+        }
+    }
+
+    // MARK: - Components
+    private func sectionHeader(title: String, icon: String, iconColor: Color, subtitle: String) -> some View {
+        HStack(spacing: 12) {
+            // Icon with background circle
+            ZStack {
+                Circle()
+                    .fill(iconColor.opacity(0.15))
+                    .frame(width: 32, height: 32)
+                
+                Image(systemName: icon)
+                    .foregroundColor(iconColor)
+                    .font(.system(size: 16, weight: .semibold))
             }
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(Color.currentText)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundColor(Color.currentSecondaryText)
+            }
+            
+            Spacer()
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.currentSecondaryBackground)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(iconColor.opacity(0.2), lineWidth: 1)
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityHeading(.h2)
+    }
+}
+
+// MARK: - GoalCardView2
+struct GoalCardView2: View {
+    let metric: Metric
+    let selectedDate: Date
+    let entries: [MetricEntry]
+    let goals: [Goal]
+    
+    @State private var viewModel = GoalsViewModel()
+    
+    private var booleanGoals: [Goal] {
+        goals.filter { $0.metric?.id == metric.id && $0.goalType == .boolean }
+    }
+    
+    private var quantityGoals: [Goal] {
+        goals.filter { $0.metric?.id == metric.id && $0.goalType == .quantity }
+    }
+    
+    private var progress: Double {
+        if !booleanGoals.isEmpty {
+            return viewModel.goalProgress(for: metric, entries: entries, selectedDate: selectedDate).percentage / 100.0
+        } else if !quantityGoals.isEmpty {
+            return viewModel.quantityGoalProgress(for: metric, entries: entries, selectedDate: selectedDate).percentage
+        }
+        return 0.0
+    }
+    
+    private var isCompleted: Bool {
+        return progress >= 1.0
+    }
+    
+    private var progressText: String {
+        if !booleanGoals.isEmpty {
+            let progressData = viewModel.goalProgress(for: metric, entries: entries, selectedDate: selectedDate)
+            return "\(progressData.current)/\(progressData.target)"
+        } else if !quantityGoals.isEmpty {
+            let progressData = viewModel.quantityGoalProgress(for: metric, entries: entries, selectedDate: selectedDate)
+            return "\(Int(progressData.current))/\(Int(progressData.target))"
+        }
+        return "0/0"
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            // Header
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        Image(systemName: metric.habitType.icon)
+                            .foregroundColor(metric.habitType == .positive ? .currentSuccess : .currentError)
+                            .font(.system(size: 16, weight: .medium))
+                            .frame(width: 20)
+                        
+                        Text(metric.name)
+                            .font(.headline)
+                            .foregroundColor(.currentText)
+                        
+                        // Goal type indicator
+                        if !booleanGoals.isEmpty {
+                            Image(systemName: "target")
+                                .foregroundColor(.currentPrimary)
+                                .font(.system(size: 14))
+                        } else if !quantityGoals.isEmpty {
+                            Image(systemName: "chart.bar.fill")
+                                .foregroundColor(.currentAccent)
+                                .font(.system(size: 14))
+                        }
+                    }
+                    
+                    Text(booleanGoals.isEmpty ? "Quantity Goal" : "Boolean Goal")
+                        .font(.caption)
+                        .foregroundColor(.currentSecondaryText)
+                        .padding(.leading, 28) // Align with metric name
+                }
                 
-                if count > 0 {
-                    let percentage = Double(completed) / Double(count)
-                    ProgressView(value: percentage, total: 1.0)
-                        .progressViewStyle(LinearProgressViewStyle(tint: color))
-                        .scaleEffect(x: 1, y: 0.8)
+                Spacer()
+                
+                // Progress indicator
+                VStack(alignment: .trailing, spacing: 4) {
+                    Text(progressText)
+                        .font(.headline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(isCompleted ? .currentSuccess : .currentText)
+                    
+                    Text(isCompleted ? "Completed" : "In Progress")
+                        .font(.caption)
+                        .foregroundColor(isCompleted ? .currentSuccess : .currentSecondaryText)
                 }
             }
+            .padding(.horizontal, 12)
+            .padding(.top, 12)
+            
+            // Progress bar
+            VStack(spacing: 8) {
+                HStack {
+                    Text("Progress")
+                        .font(.caption)
+                        .foregroundColor(.currentSecondaryText)
+                    Spacer()
+                    Text("\(Int(progress * 100))%")
+                        .font(.caption)
+                        .fontWeight(.medium)
+                        .foregroundColor(.currentSecondaryText)
+                }
+                
+                ProgressView(value: progress, total: 1.0)
+                    .progressViewStyle(LinearProgressViewStyle(tint: isCompleted ? .currentSuccess : .currentPrimary))
+                    .scaleEffect(x: 1, y: 1.5)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 12)
+            
+            // Goal details
+            if !booleanGoals.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(booleanGoals, id: \.id) { goal in
+                        HStack {
+                            Text("\(goal.target) times per \(goal.period.displayName)")
+                                .font(.caption)
+                                .foregroundColor(.currentSecondaryText)
+                            Spacer()
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 12)
+            } else if !quantityGoals.isEmpty {
+                VStack(alignment: .leading, spacing: 4) {
+                    ForEach(quantityGoals, id: \.id) { goal in
+                        HStack {
+                            Text("\(goal.target) \(goal.safeDefaultUnit) per \(goal.period.displayName)")
+                                .font(.caption)
+                                .foregroundColor(.currentSecondaryText)
+                            Spacer()
+                        }
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.bottom, 12)
+            }
+            
+            // Bottom accent
+            Rectangle()
+                .fill(isCompleted ? Color.currentSuccess.opacity(0.3) : Color.currentPrimary.opacity(0.3))
+                .frame(height: 3)
+                .cornerRadius(1.5)
         }
-        .padding(16)
-        .background(Color.appBackgroundSecondary)
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(12)
-        .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Goal for \(metric.name): \(progressText) progress")
     }
 }
 

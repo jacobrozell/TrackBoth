@@ -109,7 +109,7 @@ struct GoalProgressRow: View {
             }
         }
         .padding(12)
-        .background(Color(.systemGray6))
+        .background(Color.currentSecondaryBackground)
         .cornerRadius(8)
         .onTapGesture {
             showingEditGoal = true

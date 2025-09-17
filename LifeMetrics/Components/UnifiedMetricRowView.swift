@@ -111,7 +111,7 @@ struct UnifiedMetricRowView: View {
                                     .font(.caption)
                                 Text("\(goalProgress.current)/\(goalProgress.target)")
                                     .font(.caption)
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(Color.currentSecondaryText)
                             }
                         }
                     } else if streak > 0 {
@@ -123,7 +123,7 @@ struct UnifiedMetricRowView: View {
                                  "\(streak) day streak" : 
                                  "\(streak) days clean")
                                 .font(.subheadline)
-                                .foregroundColor(.secondary)
+                                .foregroundColor(Color.currentSecondaryText)
                         }
                     }
                 }

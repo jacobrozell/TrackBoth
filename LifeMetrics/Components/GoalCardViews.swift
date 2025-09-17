@@ -245,9 +245,6 @@ struct EnhancedGoalCardView: View {
         case .weekly:
             let daysRemaining = CalendarHelper.daysRemainingInPeriod(.weekly, from: now)
             return "\(daysRemaining) days left this week"
-        case .biWeekly:
-            let daysRemaining = CalendarHelper.daysRemainingInPeriod(.biWeekly, from: now)
-            return "\(daysRemaining) days left this period"
         case .monthly:
             if let endOfMonth = calendar.dateInterval(of: .month, for: now)?.end {
                 let daysRemaining = calendar.dateComponents([.day], from: now, to: endOfMonth).day ?? 0
@@ -297,7 +294,7 @@ struct QuantityGoalCardView: View {
                     
                     Text(quantityGoalDescription)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                 }
                 
                 Spacer()
@@ -340,10 +337,10 @@ struct QuantityGoalCardView: View {
                 HStack {
                     Image(systemName: "clock")
                         .font(.caption2)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                     Text(timeRemaining)
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color.currentSecondaryText)
                 }
             }
             
@@ -521,9 +518,6 @@ struct QuantityGoalCardView: View {
         case .weekly:
             let daysRemaining = CalendarHelper.daysRemainingInPeriod(.weekly, from: now)
             return "\(daysRemaining) days left this week"
-        case .biWeekly:
-            let daysRemaining = CalendarHelper.daysRemainingInPeriod(.biWeekly, from: now)
-            return "\(daysRemaining) days left this period"
         case .monthly:
             if let endOfMonth = calendar.dateInterval(of: .month, for: now)?.end {
                 let daysRemaining = calendar.dateComponents([.day], from: now, to: endOfMonth).day ?? 0

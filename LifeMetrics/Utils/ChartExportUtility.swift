@@ -310,9 +310,9 @@ struct ChartExportModifier: ViewModifier {
                     Image(systemName: "square.and.arrow.up")
                         .font(.caption)
                     // TODO
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color.currentPrimary)
                         .padding(8)
-                        .background(Color(.systemBackground))
+                        .background(Color.currentBackground)
                         .clipShape(Circle())
                         .shadow(radius: 2)
                 }

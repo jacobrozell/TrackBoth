@@ -98,5 +98,7 @@ struct CalendarGridView: View {
             }
             .padding(.horizontal)
         }
+        .background(Color.currentSecondaryBackground)
+        .cornerRadius(12)
     }
 }

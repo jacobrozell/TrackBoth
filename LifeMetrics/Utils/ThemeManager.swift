@@ -26,6 +26,22 @@ class ThemeManager: ObservableObject {
         } else {
             logger.info("Using default app theme - Theme: \(currentAppTheme.name)")
         }
+        
+        // Initialize navigation bar appearance
+        updateNavigationBarAppearance()
+        
+        // Set up notification observer for theme changes
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(themeDidChange),
+            name: NSNotification.Name("ThemeDidChange"),
+            object: nil
+        )
+    }
+    
+    @objc private func themeDidChange() {
+        updateNavigationBarAppearance()
+        updateTabBarAppearance()
     }
     
     func updateTheme(_ theme: Theme) {
@@ -38,6 +54,187 @@ class ThemeManager: ObservableObject {
         logger.logUserAction("App theme updated", details: "From \(currentAppTheme.name) to \(appTheme.name)")
         currentAppTheme = appTheme
         UserDefaults.standard.set(appTheme.name, forKey: "selectedAppTheme")
+        
+        // Update navigation bar appearance
+        updateNavigationBarAppearance()
+        
+        // Force UI refresh
+        DispatchQueue.main.async {
+            // Trigger a UI refresh by updating the published property
+            self.objectWillChange.send()
+            
+            // Post notification for theme change
+            NotificationCenter.default.post(name: NSNotification.Name("ThemeDidChange"), object: nil)
+            
+            // Force immediate UI refresh
+            self.forceUIRefresh()
+        }
+    }
+    
+    /// Updates the navigation bar appearance to match the current theme
+    private func updateNavigationBarAppearance() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        
+        // Set background color
+        appearance.backgroundColor = UIColor(currentAppTheme.backgroundColor)
+        
+        // Set title text attributes
+        appearance.titleTextAttributes = [
+            .foregroundColor: UIColor(currentAppTheme.textColor),
+            .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
+        ]
+        
+        // Set large title text attributes
+        appearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor(currentAppTheme.textColor),
+            .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+        ]
+        
+        // Set button appearance
+        appearance.buttonAppearance.normal.titleTextAttributes = [
+            .foregroundColor: UIColor(currentAppTheme.primaryColor)
+        ]
+        
+        // Apply to navigation bar
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
+        
+        // Force refresh of all navigation bars
+        refreshAllNavigationBars()
+        
+        // Update tab bar appearance
+        updateTabBarAppearance()
+    }
+    
+    /// Refreshes all navigation bars in the app
+    private func refreshAllNavigationBars() {
+        DispatchQueue.main.async {
+            // Get all windows and update their navigation bars
+            for windowScene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
+                for window in windowScene.windows {
+                    self.updateNavigationBarInView(window.rootViewController?.view)
+                }
+            }
+        }
+    }
+    
+    private func updateNavigationBarInView(_ view: UIView?) {
+        guard let view = view else { return }
+        
+        if let navigationBar = view as? UINavigationBar {
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor(currentAppTheme.backgroundColor)
+            appearance.titleTextAttributes = [
+                .foregroundColor: UIColor(currentAppTheme.textColor),
+                .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
+            ]
+            appearance.largeTitleTextAttributes = [
+                .foregroundColor: UIColor(currentAppTheme.textColor),
+                .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+            ]
+            appearance.buttonAppearance.normal.titleTextAttributes = [
+                .foregroundColor: UIColor(currentAppTheme.primaryColor)
+            ]
+            
+            navigationBar.standardAppearance = appearance
+            navigationBar.scrollEdgeAppearance = appearance
+            navigationBar.compactAppearance = appearance
+        }
+        
+        for subview in view.subviews {
+            updateNavigationBarInView(subview)
+        }
+    }
+    
+    /// Updates the tab bar appearance to match the current theme
+    private func updateTabBarAppearance() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        
+        // Set background color
+        appearance.backgroundColor = UIColor(currentAppTheme.backgroundColor)
+        
+        // Set normal state colors
+        appearance.stackedLayoutAppearance.normal.iconColor = UIColor(currentAppTheme.secondaryTextColor)
+        appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+            .foregroundColor: UIColor(currentAppTheme.secondaryTextColor)
+        ]
+        
+        // Set selected state colors
+        appearance.stackedLayoutAppearance.selected.iconColor = UIColor(currentAppTheme.primaryColor)
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+            .foregroundColor: UIColor(currentAppTheme.primaryColor)
+        ]
+        
+        // Apply to tab bar appearance proxy
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+
+        // Force refresh of all tab bars
+        refreshAllTabBars()
+    }
+    
+    /// Refreshes all tab bars in the app
+    private func refreshAllTabBars() {
+        DispatchQueue.main.async {
+            // Get all windows and update their tab bars
+            for windowScene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
+                for window in windowScene.windows {
+                    self.updateTabBarInView(window.rootViewController?.view)
+                }
+            }
+        }
+    }
+    
+    private func updateTabBarInView(_ view: UIView?) {
+        guard let view = view else { return }
+        
+        if let tabBar = view as? UITabBar {
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor(currentAppTheme.backgroundColor)
+            appearance.stackedLayoutAppearance.normal.iconColor = UIColor(currentAppTheme.secondaryTextColor)
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [
+                .foregroundColor: UIColor(currentAppTheme.secondaryTextColor)
+            ]
+            appearance.stackedLayoutAppearance.selected.iconColor = UIColor(currentAppTheme.primaryColor)
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [
+                .foregroundColor: UIColor(currentAppTheme.primaryColor)
+            ]
+            
+            tabBar.standardAppearance = appearance
+            tabBar.scrollEdgeAppearance = appearance
+        }
+        
+        for subview in view.subviews {
+            updateTabBarInView(subview)
+        }
+    }
+    
+    /// Forces immediate UI refresh across the app
+    private func forceUIRefresh() {
+        // Force refresh of all windows
+        for windowScene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
+            for window in windowScene.windows {
+                // Force the window to refresh its appearance
+                window.setNeedsDisplay()
+                
+                // Update navigation controller appearance if present
+                if let navController = window.rootViewController as? UINavigationController {
+                    navController.navigationBar.setNeedsLayout()
+                    navController.navigationBar.layoutIfNeeded()
+                }
+                
+                // Update tab bar controller appearance if present
+                if let tabController = window.rootViewController as? UITabBarController {
+                    tabController.tabBar.setNeedsLayout()
+                    tabController.tabBar.layoutIfNeeded()
+                }
+            }
+        }
     }
     
     /// Gets the current effective theme colors based on system appearance
