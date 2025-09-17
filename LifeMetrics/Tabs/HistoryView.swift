@@ -19,6 +19,7 @@ struct HistoryView: View {
                             title: "No data yet",
                             subtitle: "Start tracking habits and vices to see your history"
                         )
+                        .background(Color.currentBackground)
                     } else {
                         if geometry.size.width > geometry.size.height {
                             landscapeLayout(geometry: geometry)

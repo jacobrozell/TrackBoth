@@ -11,33 +11,29 @@ struct GoalsView: View {
     @State private var viewModel = GoalsViewModel()
     @State private var selectedDate = Date()
     @State private var showingAddMetric = false
-    
-    
+
+
     var body: some View {
         NavigationStack {
             ZStack {
                 GeometryReader { geometry in
                     if viewModel.metricsWithGoals(metrics).isEmpty {
-                        VStack {
-                            Spacer()
-                            EmptyStateView(
-                                icon: metrics.isEmpty ? "plus.circle.fill" : "target",
-                                title: metrics.isEmpty ? "No Habits Yet" : "No Goals Set",
-                                subtitle: metrics.isEmpty ? 
-                                    "Create your first habit to start tracking your progress and building better routines" :
-                                    "Create goals for your habits and vices to track your progress and stay motivated",
-                                actionTitle: metrics.isEmpty ? "Create Your First Habit" : "Create Your First Goal",
-                                action: {
-                                    logger.logUserAction(metrics.isEmpty ? "Add habit button tapped" : "Add goal button tapped")
-                                    if metrics.isEmpty {
-                                        showingAddMetric = true
-                                    } else {
-                                        viewModel.showAddGoal()
-                                    }
+                        EmptyStateView(
+                            icon: metrics.isEmpty ? "plus.circle.fill" : "target",
+                            title: metrics.isEmpty ? "No Habits Yet" : "No Goals Set",
+                            subtitle: metrics.isEmpty ?
+                            "Create your first habit to start tracking your progress and building better routines" :
+                                "Create goals for your habits and vices to track your progress and stay motivated",
+                            actionTitle: metrics.isEmpty ? "Create Your First Habit" : "Create Your First Goal",
+                            action: {
+                                logger.logUserAction(metrics.isEmpty ? "Add habit button tapped" : "Add goal button tapped")
+                                if metrics.isEmpty {
+                                    showingAddMetric = true
+                                } else {
+                                    viewModel.showAddGoal()
                                 }
-                            )
-                            Spacer()
-                        }
+                            })
+                        .background(Color.currentBackground)
                         .onAppear {
                             logger.info("GoalsView empty state displayed")
                         }

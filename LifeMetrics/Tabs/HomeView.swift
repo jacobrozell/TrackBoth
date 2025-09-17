@@ -46,7 +46,6 @@ struct HomeView: View {
                         action: { viewModel.showAddMetric() }
                     )
                     .background(Color.currentBackground)
-                    .padding()
                 } else if geometry.size.width > geometry.size.height {
                     // Landscape: Left (stats + week), Right (list)
                     HStack(spacing: 0) {
@@ -96,16 +95,18 @@ struct HomeView: View {
             }
             .navigationTitle("TrackBoth")
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        hasDemoData ? DemoDataGenerator.clearDemoData(modelContext: modelContext) : DemoDataGenerator.generateDemoData(modelContext: modelContext)
-                        hasDemoData.toggle()
-                    } label: {
-                        Text(hasDemoData ? "Clear Demo" : "Try Demo")
-                            .font(.caption)
+                if metrics.isEmpty || hasDemoData {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            hasDemoData ? DemoDataGenerator.clearDemoData(modelContext: modelContext) : DemoDataGenerator.generateDemoData(modelContext: modelContext)
+                            hasDemoData.toggle()
+                        } label: {
+                            Text(hasDemoData ? "Clear Demo" : "Try Demo")
+                                .font(.caption)
+                        }
                     }
                 }
-                
+
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         viewModel.showSettings()

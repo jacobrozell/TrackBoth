@@ -16,7 +16,7 @@ struct FloatingActionButton: View {
                     impactFeedback.impactOccurred()
                     action()
                 }) {
-                    Image(systemName: "plus")
+                    Image(systemName: "plus.circle.fill")
                         .font(.title2)
                         .fontWeight(.semibold)
                         .foregroundColor(.white)

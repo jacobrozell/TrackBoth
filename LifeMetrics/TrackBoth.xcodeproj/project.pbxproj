@@ -14,6 +14,7 @@
 		0B9C31FF2E7916A00089A5FD /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9C31FE2E7916A00089A5FD /* WidgetKit.framework */; };
 		0B9C32012E7916A00089A5FD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9C32002E7916A00089A5FD /* SwiftUI.framework */; };
 		0B9C32122E7916A20089A5FD /* TrackBoth-WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0BD334372E7B3B7C00EDDB19 /* TrackBoth-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0BD334362E7B3AF800EDDB19 /* TrackBoth-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "TrackBoth-WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9C31FE2E7916A00089A5FD /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		0B9C32002E7916A00089A5FD /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		0BD334362E7B3AF800EDDB19 /* TrackBoth-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "TrackBoth-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -135,9 +137,10 @@
 			membershipExceptions = (
 				ChartsView.swift,
 				GoalsView.swift,
+				GoalsView2.swift,
 				HistoryView.swift,
 				HomeView.swift,
-				MotivationView.swift,
+				MotivationsView2.swift,
 				SettingsView.swift,
 			);
 			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
@@ -230,6 +233,7 @@
 		0B9C2CA82E714E630089A5FD = {
 			isa = PBXGroup;
 			children = (
+				0BD334362E7B3AF800EDDB19 /* TrackBoth-Info.plist */,
 				0B9C31D22E7912350089A5FD /* OnboardingView.swift */,
 				0B9C31E62E7915660089A5FD /* ContentView.swift */,
 				0B9C31EC2E7915660089A5FD /* Tabs */,
@@ -358,6 +362,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9C2D8E2E734AAB0089A5FD /* Assets.xcassets in Resources */,
+				0BD334372E7B3B7C00EDDB19 /* TrackBoth-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -524,6 +529,7 @@
 				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "TrackBoth-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TrackBoth;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -564,6 +570,7 @@
 				DEVELOPMENT_TEAM = 7JT2JB89AV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "TrackBoth-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TrackBoth;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;

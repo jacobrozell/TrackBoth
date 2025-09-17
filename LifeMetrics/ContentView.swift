@@ -31,7 +31,7 @@ struct ContentView: View {
                         }
                         .tag(1)
 
-                    MotivationView()
+                    MotivationsView2()
                         .tabItem {
                             Image(systemName: "heart.fill")
                             Text("Motivation")
@@ -53,6 +53,16 @@ struct ContentView: View {
                         .tag(4)
                 }
                 .themedBackground()
+                .onAppear {
+                    // Configure tab bar appearance
+                    let appearance = UITabBarAppearance()
+                    appearance.configureWithOpaqueBackground()
+                    appearance.backgroundColor = UIColor(Color.currentSecondaryBackground)
+                    
+                    // Apply to all tab bar states
+                    UITabBar.appearance().standardAppearance = appearance
+                    UITabBar.appearance().scrollEdgeAppearance = appearance
+                }
                 .onChange(of: selectedTab) { oldValue, newValue in
                     let tabNames = ["Home", "Goals", "Charts", "Motivation", "History", "Settings"]
                     let tabName = newValue < tabNames.count ? tabNames[newValue] : "Unknown"
