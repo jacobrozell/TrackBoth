@@ -206,6 +206,7 @@ struct AddMetricView: View {
                 }
 
             }
+            .background(Color.currentBackground)
             .navigationTitle("Add Habit")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

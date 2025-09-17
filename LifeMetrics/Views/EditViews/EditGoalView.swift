@@ -79,6 +79,7 @@ struct EditGoalView: View {
                     Text(goalExplanationText)
                 }
             }
+            .background(Color.currentBackground)
             .navigationTitle("Edit Goal")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

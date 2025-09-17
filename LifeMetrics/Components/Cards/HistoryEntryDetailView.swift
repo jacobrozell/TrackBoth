@@ -186,6 +186,7 @@ struct HistoryEntryDetailView: View {
                     Spacer(minLength: 40)
                 }
             }
+            .background(Color.currentBackground)
             .navigationTitle("Entry Details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

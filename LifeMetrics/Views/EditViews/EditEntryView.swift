@@ -128,6 +128,7 @@ struct EditEntryView: View {
                 Spacer()
             }
             .padding()
+            .background(Color.currentBackground)
             .navigationTitle("Edit Entry")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -101,6 +101,7 @@ struct QuantityInputSheet: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
+            .background(Color.currentBackground)
             .navigationBarHidden(true)
         }
         .onAppear {
@@ -407,6 +408,7 @@ struct UnitPickerSheet: View {
                     }
                 }
             }
+            .background(Color.currentBackground)
             .navigationTitle("Select Unit")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

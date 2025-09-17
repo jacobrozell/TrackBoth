@@ -9,12 +9,9 @@
 /* Begin PBXBuildFile section */
 		0B9C2D872E734AAB0089A5FD /* TrackBothApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C2D642E734AAB0089A5FD /* TrackBothApp.swift */; };
 		0B9C2D8E2E734AAB0089A5FD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0B9C2D622E734AAB0089A5FD /* Assets.xcassets */; };
-		0B9C31DE2E7912350089A5FD /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C31D22E7912350089A5FD /* OnboardingView.swift */; };
-		0B9C31F22E7915660089A5FD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B9C31E62E7915660089A5FD /* ContentView.swift */; };
 		0B9C31FF2E7916A00089A5FD /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9C31FE2E7916A00089A5FD /* WidgetKit.framework */; };
 		0B9C32012E7916A00089A5FD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B9C32002E7916A00089A5FD /* SwiftUI.framework */; };
 		0B9C32122E7916A20089A5FD /* TrackBoth-WidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		0BD334372E7B3B7C00EDDB19 /* TrackBoth-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0BD334362E7B3AF800EDDB19 /* TrackBoth-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,14 +41,10 @@
 /* Begin PBXFileReference section */
 		0B9C2CB12E714E630089A5FD /* TrackBoth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackBoth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9C2D622E734AAB0089A5FD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		0B9C2D632E734AAB0089A5FD /* TrackBoth.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TrackBoth.entitlements; sourceTree = "<group>"; };
 		0B9C2D642E734AAB0089A5FD /* TrackBothApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackBothApp.swift; sourceTree = "<group>"; };
-		0B9C31D22E7912350089A5FD /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
-		0B9C31E62E7915660089A5FD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		0B9C31FC2E7916A00089A5FD /* TrackBoth-WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "TrackBoth-WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9C31FE2E7916A00089A5FD /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		0B9C32002E7916A00089A5FD /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		0BD334362E7B3AF800EDDB19 /* TrackBoth-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "TrackBoth-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -87,9 +80,11 @@
 				AddViews/AddGoalView.swift,
 				AddViews/AddMetricView.swift,
 				AddViews/AddMotivationView.swift,
+				ContentView.swift,
 				EditViews/EditEntryView.swift,
 				EditViews/EditGoalView.swift,
 				EditViews/EditMetricView.swift,
+				OnboardingView.swift,
 				ThemeSelectionView.swift,
 			);
 			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
@@ -113,45 +108,45 @@
 			);
 			target = 0B9C31FB2E7916A00089A5FD /* TrackBoth-WidgetExtension */;
 		};
-		0BD3346A2E7B4E1100EDDB19 /* Exceptions for "Components" folder in "TrackBoth" target */ = {
+		0BD334C82E7B4F3E00EDDB19 /* Exceptions for "Components" folder in "TrackBoth" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				BackupSheet.swift,
-				BarChartView.swift,
-				CalendarDayView.swift,
-				CalendarGridView.swift,
-				ChartContentView.swift,
-				ChartControlsView.swift,
-				ChartsEmptyStateView.swift,
-				CompactMetricRow.swift,
-				DateNavigationView.swift,
-				DatePickerSheet.swift,
-				EditableEntryCell.swift,
-				EmptyStateView.swift,
-				EntriesListView.swift,
-				FilterButton.swift,
-				FloatingActionButton.swift,
-				GoalCardViews.swift,
-				GoalHistoryViews.swift,
-				GoalPresets.swift,
-				HeatmapView.swift,
-				HistoryEntryCardView.swift,
-				HistoryEntryDetailView.swift,
-				LineChartView.swift,
-				LoggingSheet.swift,
-				MetricChipStyle.swift,
-				MotivationalInsightsView.swift,
-				MotivationCardView.swift,
-				MultiGoalViews.swift,
-				PresetButtons.swift,
-				PrimaryMotivationCardView.swift,
-				QuantityChartView.swift,
-				QuantityInputSheet.swift,
-				RestoreSheet.swift,
-				StatCard.swift,
-				StatsSectionView.swift,
-				StreakInfoView.swift,
-				UnifiedMetricRowView.swift,
+				Cards/CompactMetricRow.swift,
+				Cards/HistoryEntryCardView.swift,
+				Cards/HistoryEntryDetailView.swift,
+				Cards/MotivationCardView.swift,
+				Cards/PrimaryMotivationCardView.swift,
+				Cards/StatCard.swift,
+				Cards/StatsSectionView.swift,
+				Cards/UnifiedMetricRowView.swift,
+				Charts/BarChartView.swift,
+				Charts/ChartContentView.swift,
+				Charts/ChartControlsView.swift,
+				Charts/ChartsEmptyStateView.swift,
+				Charts/HeatmapView.swift,
+				Charts/LineChartView.swift,
+				Charts/QuantityChartView.swift,
+				Common/CalendarDayView.swift,
+				Common/CalendarGridView.swift,
+				Common/DateNavigationView.swift,
+				Common/EditableEntryCell.swift,
+				Common/EmptyStateView.swift,
+				Common/EntriesListView.swift,
+				Common/FilterButton.swift,
+				Common/FloatingActionButton.swift,
+				Common/MetricChipStyle.swift,
+				Common/PresetButtons.swift,
+				Goals/GoalCardViews.swift,
+				Goals/GoalHistoryViews.swift,
+				Goals/GoalPresets.swift,
+				Goals/MultiGoalViews.swift,
+				Goals/StreakInfoView.swift,
+				Inputs/BackupSheet.swift,
+				Inputs/DatePickerSheet.swift,
+				Inputs/LoggingSheet.swift,
+				Inputs/QuantityInputSheet.swift,
+				Inputs/RestoreSheet.swift,
+				Motivations/MotivationalInsightsView.swift,
 			);
 			target = 0B9C2CB02E714E630089A5FD /* TrackBoth */;
 		};
@@ -161,7 +156,7 @@
 		0B9C2DA12E735AE50089A5FD /* Components */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				0BD3346A2E7B4E1100EDDB19 /* Exceptions for "Components" folder in "TrackBoth" target */,
+				0BD334C82E7B4F3E00EDDB19 /* Exceptions for "Components" folder in "TrackBoth" target */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -236,9 +231,6 @@
 		0B9C2CA82E714E630089A5FD = {
 			isa = PBXGroup;
 			children = (
-				0BD334362E7B3AF800EDDB19 /* TrackBoth-Info.plist */,
-				0B9C31D22E7912350089A5FD /* OnboardingView.swift */,
-				0B9C31E62E7915660089A5FD /* ContentView.swift */,
 				0B9C31EC2E7915660089A5FD /* Tabs */,
 				0B9C2DA12E735AE50089A5FD /* Components */,
 				0B9C2DA72E735AE50089A5FD /* Models */,
@@ -246,7 +238,6 @@
 				0B9C2DB62E735AE50089A5FD /* ViewModels */,
 				0B9C2DBF2E735AE50089A5FD /* Views */,
 				0B9C2D622E734AAB0089A5FD /* Assets.xcassets */,
-				0B9C2D632E734AAB0089A5FD /* TrackBoth.entitlements */,
 				0B9C2D642E734AAB0089A5FD /* TrackBothApp.swift */,
 				0B9C32022E7916A00089A5FD /* TrackBoth-Widget */,
 				0B9C31FD2E7916A00089A5FD /* Frameworks */,
@@ -365,7 +356,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9C2D8E2E734AAB0089A5FD /* Assets.xcassets in Resources */,
-				0BD334372E7B3B7C00EDDB19 /* TrackBoth-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -384,8 +374,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				0B9C2D872E734AAB0089A5FD /* TrackBothApp.swift in Sources */,
-				0B9C31DE2E7912350089A5FD /* OnboardingView.swift in Sources */,
-				0B9C31F22E7915660089A5FD /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

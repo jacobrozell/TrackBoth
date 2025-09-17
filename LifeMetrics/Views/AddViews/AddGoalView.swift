@@ -103,6 +103,7 @@ struct AddGoalView: View {
                     }
                 }
             }
+            .background(Color.currentBackground)
             .navigationTitle("Add Goal")
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $showingUnitPicker) {

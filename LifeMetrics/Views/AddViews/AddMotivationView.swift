@@ -101,6 +101,7 @@ struct AddMotivationView: View {
                 }
                 .padding(.horizontal, 20)
             }
+            .background(Color.currentBackground)
             .navigationTitle("Add Motivation")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -49,6 +49,7 @@ struct LoggingSheet: View, Identifiable {
                     }
                 }
             }
+            .background(Color.currentBackground)
             .navigationTitle(metric.name)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

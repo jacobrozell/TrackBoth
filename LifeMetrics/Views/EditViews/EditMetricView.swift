@@ -199,6 +199,7 @@ struct EditMetricView: View {
                     Text(habitType == .vice ? "Target (Maximum Days)" : "Target (Days)")
                 }
             }
+            .background(Color.currentBackground)
             .navigationTitle("Edit Habit")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
