@@ -54,7 +54,12 @@ class HomeViewModel {
                 entry.metricID == metric.id && 
                 Calendar.current.isDate(entry.date, inSameDayAs: today)
             }
-            return todayEntry?.value == !isVice
+            if isVice {
+                // Treat no entry as avoided (completed) for vices
+                return todayEntry == nil || todayEntry?.value == false
+            } else {
+                return todayEntry?.value == true
+            }
         }.count
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("Today completed calculation", duration: duration)
@@ -66,7 +71,7 @@ class HomeViewModel {
     var canGoBack: Bool {
         let calendar = Calendar.current
         let daysBack = calendar.dateComponents([.day], from: selectedDate, to: Date()).day ?? 0
-        return daysBack < 7 // Allow going back up to 7 days
+        return daysBack < 30 // Allow going back up to 30 days
     }
     
     /// Whether user can navigate to next day
@@ -191,14 +196,15 @@ class HomeViewModel {
             existingEntry.value.toggle()
             logger.debug("Toggled existing entry - Metric: \(metric.name), From: \(oldValue) to \(existingEntry.value)", category: .data)
         } else {
-            // Create new entry
+            // Create new entry on first tap; interpret as an explicit action performed
+            // For both positive habits and vices, first tap means the action occurred (value == true)
             let newEntry = MetricEntry(
                 metricID: metric.id,
                 date: startOfDay,
-                value: !isVice // Default to completed for positive habits, not completed for vices
+                value: true
             )
             modelContext.insert(newEntry)
-            logger.debug("Created new entry - Metric: \(metric.name), Value: \(newEntry.value)", category: .data)
+            logger.debug("Created new entry - Metric: \(metric.name), Value set to true on first tap", category: .data)
         }
         
         do {

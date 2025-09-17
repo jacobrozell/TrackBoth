@@ -149,7 +149,7 @@ struct GoalsView: View {
             
             WeeklyDateNavigationView(
                 selectedDate: $selectedDate,
-                canGoBack: true,
+                canGoBack: CalendarHelper.daysBetween(Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date(), CalendarHelper.startOfWeek(for: selectedDate)) < 30,
                 canGoForward: !CalendarHelper.isSameWeek(selectedDate, Date()),
                 isCurrentWeek: CalendarHelper.isSameWeek(selectedDate, Date())
             )

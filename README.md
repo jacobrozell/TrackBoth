@@ -1,4 +1,4 @@
-# QuickLog - Boolean Habit Tracker
+# TrackBoth - Boolean Habit Tracker
 
 A SwiftUI/SwiftData prototype for tracking positive habits and avoiding vices with visualizations and goal tracking.
 

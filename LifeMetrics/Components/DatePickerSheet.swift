@@ -7,7 +7,8 @@ struct DatePickerSheet: View {
     var body: some View {
         NavigationView {
             VStack {
-                DatePicker("Select Date", selection: $selectedDate, in: ...Date(), displayedComponents: .date)
+                let minDate = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
+                DatePicker("Select Date", selection: $selectedDate, in: minDate...Date(), displayedComponents: .date)
                     .datePickerStyle(.graphical)
                     .padding()
                 

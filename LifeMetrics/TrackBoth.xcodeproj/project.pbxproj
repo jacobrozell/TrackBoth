@@ -137,6 +137,7 @@
 				GoalsView.swift,
 				HistoryView.swift,
 				HomeView.swift,
+				HomeView2.swift,
 				MotivationView.swift,
 				SettingsView.swift,
 			);

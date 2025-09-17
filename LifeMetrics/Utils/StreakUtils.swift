@@ -10,23 +10,54 @@ struct StreakUtils {
         
         // For positive habits: count consecutive days with value == true
         // For vices: count consecutive days with value == false
-        let sortedEntries = entries
-            .filter { $0.metricID == metric.id && $0.value == !isVice }
-            .sorted { $0.date > $1.date }
-        
-        var streak = 0
+        // Build quick lookup maps of entries by day for this metric
         let calendar = Calendar.current
-        var currentDate = selectedDate
-        
-        for entry in sortedEntries {
-            if calendar.isDate(entry.date, inSameDayAs: currentDate) {
-                streak += 1
-                currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
-            } else {
-                break
+        let startOfDayEntries = entries
+            .filter { $0.metricID == metric.id }
+            .reduce(into: [Date: MetricEntry]()) { acc, entry in
+                let day = calendar.startOfDay(for: entry.date)
+                // Prefer entries later in the day if duplicates exist
+                if let existing = acc[day] {
+                    if entry.date > existing.date { acc[day] = entry }
+                } else {
+                    acc[day] = entry
+                }
             }
+
+        var streak = 0
+        let maxLookbackDays = 365
+        var dayCursor = calendar.startOfDay(for: selectedDate)
+
+        for _ in 0..<maxLookbackDays {
+            if let entry = startOfDayEntries[dayCursor] {
+                if isVice {
+                    // For vices, a true entry breaks the clean streak
+                    if entry.value == true { break }
+                    // false (avoided) extends the streak
+                    streak += 1
+                } else {
+                    // For positive habits, only true extends the streak
+                    if entry.value == true {
+                        streak += 1
+                    } else {
+                        break
+                    }
+                }
+            } else {
+                // No entry
+                if isVice {
+                    // Missing means avoided for vices → extend streak
+                    streak += 1
+                } else {
+                    // Missing means not done for habits → break streak
+                    break
+                }
+            }
+
+            guard let previousDay = calendar.date(byAdding: .day, value: -1, to: dayCursor) else { break }
+            dayCursor = previousDay
         }
-        
+
         return streak
     }
     

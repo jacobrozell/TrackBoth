@@ -135,9 +135,10 @@ struct UnifiedMetricRowView: View {
                     logger.logUserAction("Toggle metric completion", details: "Metric: \(metric.name)")
                     toggleSelectedDateEntry()
                 } label: {
-                    Image(systemName: selectedDateEntry?.value == true ? "checkmark.circle.fill" : "circle")
+                    let isCompleted = selectedDateEntry?.value == true
+                    Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                         .font(.title)
-                        .foregroundColor(selectedDateEntry?.value == true ? Color.currentSuccess : Color.currentSecondaryText)
+                        .foregroundColor(isCompleted ? Color.currentSuccess : Color.currentSecondaryText)
                 }
             }
             
@@ -151,15 +152,18 @@ struct UnifiedMetricRowView: View {
                     Spacer()
                     
                     if metric.safeHabitType == .positive {
-                        Text(selectedDateEntry?.value == true ? "Done" : "Not Done")
+                        let done = selectedDateEntry?.value == true
+                        Text(done ? "Done" : "Not Done")
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(selectedDateEntry?.value == true ? Color.currentSuccess : Color.currentSecondaryText)
+                            .foregroundColor(done ? Color.currentSuccess : Color.currentSecondaryText)
                     } else {
-                        Text(selectedDateEntry?.value == false ? "Avoided" : "Not Avoided")
+                        // For vices, absence of an entry means avoided (default good state)
+                        let avoided = selectedDateEntry == nil || selectedDateEntry?.value == false
+                        Text(avoided ? "Avoided" : "Not Avoided")
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(selectedDateEntry?.value == false ? Color.currentSuccess : Color.currentError)
+                            .foregroundColor(avoided ? Color.currentSuccess : Color.currentError)
                     }
                 }
                 
