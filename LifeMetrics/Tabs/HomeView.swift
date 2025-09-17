@@ -94,6 +94,19 @@ struct HomeView: View {
             }
             .navigationTitle("TrackBoth")
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        if DemoDataGenerator.hasDemoData() {
+                            DemoDataGenerator.clearDemoData(modelContext: modelContext)
+                        } else {
+                            DemoDataGenerator.generateDemoData(modelContext: modelContext)
+                        }
+                    } label: { 
+                        Text(DemoDataGenerator.hasDemoData() ? "Clear Demo" : "Try Demo")
+                            .font(.caption)
+                    }
+                }
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         viewModel.showSettings()
@@ -388,21 +401,25 @@ private struct CompactMetricRow: View {
                     .id(refreshTrigger) // Force UI refresh when trigger changes
 
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(metric.name)
-                            .font(.headline)
-                            .foregroundColor(Color.currentText)
-
-                        // Status label
-                        Text(statusInfo.text)
-                            .font(.caption)
-                            .fontWeight(.medium)
-                            .foregroundColor(statusInfo.color)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(statusInfo.color.opacity(0.15))
-                            )
+                        HStack {
+                            Text(metric.name)
+                                .font(.headline)
+                                .foregroundColor(Color.currentText)
+                            
+                            Spacer()
+                            
+                            // Status label moved to top right
+                            Text(statusInfo.text)
+                                .font(.caption)
+                                .fontWeight(.medium)
+                                .foregroundColor(statusInfo.color)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 2)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(statusInfo.color.opacity(0.15))
+                                )
+                        }
 
                         HStack(spacing: 10) {
                             let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
@@ -424,17 +441,25 @@ private struct CompactMetricRow: View {
                                         .foregroundColor(Color.currentSecondaryText)
                                 }
                             }
+                            
+                            Spacer()
+                            
+                            // Quantity label in bottom right
+                            if let quantityString = selectedDateEntry?.quantityString {
+                                Text(quantityString)
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(Color.currentSecondaryText)
+                            }
                         }
+                    }
+                    .onTapGesture {
+                        onLog()
                     }
 
                     Spacer()
                 }
                 .contentShape(Rectangle())
-                .onTapGesture { onLog() }
-            }
-
-            if metric.habitType == .vice {
-
             }
 
             if showOptions {
