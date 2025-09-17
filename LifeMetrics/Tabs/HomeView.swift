@@ -14,6 +14,7 @@ struct HomeView: View {
     // UI State
     @State private var showingLoggingSheetForMetric: Metric? = nil
     @State private var showingRowOptions: Bool = false
+    @State private var hasDemoData: Bool = DemoDataGenerator.hasDemoData()
 
     // MARK: - Derived values
     private var weekDays: [Date] {
@@ -45,6 +46,7 @@ struct HomeView: View {
                         action: { viewModel.showAddMetric() }
                     )
                     .background(Color.currentBackground)
+                    .padding()
                 } else if geometry.size.width > geometry.size.height {
                     // Landscape: Left (stats + week), Right (list)
                     HStack(spacing: 0) {
@@ -96,13 +98,10 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        if DemoDataGenerator.hasDemoData() {
-                            DemoDataGenerator.clearDemoData(modelContext: modelContext)
-                        } else {
-                            DemoDataGenerator.generateDemoData(modelContext: modelContext)
-                        }
-                    } label: { 
-                        Text(DemoDataGenerator.hasDemoData() ? "Clear Demo" : "Try Demo")
+                        hasDemoData ? DemoDataGenerator.clearDemoData(modelContext: modelContext) : DemoDataGenerator.generateDemoData(modelContext: modelContext)
+                        hasDemoData.toggle()
+                    } label: {
+                        Text(hasDemoData ? "Clear Demo" : "Try Demo")
                             .font(.caption)
                     }
                 }
@@ -347,8 +346,8 @@ private struct CompactMetricRow: View {
 
         let isVice = metric.habitType == .vice
         if isVice {
-            // For vices, completed when explicitly logged as avoided (value == false)
-            return selectedDateEntry?.value == false
+            // For vices, completed when explicitly logged as avoided (value == true)
+            return selectedDateEntry?.value == true
         } else {
             // For habits, completed when explicitly logged as done (value == true)
             return selectedDateEntry?.value == true
@@ -554,8 +553,8 @@ private struct LoggingSheet: View, Identifiable {
             details = entry.details ?? ""
             motivation = entry.motivation ?? ""
         } else {
-            // Defaults per spec: habits not done; vices avoided
-            value = metric.habitType == .positive ? false : false // vices avoided means no true entry; keep false
+            // Defaults per spec: habits not done; vices not avoided
+            value = false
         }
     }
 
