@@ -4,7 +4,7 @@ import SwiftData
 
 // MARK: - HistoryView2
 /// Redesigned History view following Home/Motivations/Goals design patterns
-struct HistoryView2: View {
+struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
@@ -243,40 +243,43 @@ struct HistoryView2: View {
     }
     
     private var historyContentView: some View {
-        ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                // Calendar Section
-                Section(header: sectionHeader(
-                    title: "Calendar View",
-                    icon: "calendar",
-                    iconColor: Color.currentPrimary,
-                    subtitle: "Monthly overview of your progress"
-                )) {
-                    CalendarGridView(
-                        entries: calendarEntries,
-                        selectedFilter: currentMetricFilter,
-                        selectedDate: $selectedDate,
-                        metrics: metrics
-                    )
-                    .padding(.horizontal, 16)
-                }
-
-                // Recent Entries Section
-                if !filteredEntries.isEmpty {
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                    // Calendar Section
                     Section(header: sectionHeader(
-                        title: "Recent Entries",
-                        icon: "clock",
-                        iconColor: Color.currentSecondaryText,
-                        subtitle: "Your latest activity"
+                        title: "Calendar View",
+                        icon: "calendar",
+                        iconColor: Color.currentPrimary,
+                        subtitle: "Monthly overview of your progress"
                     )) {
-                        ForEach(filteredEntries.prefix(20)) { entry in
-                            HistoryEntryCardView(entry: entry, metrics: metrics)
+                        CalendarGridView(
+                            entries: calendarEntries,
+                            selectedFilter: currentMetricFilter,
+                            selectedDate: $selectedDate,
+                            metrics: metrics
+                        )
+                        .padding(.horizontal, 16)
+                    }
+
+                    // Recent Entries Section
+                    if !filteredEntries.isEmpty {
+                        Section(header: sectionHeader(
+                            title: "Recent Entries",
+                            icon: "clock",
+                            iconColor: Color.currentSecondaryText,
+                            subtitle: "Your latest activity"
+                        )) {
+                            ForEach(filteredEntries.prefix(20)) { entry in
+                                HistoryEntryCardView(entry: entry, metrics: metrics)
+                            }
                         }
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .id("portrait-\(geometry.size.width)-\(geometry.size.height)")
         }
     }
 
@@ -328,113 +331,94 @@ struct HistoryView2: View {
                     .fontWeight(.medium)
                     .foregroundColor(Color.currentSecondaryText)
 
-                VStack(spacing: 8) {
-                    // All filter
-                    ReactiveFilterButton(
-                        title: "All",
-                        isSelected: selectedFilter == MetricFilter.all
-                    ) {
-                        selectedFilter = .all
-                    }
-                    
-                    // All Habits filter
-                    ReactiveFilterButton(
-                        title: "All Habits",
-                        isSelected: selectedFilter == MetricFilter.allHabits
-                    ) {
-                        selectedFilter = .allHabits
-                    }
-                    
-                    // All Vices filter
-                    ReactiveFilterButton(
-                        title: "All Vices",
-                        isSelected: selectedFilter == MetricFilter.allVices
-                    ) {
-                        selectedFilter = .allVices
-                    }
-
-                    // Individual metrics
-                    ForEach(metrics) { metric in
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 8) {
+                        // All filter
                         ReactiveFilterButton(
-                            title: metric.name,
-                            isSelected: {
-                                if case .specific(let selectedMetric) = selectedFilter {
-                                    return selectedMetric.id == metric.id
-                                }
-                                return false
-                            }()
+                            title: "All",
+                            isSelected: selectedFilter == MetricFilter.all
                         ) {
-                            selectedFilter = .specific(metric)
+                            selectedFilter = .all
+                        }
+                        
+                        // All Habits filter
+                        ReactiveFilterButton(
+                            title: "All Habits",
+                            isSelected: selectedFilter == MetricFilter.allHabits
+                        ) {
+                            selectedFilter = .allHabits
+                        }
+                        
+                        // All Vices filter
+                        ReactiveFilterButton(
+                            title: "All Vices",
+                            isSelected: selectedFilter == MetricFilter.allVices
+                        ) {
+                            selectedFilter = .allVices
+                        }
+
+                        // Individual metrics
+                        ForEach(metrics) { metric in
+                            ReactiveFilterButton(
+                                title: metric.name,
+                                isSelected: {
+                                    if case .specific(let selectedMetric) = selectedFilter {
+                                        return selectedMetric.id == metric.id
+                                    }
+                                    return false
+                                }()
+                            ) {
+                                selectedFilter = .specific(metric)
+                            }
                         }
                     }
                 }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
-
-            // Search bar
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(Color.currentSecondaryText)
-
-                TextField("Search details...", text: $searchText)
-                    .textFieldStyle(PlainTextFieldStyle())
-
-                if !searchText.isEmpty {
-                    Button {
-                        searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
-                }
-            }
-            .padding()
-            .background(Color.currentSecondaryBackground)
-            .cornerRadius(10)
-            .padding(.horizontal, 16)
-
-            Spacer(minLength: 0)
         }
         .padding()
     }
 
     private var rightPanel: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                    // Calendar Section
-                    Section(header: sectionHeader(
-                        title: "Calendar View",
-                        icon: "calendar",
-                        iconColor: Color.currentPrimary,
-                        subtitle: "Monthly overview of your progress"
-                    )) {
-                        CalendarGridView(
-                            entries: calendarEntries,
-                            selectedFilter: currentMetricFilter,
-                            selectedDate: $selectedDate,
-                            metrics: metrics
-                        )
-                        .padding(.horizontal, 16)
-                    }
-
-                    // Recent Entries Section
-                    if !filteredEntries.isEmpty {
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                ScrollView {
+                    LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                        // Calendar Section
                         Section(header: sectionHeader(
-                            title: "Recent Entries",
-                            icon: "clock",
-                            iconColor: Color.currentSecondaryText,
-                            subtitle: "Your latest activity"
+                            title: "Calendar View",
+                            icon: "calendar",
+                            iconColor: Color.currentPrimary,
+                            subtitle: "Monthly overview of your progress"
                         )) {
-                            ForEach(filteredEntries.prefix(20)) { entry in
-                                HistoryEntryCardView(entry: entry, metrics: metrics)
+                            CalendarGridView(
+                                entries: calendarEntries,
+                                selectedFilter: currentMetricFilter,
+                                selectedDate: $selectedDate,
+                                metrics: metrics
+                            )
+                            .padding(.horizontal, 16)
+                        }
+
+                        // Recent Entries Section
+                        if !filteredEntries.isEmpty {
+                            Section(header: sectionHeader(
+                                title: "Recent Entries",
+                                icon: "clock",
+                                iconColor: Color.currentSecondaryText,
+                                subtitle: "Your latest activity"
+                            )) {
+                                ForEach(filteredEntries.prefix(20)) { entry in
+                                    HistoryEntryCardView(entry: entry, metrics: metrics)
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                .id("landscape-\(geometry.size.width)-\(geometry.size.height)")
             }
         }
     }
@@ -483,6 +467,6 @@ struct HistoryView2: View {
 
 
 #Preview {
-    HistoryView2()
+    HistoryView()
         .modelContainer(for: [Metric.self, MetricEntry.self], inMemory: true)
 }

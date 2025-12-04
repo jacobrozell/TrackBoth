@@ -32,13 +32,13 @@ struct StatCard: View {
             
             // Value with modern typography
             Text(value)
-                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .h2()
                 .foregroundColor(Color.currentText)
                 .minimumScaleFactor(0.7)
             
             // Title with improved styling
             Text(title)
-                .font(.system(size: 11, weight: .medium, design: .default))
+                .captionSmall()
                 .foregroundColor(Color.currentSecondaryText)
                 .textCase(.uppercase)
                 .tracking(0.8)

@@ -4,6 +4,7 @@ import SwiftData
 struct AddGoalView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var themeManager = ThemeManager.shared
     @Query private var metrics: [Metric]
     
     let selectedMetric: Metric?
@@ -56,7 +57,7 @@ struct AddGoalView: View {
                     Section {
                         HStack {
                             Image(systemName: effectiveSelectedMetric!.habitType.icon)
-                                .foregroundColor(effectiveSelectedMetric!.habitType == .positive ? .green : .red)
+                                .foregroundColor(effectiveSelectedMetric!.habitType == .positive ? Color.currentSuccess : Color.currentError)
                             Text(effectiveSelectedMetric!.name)
                                 .font(.headline)
                         }
@@ -103,6 +104,7 @@ struct AddGoalView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
             .background(Color.currentBackground)
             .navigationTitle("Add Goal")
             .navigationBarTitleDisplayMode(.inline)

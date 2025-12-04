@@ -10,12 +10,13 @@ struct BackupSheet: View {
     @Binding var isBackingUp: Bool
     @Binding var backupError: String?
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var themeManager = ThemeManager.shared
     
     @State private var backupProgress: String = ""
     @State private var showingSuccessAlert = false
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 24) {
                 // Header
                 VStack(spacing: 12) {
@@ -119,6 +120,7 @@ struct BackupSheet: View {
                 }
             }
             .padding()
+            .background(Color.currentBackground)
             .navigationTitle("Backup")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

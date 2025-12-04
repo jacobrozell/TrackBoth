@@ -103,3 +103,8 @@ Notes:
 - [ ] Define haptics/animations for toggle and deletes (subtle, consistent)
 
 
+Notes:
+ 1. We shouldn't be able to go into the future in the new calendar week view. The last day should always be today and it goes a week back.
+ 2. LoggingForm handles quantitys wierdly. Why is it a string? We have a Quantity selector view somewhere that we could reuse here.
+ 3. Lets add a edit button at the very top of the list that shows the cells options.
+ 4. 

@@ -3,6 +3,7 @@ import SwiftUI
 // MARK: - OnboardingView
 /// Onboarding flow introducing users to each tab of the app
 struct OnboardingView: View {
+    @StateObject private var themeManager = ThemeManager.shared
     @State private var currentPage = 0
     
     private let pages = OnboardingPage.allPages
@@ -106,12 +107,12 @@ struct OnboardingPageView: View {
             // Content
             VStack(spacing: 16) {
                 Text(page.title)
-                    .font(.system(size: 32, weight: .bold))
+                    .displaySmall()
                     .foregroundColor(Color.currentText)
                     .multilineTextAlignment(.center)
                 
                 Text(page.description)
-                    .font(.system(size: 18, weight: .regular))
+                    .bodyLarge()
                     .foregroundColor(Color.currentSecondaryText)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
@@ -142,13 +143,13 @@ struct OnboardingPage {
             title: "Home Tab",
             description: "Your daily habit dashboard. Toggle habits on/off, view your streaks, and see today's progress at a glance.",
             icon: "house.fill",
-            color: .green
+            color: Color.currentSuccess
         ),
         OnboardingPage(
             title: "History Tab",
             description: "View your tracking history in a beautiful calendar. See patterns, search entries, and review your journey over time.",
             icon: "calendar",
-            color: .orange
+            color: Color.currentWarning
         ),
         OnboardingPage(
             title: "Goals Tab",
@@ -160,13 +161,13 @@ struct OnboardingPage {
             title: "Charts Tab",
             description: "Visualize your data with interactive charts. See trends, streaks, and patterns to understand your habits better.",
             icon: "chart.bar.fill",
-            color: .red
+            color: Color.currentPrimary
         ),
         OnboardingPage(
             title: "Motivation Tab",
             description: "Build your motivation library. Add reasons for avoiding vices and revisit them when you need strength to stay on track.",
             icon: "heart.text.square",
-            color: .pink
+            color: Color.currentAccent
         )
     ]
 }

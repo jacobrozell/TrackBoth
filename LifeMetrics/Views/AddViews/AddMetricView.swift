@@ -4,6 +4,7 @@ import SwiftData
 struct AddMetricView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var themeManager = ThemeManager.shared
     @State private var metricName = ""
     @State private var selectedHabitType: HabitType = .positive
     @State private var primaryMotivation = ""
@@ -206,6 +207,7 @@ struct AddMetricView: View {
                 }
 
             }
+            .scrollContentBackground(.hidden)
             .background(Color.currentBackground)
             .navigationTitle("Add Habit")
             .navigationBarTitleDisplayMode(.inline)

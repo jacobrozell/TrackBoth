@@ -25,6 +25,7 @@ struct ChartControlsView: View {
                         }
                         .padding(.horizontal)
                     }
+                    .id("controls-landscape")
                 } else {
                     // Portrait: horizontal chips row
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -33,6 +34,7 @@ struct ChartControlsView: View {
                         }
                         .padding(.horizontal)
                     }
+                    .id("controls-portrait")
                 }
             }
 

@@ -46,7 +46,7 @@ struct ContentView: View {
 //                        }
 //                        .tag(3)
 
-                    HistoryView2()
+                    HistoryView()
                         .tabItem {
                             Image(systemName: "calendar.badge.clock")
                             Text("History")
@@ -54,6 +54,7 @@ struct ContentView: View {
                         .tag(4)
                 }
                 .themedBackground()
+                .id(themeManager.currentAppTheme.name)
                 .onChange(of: selectedTab) { oldValue, newValue in
                     let tabNames = ["Home", "Goals", "Charts", "Motivation", "History", "Settings"]
                     let tabName = newValue < tabNames.count ? tabNames[newValue] : "Unknown"
@@ -68,6 +69,9 @@ struct ContentView: View {
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OnboardingCompleted"))) { _ in
             logger.info("Onboarding completed notification received")
             checkFirstLaunch()
+        }
+        .onChange(of: themeManager.currentAppTheme) { _, _ in
+            // Force TabView refresh when theme changes
         }
     }
 

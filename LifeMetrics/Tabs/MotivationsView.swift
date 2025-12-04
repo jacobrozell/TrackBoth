@@ -216,6 +216,7 @@ struct MotivationsView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                         }
+                        .id("motivations-portrait-\(geometry.size.width)-\(geometry.size.height)")
                         .overlay(alignment: .bottomTrailing) {
                             FloatingActionButton {
                                 logger.logUserAction("Add motivation button tapped")
@@ -263,43 +264,45 @@ struct MotivationsView: View {
                     .fontWeight(.medium)
                     .foregroundColor(Color.currentSecondaryText)
 
-                VStack(spacing: 8) {
-                    // All filter
-                    ReactiveFilterButton(
-                        title: "All",
-                        isSelected: selectedFilter == .all
-                    ) {
-                        selectedFilter = .all
-                    }
-                    
-                    // All Habits filter
-                    ReactiveFilterButton(
-                        title: "All Habits",
-                        isSelected: selectedFilter == .allHabits
-                    ) {
-                        selectedFilter = .allHabits
-                    }
-                    
-                    // All Vices filter
-                    ReactiveFilterButton(
-                        title: "All Vices",
-                        isSelected: selectedFilter == .allVices
-                    ) {
-                        selectedFilter = .allVices
-                    }
-
-                    // Individual metrics
-                    ForEach(metrics) { metric in
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 8) {
+                        // All filter
                         ReactiveFilterButton(
-                            title: metric.name,
-                            isSelected: {
-                                if case .specific(let selectedMetric) = selectedFilter {
-                                    return selectedMetric.id == metric.id
-                                }
-                                return false
-                            }()
+                            title: "All",
+                            isSelected: selectedFilter == .all
                         ) {
-                            selectedFilter = .specific(metric)
+                            selectedFilter = .all
+                        }
+                        
+                        // All Habits filter
+                        ReactiveFilterButton(
+                            title: "All Habits",
+                            isSelected: selectedFilter == .allHabits
+                        ) {
+                            selectedFilter = .allHabits
+                        }
+                        
+                        // All Vices filter
+                        ReactiveFilterButton(
+                            title: "All Vices",
+                            isSelected: selectedFilter == .allVices
+                        ) {
+                            selectedFilter = .allVices
+                        }
+
+                        // Individual metrics
+                        ForEach(metrics) { metric in
+                            ReactiveFilterButton(
+                                title: metric.name,
+                                isSelected: {
+                                    if case .specific(let selectedMetric) = selectedFilter {
+                                        return selectedMetric.id == metric.id
+                                    }
+                                    return false
+                                }()
+                            ) {
+                                selectedFilter = .specific(metric)
+                            }
                         }
                     }
                 }
@@ -313,39 +316,42 @@ struct MotivationsView: View {
     }
 
     private var rightPanel: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                    // Primary Motivations Section
-                    if !primaryMotivations.isEmpty {
-                        Section(header: sectionHeader(
-                            title: "Primary Motivations",
-                            icon: "star.fill",
-                            iconColor: Color.currentWarning,
-                            subtitle: "Your core reasons for your habits"
-                        )) {
-                            ForEach(primaryMotivations) { metric in
-                                PrimaryMotivationCardView2(metric: metric)
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                ScrollView {
+                    LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                        // Primary Motivations Section
+                        if !primaryMotivations.isEmpty {
+                            Section(header: sectionHeader(
+                                title: "Primary Motivations",
+                                icon: "star.fill",
+                                iconColor: Color.currentWarning,
+                                subtitle: "Your core reasons for your habits"
+                            )) {
+                                ForEach(primaryMotivations) { metric in
+                                    PrimaryMotivationCardView2(metric: metric)
+                                }
                             }
                         }
-                    }
 
-                    // Daily Motivations Section
-                    if !dailyMotivations.isEmpty {
-                        Section(header: sectionHeader(
-                            title: "Daily Motivations",
-                            icon: "clock",
-                            iconColor: Color.currentSecondaryText,
-                            subtitle: "Recent motivation entries"
-                        )) {
-                            ForEach(dailyMotivations) { entry in
-                                DailyMotivationCardView2(entry: entry, metrics: metrics)
+                        // Daily Motivations Section
+                        if !dailyMotivations.isEmpty {
+                            Section(header: sectionHeader(
+                                title: "Daily Motivations",
+                                icon: "clock",
+                                iconColor: Color.currentSecondaryText,
+                                subtitle: "Recent motivation entries"
+                            )) {
+                                ForEach(dailyMotivations) { entry in
+                                    DailyMotivationCardView2(entry: entry, metrics: metrics)
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                .id("motivations-landscape-\(geometry.size.width)-\(geometry.size.height)")
             }
         }
     }

@@ -72,14 +72,14 @@ struct HomeView: View {
                                 Button(showingRowOptions ? "Done" : "Edit") {
                                     showingRowOptions.toggle()
                                 }
-                                .font(.caption)
+                                .caption()
                                 .foregroundColor(Color.currentPrimary)
 
                                 Spacer()
 
                                 if !viewModel.isToday {
                                     Button("Today") { viewModel.goToToday() }
-                                        .font(.caption)
+                                        .caption()
                                         .foregroundColor(Color.currentPrimary)
                                 }
                             }
@@ -105,7 +105,7 @@ struct HomeView: View {
                             hasDemoData.toggle()
                         } label: {
                             Text(hasDemoData ? "Clear Demo" : "Try Demo")
-                                .font(.caption)
+                                .caption()
                         }
                     }
                 }
@@ -160,17 +160,17 @@ struct HomeView: View {
             // Simple header mirroring week context
             HStack {
                 Text(weekHeaderTitle)
-                    .font(.headline)
+                    .h4()
                     .foregroundColor(Color.currentText)
                 Spacer()
                 Button(showingRowOptions ? "Done" : "Edit") {
                     showingRowOptions.toggle()
                 }
-                .font(.caption)
+                .caption()
                 .foregroundColor(Color.currentPrimary)
                 if !viewModel.isToday {
                     Button("Today") { viewModel.goToToday() }
-                        .font(.caption)
+                        .caption()
                         .foregroundColor(Color.currentPrimary)
                 }
             }
@@ -243,48 +243,51 @@ struct HomeView: View {
     }
 
     private var sectionsList: some View {
-        ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section(header: sectionHeader(title: "Habits", items: habits)) {
-                    ForEach(habits) { metric in
-                        CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
-                            // primary toggle
-                            viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
-                        } onLog: {
-                            showingLoggingSheetForMetric = metric
-                        } onEdit: {
-                            viewModel.showEditMetric(metric)
-                        } onDelete: {
-                            viewModel.metricToDelete = metric
-                            viewModel.showingDeleteConfirmation = true
+        GeometryReader { geometry in
+            ScrollView {
+                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                    Section(header: sectionHeader(title: "Habits", items: habits)) {
+                        ForEach(habits) { metric in
+                            CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
+                                // primary toggle
+                                viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                            } onLog: {
+                                showingLoggingSheetForMetric = metric
+                            } onEdit: {
+                                viewModel.showEditMetric(metric)
+                            } onDelete: {
+                                viewModel.metricToDelete = metric
+                                viewModel.showingDeleteConfirmation = true
+                            }
                         }
                     }
-                }
 
-                Section(header: sectionHeader(title: "Vices", items: vices)) {
-                    ForEach(vices) { metric in
-                        CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
-                            viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
-                        } onLog: {
-                            showingLoggingSheetForMetric = metric
-                        } onEdit: {
-                            viewModel.showEditMetric(metric)
-                        } onDelete: {
-                            viewModel.metricToDelete = metric
-                            viewModel.showingDeleteConfirmation = true
+                    Section(header: sectionHeader(title: "Vices", items: vices)) {
+                        ForEach(vices) { metric in
+                            CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
+                                viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                            } onLog: {
+                                showingLoggingSheetForMetric = metric
+                            } onEdit: {
+                                viewModel.showEditMetric(metric)
+                            } onDelete: {
+                                viewModel.metricToDelete = metric
+                                viewModel.showingDeleteConfirmation = true
+                            }
                         }
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-        }
-        .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
-            Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
-            Button("Delete", role: .destructive) { viewModel.deleteMetric(in: modelContext, entries: entries) }
-        } message: {
-            if let metric = viewModel.metricToDelete {
-                Text("Are you sure you want to delete '\(metric.name)'? This will also delete all associated entries and cannot be undone.")
+            .id("home-\(geometry.size.width > geometry.size.height ? "landscape" : "portrait")-\(geometry.size.width)-\(geometry.size.height)")
+            .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
+                Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
+                Button("Delete", role: .destructive) { viewModel.deleteMetric(in: modelContext, entries: entries) }
+            } message: {
+                if let metric = viewModel.metricToDelete {
+                    Text("Are you sure you want to delete '\(metric.name)'? This will also delete all associated entries and cannot be undone.")
+                }
             }
         }
     }

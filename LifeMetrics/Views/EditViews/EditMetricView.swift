@@ -4,6 +4,7 @@ import SwiftData
 struct EditMetricView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @StateObject private var themeManager = ThemeManager.shared
     @Query private var entries: [MetricEntry]
     @State var metric: Metric
     @State private var name: String = ""
@@ -199,6 +200,7 @@ struct EditMetricView: View {
                     Text(habitType == .vice ? "Target (Maximum Days)" : "Target (Days)")
                 }
             }
+            .scrollContentBackground(.hidden)
             .background(Color.currentBackground)
             .navigationTitle("Edit Habit")
             .navigationBarTitleDisplayMode(.inline)

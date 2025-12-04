@@ -71,7 +71,9 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationStack {
-            List {
+            ZStack {
+                Color.currentBackground.ignoresSafeArea()
+                List {
                 // Data Management Section
                 Section("Data Management") {
                     Button("Export Data") {
@@ -80,6 +82,7 @@ struct SettingsView: View {
                         showingExportSheet = true
                     }
                     .foregroundColor(Color.currentPrimary)
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     if !metrics.isEmpty && DemoDataGenerator.hasDemoData() {
                         Button("Clear Demo Data") {
@@ -87,6 +90,7 @@ struct SettingsView: View {
                             DemoDataGenerator.clearDemoData(modelContext: modelContext)
                         }
                         .foregroundColor(Color.currentWarning)
+                        .listRowBackground(Color.currentSecondaryBackground)
                     }
                     
                     Button("Delete All Data") {
@@ -94,6 +98,7 @@ struct SettingsView: View {
                         showingDeleteConfirmation = true
                     }
                     .foregroundColor(Color.currentError)
+                    .listRowBackground(Color.currentSecondaryBackground)
                 }
                 
                 // iCloud Backup Section
@@ -104,6 +109,7 @@ struct SettingsView: View {
                     }
                     .foregroundColor(Color.currentPrimary)
                     .disabled(isBackingUp)
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     Button("Restore from iCloud") {
                         logger.logUserAction("Restore from iCloud button tapped")
@@ -111,6 +117,7 @@ struct SettingsView: View {
                     }
                     .foregroundColor(Color.currentSuccess)
                     .disabled(isRestoring)
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     if let backupInfo = backupInfo {
                         HStack {
@@ -119,6 +126,7 @@ struct SettingsView: View {
                             Text(backupInfo.timestamp, style: .relative)
                                 .foregroundColor(Color.currentSecondaryText)
                         }
+                        .listRowBackground(Color.currentSecondaryBackground)
                     }
                 }
                 
@@ -134,6 +142,7 @@ struct SettingsView: View {
                         Text("Saturday").tag(7)
                     }
                     .pickerStyle(.menu)
+                    .listRowBackground(Color.currentSecondaryBackground)
                 }
                 
                 // Theme Settings Section
@@ -159,6 +168,7 @@ struct SettingsView: View {
                         }
                     }
                     .padding(.vertical, 8)
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     // Theme Preview
                     VStack(alignment: .leading, spacing: 8) {
@@ -170,13 +180,57 @@ struct SettingsView: View {
                             .frame(maxWidth: .infinity)
                     }
                     .padding(.vertical, 8)
+                    .listRowBackground(Color.currentSecondaryBackground)
+                    
+                    // Font Design Selection
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Font")
+                            .font(.headline)
+                            .themedPrimaryText()
+                        
+                        Picker("Font Design", selection: Binding(
+                            get: { themeManager.selectedFontDesign },
+                            set: { themeManager.updateFontDesign($0) }
+                        )) {
+                            ForEach(FontDesign.allCases, id: \.self) { design in
+                                HStack {
+                                    Text(design.displayName)
+                                    if design == themeManager.selectedFontDesign {
+                                        Spacer()
+                                        Image(systemName: "checkmark")
+                                            .foregroundColor(Color.currentPrimary)
+                                    }
+                                }
+                                .tag(design)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .listRowBackground(Color.currentSecondaryBackground)
+                        
+                        // Font Preview
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Sample Text")
+                                .font(AppTypography.h3)
+                            Text("This is how the font looks in the app")
+                                .font(AppTypography.body)
+                            Text("Smaller text example")
+                                .font(AppTypography.caption)
+                        }
+                        .padding()
+                        .background(Color.currentSecondaryBackground)
+                        .cornerRadius(8)
+                        .padding(.top, 4)
+                    }
+                    .padding(.vertical, 8)
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     // Theme Reset Option
                     Button("Reset to Default Theme") {
                         logger.logUserAction("Reset theme button tapped")
-                        themeManager.updateAppTheme(.default)
+                        themeManager.resetToDefaultTheme()
                     }
                     .foregroundColor(Color.currentWarning)
+                    .listRowBackground(Color.currentSecondaryBackground)
                 }
                 
                 // Help & Support Section
@@ -185,11 +239,13 @@ struct SettingsView: View {
                         showingShareSheet = true
                     }
                     .foregroundColor(Color.currentPrimary)
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     Button("View Onboarding Again") {
                         showOnboardingAgain()
                     }
                     .foregroundColor(Color.currentPrimary)
+                    .listRowBackground(Color.currentSecondaryBackground)
                 }
                 
                 // App Information Section
@@ -200,6 +256,7 @@ struct SettingsView: View {
                         Text(appVersion)
                             .foregroundColor(Color.currentSecondaryText)
                     }
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     HStack {
                         Text("Total Metrics")
@@ -207,6 +264,7 @@ struct SettingsView: View {
                         Text("\(metrics.count)")
                             .foregroundColor(Color.currentSecondaryText)
                     }
+                    .listRowBackground(Color.currentSecondaryBackground)
 
                     HStack {
                         Text("Total Habits")
@@ -214,6 +272,7 @@ struct SettingsView: View {
                         Text("\(metrics.filter { $0.habitType == .positive }.count)")
                             .foregroundColor(Color.currentSecondaryText)
                     }
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     HStack {
                         Text("Total Vices")
@@ -221,6 +280,7 @@ struct SettingsView: View {
                         Text("\(metrics.filter { $0.habitType == .vice }.count)")
                             .foregroundColor(Color.currentSecondaryText)
                     }
+                    .listRowBackground(Color.currentSecondaryBackground)
 
                     HStack {
                         Text("Total Entries")
@@ -228,6 +288,7 @@ struct SettingsView: View {
                         Text("\(entries.count)")
                             .foregroundColor(Color.currentSecondaryText)
                     }
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     HStack {
                         Text("Date Joined")
@@ -235,6 +296,7 @@ struct SettingsView: View {
                         Text(dateJoinedText)
                             .foregroundColor(Color.currentSecondaryText)
                     }
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     // Goals are tracked per Metric; no separate count
                 }
@@ -250,6 +312,7 @@ struct SettingsView: View {
                             .foregroundColor(Color.currentSecondaryText)
                             .font(.caption)
                     }
+                    .listRowBackground(Color.currentSecondaryBackground)
                     
                     HStack {
                         Image(systemName: "heart.fill")
@@ -260,41 +323,19 @@ struct SettingsView: View {
                             .foregroundColor(Color.currentSecondaryText)
                             .font(.caption)
                     }
-                    
-                    HStack {
-                        Image(systemName: "app.badge")
-                            .foregroundColor(Color.currentSecondaryText)
-                        Text("Custom App Icons")
-                        Spacer()
-                        Text("Soon")
-                            .foregroundColor(Color.currentSecondaryText)
-                            .font(.caption)
-                    }
-                    
-                    
+                    .listRowBackground(Color.currentSecondaryBackground)
                 }
-                
-                // Current Time Section
-                Section("Current Time") {
-                    HStack {
-                        Text("Local Time")
-                        Spacer()
-                        Text(currentTime, style: .time)
-                            .foregroundColor(Color.currentSecondaryText)
-                            .monospacedDigit()
-                    }
-                    
-                    HStack {
-                        Text("Date")
-                        Spacer()
-                        Text(currentTime, style: .date)
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
                 }
+                .scrollContentBackground(.hidden)
+                .listStyle(.insetGrouped)
+                .environment(\.defaultMinListRowHeight, 44)
             }
-            .themedBackground()
             .navigationTitle("Settings")
+            .toolbarBackground(Color.currentBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .onAppear {
+                // Force update when theme changes
+                themeManager.objectWillChange.send()
                 logger.info("SettingsView appeared")
                 logger.debug("Metrics count: \(metrics.count), Entries count: \(entries.count)", category: .data)
                 // Update time every second
@@ -304,6 +345,9 @@ struct SettingsView: View {
                 
                 // Load backup info
                 loadBackupInfo()
+            }
+            .onChange(of: themeManager.currentAppTheme) { _, _ in
+                // Force refresh when theme changes
             }
             .sheet(isPresented: $showingExportSheet) {
                 if let exportData = exportData {

@@ -5,7 +5,7 @@ struct MetricChipStyle: ButtonStyle {
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.system(size: 16, weight: .medium))
+            .bodyMedium()
             .padding(.horizontal, 20)
             .padding(.vertical, 12)
             .background(
@@ -43,7 +43,7 @@ struct ReactiveFilterButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 16, weight: .medium))
+                .bodyMedium()
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
                 .background(

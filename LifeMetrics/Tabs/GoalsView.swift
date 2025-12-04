@@ -11,8 +11,6 @@ struct GoalsView: View {
     @Query private var goals: [Goal]
     @State private var viewModel = GoalsViewModel()
     @State private var selectedDate = Date()
-    @State private var showingAddGoal = false
-    @State private var showingAddMetric = false
     @State private var selectedFilter: MetricFilter = .all
     @StateObject private var themeManager = ThemeManager.shared
 
@@ -60,7 +58,7 @@ struct GoalsView: View {
                         actionTitle: "Create Your First Habit",
                         action: {
                             logger.logUserAction("Add habit button tapped from goals")
-                            showingAddMetric = true
+                            viewModel.showingAddMetric = true
                         }
                     )
                     .background(Color.currentBackground)
@@ -72,7 +70,7 @@ struct GoalsView: View {
                         actionTitle: "Create Your First Goal",
                         action: {
                             logger.logUserAction("Add goal button tapped from empty state")
-                            showingAddGoal = true
+                            viewModel.showingAddGoal = true
                         }
                     )
                     .background(Color.currentBackground)
@@ -90,7 +88,7 @@ struct GoalsView: View {
                             .overlay(alignment: .bottomTrailing) {
                                 FloatingActionButton {
                                     logger.logUserAction("Add goal button tapped")
-                                    showingAddGoal = true
+                                    viewModel.showingAddGoal = true
                                 }
                             }
                     }
@@ -137,7 +135,7 @@ struct GoalsView: View {
                                 // Boolean Goals Section
                                 if !booleanGoals.isEmpty {
                                     Section(header: sectionHeader(
-                                        title: "Boolean Goals",
+                                        title: "Completion Goals",
                                         icon: "target",
                                         iconColor: Color.currentPrimary,
                                         subtitle: "Complete or avoid goals"
@@ -165,10 +163,11 @@ struct GoalsView: View {
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                         }
+                        .id("goals-portrait-\(geometry.size.width)-\(geometry.size.height)")
                         .overlay(alignment: .bottomTrailing) {
                             FloatingActionButton {
                                 logger.logUserAction("Add goal button tapped")
-                                showingAddGoal = true
+                                viewModel.showingAddGoal = true
                             }
                         }
                     }
@@ -201,7 +200,7 @@ struct GoalsView: View {
                         logger.info("SettingsView sheet presented")
                     }
             }
-            .sheet(isPresented: $showingAddMetric) {
+            .sheet(isPresented: $viewModel.showingAddMetric) {
                 AddMetricView()
                     .onAppear {
                         logger.info("AddMetricView sheet presented")
@@ -220,29 +219,31 @@ struct GoalsView: View {
                     .fontWeight(.medium)
                     .foregroundColor(Color.currentSecondaryText)
 
-                VStack(spacing: 8) {
-                    // All filter
-                    ReactiveFilterButton(
-                        title: "All",
-                        isSelected: selectedFilter == .all
-                    ) {
-                        selectedFilter = .all
-                    }
-                    
-                    // All Habits filter
-                    ReactiveFilterButton(
-                        title: "All Habits",
-                        isSelected: selectedFilter == .allHabits
-                    ) {
-                        selectedFilter = .allHabits
-                    }
-                    
-                    // All Vices filter
-                    ReactiveFilterButton(
-                        title: "All Vices",
-                        isSelected: selectedFilter == .allVices
-                    ) {
-                        selectedFilter = .allVices
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(spacing: 8) {
+                        // All filter
+                        ReactiveFilterButton(
+                            title: "All",
+                            isSelected: selectedFilter == .all
+                        ) {
+                            selectedFilter = .all
+                        }
+                        
+                        // All Habits filter
+                        ReactiveFilterButton(
+                            title: "All Habits",
+                            isSelected: selectedFilter == .allHabits
+                        ) {
+                            selectedFilter = .allHabits
+                        }
+                        
+                        // All Vices filter
+                        ReactiveFilterButton(
+                            title: "All Vices",
+                            isSelected: selectedFilter == .allVices
+                        ) {
+                            selectedFilter = .allVices
+                        }
                     }
                 }
             }
@@ -255,39 +256,42 @@ struct GoalsView: View {
     }
 
     private var rightPanel: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                    // Boolean Goals Section
-                    if !booleanGoals.isEmpty {
-                        Section(header: sectionHeader(
-                            title: "Boolean Goals",
-                            icon: "target",
-                            iconColor: Color.currentPrimary,
-                            subtitle: "Complete or avoid goals"
-                        )) {
-                            ForEach(booleanGoals) { metric in
-                                GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+        GeometryReader { geometry in
+            VStack(spacing: 0) {
+                ScrollView {
+                    LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                        // Boolean Goals Section
+                        if !booleanGoals.isEmpty {
+                            Section(header: sectionHeader(
+                                title: "Completion Goals",
+                                icon: "target",
+                                iconColor: Color.currentPrimary,
+                                subtitle: "Complete or avoid goals"
+                            )) {
+                                ForEach(booleanGoals) { metric in
+                                    GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+                                }
                             }
                         }
-                    }
 
-                    // Quantity Goals Section
-                    if !quantityGoals.isEmpty {
-                        Section(header: sectionHeader(
-                            title: "Quantity Goals",
-                            icon: "chart.bar.fill",
-                            iconColor: Color.currentAccent,
-                            subtitle: "Track measurable progress"
-                        )) {
-                            ForEach(quantityGoals) { metric in
-                                GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+                        // Quantity Goals Section
+                        if !quantityGoals.isEmpty {
+                            Section(header: sectionHeader(
+                                title: "Quantity Goals",
+                                icon: "chart.bar.fill",
+                                iconColor: Color.currentAccent,
+                                subtitle: "Track measurable progress"
+                            )) {
+                                ForEach(quantityGoals) { metric in
+                                    GoalCardView2(metric: metric, selectedDate: selectedDate, entries: entries, goals: goals)
+                                }
                             }
                         }
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                .id("goals-landscape-\(geometry.size.width)-\(geometry.size.height)")
             }
         }
     }
@@ -400,7 +404,7 @@ struct GoalCardView2: View {
                         }
                     }
                     
-                    Text(booleanGoals.isEmpty ? "Quantity Goal" : "Boolean Goal")
+                    Text(booleanGoals.isEmpty ? "Quantity Goal" : "Completion Goal")
                         .font(.caption)
                         .foregroundColor(.currentSecondaryText)
                         .padding(.leading, 28) // Align with metric name

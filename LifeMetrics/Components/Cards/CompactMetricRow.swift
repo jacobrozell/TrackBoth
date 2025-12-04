@@ -83,15 +83,14 @@ struct CompactMetricRow: View {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
                             Text(metric.name)
-                                .font(.headline)
+                                .h4()
                                 .foregroundColor(Color.currentText)
                             
                             Spacer()
                             
                             // Status label moved to top right
                             Text(statusInfo.text)
-                                .font(.caption)
-                                .fontWeight(.medium)
+                                .caption()
                                 .foregroundColor(statusInfo.color)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 2)
@@ -107,7 +106,7 @@ struct CompactMetricRow: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "flame.fill").foregroundColor(Color.currentWarning).font(.caption)
                                     Text(metric.habitType == .positive ? "\(streak) day streak" : "\(streak) days clean")
-                                        .font(.caption)
+                                        .caption()
                                         .foregroundColor(Color.currentSecondaryText)
                                 }
                             }
@@ -117,7 +116,7 @@ struct CompactMetricRow: View {
                                 HStack(spacing: 4) {
                                     Image(systemName: "target").foregroundColor(Color.currentPrimary).font(.caption)
                                     Text("\(Int(progress.current))/\(Int(progress.target))")
-                                        .font(.caption)
+                                        .caption()
                                         .foregroundColor(Color.currentSecondaryText)
                                 }
                             }
@@ -127,8 +126,7 @@ struct CompactMetricRow: View {
                             // Quantity label in bottom right
                             if let quantityString = selectedDateEntry?.quantityString {
                                 Text(quantityString)
-                                    .font(.caption2)
-                                    .fontWeight(.medium)
+                                    .captionSmall()
                                     .foregroundColor(Color.currentSecondaryText)
                             }
                         }

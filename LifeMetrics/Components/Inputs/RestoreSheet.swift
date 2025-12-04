@@ -9,6 +9,7 @@ struct RestoreSheet: View {
     @Binding var backupError: String?
     let onRestore: (iCloudBackupService.BackupData) throws -> Void
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var themeManager = ThemeManager.shared
     
     @State private var backupInfo: BackupInfo?
     @State private var isLoading = true
@@ -17,7 +18,7 @@ struct RestoreSheet: View {
     @State private var restoreProgress: String = ""
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 24) {
                 // Header
                 VStack(spacing: 12) {
@@ -152,6 +153,7 @@ struct RestoreSheet: View {
                 }
             }
             .padding()
+            .background(Color.currentBackground)
             .navigationTitle("Restore")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

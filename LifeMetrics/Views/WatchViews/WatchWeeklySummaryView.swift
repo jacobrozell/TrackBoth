@@ -102,7 +102,7 @@ struct WatchWeeklySummaryView: View {
         VStack(spacing: 8) {
             HStack {
                 Image(systemName: "chart.bar.fill")
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color.currentPrimary)
                 Text("Overall Progress")
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -119,7 +119,7 @@ struct WatchWeeklySummaryView: View {
             
             // Progress Bar
             ProgressView(value: weeklyData.overallPercentage)
-                .progressViewStyle(LinearProgressViewStyle(tint: .blue))
+                .progressViewStyle(LinearProgressViewStyle(tint: Color.currentPrimary))
                 .scaleEffect(x: 1, y: 2, anchor: .center)
         }
         .padding(.vertical, 8)
@@ -130,7 +130,7 @@ struct WatchWeeklySummaryView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(Color.currentSuccess)
                 Text("Habits")
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -154,7 +154,7 @@ struct WatchWeeklySummaryView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.red)
+                    .foregroundColor(Color.currentError)
                 Text("Vices")
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -201,9 +201,9 @@ struct WeeklyMetricRowView: View {
     
     private var progressColor: Color {
         if isHabit {
-            return completionRate >= 0.7 ? .green : completionRate >= 0.4 ? .orange : .red
+            return completionRate >= 0.7 ? Color.currentSuccess : completionRate >= 0.4 ? Color.currentWarning : Color.currentError
         } else {
-            return completionRate >= 0.7 ? .red : completionRate >= 0.4 ? .orange : .green
+            return completionRate >= 0.7 ? Color.currentError : completionRate >= 0.4 ? Color.currentWarning : Color.currentSuccess
         }
     }
     

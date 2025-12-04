@@ -4,6 +4,7 @@ import SwiftData
 struct EditEntryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var themeManager = ThemeManager.shared
     
     let entry: MetricEntry
     let metric: Metric?

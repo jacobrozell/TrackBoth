@@ -2,7 +2,7 @@ import SwiftUI
 
 // MARK: - App Theme Configuration
 /// Defines the default color scheme and visual appearance for the app
-struct AppTheme {
+struct AppTheme: Equatable {
     let name: String
     let primaryColor: Color
     let secondaryColor: Color
@@ -16,30 +16,15 @@ struct AppTheme {
     let errorColor: Color
     let infoColor: Color
     
-    // MARK: - Default Themes
-    static let `default` = AppTheme(
-        name: "Default",
-        primaryColor: Color("ThemePrimary"),
-        secondaryColor: Color("ThemeSecondary"),
-        backgroundColor: Color("BackgroundPrimary"),
-        secondaryBackgroundColor: Color("BackgroundSecondary"),
-        textColor: Color("TextPrimary"),
-        secondaryTextColor: Color("TextSecondary"),
-        accentColor: Color("ThemeAccent"),
-        successColor: Color("ThemeSuccess"),
-        warningColor: Color("ThemeWarning"),
-        errorColor: Color("ThemeError"),
-        infoColor: Color("ThemeInfo")
-    )
-    
+    // MARK: - Available Themes
     static let ocean = AppTheme(
         name: "Ocean",
         primaryColor: Color(red: 0.0, green: 0.4, blue: 0.8),
-        secondaryColor: Color(red: 0.0, green: 0.6, blue: 0.9),
+        secondaryColor: Color(red: 0.0, green: 0.45, blue: 0.75), // Darker for better contrast
         backgroundColor: Color(red: 0.95, green: 0.98, blue: 1.0),
         secondaryBackgroundColor: Color(red: 0.9, green: 0.95, blue: 1.0),
         textColor: Color(red: 0.1, green: 0.2, blue: 0.3),
-        secondaryTextColor: Color(red: 0.3, green: 0.4, blue: 0.5), // Improved contrast
+        secondaryTextColor: Color(red: 0.3, green: 0.4, blue: 0.5),
         accentColor: Color(red: 0.2, green: 0.7, blue: 0.9),
         successColor: Color(red: 0.0, green: 0.7, blue: 0.4),
         warningColor: Color(red: 1.0, green: 0.6, blue: 0.0),
@@ -50,11 +35,11 @@ struct AppTheme {
     static let forest = AppTheme(
         name: "Forest",
         primaryColor: Color(red: 0.0, green: 0.5, blue: 0.2),
-        secondaryColor: Color(red: 0.2, green: 0.7, blue: 0.3),
-        backgroundColor: Color(red: 0.95, green: 0.98, blue: 0.95),
-        secondaryBackgroundColor: Color(red: 0.9, green: 0.95, blue: 0.9),
+        secondaryColor: Color(red: 0.05, green: 0.45, blue: 0.15), // Darker for better contrast
+        backgroundColor: Color(red: 0.94, green: 0.97, blue: 0.94), // More distinct from Ocean
+        secondaryBackgroundColor: Color(red: 0.88, green: 0.94, blue: 0.88),
         textColor: Color(red: 0.1, green: 0.3, blue: 0.1),
-        secondaryTextColor: Color(red: 0.3, green: 0.4, blue: 0.3), // Improved contrast
+        secondaryTextColor: Color(red: 0.3, green: 0.4, blue: 0.3),
         accentColor: Color(red: 0.3, green: 0.8, blue: 0.4),
         successColor: Color(red: 0.0, green: 0.7, blue: 0.3),
         warningColor: Color(red: 0.9, green: 0.6, blue: 0.0),
@@ -64,12 +49,12 @@ struct AppTheme {
     
     static let sunset = AppTheme(
         name: "Sunset",
-        primaryColor: Color(red: 0.8, green: 0.3, blue: 0.0),
-        secondaryColor: Color(red: 1.0, green: 0.5, blue: 0.0),
+        primaryColor: Color(red: 0.75, green: 0.25, blue: 0.0), // Darker for better contrast
+        secondaryColor: Color(red: 0.7, green: 0.3, blue: 0.0), // Darker for better contrast
         backgroundColor: Color(red: 1.0, green: 0.98, blue: 0.95),
         secondaryBackgroundColor: Color(red: 1.0, green: 0.95, blue: 0.9),
         textColor: Color(red: 0.3, green: 0.2, blue: 0.1),
-        secondaryTextColor: Color(red: 0.5, green: 0.4, blue: 0.3), // Improved contrast
+        secondaryTextColor: Color(red: 0.5, green: 0.4, blue: 0.3),
         accentColor: Color(red: 1.0, green: 0.6, blue: 0.2),
         successColor: Color(red: 0.0, green: 0.7, blue: 0.3),
         warningColor: Color(red: 1.0, green: 0.7, blue: 0.0),
@@ -92,9 +77,8 @@ struct AppTheme {
         infoColor: Color(red: 0.0, green: 0.7, blue: 0.9)
     )
     
-    // MARK: - Available Themes
+    // MARK: - All Available Themes
     static let allThemes: [AppTheme] = [
-        .default,
         .ocean,
         .forest,
         .sunset,

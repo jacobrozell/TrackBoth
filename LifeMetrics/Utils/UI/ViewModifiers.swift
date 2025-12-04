@@ -35,6 +35,7 @@ struct EmptyStateModifier: ViewModifier {
 struct PrimaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .button()
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .background(Color.currentPrimary)
@@ -48,6 +49,7 @@ struct PrimaryButtonStyle: ButtonStyle {
 struct SecondaryButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .button()
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .background(Color.currentSecondaryBackground)

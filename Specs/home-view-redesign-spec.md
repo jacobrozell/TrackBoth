@@ -36,6 +36,19 @@ Your notes:
 Orientation-specific notes:
 
 ```
+Query: Landscape needs a lot of work. 
+
+
+Left side (top to bottom):
+    Quick Stats centered and top aligned
+    Spacer
+    Add new habit button
+
+Right Side (top to bottom):
+    Date selector
+    List
+
+Am i missing anything?
 
 ```
 
@@ -49,6 +62,8 @@ Orientation-specific notes:
 Design notes:
 
 ```
+
+Query: Empty State should be the same as the other empty state's found in Goals/Motivations
 
 ```
 
@@ -64,6 +79,7 @@ Design notes:
 Design and behavior:
 
 ```
+Query:  Since we are only targeting a week now, I'm thinking this should be a small calendar that shows each day (kind of like History)
 
 ```
 
@@ -83,6 +99,7 @@ Design and behavior:
 Visual + layout specs:
 
 ```
+Query:  This section is really cool. However, when the values are zero, the card isnt needed. So when they dont have any streaks / habits / vice maybe we don't draw the card at all. 
 
 ```
 
@@ -96,6 +113,7 @@ Visual + layout specs:
 List presentation and spacing:
 
 ```
+Query:  I want to seperate the vices / habits into different sections. Each section header can display some stats. Like "Here is my vice section; I have 2 vices; The section header could have information like 0/2 logged today.
 
 ```
 
@@ -119,6 +137,10 @@ List presentation and spacing:
 Visual hierarchy, paddings, and interactions:
 
 ```
+Query: 
+
+IMPORTANT: This is the main part that I want to redesign. 
+I dont like how bulky the cards are, espcailly if the user isnt going to use Motivations / Quanitiies. But I want to show the user that its there. I think we should remove the Textfelds on the cell and when the user presses the cell show a basic edit form that allows them to enter that information. I want the main functionality to be toggling if they did that habit/vice or not.
 
 ```
 
@@ -132,6 +154,7 @@ Visual hierarchy, paddings, and interactions:
 Look and feel:
 
 ```
+Query: No notes looks great.
 
 ```
 
@@ -172,65 +195,7 @@ Design specifics:
 
 ```
 
-```
-
----
-
-## Theming
-- Colors: `Color.current*` palette (Primary, SecondaryText, Success, Error, Warning, Accent, Backgrounds)
-- Shadows, corner radii, dividers: consistent with existing design language
-
-Theme rules and examples:
-
-```
 
 ```
 
 ---
-
-## Accessibility
-- Minimum touch targets for toggles and buttons
-- Dynamic Type support for labels and chips
-- VoiceOver labels for state (e.g., "Done", "Avoided")
-
-Notes:
-
-```
-
-```
-
----
-
-## Animations & Feedback
-- Subtle animations on toggle and card appearance
-- Haptics on completion toggle and deletes
-
-Ideas and specifics:
-
-```
-
-```
-
----
-
-## Open Questions
-- Do we surface primary motivations on the Home view (e.g., featured card)?
-- Should quantity be inline or always via sheet?
-- Any additional quick filters for the list?
-
-Your answers/decisions:
-
-```
-
-```
-
----
-
-## Sketch Space
-Freeform area for wireframes or layout notes.
-
-```
-
-```
-
-

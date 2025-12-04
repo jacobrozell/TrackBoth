@@ -187,3 +187,38 @@ enum Theme: String, CaseIterable, Codable {
         }
     }
 }
+
+// MARK: - FontDesign Enum
+enum FontDesign: String, CaseIterable, Codable {
+    case `default` = "default"
+    case rounded = "rounded"
+    case serif = "serif"
+    case monospaced = "monospaced"
+    
+    var displayName: String {
+        switch self {
+        case .default: return "Default"
+        case .rounded: return "Rounded"
+        case .serif: return "Serif"
+        case .monospaced: return "Monospaced"
+        }
+    }
+    
+    var accessibilityDescription: String {
+        switch self {
+        case .default: return "Standard system font"
+        case .rounded: return "Rounded system font"
+        case .serif: return "Serif font for better readability"
+        case .monospaced: return "Monospaced font for clarity"
+        }
+    }
+    
+    var swiftUIDesign: Font.Design {
+        switch self {
+        case .default: return .default
+        case .rounded: return .rounded
+        case .serif: return .serif
+        case .monospaced: return .monospaced
+        }
+    }
+}

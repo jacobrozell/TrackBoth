@@ -10,7 +10,8 @@ class GoalsViewModel {
     // MARK: - Properties
     var showingAddGoal = false
     var showingSettings = false
-    
+    var showingAddMetric = false
+
     // MARK: - Computed Properties
     /// Metrics with goals set (boolean or quantity)
     func metricsWithGoals(_ metrics: [Metric]) -> [Metric] {

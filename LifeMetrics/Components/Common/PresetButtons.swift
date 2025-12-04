@@ -10,17 +10,15 @@ struct PresetButton: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(preset.title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .h4()
                     .foregroundColor(.currentText)
                 
                 Text(preset.description)
-                    .font(.caption)
+                    .caption()
                     .foregroundColor(.currentSecondaryText)
                 
                 Text("\(preset.target) days")
-                    .font(.caption)
-                    .fontWeight(.medium)
+                    .caption()
                     .foregroundColor(.currentPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -45,17 +43,15 @@ struct QuantityPresetButton: View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(preset.title)
-                    .font(.headline)
-                    .fontWeight(.semibold)
+                    .h4()
                     .foregroundColor(.currentText)
                 
                 Text(preset.description)
-                    .font(.caption)
+                    .caption()
                     .foregroundColor(.currentSecondaryText)
                 
                 Text("\(preset.target) \(preset.unit)")
-                    .font(.caption)
-                    .fontWeight(.medium)
+                    .caption()
                     .foregroundColor(.currentPrimary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)

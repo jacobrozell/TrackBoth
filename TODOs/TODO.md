@@ -108,3 +108,12 @@
 ---
 
 *This TODO list represents all planned improvements from the TrackBoth app specifications. Items are organized by category and include emoji indicators for easy identification.*
+
+
+* Lets remove Bi-weekly as an option
+* Vices card cant have the same check toggle UI. We need an Avoided label
+
+
+Bugs found during testing:
+* Vices are showing 1/1 today after creation
+* If I go to yesterday and toggle, I see 365 days clean / 365 day streak which isnt correct since all the Metrics before should have hasBeenLogged as false.

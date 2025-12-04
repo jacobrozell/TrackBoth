@@ -29,11 +29,11 @@ struct EmptyStateView: View {
                 .foregroundColor(Color.currentSecondaryText)
 
             Text(title)
-                .font(.title2)
-                .fontWeight(.medium)
+                .h3()
                 .foregroundColor(Color.currentText)
 
             Text(subtitle)
+                .body()
                 .foregroundColor(Color.currentSecondaryText)
                 .multilineTextAlignment(.center)
             
@@ -42,7 +42,7 @@ struct EmptyStateView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill")
                         Text(actionTitle)
-                            .fontWeight(.semibold)
+                            .button()
                     }
                     .foregroundColor(.white)
                     .padding(.horizontal, 24)

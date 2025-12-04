@@ -67,6 +67,7 @@ struct ChartContentView: View {
                 }
                 .padding()
             }
+            .id("chart-\(geometry.size.width > geometry.size.height ? "landscape" : "portrait")-\(geometry.size.width)-\(geometry.size.height)")
         }
     }
 }

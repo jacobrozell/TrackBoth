@@ -7,6 +7,7 @@ struct HistoryEntryDetailView: View {
     let metric: Metric?
     
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var themeManager = ThemeManager.shared
     
     private var formattedDate: String {
         let formatter = DateFormatter()

@@ -116,7 +116,7 @@ struct WatchMainView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "checkmark.circle.fill")
-                    .foregroundColor(.green)
+                    .foregroundColor(Color.currentSuccess)
                 Text("Habits (\(todaySummary.completedHabits)/\(todaySummary.totalHabits))")
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -145,7 +145,7 @@ struct WatchMainView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.red)
+                    .foregroundColor(Color.currentError)
                 Text("Vices (\(todaySummary.completedVices)/\(todaySummary.totalVices))")
                     .font(.subheadline)
                     .fontWeight(.semibold)
@@ -183,7 +183,7 @@ struct WatchMainView: View {
             if let streak = calculateStreak() {
                 HStack {
                     Image(systemName: "flame.fill")
-                        .foregroundColor(.orange)
+                        .foregroundColor(Color.currentWarning)
                     Text("\(streak) day streak")
                         .font(.caption)
                         .fontWeight(.medium)

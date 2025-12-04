@@ -8,6 +8,7 @@ struct QuantityInputSheet: View {
     let selectedDate: Date
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @StateObject private var themeManager = ThemeManager.shared
     @Query private var entries: [MetricEntry]
     
     @State private var quantity: Int = 1
@@ -45,7 +46,7 @@ struct QuantityInputSheet: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack(spacing: 24) {
                 // Header with habit info
                 VStack(spacing: 8) {
@@ -102,8 +103,8 @@ struct QuantityInputSheet: View {
                 .padding(.bottom, 20)
             }
             .background(Color.currentBackground)
-            .navigationBarHidden(true)
         }
+        .navigationBarHidden(true)
         .onAppear {
             setupInitialValues()
         }
@@ -371,11 +372,12 @@ struct UnitPickerSheet: View {
     @Binding var selectedUnit: String
     let units: [String]
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var themeManager = ThemeManager.shared
     @State private var customUnit: String = ""
     @State private var showingCustomInput = false
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List {
                 // Predefined units
                 ForEach(units, id: \.self) { unit in
@@ -408,6 +410,7 @@ struct UnitPickerSheet: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
             .background(Color.currentBackground)
             .navigationTitle("Select Unit")
             .navigationBarTitleDisplayMode(.inline)

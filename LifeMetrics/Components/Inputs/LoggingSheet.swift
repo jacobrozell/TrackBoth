@@ -10,6 +10,7 @@ struct LoggingSheet: View, Identifiable {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @StateObject private var themeManager = ThemeManager.shared
     @Query private var entries: [MetricEntry]
 
     @State private var value: Bool = false
@@ -49,6 +50,7 @@ struct LoggingSheet: View, Identifiable {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
             .background(Color.currentBackground)
             .navigationTitle(metric.name)
             .toolbar {

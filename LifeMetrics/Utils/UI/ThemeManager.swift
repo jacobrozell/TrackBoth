@@ -6,7 +6,8 @@ class ThemeManager: ObservableObject {
     static let shared = ThemeManager()
     
     @Published var currentTheme: Theme = .system
-    @Published var currentAppTheme: AppTheme = .default
+    @Published var currentAppTheme: AppTheme = .ocean
+    @Published var selectedFontDesign: FontDesign = .rounded
     
     private init() {
         // Load saved theme from UserDefaults
@@ -24,7 +25,18 @@ class ThemeManager: ObservableObject {
             currentAppTheme = appTheme
             logger.info("App theme loaded from UserDefaults - Theme: \(appTheme.name)")
         } else {
+            // Set default theme based on system appearance
+            setDefaultThemeForSystemAppearance()
             logger.info("Using default app theme - Theme: \(currentAppTheme.name)")
+        }
+        
+        // Load saved font design from UserDefaults
+        if let savedFontDesign = UserDefaults.standard.string(forKey: "selectedFontDesign"),
+           let fontDesign = FontDesign(rawValue: savedFontDesign) {
+            selectedFontDesign = fontDesign
+            logger.info("Font design loaded from UserDefaults - Design: \(fontDesign.rawValue)")
+        } else {
+            logger.info("Using default font design - Design: \(selectedFontDesign.rawValue)")
         }
         
         // Initialize navigation bar appearance
@@ -37,11 +49,29 @@ class ThemeManager: ObservableObject {
             name: NSNotification.Name("ThemeDidChange"),
             object: nil
         )
+        
+        // Set up notification observer for system appearance changes
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(systemAppearanceDidChange),
+            name: NSNotification.Name("SystemAppearanceDidChange"),
+            object: nil
+        )
     }
     
     @objc private func themeDidChange() {
         updateNavigationBarAppearance()
         updateTabBarAppearance()
+    }
+    
+    @objc private func systemAppearanceDidChange() {
+        // Only update theme if user is using system theme and hasn't manually selected an app theme
+        if currentTheme == .system && UserDefaults.standard.string(forKey: "selectedAppTheme") == nil {
+            logger.info("System appearance changed - updating default theme")
+            setDefaultThemeForSystemAppearance()
+            updateNavigationBarAppearance()
+            updateTabBarAppearance()
+        }
     }
     
     func updateTheme(_ theme: Theme) {
@@ -71,6 +101,66 @@ class ThemeManager: ObservableObject {
         }
     }
     
+    func updateFontDesign(_ fontDesign: FontDesign) {
+        logger.logUserAction("Font design updated", details: "From \(selectedFontDesign.rawValue) to \(fontDesign.rawValue)")
+        selectedFontDesign = fontDesign
+        UserDefaults.standard.set(fontDesign.rawValue, forKey: "selectedFontDesign")
+        
+        // Update navigation bar appearance
+        updateNavigationBarAppearance()
+        
+        // Force UI refresh
+        DispatchQueue.main.async {
+            // Trigger a UI refresh by updating the published property
+            self.objectWillChange.send()
+            
+            // Post notification for font change
+            NotificationCenter.default.post(name: NSNotification.Name("FontDidChange"), object: nil)
+            
+            // Force immediate UI refresh
+            self.forceUIRefresh()
+        }
+    }
+    
+    /// Sets the default theme based on the current system appearance
+    private func setDefaultThemeForSystemAppearance() {
+        let systemAppearance = UITraitCollection.current.userInterfaceStyle
+        
+        switch systemAppearance {
+        case .dark:
+            currentAppTheme = .midnight
+            logger.info("System is in dark mode - using Midnight theme as default")
+        case .light, .unspecified:
+            currentAppTheme = .ocean
+            logger.info("System is in light mode - using Ocean theme as default")
+        @unknown default:
+            currentAppTheme = .ocean
+            logger.info("Unknown system appearance - defaulting to Ocean theme")
+        }
+    }
+    
+    /// Resets the app theme to the default based on current system appearance
+    func resetToDefaultTheme() {
+        logger.logUserAction("Reset to default theme", details: "Based on system appearance")
+        setDefaultThemeForSystemAppearance()
+        UserDefaults.standard.set(currentAppTheme.name, forKey: "selectedAppTheme")
+        
+        // Update navigation bar appearance
+        updateNavigationBarAppearance()
+        
+        // Force UI refresh
+        DispatchQueue.main.async {
+            // Trigger a UI refresh by updating the published property
+            self.objectWillChange.send()
+            
+            // Post notification for theme change
+            NotificationCenter.default.post(name: NSNotification.Name("ThemeDidChange"), object: nil)
+            
+            // Force immediate UI refresh
+            self.forceUIRefresh()
+        }
+    }
+    
     /// Updates the navigation bar appearance to match the current theme
     private func updateNavigationBarAppearance() {
         let appearance = UINavigationBarAppearance()
@@ -79,16 +169,16 @@ class ThemeManager: ObservableObject {
         // Set background color
         appearance.backgroundColor = UIColor(currentAppTheme.backgroundColor)
         
-        // Set title text attributes
+        // Set title text attributes with selected font design
         appearance.titleTextAttributes = [
             .foregroundColor: UIColor(currentAppTheme.textColor),
-            .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
+            .font: UIFont.systemFont(ofSize: 17, weight: .semibold).withDesign(selectedFontDesign)
         ]
         
-        // Set large title text attributes
+        // Set large title text attributes with selected font design
         appearance.largeTitleTextAttributes = [
             .foregroundColor: UIColor(currentAppTheme.textColor),
-            .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+            .font: UIFont.systemFont(ofSize: 34, weight: .bold).withDesign(selectedFontDesign)
         ]
         
         // Set button appearance
@@ -129,11 +219,11 @@ class ThemeManager: ObservableObject {
             appearance.backgroundColor = UIColor(currentAppTheme.backgroundColor)
             appearance.titleTextAttributes = [
                 .foregroundColor: UIColor(currentAppTheme.textColor),
-                .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
+                .font: UIFont.systemFont(ofSize: 17, weight: .semibold).withDesign(selectedFontDesign)
             ]
             appearance.largeTitleTextAttributes = [
                 .foregroundColor: UIColor(currentAppTheme.textColor),
-                .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+                .font: UIFont.systemFont(ofSize: 34, weight: .bold).withDesign(selectedFontDesign)
             ]
             appearance.buttonAppearance.normal.titleTextAttributes = [
                 .foregroundColor: UIColor(currentAppTheme.primaryColor)
