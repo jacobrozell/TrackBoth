@@ -41,7 +41,7 @@ extension TabBarLayout {
         horizontal: UserInterfaceSizeClass?,
         vertical: UserInterfaceSizeClass?
     ) -> LayoutMode {
-        if usesSidebarSplit(horizontal: horizontal, vertical: vertical) {
+        if usesSidebarSplit(horizontal: horizontal, vertical: vertical), InterfaceLayout.isLandscape {
             return .sidebarSplit
         }
         if isCompactLandscape(horizontal: horizontal, vertical: vertical) {

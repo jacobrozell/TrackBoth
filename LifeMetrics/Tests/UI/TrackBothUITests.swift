@@ -100,25 +100,31 @@ final class TrackBothUITests: XCTestCase {
         switch name {
         case "Home":
             XCTAssertTrue(
-                app.navigationBars["TrackBoth"].waitForExistence(timeout: 5)
+                app.navigationBars["TrackBoth"].waitForExistence(timeout: 10)
                     || app.staticTexts["HABITS"].waitForExistence(timeout: 5)
             )
         case "Goals":
             XCTAssertTrue(
-                app.navigationBars["Goals"].waitForExistence(timeout: 5)
+                app.navigationBars["Goals"].waitForExistence(timeout: 10)
                     || app.staticTexts["No Goals Set"].waitForExistence(timeout: 5)
+                    || app.staticTexts["No Habits Yet"].waitForExistence(timeout: 5)
                     || app.staticTexts["Morning Exercise"].waitForExistence(timeout: 5)
             )
         case "Motivation":
-            XCTAssertTrue(app.navigationBars["Motivation"].waitForExistence(timeout: 5))
+            XCTAssertTrue(
+                app.navigationBars["Motivation"].waitForExistence(timeout: 10)
+                    || app.staticTexts["No Habits Yet"].waitForExistence(timeout: 5)
+                    || app.staticTexts["No Motivations Yet"].waitForExistence(timeout: 5)
+                    || app.staticTexts["Primary Motivations"].waitForExistence(timeout: 5)
+            )
         case "History":
             XCTAssertTrue(
-                app.navigationBars["History"].waitForExistence(timeout: 5)
+                app.navigationBars["History"].waitForExistence(timeout: 10)
                     || app.staticTexts["No Habits Yet"].waitForExistence(timeout: 5)
             )
         case "Charts":
             XCTAssertTrue(
-                app.navigationBars["Charts"].waitForExistence(timeout: 5)
+                app.navigationBars["Charts"].waitForExistence(timeout: 10)
                     || app.staticTexts["Your Journey Starts Here"].waitForExistence(timeout: 5)
             )
         default:

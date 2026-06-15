@@ -1,4 +1,15 @@
 import SwiftUI
+import UIKit
+
+// MARK: - Interface orientation
+enum InterfaceLayout {
+    /// True when the active window scene is in a landscape interface orientation.
+    static var isLandscape: Bool {
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .contains { $0.interfaceOrientation.isLandscape }
+    }
+}
 
 // MARK: - TabBarLayout
 /// Shared spacing and layout decisions for tab content, FABs, and landscape adaptation.
@@ -57,7 +68,9 @@ enum TabBarLayout {
         horizontal: UserInterfaceSizeClass?,
         vertical: UserInterfaceSizeClass?
     ) -> Bool {
-        usesSidebarSplit(horizontal: horizontal, vertical: vertical) && size.isLandscapeLayout
+        usesSidebarSplit(horizontal: horizontal, vertical: vertical)
+            && size.isLandscapeLayout
+            && InterfaceLayout.isLandscape
     }
 
     static func fabBottomInset(isLandscape: Bool) -> CGFloat {

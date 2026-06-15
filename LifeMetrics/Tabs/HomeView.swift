@@ -17,7 +17,6 @@ struct HomeView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Environment(\.usesSidebarSplit) private var usesSidebarSplit
     @Environment(\.isCompactLandscape) private var isCompactLandscape
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
@@ -53,36 +52,40 @@ struct HomeView: View {
                             actionTitle: "Add Your First Habit",
                             action: { viewModel.showAddMetric() }
                         )
-                    } else if usesSidebarSplit {
-                        GeometryReader { geometry in
-                            LandscapeSplitLayout(
-                                totalWidth: geometry.size.width,
-                                totalHeight: geometry.size.height,
-                                sidebar: { leftPanel },
-                                content: { rightPanel }
-                            )
-                            .tabBarFloatingActionButton(isLandscape: true) {
-                                viewModel.showAddMetric()
-                            }
-                        }
                     } else {
                         GeometryReader { geometry in
-                            VStack(spacing: 0) {
-                                ScrollView {
-                                    LazyVStack(
-                                        spacing: 16,
-                                        pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
-                                    ) {
-                                        homeHeader
-                                        metricsSections
-                                    }
-                                    .adaptiveScrollInset()
+                            if TabBarLayout.shouldUseSidebarSplit(
+                                size: geometry.size,
+                                horizontal: horizontalSizeClass,
+                                vertical: verticalSizeClass
+                            ) {
+                                LandscapeSplitLayout(
+                                    totalWidth: geometry.size.width,
+                                    totalHeight: geometry.size.height,
+                                    sidebar: { leftPanel },
+                                    content: { rightPanel }
+                                )
+                                .tabBarFloatingActionButton(isLandscape: true) {
+                                    viewModel.showAddMetric()
                                 }
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            }
-                            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-                            .adaptiveFloatingActionButton {
-                                viewModel.showAddMetric()
+                            } else {
+                                VStack(spacing: 0) {
+                                    ScrollView {
+                                        LazyVStack(
+                                            spacing: 16,
+                                            pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                                        ) {
+                                            homeHeader
+                                            metricsSections
+                                        }
+                                        .adaptiveScrollInset()
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                }
+                                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                                .adaptiveFloatingActionButton {
+                                    viewModel.showAddMetric()
+                                }
                             }
                         }
                     }

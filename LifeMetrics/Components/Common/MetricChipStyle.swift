@@ -37,18 +37,21 @@ struct ReactiveFilterButton: View {
     let title: String
     let isSelected: Bool
     let action: () -> Void
-    
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @StateObject private var themeManager = ThemeManager.shared
-    
+
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.body)
+                .font(dynamicTypeSize.usesAccessibilityLayout ? .subheadline : .body)
                 .fontWeight(.medium)
                 .fixedSize(horizontal: false, vertical: true)
                 .multilineTextAlignment(.center)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 12)
+                .lineLimit(2)
+                .minimumScaleFactor(0.85)
+                .padding(.horizontal, dynamicTypeSize.usesAccessibilityLayout ? 16 : 20)
+                .padding(.vertical, dynamicTypeSize.usesAccessibilityLayout ? 10 : 12)
                 .background(
                     RoundedRectangle(cornerRadius: 25)
                         .fill(isSelected ? 

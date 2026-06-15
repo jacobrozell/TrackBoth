@@ -5,8 +5,14 @@ import SwiftUI
 struct OnboardingView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @State private var currentPage = 0
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     
     private let pages = OnboardingPage.allPages
+    
+    private var usesCompactLayout: Bool {
+        dynamicTypeSize.usesAccessibilityLayout || verticalSizeClass == .compact
+    }
     
     var body: some View {
         ZStack {
@@ -21,7 +27,7 @@ struct OnboardingView: View {
             VStack(spacing: 0) {
                 TabView(selection: $currentPage) {
                     ForEach(pages.indices, id: \.self) { index in
-                        OnboardingPageView(page: pages[index])
+                        OnboardingPageView(page: pages[index], usesCompactLayout: usesCompactLayout)
                             .tag(index)
                     }
                 }
@@ -92,42 +98,47 @@ struct OnboardingView: View {
 // MARK: - OnboardingPageView
 struct OnboardingPageView: View {
     let page: OnboardingPage
+    let usesCompactLayout: Bool
     
     var body: some View {
-        VStack(spacing: 32) {
-            Spacer()
-            
-            // Icon
-            ZStack {
-                Circle()
-                    .fill(page.color.opacity(0.2))
-                    .frame(width: 120, height: 120)
-                
-                Image(systemName: page.icon)
-                    .font(.system(size: 50, weight: .medium))
-                    .foregroundColor(page.color)
-            }
-            
-            // Content
-            VStack(spacing: 16) {
-                Text(page.title)
-                    .h2()
-                    .foregroundColor(Color.currentText)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
+        ScrollView {
+            VStack(spacing: usesCompactLayout ? 20 : 32) {
+                Spacer(minLength: usesCompactLayout ? 8 : 24)
 
-                Text(page.description)
-                    .bodyLarge()
-                    .foregroundColor(Color.currentSecondaryText)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(4)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(.horizontal, 8)
+                // Icon
+                ZStack {
+                    Circle()
+                        .fill(page.color.opacity(0.2))
+                        .frame(width: usesCompactLayout ? 88 : 120, height: usesCompactLayout ? 88 : 120)
 
-            Spacer()
+                    Image(systemName: page.icon)
+                        .font(.system(size: usesCompactLayout ? 36 : 50, weight: .medium))
+                        .foregroundColor(page.color)
+                }
+
+                // Content
+                VStack(spacing: 16) {
+                    Text(page.title)
+                        .h2()
+                        .foregroundColor(Color.currentText)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(page.description)
+                        .bodyLarge()
+                        .foregroundColor(Color.currentSecondaryText)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(4)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.horizontal, 8)
+
+                Spacer(minLength: usesCompactLayout ? 8 : 24)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 24)
         }
-        .padding(.horizontal, 24)
+        .scrollBounceBehavior(.basedOnSize)
     }
 }
 

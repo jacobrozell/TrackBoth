@@ -47,12 +47,14 @@ struct AdaptiveSectionHeader: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 12) {
                 sectionIcon
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(Color.currentText)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 0)
             }
+
+            Text(title)
+                .font(.headline)
+                .foregroundColor(Color.currentText)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(subtitle)
                 .font(.subheadline)

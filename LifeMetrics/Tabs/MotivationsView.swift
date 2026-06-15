@@ -15,6 +15,7 @@ struct MotivationsView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.usesSidebarSplit) private var usesSidebarSplit
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // MARK: - Computed Properties
     private var filteredMetrics: [Metric] {
@@ -140,14 +141,17 @@ struct MotivationsView: View {
                         }
 
                         ScrollView {
-                            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                            LazyVStack(
+                                spacing: 16,
+                                pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                            ) {
                                 // Primary Motivations Section
                                 if !primaryMotivations.isEmpty {
-                                    Section(header: sectionHeader(
+                                    Section(header: AdaptiveSectionHeader(
                                         title: "Primary Motivations",
+                                        subtitle: "Your core reasons for your habits",
                                         icon: "star.fill",
-                                        iconColor: Color.currentWarning,
-                                        subtitle: "Your core reasons for your habits"
+                                        iconColor: Color.currentWarning
                                     )) {
                                         ForEach(primaryMotivations) { metric in
                                             PrimaryMotivationCardView2(metric: metric)
@@ -157,11 +161,11 @@ struct MotivationsView: View {
 
                                 // Daily Motivations Section
                                 if !dailyMotivations.isEmpty {
-                                    Section(header: sectionHeader(
+                                    Section(header: AdaptiveSectionHeader(
                                         title: "Daily Motivations",
+                                        subtitle: "Recent motivation entries",
                                         icon: "clock",
-                                        iconColor: Color.currentSecondaryText,
-                                        subtitle: "Recent motivation entries"
+                                        iconColor: Color.currentSecondaryText
                                     )) {
                                         ForEach(dailyMotivations) { entry in
                                             DailyMotivationCardView2(entry: entry, metrics: metrics)
@@ -235,14 +239,17 @@ struct MotivationsView: View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 ScrollView {
-                    LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                    LazyVStack(
+                        spacing: 16,
+                        pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                    ) {
                         // Primary Motivations Section
                         if !primaryMotivations.isEmpty {
-                            Section(header: sectionHeader(
+                            Section(header: AdaptiveSectionHeader(
                                 title: "Primary Motivations",
+                                subtitle: "Your core reasons for your habits",
                                 icon: "star.fill",
-                                iconColor: Color.currentWarning,
-                                subtitle: "Your core reasons for your habits"
+                                iconColor: Color.currentWarning
                             )) {
                                 ForEach(primaryMotivations) { metric in
                                     PrimaryMotivationCardView2(metric: metric)
@@ -252,11 +259,11 @@ struct MotivationsView: View {
 
                         // Daily Motivations Section
                         if !dailyMotivations.isEmpty {
-                            Section(header: sectionHeader(
+                            Section(header: AdaptiveSectionHeader(
                                 title: "Daily Motivations",
+                                subtitle: "Recent motivation entries",
                                 icon: "clock",
-                                iconColor: Color.currentSecondaryText,
-                                subtitle: "Recent motivation entries"
+                                iconColor: Color.currentSecondaryText
                             )) {
                                 ForEach(dailyMotivations) { entry in
                                     DailyMotivationCardView2(entry: entry, metrics: metrics)
@@ -274,43 +281,6 @@ struct MotivationsView: View {
     }
 
     // MARK: - Components
-    private func sectionHeader(title: String, icon: String, iconColor: Color, subtitle: String) -> some View {
-        HStack(spacing: 12) {
-            // Icon with background circle
-            ZStack {
-                Circle()
-                    .fill(iconColor.opacity(0.15))
-                    .frame(width: 32, height: 32)
-                
-                Image(systemName: icon)
-                    .foregroundColor(iconColor)
-                    .font(.system(size: 16, weight: .semibold))
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color.currentText)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(Color.currentSecondaryText)
-            }
-            
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.currentSecondaryBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(iconColor.opacity(0.2), lineWidth: 1)
-                )
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityHeading(.h2)
-    }
 }
 
 // MARK: - PrimaryMotivationCardView2

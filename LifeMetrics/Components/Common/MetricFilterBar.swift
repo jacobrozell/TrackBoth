@@ -4,6 +4,7 @@ import SwiftUI
 /// Shared filter UI for portrait and compact-landscape layouts (horizontal chips).
 struct MetricFilterChipRow: View {
     @Environment(\.isCompactLandscape) private var isCompactLandscape
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     let metrics: [Metric]
     @Binding var selectedFilter: MetricFilter
@@ -12,11 +13,21 @@ struct MetricFilterChipRow: View {
     private var verticalPadding: CGFloat { isCompactLandscape ? 4 : 8 }
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: isCompactLandscape ? 8 : 12) {
-                chipButtons
+        Group {
+            if dynamicTypeSize.usesAccessibilityLayout {
+                VStack(alignment: .leading, spacing: 8) {
+                    chipButtons
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: isCompactLandscape ? 8 : 12) {
+                        chipButtons
+                    }
+                    .padding(.horizontal, 16)
+                }
             }
-            .padding(.horizontal, 16)
         }
         .padding(.vertical, verticalPadding)
         .background(Color.currentSecondaryBackground)

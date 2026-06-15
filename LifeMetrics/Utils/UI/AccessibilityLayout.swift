@@ -19,7 +19,14 @@ extension TabBarLayout {
     static func scrollBottomInset(for mode: LayoutMode, dynamicTypeSize: DynamicTypeSize) -> CGFloat {
         let base = scrollBottomInset(for: mode)
         guard dynamicTypeSize.usesAccessibilityLayout else { return base }
-        return base + 120
+        switch mode {
+        case .portrait:
+            return max(base + 160, TabBarLayout.fabBottomInset + 96)
+        case .compactLandscape:
+            return max(base + 120, TabBarLayout.landscapeFabBottomInset + 80)
+        case .sidebarSplit:
+            return base + 48
+        }
     }
 
     /// Bottom padding so the FAB clears the floating tab bar.
