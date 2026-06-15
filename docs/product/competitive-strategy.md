@@ -42,10 +42,9 @@ Use **TrackBoth** (one word) consistently in code and bundle ID; use subtitle fo
 | Clean Slate | **Taken** on App Store — vice-quit app (see competitor section) |
 | HabitHub / HabitMaster | Crowded, generic |
 | ViceGuard / ViceBreaker | Vice-only; misses habit-building lane |
-| LifeMetrics | Sounds like a health dashboard; internal folder name only |
-| QuickLog | Repo name; fast daily tap but hides vice angle |
 | BothWays | Same idea as TrackBoth, slightly more brandable |
-| QuickLog | Hides differentiator |
+
+**Retired internal names:** `LifeMetrics` (source folder), `QuickLog` (local repo folder) — both replaced by **TrackBoth**.
 
 ---
 

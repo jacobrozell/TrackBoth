@@ -10,9 +10,9 @@ Living record of implementation progress against [`lean-1.0-master-plan.md`](lea
 
 | Deliverable | Location |
 |-------------|----------|
-| XcodeGen project | `LifeMetrics/project.yml` |
-| Unit test target | `TrackBothTests` → `LifeMetrics/Tests/Unit/` |
-| UI test target | `TrackBothUITests` → `LifeMetrics/Tests/UI/` |
+| XcodeGen project | `TrackBoth/project.yml` |
+| Unit test target | `TrackBothTests` → `TrackBoth/Tests/Unit/` |
+| UI test target | `TrackBothUITests` → `TrackBoth/Tests/UI/` |
 | CI build workflow | `.github/workflows/ci.yml` (`TrackBothCI` scheme) |
 | Contributing guide | `CONTRIBUTING.md` |
 | Spec catalog | `specs/` (governance + lean 1.0 feature specs) |

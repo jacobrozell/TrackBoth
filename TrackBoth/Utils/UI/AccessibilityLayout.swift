@@ -49,12 +49,14 @@ extension View {
 
 private struct AdaptiveNavTitleModifier: ViewModifier {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.isCompactLandscape) private var environmentCompactLandscape
     let isCompactLandscape: Bool
 
     func body(content: Content) -> some View {
-        content.navigationBarTitleDisplayMode(
-            (isCompactLandscape || dynamicTypeSize.usesExpandedChrome) ? .inline : .large
-        )
+        let usesInlineTitle = isCompactLandscape
+            || environmentCompactLandscape
+            || dynamicTypeSize.usesExpandedChrome
+        content.navigationBarTitleDisplayMode(usesInlineTitle ? .inline : .large)
     }
 }
 

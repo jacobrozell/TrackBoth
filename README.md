@@ -30,7 +30,7 @@ A SwiftUI/SwiftData prototype for tracking positive habits and avoiding vices wi
 2. Generate the Xcode project and open it:
 
 ```bash
-cd LifeMetrics
+cd TrackBoth
 xcodegen generate
 open TrackBoth.xcodeproj
 ```

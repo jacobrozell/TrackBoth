@@ -3,7 +3,7 @@ import SwiftUI
 import WidgetKit
 
 struct TrackBoth_WidgetControl: ControlWidget {
-    static let kind = "com.jacobrozell.TrackBoth.QuickLogControl"
+    static let kind = "com.jacobrozell.TrackBoth.LogControl"
 
     var body: some ControlWidgetConfiguration {
         AppIntentControlConfiguration(
@@ -21,7 +21,7 @@ struct TrackBoth_WidgetControl: ControlWidget {
                 )
             }
         }
-        .displayName("Quick Log")
+        .displayName("TrackBoth Log")
         .description("Log one habit or vice from Control Center.")
         .promptsForUserConfiguration()
     }

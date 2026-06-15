@@ -42,38 +42,32 @@ struct ContentView: View {
                     ZStack(alignment: .top) {
                         TabView(selection: $selectedTab) {
                             HomeView()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabHome)
                                 .tabItem { tabItem(for: .home, systemImage: "house.fill") }
                                 .tag(0)
 
                             GoalsView()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
                                 .tabItem { tabItem(for: .goals, systemImage: "target") }
                                 .tag(1)
 
                             MotivationsView()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
                                 .tabItem { tabItem(for: .motivation, systemImage: "heart.fill") }
                                 .tag(2)
 
                             HistoryView()
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabHistory)
                                 .tabItem { tabItem(for: .history, systemImage: "calendar.badge.clock") }
                                 .tag(3)
 
                             if ProductSurface.showsCharts {
                                 ChartsView()
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
                                     .tabItem { tabItem(for: .charts, systemImage: "chart.line.uptrend.xyaxis") }
                                     .tag(4)
                             }
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .publishAdaptiveLayoutMode(
                             horizontal: horizontalSizeClass,
                             vertical: verticalSizeClass,
@@ -93,9 +87,7 @@ struct ContentView: View {
                             )
                         }
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

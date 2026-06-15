@@ -115,4 +115,4 @@ Migration to target layout is incremental — do not block 1.0 on full folder re
 | **Estimated release** | `1.0.0` |
 | **Last verified** | 2026-06-14 |
 | **Commit** | (pre-refactor) |
-| **Code** | `LifeMetrics/` flat structure |
+| **Code** | `TrackBoth/` flat structure |

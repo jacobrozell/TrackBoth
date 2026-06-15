@@ -1,6 +1,6 @@
 # Architecture Cleanup Plan
 
-Phased cleanup from the LifeMetrics architecture audit (June 2026). Goal: consistent MVVM layering, single sources of truth for shared logic, and removal of compiled dead code.
+Phased cleanup from the TrackBoth architecture audit (June 2026). Goal: consistent MVVM layering, single sources of truth for shared logic, and removal of compiled dead code.
 
 **Status:** Phase 1 complete.
 
@@ -92,4 +92,4 @@ Phased cleanup from the LifeMetrics architecture audit (June 2026). Goal: consis
 ## Reference
 
 - Audit context: architecture audit conversation (June 2026)
-- Related: `Specs/ArchitectureSpec.md`, `LifeMetrics/Archive/README.md`, `LifeMetrics/Support/Release/ProductSurface.swift`
+- Related: `Specs/ArchitectureSpec.md`, `TrackBoth/Archive/README.md`, `TrackBoth/Support/Release/ProductSurface.swift`

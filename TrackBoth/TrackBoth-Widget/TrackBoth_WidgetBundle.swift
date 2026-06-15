@@ -5,7 +5,7 @@ import SwiftUI
 struct TrackBoth_WidgetBundle: WidgetBundle {
     var body: some Widget {
         TodayProgressWidget()
-        QuickLogWidget()
+        TrackBothLogWidget()
         StreakSpotlightWidget()
         ViceRecoveryWidget()
         MoneySavedWidget()

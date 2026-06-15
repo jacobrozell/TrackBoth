@@ -2,8 +2,8 @@ import AppIntents
 import Foundation
 import WidgetKit
 
-struct QuickLogIntent: AppIntent {
-    static var title: LocalizedStringResource = "Quick Log"
+struct TrackBothLogIntent: AppIntent {
+    static var title: LocalizedStringResource = "Log with TrackBoth"
     static var description = IntentDescription("Log a habit or vice for today.")
 
     @Parameter(title: "Metric ID")
@@ -56,8 +56,8 @@ struct TodayProgressConfiguration: WidgetConfigurationIntent {
     static var description = IntentDescription("See what's left to log today.")
 }
 
-struct QuickLogConfiguration: WidgetConfigurationIntent {
-    static var title: LocalizedStringResource = "Quick Log"
+struct TrackBothLogConfiguration: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "TrackBoth Log"
     static var description = IntentDescription("Log habits and vices from the Home Screen.")
 }
 
@@ -110,7 +110,7 @@ struct DailyMotivationConfiguration: WidgetConfigurationIntent {
 }
 
 struct ControlMetricConfiguration: ControlConfigurationIntent {
-    static var title: LocalizedStringResource = "Quick Log Control"
+    static var title: LocalizedStringResource = "TrackBoth Control"
     static var description = IntentDescription("Log one metric from Control Center.")
 
     @Parameter(title: "Metric")

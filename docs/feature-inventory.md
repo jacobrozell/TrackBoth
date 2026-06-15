@@ -17,7 +17,7 @@ Living register of what exists vs what ships in lean 1.0.0. Updated alongside th
 | **Partial** | Exists but needs manual QA or polish |
 | **Dev only** | DEBUG builds only via `ProductSurface` |
 | **Cut 1.0** | Not compiled or not exposed in Release |
-| **Archived** | Moved to `LifeMetrics/Archive/` |
+| **Archived** | Moved to `TrackBoth/Archive/` |
 | **Planned** | Spec only; no implementation |
 
 ---
@@ -79,7 +79,7 @@ Living register of what exists vs what ships in lean 1.0.0. Updated alongside th
 | Unit tests | **Ships 1.0** | 45+ tests — domain, export, iCloud, a11y |
 | UI smoke tests | **Ships 1.0** | 5 flows |
 | CI (GitHub Actions) | **Ships 1.0** | Build + unit tests |
-| XcodeGen | **Ships 1.0** | `LifeMetrics/project.yml` |
+| XcodeGen | **Ships 1.0** | `TrackBoth/project.yml` |
 | ProductSurface gating | **Ships 1.0** | Demo, widget, watch flags |
 | BootstrapStoreRecovery | **Ships 1.0** | In-memory fallback + banner |
 | Domain layer | **Ships 1.0** | Tracking, streaks, goals, export |

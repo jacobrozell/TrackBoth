@@ -2,10 +2,10 @@
 
 ## Project generation
 
-The Xcode project is generated from `LifeMetrics/project.yml` via [XcodeGen](https://github.com/yonaskolb/XcodeGen). **Do not hand-edit** `TrackBoth.xcodeproj` — change `project.yml` or source folders, then regenerate:
+The Xcode project is generated from `TrackBoth/project.yml` via [XcodeGen](https://github.com/yonaskolb/XcodeGen). **Do not hand-edit** `TrackBoth.xcodeproj` — change `project.yml` or source folders, then regenerate:
 
 ```bash
-cd LifeMetrics
+cd TrackBoth
 brew install xcodegen   # once
 xcodegen generate
 open TrackBoth.xcodeproj
@@ -17,11 +17,24 @@ open TrackBoth.xcodeproj
 |--------|---------|
 | `TrackBoth` | Local dev — app, widget, run unit + UI tests |
 | `TrackBothCI` | CI — builds app + both test targets (no test execution) |
+| `TrackBothScreenshots` | App Store screenshots — seeds demo data, skips onboarding |
+
+## App Store screenshots
+
+1. Select the **TrackBothScreenshots** scheme in Xcode (or run with launch args `-skip_onboarding -screenshot_demo`).
+2. Use iPhone 6.7" simulator (e.g. iPhone 16 Pro Max).
+3. Capture Home (habits + vices visible), Goals, History, and Charts.
+
+Regenerate the project after editing `project.yml`:
+
+```bash
+cd TrackBoth && xcodegen generate
+```
 
 ## Running tests locally
 
 ```bash
-cd LifeMetrics
+cd TrackBoth
 
 # Unit tests
 xcodebuild test \

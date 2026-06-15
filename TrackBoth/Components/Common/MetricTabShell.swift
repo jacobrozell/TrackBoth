@@ -18,7 +18,7 @@ struct MetricTabShell<Content: View>: View {
                     vertical: verticalSizeClass
                 )
                 content(geometry, usesSplit)
-                    .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             .themedBackground()
             .navigationTitle(title)

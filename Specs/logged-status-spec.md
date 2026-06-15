@@ -107,78 +107,78 @@ if !metric.hasBeenLogged {
 ## Files Requiring Updates
 
 ### Core Models
-1. **`LifeMetrics/Models/Metric.swift`**
+1. **`TrackBoth/Models/Metric.swift`**
    - Add `hasBeenLogged: Bool = false` property
    - Update initializer to accept `hasBeenLogged` parameter
    - Add migration logic for existing metrics
 
 ### Streak Calculation
-2. **`LifeMetrics/Utils/StreakUtils.swift`**
+2. **`TrackBoth/Utils/StreakUtils.swift`**
    - Update `calculateCurrentStreak()` method
    - Update `calculateLongestStreak()` method
    - Add logic to check `hasBeenLogged` before calculating streaks
    - Handle "never logged" state in streak calculations
 
 ### Entry Management
-3. **`LifeMetrics/Models/MetricEntry.swift`**
+3. **`TrackBoth/Models/MetricEntry.swift`**
    - Update `getOrCreate()` method to set `hasBeenLogged = true`
    - Update `updateOrCreate()` method to set `hasBeenLogged = true`
    - Ensure all entry creation paths update the metric's logged status
 
 ### View Models
-4. **`LifeMetrics/ViewModels/HomeViewModel.swift`**
+4. **`TrackBoth/ViewModels/HomeViewModel.swift`**
    - Update `toggleMetricCompletion()` method
    - Set `hasBeenLogged = true` when creating first entry
    - Update streak calculation calls
 
-5. **`LifeMetrics/ViewModels/ChartsViewModel.swift`**
+5. **`TrackBoth/ViewModels/ChartsViewModel.swift`**
    - Update streak calculations to respect `hasBeenLogged`
    - Handle "never logged" state in chart data
 
-6. **`LifeMetrics/ViewModels/GoalsViewModel.swift`**
+6. **`TrackBoth/ViewModels/GoalsViewModel.swift`**
    - Update goal progress calculations
    - Handle "never logged" metrics in goal tracking
 
 ### UI Components
-7. **`LifeMetrics/Components/StreakInfoView.swift`**
+7. **`TrackBoth/Components/StreakInfoView.swift`**
    - Update streak display logic
    - Show "Not logged yet" for unlogged metrics
    - Handle empty state for never-logged metrics
 
-8. **`LifeMetrics/Components/UnifiedMetricRowView.swift`**
+8. **`TrackBoth/Components/UnifiedMetricRowView.swift`**
    - Update toggle logic to set `hasBeenLogged = true`
    - Update visual indicators for logged vs unlogged state
    - Handle streak display for unlogged metrics
 
-9. **`LifeMetrics/Components/StatCard.swift`**
+9. **`TrackBoth/Components/StatCard.swift`**
    - Update streak display logic
    - Handle "never logged" state in statistics
 
 ### Watch Views
-10. **`LifeMetrics/Views/WatchViews/WatchMainView.swift`**
+10. **`TrackBoth/Views/WatchViews/WatchMainView.swift`**
     - Update toggle logic to set `hasBeenLogged = true`
     - Update streak calculation for watch
     - Handle unlogged metrics in watch UI
 
-11. **`LifeMetrics/Views/WatchViews/WatchWeeklySummaryView.swift`**
+11. **`TrackBoth/Views/WatchViews/WatchWeeklySummaryView.swift`**
     - Update weekly summary to handle unlogged metrics
     - Filter out unlogged metrics from summaries
 
 ### Widget Integration
-12. **`LifeMetrics/Utils/WidgetIntegration.swift`**
+12. **`TrackBoth/Utils/WidgetIntegration.swift`**
     - Update widget data to respect `hasBeenLogged`
     - Handle unlogged metrics in widget display
 
-13. **`LifeMetrics/Widgets/WidgetDataModels.swift`**
+13. **`TrackBoth/Widgets/WidgetDataModels.swift`**
     - Update widget data models to include logged status
     - Handle unlogged metrics in widget calculations
 
 ### Utility Functions
-14. **`LifeMetrics/Utils/DemoDataGenerator.swift`**
+14. **`TrackBoth/Utils/DemoDataGenerator.swift`**
     - Update demo data generation to set `hasBeenLogged = true`
     - Ensure demo metrics have proper logged status
 
-15. **`LifeMetrics/Utils/GoalUtils.swift`**
+15. **`TrackBoth/Utils/GoalUtils.swift`**
     - Update goal progress calculations
     - Handle unlogged metrics in goal tracking
 

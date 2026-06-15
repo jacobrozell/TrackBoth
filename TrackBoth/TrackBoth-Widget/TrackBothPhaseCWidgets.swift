@@ -130,7 +130,7 @@ struct WeekGlanceWidgetView: View {
                         .foregroundStyle(.secondary)
                     Spacer(minLength: 0)
                     if !metric.today.isSuccess || !metric.today.isLogged {
-                        Button(intent: QuickLogIntent(metricID: metric.id)) {
+                        Button(intent: TrackBothLogIntent(metricID: metric.id)) {
                             Label("Log today", systemImage: "checkmark.circle")
                                 .font(.caption)
                         }
@@ -253,7 +253,7 @@ struct DailyMotivationWidgetView: View {
                     .font(.caption)
                     .foregroundStyle(.orange)
                 Spacer(minLength: 0)
-                Button(intent: QuickLogIntent(metricID: metric.id)) {
+                Button(intent: TrackBothLogIntent(metricID: metric.id)) {
                     Label("Log", systemImage: "checkmark.circle")
                         .font(.caption)
                 }

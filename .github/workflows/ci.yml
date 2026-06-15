@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CI_XCODE_PROJECT: LifeMetrics/TrackBoth.xcodeproj
+  CI_XCODE_PROJECT: TrackBoth/TrackBoth.xcodeproj
   CI_XCODE_SCHEME: TrackBothCI
   SIM_DESTINATION: platform=iOS Simulator,name=iPhone 17
 
@@ -33,11 +33,11 @@ jobs:
         run: brew install xcodegen xcbeautify
 
       - name: Generate Xcode project
-        working-directory: LifeMetrics
+        working-directory: TrackBoth
         run: xcodegen generate
 
       - name: Build app and test targets
-        working-directory: LifeMetrics
+        working-directory: TrackBoth
         run: |
           set -eo pipefail
           xcodebuild build \
@@ -48,7 +48,7 @@ jobs:
             | xcbeautify --renderer github-actions
 
       - name: Run unit tests with coverage
-        working-directory: LifeMetrics
+        working-directory: TrackBoth
         run: |
           set -eo pipefail
           RESULT_BUNDLE="$RUNNER_TEMP/TrackBothTestResults.xcresult"

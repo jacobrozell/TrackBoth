@@ -99,7 +99,7 @@ struct FlowChips: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             ForEach(metrics) { metric in
-                Button(intent: QuickLogIntent(metricID: metric.id)) {
+                Button(intent: TrackBothLogIntent(metricID: metric.id)) {
                     HStack(spacing: 6) {
                         Image(systemName: metric.habitType == HabitTypeSnapshot.positive ? "checkmark.circle" : "shield")
                         Text(metric.name)
@@ -116,28 +116,28 @@ struct FlowChips: View {
     }
 }
 
-// MARK: - Quick Log
+// MARK: - TrackBoth Log
 
-struct QuickLogWidget: Widget {
-    let kind = "QuickLogWidget"
+struct TrackBothLogWidget: Widget {
+    let kind = "TrackBothLogWidget"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: SnapshotProvider()) { entry in
-            QuickLogWidgetView(snapshot: entry.snapshot)
+            TrackBothLogWidgetView(snapshot: entry.snapshot)
                 .containerBackground(.fill.tertiary, for: .widget)
         }
-        .configurationDisplayName("Quick Log")
+        .configurationDisplayName("TrackBoth Log")
         .description("Log habits and vices without opening the app.")
         .supportedFamilies([.systemMedium, .systemLarge])
     }
 }
 
-struct QuickLogWidgetView: View {
+struct TrackBothLogWidgetView: View {
     let snapshot: WidgetSnapshotV1
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Quick Log")
+            Text("TrackBoth")
                 .font(.headline)
 
             HStack(alignment: .top, spacing: 12) {
@@ -162,7 +162,7 @@ struct QuickLogWidgetView: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(metrics) { metric in
-                    QuickLogRow(metric: metric, tint: tint)
+                    TrackBothLogRow(metric: metric, tint: tint)
                 }
             }
         }
@@ -170,12 +170,12 @@ struct QuickLogWidgetView: View {
     }
 }
 
-struct QuickLogRow: View {
+struct TrackBothLogRow: View {
     let metric: WidgetMetricSnapshot
     let tint: Color
 
     var body: some View {
-        Button(intent: QuickLogIntent(metricID: metric.id)) {
+        Button(intent: TrackBothLogIntent(metricID: metric.id)) {
             HStack(spacing: 8) {
                 Image(systemName: metric.today.isSuccess ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(metric.today.isSuccess ? tint : .secondary)

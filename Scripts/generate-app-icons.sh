@@ -45,4 +45,4 @@ for spec in "${SPECS[@]}"; do
   echo "Wrote $OUT_DIR/$name (${size}x${size})"
 done
 
-echo "Done. Copy into LifeMetrics/Assets.xcassets/AppIcon.appiconset/ when ready."
+echo "Done. Copy into TrackBoth/Assets.xcassets/AppIcon.appiconset/ when ready."

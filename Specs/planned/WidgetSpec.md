@@ -42,13 +42,13 @@ Each row is a **separate widget** in `TrackBoth_WidgetBundle` (distinct `kind` +
 
 **Config:** None (always all metrics) or optional “Habits only” / “Vices only” filter.
 
-**Tap:** Opens Home. Chip tap runs `QuickLogIntent` for that metric.
+**Tap:** Opens Home. Chip tap runs `TrackBothLogIntent` for that metric.
 
 **Priority:** **P0 — ship first**
 
 ---
 
-### 3.2 Quick Log — `QuickLogWidget`
+### 3.2 TrackBoth Log — `TrackBothLogWidget`
 
 **Question:** *Let me log in two taps.*
 
@@ -63,8 +63,8 @@ Each row is a **separate widget** in `TrackBoth_WidgetBundle` (distinct `kind` +
 
 | Action | Intent | Semantics |
 |--------|--------|-----------|
-| Tap toggle (habit) | `QuickLogIntent` | Log today `value: true` |
-| Tap toggle (vice, off→on) | `QuickLogIntent` | Log today `value: false` (avoided) |
+| Tap toggle (habit) | `TrackBothLogIntent` | Log today `value: true` |
+| Tap toggle (vice, off→on) | `TrackBothLogIntent` | Log today `value: false` (avoided) |
 | Tap logged row | `OpenLoggingSheetIntent` | Deep link to app LoggingSheet for today |
 | Tap section header | — | Open Home filtered (future) |
 
@@ -213,7 +213,7 @@ Each row is a **separate widget** in `TrackBoth_WidgetBundle` (distinct `kind` +
 |------|--------|
 | **Live Activity** | Template stub only; no session-based habits. Revisit if timed exercise blocks ship. |
 | **Second-precision recovery timer** | Competitive strategy skip; day/hour granularity matches in-app recovery label. |
-| **Full mood journal on widget** | Mood stays in LoggingSheet; optional emoji on medium Quick Log row only. |
+| **Full mood journal on widget** | Mood stays in LoggingSheet; optional emoji on medium TrackBoth Log row only. |
 | **Charts tab parity** | Use Week Glance heatmap, not full `ChartsView` in widget. |
 | **iCloud sync in extension** | Widget reads snapshot only; app owns SwiftData + sync. |
 
@@ -225,8 +225,8 @@ Each row is a **separate widget** in `TrackBoth_WidgetBundle` (distinct `kind` +
 
 | Path | Action |
 |------|--------|
-| `LifeMetrics/TrackBoth-Widget/` | **Keep** — shipping extension target, bundle entry point |
-| `LifeMetrics/Widgets/` | **Merge into** extension + shared `WidgetKitSupport` group (or `Domain/Widget/`) |
+| `TrackBoth/TrackBoth-Widget/` | **Keep** — shipping extension target, bundle entry point |
+| `TrackBoth/Widgets/` | **Merge into** extension + shared `WidgetKitSupport` group (or `Domain/Widget/`) |
 | `WidgetDataManager.swift` | **Evolve** — single writer for `WidgetSnapshot` v1 |
 | `WidgetSyncCoordinator.swift` | **Keep** — gate on `ProductSurface.showsWidget`; call after every log/import/delete |
 
@@ -319,7 +319,7 @@ Single JSON blob in App Group (replaces separate `widget_metrics`, `widget_entri
 | App log / edit / delete | `WidgetCenter.shared.reloadAllTimelines()` |
 | App foreground | Full snapshot rewrite |
 | Import / delete all | Full snapshot rewrite |
-| `QuickLogIntent` success | Incremental metric update + reload |
+| `TrackBothLogIntent` success | Incremental metric update + reload |
 | Midnight local | Scheduled entry at `startOfTomorrow` in each provider |
 | Recovery widget | Additional entry at next **hour** boundary only when &lt; 24h since slip (optional P1 polish) |
 
@@ -329,7 +329,7 @@ Do **not** register high-frequency timers for day-granular recovery.
 
 | Intent | Used by |
 |--------|---------|
-| `QuickLogIntent` | Quick Log, Today Progress chips, Control toggle |
+| `TrackBothLogIntent` | TrackBoth Log, Today Progress chips, Control toggle |
 | `OpenAppIntent` (tab/home) | Default widget tap |
 | `OpenMetricIntent` | Streak / recovery / savings tap |
 | `SelectMetricEntity` | Widget configuration (App Entity backed by snapshot IDs) |
@@ -373,7 +373,7 @@ Widget `widgetURL` uses these; intents preferred for logging.
 | Widget | Display name | Description |
 |--------|--------------|-------------|
 | Today’s Progress | Today | See what’s left to log today |
-| Quick Log | Quick Log | Log habits and vices without opening the app |
+| TrackBoth Log | TrackBoth Log | Log habits and vices without opening the app |
 | Streak Spotlight | Streak | Your biggest streak at a glance |
 | Vice Recovery | Recovery | Time recovering since your last slip |
 | Money Saved | Savings | Money saved on your vice streak |
@@ -391,7 +391,7 @@ Widget `widgetURL` uses these; intents preferred for logging.
 | Quit streak | Streak Spotlight + dual Today Progress |
 | Money saved | Dedicated Money Saved widget |
 | Single vice focus | User-configurable pin **per widget** |
-| — | **Habits + vices** in Quick Log (wedge) |
+| — | **Habits + vices** in TrackBoth Log (wedge) |
 
 ---
 
@@ -401,7 +401,7 @@ Widget `widgetURL` uses these; intents preferred for logging.
 |-------|-------|
 | **Unit** | `WidgetSnapshotBuilder` — streak, today completion, recovery, savings match domain tests |
 | **Unit** | `WidgetSyncCoordinatorTests` (exists) — extend for snapshot v1 |
-| **Intent** | `QuickLogIntent` writes entry; idempotent second tap same day |
+| **Intent** | `TrackBothLogIntent` writes entry; idempotent second tap same day |
 | **UI** | Add widget in simulator; tap toggle; verify Home matches |
 | **Manual** | App Group on physical device; midnight rollover; delete metric removes from widget |
 
@@ -414,11 +414,11 @@ Widget `widgetURL` uses these; intents preferred for logging.
 - [x] App Groups + snapshot v1 pipeline
 - [x] Consolidate widget folders; remove emoji template
 - [x] **Today’s Progress** (S)
-- [x] **Quick Log** (M) — vice rows include recovery subtitle when enabled
+- [x] **TrackBoth Log** (M) — vice rows include recovery subtitle when enabled
 - [x] **Streak Spotlight** (S) — recovery subtitle for pinned vice
 - [x] **Vice Recovery** (S, M) — dedicated recovery glance
 - [x] `ProductSurface.showsWidget = true` in development; TestFlight beta
-- [x] `QuickLogIntent` + deep link to Home
+- [x] `TrackBothLogIntent` + deep link to Home
 - [x] Snapshot `recovery` block from `ViceSlipTimer` + `MetricDisplayPreferences`
 
 ### Phase B — `1.2.x`
@@ -432,7 +432,7 @@ Widget `widgetURL` uses these; intents preferred for logging.
 - [x] **Week at a Glance** (M/L)
 - [x] **Daily Motivation** (S/M)
 - [x] **Control Widget** (replace timer stub)
-- [x] Siri intent donations (`QuickLogIntent`, `LogMetricControlIntent`)
+- [x] Siri intent donations (`TrackBothLogIntent`, `LogMetricControlIntent`)
 
 ---
 
@@ -459,8 +459,8 @@ Legacy checklist: [`TODOs/todo_widget.md`](../../TODOs/todo_widget.md) — super
 
 ### Phase A acceptance
 
-- [ ] Four P0 widgets appear in gallery (Today, Quick Log, Streak, **Recovery**)
-- [ ] Quick Log toggle matches Home completion state after reload
+- [ ] Four P0 widgets appear in gallery (Today, TrackBoth Log, Streak, **Recovery**)
+- [ ] TrackBoth Log toggle matches Home completion state after reload
 - [ ] Streak Spotlight matches `StreakUtils` for pinned metric
 - [ ] **Vice Recovery** matches `ViceSlipTimer` for pinned vice (day/hour granularity)
 - [ ] Recovery hidden when `showRecoveryTimer` off or no prior slip

@@ -15,9 +15,8 @@ struct HomeView: View {
     @State private var showingLoggingSheetForMetric: Metric? = nil
     @State private var showingRowOptions: Bool = false
     @State private var activeMilestone: MilestoneAnnouncement? = nil
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.isCompactLandscape) private var isCompactLandscape
+    @Environment(\.adaptiveLayoutMode) private var layoutMode
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     init() {
@@ -45,65 +44,48 @@ struct HomeView: View {
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            ZStack(alignment: .top) {
-                Color.currentBackground.ignoresSafeArea()
-
-                Group {
-                    if metrics.isEmpty {
-                        EmptyStateView(
-                            icon: "plus.circle.fill",
-                            title: "No Habits Yet",
-                            subtitle: "Build good habits and break bad ones — add your first metric to get started",
-                            actionTitle: "Add Your First Habit",
-                            action: { viewModel.showAddMetric() }
+            Group {
+                if metrics.isEmpty {
+                    EmptyStateView(
+                        icon: "plus.circle.fill",
+                        title: "No Habits Yet",
+                        subtitle: "Build good habits and break bad ones — add your first metric to get started",
+                        actionTitle: "Add Your First Habit",
+                        action: { viewModel.showAddMetric() }
+                    )
+                } else if layoutMode == .sidebarSplit {
+                    GeometryReader { geometry in
+                        LandscapeSplitLayout(
+                            totalWidth: geometry.size.width,
+                            totalHeight: geometry.size.height,
+                            sidebar: { leftPanel },
+                            content: { rightPanel }
                         )
-                    } else {
-                        GeometryReader { geometry in
-                            let layoutMode = TabBarLayout.layoutMode(
-                                horizontal: horizontalSizeClass,
-                                vertical: verticalSizeClass,
-                                size: geometry.size
-                            )
-                            if TabBarLayout.shouldUseSidebarSplit(
-                                size: geometry.size,
-                                horizontal: horizontalSizeClass,
-                                vertical: verticalSizeClass
-                            ) {
-                                LandscapeSplitLayout(
-                                    totalWidth: geometry.size.width,
-                                    totalHeight: geometry.size.height,
-                                    sidebar: { leftPanel },
-                                    content: { rightPanel }
-                                )
-                                .tabBarFloatingActionButton(isLandscape: true) {
-                                    viewModel.showAddMetric()
-                                }
-                            } else {
-                                VStack(spacing: 0) {
-                                    ScrollView {
-                                        LazyVStack(
-                                            spacing: 16,
-                                            pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
-                                        ) {
-                                            homeHeader(layoutMode: layoutMode)
-                                            metricsSections
-                                        }
-                                        .adaptiveScrollInset()
-                                    }
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                }
-                                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-                                .adaptiveFloatingActionButton {
-                                    viewModel.showAddMetric()
-                                }
-                            }
+                        .tabBarFloatingActionButton(isLandscape: true) {
+                            viewModel.showAddMetric()
                         }
                     }
+                } else {
+                    ScrollView {
+                        LazyVStack(
+                            spacing: 16,
+                            pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                        ) {
+                            homeHeader(layoutMode: layoutMode)
+                            metricsSections
+                        }
+                        .adaptiveScrollInset()
+                    }
+                    .adaptiveFloatingActionButton {
+                        viewModel.showAddMetric()
+                    }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
+            .themedBackground()
             .navigationTitle("TrackBoth")
             .adaptiveNavigationBarTitleDisplayMode(isCompactLandscape: isCompactLandscape)
+            .toolbarBackground(Color.currentBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {

@@ -26,7 +26,7 @@ Authoritative tracking rules: [`TrackingSemanticsSpec.md`](TrackingSemanticsSpec
 - Date navigation up to 30 days back
 
 ### Out of scope (1.0)
-- Widget quick-log
+- Widget TrackBoth log
 - Watch companion
 - Inline details/motivation/quantity on row (moved to LoggingSheet)
 

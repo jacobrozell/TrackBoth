@@ -118,7 +118,7 @@ Offer elapsed-time display for vices without making it default (Clean Slate uses
 - Per-vice setting: “Show recovery timer” (default off)
 - Display days + hours since last `value == true` entry on vice row (`ViceSlipTimer`)
 - **History entry detail:** same recovery label as of that entry’s date (avoided days only)
-- **Widgets:** dedicated Vice Recovery widget + subtitles on Quick Log / Streak Spotlight — see [`WidgetSpec.md`](WidgetSpec.md)
+- **Widgets:** dedicated Vice Recovery widget + subtitles on TrackBoth Log / Streak Spotlight — see [`WidgetSpec.md`](WidgetSpec.md)
 
 ### Verification
 
@@ -166,7 +166,7 @@ Full catalog, snapshot schema, intents, and phased rollout: [`WidgetSpec.md`](Wi
 | Widget | Focus |
 |--------|-------|
 | Today's Progress | `todayCompleted / total` + unlogged chips |
-| Quick Log | Habits + vices toggles; recovery subtitle on vice rows |
+| TrackBoth Log | Habits + vices toggles; recovery subtitle on vice rows |
 | Streak Spotlight | One pinned metric; recovery when pinned vice |
 | **Vice Recovery** | **Time recovering since last slip** |
 
@@ -177,7 +177,7 @@ Week Glance, Daily Motivation, Control Widget (incl. recovery preset).
 ### Verification
 
 - [ ] Phase A widgets in gallery with correct copy
-- [ ] Quick Log matches Home after toggle
+- [ ] TrackBoth Log matches Home after toggle
 - [ ] Vice Recovery matches `ViceSlipTimer` + Edit Metric toggle
 - [ ] Gated by `ProductSurface.showsWidget`
 
