@@ -68,6 +68,7 @@ struct OnboardingView: View {
                                 completeOnboarding()
                             }
                             .buttonStyle(PrimaryButtonStyle())
+                            .accessibilityIdentifier(AccessibilityIdentifiers.onboardingGetStarted)
                         }
                     }
                     .padding(.horizontal, 32)

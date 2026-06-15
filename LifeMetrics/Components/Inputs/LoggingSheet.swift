@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 // MARK: - LoggingSheet Component
 /// Sheet component for logging metric entries with details and motivation
@@ -16,6 +17,8 @@ struct LoggingSheet: View, Identifiable {
     @State private var value: Bool = false
     @State private var details: String = ""
     @State private var motivation: String = ""
+    @State private var quantity: Int?
+    @State private var unit: String = "times"
     @State private var showingQuantitySheet: Bool = false
 
     private var existingEntry: MetricEntry? {
@@ -23,13 +26,19 @@ struct LoggingSheet: View, Identifiable {
         return entries.first { $0.metricID == metric.id && Calendar.current.isDate($0.date, inSameDayAs: start) }
     }
 
+    private var quantitySummary: String {
+        guard let quantity, quantity > 0 else { return "Not set" }
+        return "\(quantity) \(unit)"
+    }
+
     var body: some View {
         NavigationStack {
             Form {
                 Section(header: Text("Status")) {
-                    Toggle(isOn: $value) {
+                    Toggle(isOn: statusToggleBinding) {
                         Text(metric.habitType == .positive ? "Did it" : "Avoided")
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifiers.loggingStatusToggle)
                 }
 
                 Section(header: Text("Daily Details")) {
@@ -41,12 +50,33 @@ struct LoggingSheet: View, Identifiable {
                 }
 
                 Section(header: Text("Quantity")) {
-                    HStack {
-                        Text(existingEntry?.quantityString ?? "Not set")
-                            .foregroundColor(.currentSecondaryText)
-                        Spacer()
-                        Button("Set Quantity") { showingQuantitySheet = true }
-                            .foregroundColor(.currentPrimary)
+                    if (quantity ?? 0) > 0 {
+                        Stepper(value: Binding(
+                            get: { quantity ?? 1 },
+                            set: { quantity = max(1, $0) }
+                        ), in: 1...999) {
+                            Text(quantitySummary)
+                        }
+
+                        Button("Advanced quantity editor") {
+                            showingQuantitySheet = true
+                        }
+                        .foregroundColor(.currentPrimary)
+
+                        Button("Clear quantity", role: .destructive) {
+                            quantity = nil
+                        }
+                    } else {
+                        Button("Add quantity") {
+                            quantity = 1
+                            unit = metric.quantityGoals.first?.safeDefaultUnit ?? "times"
+                        }
+                        .foregroundColor(.currentPrimary)
+
+                        Button("Open quantity editor") {
+                            showingQuantitySheet = true
+                        }
+                        .foregroundColor(.currentSecondaryText)
                     }
                 }
             }
@@ -59,13 +89,21 @@ struct LoggingSheet: View, Identifiable {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") { saveAndClose() }
+                        .accessibilityIdentifier(AccessibilityIdentifiers.loggingSaveButton)
                 }
             }
             .onAppear { seedDefaults() }
-            .sheet(isPresented: $showingQuantitySheet) {
+            .sheet(isPresented: $showingQuantitySheet, onDismiss: syncQuantityFromStore) {
                 QuantityInputSheet(metric: metric, selectedDate: selectedDate)
             }
         }
+    }
+
+    private var statusToggleBinding: Binding<Bool> {
+        Binding(
+            get: { TrackingSemantics.toggleIsOn(habitType: metric.habitType, value: value) },
+            set: { value = TrackingSemantics.value(fromToggleIsOn: $0, habitType: metric.habitType) }
+        )
     }
 
     private func seedDefaults() {
@@ -73,33 +111,56 @@ struct LoggingSheet: View, Identifiable {
             value = entry.value
             details = entry.details ?? ""
             motivation = entry.motivation ?? ""
+            quantity = entry.quantity
+            unit = entry.unit ?? (metric.quantityGoals.first?.safeDefaultUnit ?? "times")
         } else {
-            // Defaults per spec: habits not done; vices not avoided
-            value = false
+            value = TrackingSemantics.failureValue(habitType: metric.habitType)
+            quantity = nil
+            unit = metric.quantityGoals.first?.safeDefaultUnit ?? "times"
+        }
+    }
+
+    private func syncQuantityFromStore() {
+        guard let entry = existingEntry else { return }
+        quantity = entry.quantity
+        unit = entry.unit ?? unit
+        if entry.hasBeenLogged {
+            value = entry.value
         }
     }
 
     private func saveAndClose() {
-        // Persist via HomeViewModel-like helpers
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
 
-        if let entry = existingEntry {
-            entry.value = value
-            entry.details = details.isEmpty ? nil : details
-            entry.motivation = motivation.isEmpty ? nil : motivation
+        let entry: MetricEntry
+        if let existingEntry {
+            entry = existingEntry
         } else {
-            let newEntry = MetricEntry(metricID: metric.id, date: startOfDay, value: value)
-            newEntry.details = details.isEmpty ? nil : details
-            newEntry.motivation = motivation.isEmpty ? nil : motivation
-            modelContext.insert(newEntry)
+            entry = MetricEntry(metricID: metric.id, date: startOfDay, value: value, hasBeenLogged: false)
+            modelContext.insert(entry)
         }
+
+        entry.value = value
+        entry.details = details.isEmpty ? nil : details
+        entry.motivation = motivation.isEmpty ? nil : motivation
+
+        if let quantity, quantity > 0 {
+            entry.quantity = quantity
+            entry.unit = unit.isEmpty ? nil : unit
+        } else {
+            entry.quantity = nil
+            entry.unit = nil
+        }
+
+        MetricEntry.markLogged(entry: entry, metric: metric)
+
+        let impact = UIImpactFeedbackGenerator(style: .light)
+        impact.impactOccurred()
 
         try? modelContext.save()
         dismiss()
     }
-
-    // Quantity is handled by QuantityInputSheet which persists directly
 }
 
 #Preview {

@@ -22,33 +22,20 @@ struct CompactMetricRow: View {
     }
 
     private func isMetricCompleted() -> Bool {
-        // Only count as completed if metric has entries
-        guard entries.contains(where: { $0.metricID == metric.id }) else { return false }
-
-        let isVice = metric.habitType == .vice
-        if isVice {
-            // For vices, completed when explicitly logged as avoided (value == true)
-            return selectedDateEntry?.value == true
-        } else {
-            // For habits, completed when explicitly logged as done (value == true)
-            return selectedDateEntry?.value == true
-        }
+        TrackingSemantics.isCompleted(habitType: metric.habitType, entry: selectedDateEntry)
     }
 
     private var statusInfo: (text: String, color: Color) {
-        let isCompleted = isMetricCompleted()
-
-        if metric.habitType == .positive {
-            return (
-                text: isCompleted ? "Completed" : "Incomplete",
-                color: isCompleted ? Color.currentSuccess : Color.currentSecondaryText
-            )
+        let status = TrackingSemantics.statusLabel(habitType: metric.habitType, entry: selectedDateEntry)
+        let color: Color
+        if status.isSuccess {
+            color = Color.currentSuccess
+        } else if metric.habitType == .vice && TrackingSemantics.isLoggedForDay(entry: selectedDateEntry) {
+            color = Color.currentError
         } else {
-            return (
-                text: isCompleted ? "Avoided" : "Not Avoided",
-                color: isCompleted ? Color.currentSuccess : Color.currentError
-            )
+            color = Color.currentSecondaryText
         }
+        return (text: status.text, color: color)
     }
 
     var body: some View {
@@ -66,11 +53,22 @@ struct CompactMetricRow: View {
                         }
                     }) {
                         let isCompleted = isMetricCompleted()
-                        if metric.habitType == .vice && isCompleted {
-                            // For vices, show X icon when avoided (completed)
-                            Image(systemName: "xmark.circle.fill")
-                                .font(.title3)
-                                .foregroundColor(Color.currentError)
+                        let isLogged = TrackingSemantics.isLoggedForDay(entry: selectedDateEntry)
+
+                        if metric.habitType == .vice {
+                            if isCompleted {
+                                Image(systemName: "checkmark.shield.fill")
+                                    .font(.title3)
+                                    .foregroundColor(Color.currentSuccess)
+                            } else if isLogged {
+                                Image(systemName: "xmark.circle.fill")
+                                    .font(.title3)
+                                    .foregroundColor(Color.currentError)
+                            } else {
+                                Image(systemName: "circle")
+                                    .font(.title3)
+                                    .foregroundColor(Color.currentSecondaryText)
+                            }
                         } else {
                             Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                                 .font(.title3)
@@ -78,7 +76,10 @@ struct CompactMetricRow: View {
                         }
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .id(refreshTrigger) // Force UI refresh when trigger changes
+                    .accessibilityIdentifier(AccessibilityIdentifiers.metricToggle(metric.id))
+                    .accessibilityLabel("\(metric.name), \(statusInfo.text)")
+                    .accessibilityHint(metric.habitType == .positive ? "Toggle completion" : "Toggle avoided status")
+                    .id(refreshTrigger)
 
                     VStack(alignment: .leading, spacing: 4) {
                         HStack {
@@ -102,7 +103,7 @@ struct CompactMetricRow: View {
 
                         HStack(spacing: 10) {
                             let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
-                            if streak > 0 {
+                            if metric.hasBeenLogged, streak > 0 {
                                 HStack(spacing: 4) {
                                     Image(systemName: "flame.fill").foregroundColor(Color.currentWarning).font(.caption)
                                     Text(metric.habitType == .positive ? "\(streak) day streak" : "\(streak) days clean")
@@ -134,6 +135,7 @@ struct CompactMetricRow: View {
                     .onTapGesture {
                         onLog()
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
 
                     Spacer()
                 }
@@ -155,6 +157,7 @@ struct CompactMetricRow: View {
         .padding(12)
         .background(Color.currentSecondaryBackground)
         .cornerRadius(12)
+        .accessibilityElement(children: .contain)
         .contextMenu {
             Button(action: onLog) { Label("Log", systemImage: "square.and.pencil") }
             Button(action: onEdit) { Label("Edit Habit", systemImage: "pencil") }

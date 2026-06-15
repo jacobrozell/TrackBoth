@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UniformTypeIdentifiers
 
 // Import the backup service and components
 // These should be accessible if all files are in the same target
@@ -13,6 +14,13 @@ struct SettingsView: View {
     // Goals are embedded in Metric now
     
     @State private var showingExportSheet = false
+    @State private var showingImportPicker = false
+    @State private var showingImportConfirmation = false
+    @State private var showingImportSuccess = false
+    @State private var showingImportError = false
+    @State private var pendingImportURL: URL?
+    @State private var importErrorMessage: String?
+    @State private var importedSummary: String?
     @State private var showingDeleteConfirmation = false
     @State private var showingShareSheet = false
     @State private var showingBackupSheet = false
@@ -81,10 +89,19 @@ struct SettingsView: View {
                         exportData = generateExportData()
                         showingExportSheet = true
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsExportData)
+                    .foregroundColor(Color.currentPrimary)
+                    .listRowBackground(Color.currentSecondaryBackground)
+
+                    Button("Import Data") {
+                        logger.logUserAction("Import data button tapped")
+                        showingImportPicker = true
+                    }
+                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsImportData)
                     .foregroundColor(Color.currentPrimary)
                     .listRowBackground(Color.currentSecondaryBackground)
                     
-                    if !metrics.isEmpty && DemoDataGenerator.hasDemoData() {
+                    if ProductSurface.showsDemoData && !metrics.isEmpty && DemoDataGenerator.hasDemoData() {
                         Button("Clear Demo Data") {
                             logger.logUserAction("Clear demo data button tapped")
                             DemoDataGenerator.clearDemoData(modelContext: modelContext)
@@ -396,37 +413,75 @@ struct SettingsView: View {
             } message: {
                 Text("This will permanently delete all habits and entries. This action cannot be undone.")
             }
+            .alert("Import Data?", isPresented: $showingImportConfirmation) {
+                Button("Cancel", role: .cancel) {
+                    pendingImportURL = nil
+                }
+                Button("Replace All Data", role: .destructive) {
+                    performImport()
+                }
+            } message: {
+                Text("This will replace all habits and entries with the selected JSON export file.")
+            }
+            .alert("Import Complete", isPresented: $showingImportSuccess) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(importedSummary ?? "Your data was imported.")
+            }
+            .alert("Import Failed", isPresented: $showingImportError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(importErrorMessage ?? "The file could not be imported.")
+            }
+            .fileImporter(
+                isPresented: $showingImportPicker,
+                allowedContentTypes: [.json],
+                allowsMultipleSelection: false
+            ) { result in
+                handleImportSelection(result)
+            }
+        }
+    }
+
+    private func handleImportSelection(_ result: Result<[URL], Error>) {
+        switch result {
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            pendingImportURL = url
+            showingImportConfirmation = true
+        case .failure(let error):
+            importErrorMessage = error.localizedDescription
+            showingImportError = true
+        }
+    }
+
+    private func performImport() {
+        guard let url = pendingImportURL else { return }
+        let accessed = url.startAccessingSecurityScopedResource()
+        defer {
+            if accessed { url.stopAccessingSecurityScopedResource() }
+            pendingImportURL = nil
+        }
+
+        do {
+            let data = try Data(contentsOf: url)
+            let payload = try TrackBothExport.decode(data)
+            let counts = try ExportImportService.importPayload(payload, into: modelContext)
+            importedSummary = "Imported \(counts.metrics) habits and \(counts.entries) entries."
+            showingImportSuccess = true
+            logger.info("JSON import succeeded — \(counts.metrics) metrics, \(counts.entries) entries", category: .data)
+        } catch {
+            importErrorMessage = error.localizedDescription
+            showingImportError = true
+            logger.error("JSON import failed: \(error.localizedDescription)", category: .data)
         }
     }
     
     private func generateExportData() -> Data? {
-        let exportData = ExportData(
-            metrics: metrics.map { metric in
-                ExportMetric(
-                    id: metric.id.uuidString,
-                    name: metric.name,
-                    createdAt: metric.createdAt,
-                    habitType: metric.habitType.rawValue
-                )
-            },
-            entries: entries.map { entry in
-                ExportEntry(
-                    id: entry.id.uuidString,
-                    metricID: entry.metricID.uuidString,
-                    date: entry.date,
-                    value: entry.value,
-                    details: entry.details,
-                    motivation: entry.motivation,
-                    starred: entry.starred
-                )
-            },
-            exportDate: Date()
-        )
-        
         do {
-            return try JSONEncoder().encode(exportData)
+            return try TrackBothExport.encode(metrics: metrics, entries: entries)
         } catch {
-            print("Failed to encode export data: \(error)")
+            logger.error("Failed to encode export data: \(error.localizedDescription)", category: .data)
             return nil
         }
     }
@@ -475,30 +530,7 @@ struct SettingsView: View {
 }
 
 // MARK: - Export Data Models
-struct ExportData: Codable {
-    let metrics: [ExportMetric]
-    let entries: [ExportEntry]
-    let exportDate: Date
-}
-
-struct ExportMetric: Codable {
-    let id: String
-    let name: String
-    let createdAt: Date
-    let habitType: String
-}
-
-struct ExportEntry: Codable {
-    let id: String
-    let metricID: String
-    let date: Date
-    let value: Bool
-    let details: String?
-    let motivation: String?
-    let starred: Bool?
-}
-
-// Removed ExportGoal; goals are included in Metric now
+// See Domain/Data/TrackBothExport.swift for canonical export types.
 
 // MARK: - Share Sheet
 struct ShareSheet: UIViewControllerRepresentable {

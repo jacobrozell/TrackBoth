@@ -4,60 +4,69 @@ import SwiftData
 // MARK: - Migration Utilities
 /// Handles data migration for the logged status feature
 struct MigrationUtils {
-    
-    /// Migrate existing metrics to set hasBeenLogged based on existing entries
+
+    /// Migrate metrics to set hasBeenLogged based on existing logged entries
     static func migrateLoggedStatus(in modelContext: ModelContext) {
         logger.info("Starting logged status migration", category: .data)
         let startTime = Date()
-        
+
         do {
-            // Fetch all entries
-            let entriesDescriptor = FetchDescriptor<MetricEntry>()
-            let entries = try modelContext.fetch(entriesDescriptor)
-            
-            var updatedMetricsCount = 0
-            
-            // Update metrics based on existing entries
-            for entry in entries {
-                if !entry.hasBeenLogged {
-                    entry.hasBeenLogged = true
-                    updatedMetricsCount += 1
-                    logger.debug("Updated entry for metric '\(entry.metricID)' to hasBeenLogged=true", category: .data)
+            let metrics = try modelContext.fetch(FetchDescriptor<Metric>())
+            let entries = try modelContext.fetch(FetchDescriptor<MetricEntry>())
+
+            var updatedMetrics = 0
+            var updatedEntries = 0
+
+            let loggedMetricIDs = Set(
+                entries
+                    .filter { $0.hasBeenLogged || $0.hasContent }
+                    .map(\.metricID)
+            )
+
+            for metric in metrics where !metric.hasBeenLogged {
+                if loggedMetricIDs.contains(metric.id) {
+                    metric.hasBeenLogged = true
+                    updatedMetrics += 1
                 }
             }
 
-            // Save changes
+            for entry in entries where !entry.hasBeenLogged && entry.hasContent {
+                entry.hasBeenLogged = true
+                updatedEntries += 1
+            }
+
             try modelContext.save()
-            
+
             let duration = Date().timeIntervalSince(startTime)
             logger.logPerformance("Logged status migration", duration: duration)
-            logger.info("Migration completed successfully - Updated \(updatedMetricsCount) metrics", category: .data)
-            
+            logger.info(
+                "Migration completed - Updated \(updatedMetrics) metrics, \(updatedEntries) entries",
+                category: .data
+            )
         } catch {
             logger.error("Migration failed: \(error.localizedDescription)", category: .data)
         }
     }
-    
+
     /// Check if migration is needed
     static func needsMigration(in modelContext: ModelContext) -> Bool {
         do {
-            let entriesDescriptor = FetchDescriptor<MetricEntry>()
-            let entries = try modelContext.fetch(entriesDescriptor)
-            
-            for entry in entries {
-                if !entry.hasBeenLogged {
-                    logger.debug("Migration needed - Entry for metric '\(entry.metricID)' has hasBeenLogged=false", category: .data)
+            let metrics = try modelContext.fetch(FetchDescriptor<Metric>())
+            if metrics.contains(where: { !$0.hasBeenLogged }) {
+                let entries = try modelContext.fetch(FetchDescriptor<MetricEntry>())
+                if entries.contains(where: { $0.hasBeenLogged || $0.hasContent }) {
                     return true
                 }
             }
-            
-            return false
+
+            let entries = try modelContext.fetch(FetchDescriptor<MetricEntry>())
+            return entries.contains { !$0.hasBeenLogged && $0.hasContent }
         } catch {
             logger.error("Failed to check migration status: \(error.localizedDescription)", category: .data)
             return false
         }
     }
-    
+
     /// Run migration if needed
     static func runMigrationIfNeeded(in modelContext: ModelContext) {
         if needsMigration(in: modelContext) {
@@ -66,11 +75,5 @@ struct MigrationUtils {
         } else {
             logger.info("No migration needed", category: .data)
         }
-    }
-    
-    /// Force run migration (for testing/debugging)
-    static func forceMigration(in modelContext: ModelContext) {
-        logger.info("Force running logged status migration", category: .data)
-        migrateLoggedStatus(in: modelContext)
     }
 }

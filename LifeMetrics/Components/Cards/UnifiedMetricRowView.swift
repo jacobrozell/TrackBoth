@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 
 // MARK: - Unified Metric Row Component
+/// Deprecated for lean 1.0 — `CompactMetricRow` is the active home row. Retained for reference.
 struct UnifiedMetricRowView: View {
     let metric: Metric
     let selectedDate: Date

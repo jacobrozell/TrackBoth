@@ -329,7 +329,7 @@ struct ChartExportModifier: ViewModifier {
         // This function is used by the ChartExportModifier
         // The actual export logic is handled in the individual chart components
         // and the ChartsView where the export buttons are implemented
-        print("Chart export requested - handled by individual chart components")
+        logger.debug("Chart export requested - handled by individual chart components", category: .ui)
     }
 }
 

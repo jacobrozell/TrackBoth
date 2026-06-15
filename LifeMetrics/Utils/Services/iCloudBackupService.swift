@@ -7,10 +7,10 @@ import SwiftData
 /// Service for backing up and restoring app data to/from iCloud
 @Observable
 class iCloudBackupService {
-    
-    // MARK: - Properties
-    private let container = CKContainer.default()
-    private let database: CKDatabase
+
+    private func cloudDatabase() -> CKDatabase {
+        CKContainer.default().privateCloudDatabase
+    }
     
     // MARK: - Backup Data Models
     struct BackupData: Codable {
@@ -60,9 +60,7 @@ class iCloudBackupService {
     }
     
     // MARK: - Initialization
-    init() {
-        self.database = container.privateCloudDatabase
-    }
+    init() {}
     
     // MARK: - Backup Methods
     
@@ -144,7 +142,7 @@ class iCloudBackupService {
         let asset = CKAsset(fileURL: try saveToTemporaryFile(jsonData))
         record["backupData"] = asset
         
-        try await database.save(record)
+        try await cloudDatabase().save(record)
         
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("iCloud backup upload", duration: duration)
@@ -156,7 +154,7 @@ class iCloudBackupService {
         let query = CKQuery(recordType: "TrackBothBackup", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         
-        let results = try await database.records(matching: query)
+        let results = try await cloudDatabase().records(matching: query)
         
         guard let record = results.matchResults.first?.1,
               case .success(let recordData) = record else {
@@ -222,14 +220,21 @@ class iCloudBackupService {
                 starred: backupEntry.starred,
                 details: backupEntry.details,
                 quantity: backupEntry.quantity,
-                unit: backupEntry.unit
+                unit: backupEntry.unit,
+                hasBeenLogged: true
             )
-            
+
             // Set the original ID
             entry.id = UUID(uuidString: backupEntry.id) ?? UUID()
             context.insert(entry)
         }
-        
+
+        let restoredMetrics = try context.fetch(FetchDescriptor<Metric>())
+        let loggedMetricIDs = Set(backupData.entries.map(\.metricID))
+        for metric in restoredMetrics where loggedMetricIDs.contains(metric.id.uuidString) {
+            metric.hasBeenLogged = true
+        }
+
         try context.save()
         
         let duration = Date().timeIntervalSince(startTime)
@@ -240,7 +245,7 @@ class iCloudBackupService {
     /// Check if iCloud is available
     func checkiCloudAvailability() async -> Bool {
         do {
-            let status = try await container.accountStatus()
+            let status = try await CKContainer.default().accountStatus()
             return status == .available
         } catch {
             return false
@@ -252,7 +257,7 @@ class iCloudBackupService {
         let query = CKQuery(recordType: "TrackBothBackup", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         
-        let results = try await database.records(matching: query)
+        let results = try await cloudDatabase().records(matching: query)
         
         guard let record = results.matchResults.first?.1,
               case .success(let recordData) = record else {

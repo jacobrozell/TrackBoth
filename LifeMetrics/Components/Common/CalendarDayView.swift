@@ -121,5 +121,16 @@ struct CalendarDayView: View {
             RoundedRectangle(cornerRadius: 8)
                 .fill(isToday ? Color.currentAccent.opacity(0.2) : Color.clear)
         )
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(calendarAccessibilityLabel)
+        .accessibilityAddTraits(isToday ? .isSelected : [])
+    }
+
+    private var calendarAccessibilityLabel: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        let dateText = formatter.string(from: date)
+        if isToday { return "Today, \(dateText), \(hasEntry ? "has entries" : "no entries")" }
+        return "\(dateText), \(hasEntry ? "has entries" : "no entries")"
     }
 }

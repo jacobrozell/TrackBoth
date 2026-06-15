@@ -37,8 +37,7 @@ struct HomeView: View {
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            GeometryReader { geometry in
-                if metrics.isEmpty {
+            GeometryReader { geometry in                if metrics.isEmpty {
                     EmptyStateView(
                         icon: "plus.circle.fill",
                         title: "No Habits Yet",
@@ -97,8 +96,9 @@ struct HomeView: View {
             }
             .themedBackground()
             .navigationTitle("TrackBoth")
+            .accessibilityIdentifier(AccessibilityIdentifiers.tabHome)
             .toolbar {
-                if metrics.isEmpty || hasDemoData {
+                if ProductSurface.showsDemoData && (metrics.isEmpty || hasDemoData) {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
                             hasDemoData ? DemoDataGenerator.clearDemoData(modelContext: modelContext) : DemoDataGenerator.generateDemoData(modelContext: modelContext)
@@ -113,7 +113,11 @@ struct HomeView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
                         viewModel.showSettings()
-                    } label: { Image(systemName: "gear") }
+                    } label: {
+                        Image(systemName: "gear")
+                    }
+                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
+                    .accessibilityLabel("Settings")
                 }
             }
             .onAppear {

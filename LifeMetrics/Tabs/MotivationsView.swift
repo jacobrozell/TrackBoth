@@ -229,6 +229,7 @@ struct MotivationsView: View {
             }
             .themedBackground()
             .navigationTitle("Motivation")
+            .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

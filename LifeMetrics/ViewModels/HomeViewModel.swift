@@ -49,22 +49,14 @@ class HomeViewModel {
         let startTime = Date()
         let today = Calendar.current.startOfDay(for: selectedDate)
         let count = metrics.filter { metric in
-            // Only count metrics that have entries
-            guard entries.contains(where: { $0.metricID == metric.id }) else { return false }
-            
-            let isVice = metric.habitType == .vice
             let todayEntry = entries.first { entry in
-                entry.metricID == metric.id && 
+                entry.metricID == metric.id &&
                 Calendar.current.isDate(entry.date, inSameDayAs: today)
             }
-            
-            if isVice {
-                // For vices, only count as completed if explicitly logged as avoided (value == false)
-                return todayEntry?.value == false
-            } else {
-                // For habits, count as completed if explicitly logged as done (value == true)
-                return todayEntry?.value == true
-            }
+            return TrackingSemantics.countsTowardTodayCompleted(
+                habitType: metric.habitType,
+                entry: todayEntry
+            )
         }.count
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("Today completed calculation", duration: duration)
@@ -184,27 +176,33 @@ class HomeViewModel {
     }
     
     /// Toggle metric completion for selected date
-    func toggleMetricCompletion(_ metric: Metric, in modelContext: ModelContext, entries: [MetricEntry]) { 
+    func toggleMetricCompletion(_ metric: Metric, in modelContext: ModelContext, entries: [MetricEntry]) {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
-        
-        logger.logUserAction("Toggle metric completion", details: "Metric: \(metric.name), Date: \(DateFormatter.dateFormatter.string(from: selectedDate))")
-        let startTime = Date()
-        
-        // Use getOrCreate to handle both existing and new entries
-        let entry = MetricEntry.getOrCreate(
-            for: metric.id,
-            date: startOfDay,
-            in: modelContext,
-            entries: entries,
-            metric: metric
+
+        logger.logUserAction(
+            "Toggle metric completion",
+            details: "Metric: \(metric.name), Date: \(DateFormatter.dateFormatter.string(from: selectedDate))"
         )
-        
-        // Toggle the entry value
-        let oldValue = entry.value
-        entry.value.toggle()
-        logger.debug("Toggled entry - Metric: \(metric.name), From: \(oldValue) to \(entry.value)", category: .data)
-        
+        let startTime = Date()
+
+        let existingEntry = MetricEntry.find(for: metric.id, date: startOfDay, in: entries)
+        let newValue = TrackingSemantics.valueAfterQuickToggle(
+            habitType: metric.habitType,
+            existingEntry: existingEntry
+        )
+
+        let entry: MetricEntry
+        if let existingEntry {
+            entry = existingEntry
+        } else {
+            entry = MetricEntry(metricID: metric.id, date: startOfDay, value: newValue, hasBeenLogged: false)
+            modelContext.insert(entry)
+        }
+
+        entry.value = newValue
+        MetricEntry.markLogged(entry: entry, metric: metric)
+
         do {
             try modelContext.save()
             let duration = Date().timeIntervalSince(startTime)

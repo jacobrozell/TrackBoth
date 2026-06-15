@@ -38,10 +38,10 @@ class MetricEntry {
         return starred ?? false
     }
     
-    /// Check if entry has meaningful content (value, motivation, details, or quantity)
+    /// Check if entry has meaningful content (explicit log, motivation, details, or quantity)
     var hasContent: Bool {
-        return value || 
-               (details != nil && !details!.isEmpty) || 
+        if hasBeenLogged { return true }
+        return (details != nil && !details!.isEmpty) ||
                (motivation != nil && !motivation!.isEmpty) ||
                (quantity != nil && quantity! > 0)
     }
@@ -71,11 +71,25 @@ class MetricEntry {
             return existingEntry
         }
         
-        // Create new entry
-        let newEntry = MetricEntry(metricID: metricID, date: startOfDay, value: false, hasBeenLogged: true)
+        // Create new entry (not marked logged until user explicitly saves)
+        let newEntry = MetricEntry(metricID: metricID, date: startOfDay, value: false, hasBeenLogged: false)
         context.insert(newEntry)
         
         return newEntry
+    }
+
+    /// Find entry for metric and date without creating one.
+    static func find(for metricID: UUID, date: Date, in entries: [MetricEntry]) -> MetricEntry? {
+        let startOfDay = Calendar.current.startOfDay(for: date)
+        return entries.first {
+            $0.metricID == metricID && Calendar.current.isDate($0.date, inSameDayAs: startOfDay)
+        }
+    }
+
+    /// Mark entry and metric as explicitly logged by the user.
+    static func markLogged(entry: MetricEntry, metric: Metric?) {
+        entry.hasBeenLogged = true
+        metric?.hasBeenLogged = true
     }
 }
 
@@ -117,7 +131,11 @@ extension MetricEntry {
         if let unit = unit {
             entry.unit = unit.isEmpty ? nil : unit
         }
-        
+
+        if value != nil || details != nil || motivation != nil || quantity != nil {
+            MetricEntry.markLogged(entry: entry, metric: metric)
+        }
+
         return entry
     }
     

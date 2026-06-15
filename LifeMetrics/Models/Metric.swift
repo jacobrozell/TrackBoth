@@ -11,6 +11,7 @@ class Metric {
     var createdAt: Date = Date()
     var habitType: HabitType = HabitType.positive
     var primaryMotivation: String? // Primary motivation set when creating the habit/vice
+    var hasBeenLogged: Bool = false // User has ever explicitly logged this metric
     
     // Relationship to goals (one metric can have multiple goals)
     @Relationship(deleteRule: .cascade, inverse: \Goal.metric)

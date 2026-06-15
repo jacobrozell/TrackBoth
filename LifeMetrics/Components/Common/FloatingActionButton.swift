@@ -43,6 +43,7 @@ struct FloatingActionButton: View {
                         isPressed = pressing
                     }
                 }, perform: {})
+                .accessibilityIdentifier(AccessibilityIdentifiers.fabAddMetric)
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
             }
@@ -54,7 +55,7 @@ struct FloatingActionButton: View {
     ZStack {
         Color.gray.opacity(0.1)
         FloatingActionButton {
-            print("Floating button tapped")
+            logger.logUserAction("Floating action button tapped (preview)")
         }
     }
 }

@@ -175,6 +175,7 @@ struct GoalsView: View {
             }
             .themedBackground()
             .navigationTitle("Goals")
+            .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

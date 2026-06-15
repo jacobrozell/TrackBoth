@@ -11,46 +11,28 @@ import SwiftData
 @main
 struct TrackBothApp: App {
     @AppStorage("selectedTheme") private var selectedTheme: String = Theme.system.rawValue
-    
+
     init() {
         logger.info("TrackBothApp initializing", category: .general)
+        applyLaunchEnvironmentOverrides()
     }
-    
-    var sharedModelContainer: ModelContainer = {
+
+    let sharedModelContainer: ModelContainer = {
         logger.info("Creating SwiftData ModelContainer", category: .data)
         let startTime = Date()
-        
-        do {
-            // Create a simple container with all models
-            let container = try ModelContainer(for: Metric.self, MetricEntry.self, Goal.self)
-            let duration = Date().timeIntervalSince(startTime)
-            logger.logPerformance("SwiftData ModelContainer creation", duration: duration)
+        let container = BootstrapStoreRecovery.makeContainer()
+        let duration = Date().timeIntervalSince(startTime)
+        logger.logPerformance("SwiftData ModelContainer creation", duration: duration)
+        if BootstrapStoreRecovery.mode == .inMemoryFallback {
+            logger.warn("SwiftData ModelContainer using in-memory fallback", category: .data)
+        } else {
             logger.info("SwiftData ModelContainer created successfully", category: .data)
-            return container
-        } catch {
-            logger.error("SwiftData Error: \(error.localizedDescription)", category: .data)
-            logger.warn("Attempting fallback with explicit schema and in-memory storage", category: .data)
-            
-            // Try with explicit schema
-            do {
-                let schema = Schema([Metric.self, MetricEntry.self, Goal.self])
-                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                let container = try ModelContainer(for: schema, configurations: [config])
-                let duration = Date().timeIntervalSince(startTime)
-                logger.logPerformance("SwiftData ModelContainer creation (fallback)", duration: duration)
-                logger.warn("SwiftData ModelContainer created with in-memory storage", category: .data)
-                return container
-            } catch {
-                logger.fatal("Even in-memory storage failed: \(error.localizedDescription)", category: .data)
-                fatalError("Could not create ModelContainer: \(error)")
-            }
         }
+        return container
     }()
-    
+
     private var currentTheme: Theme {
-        let theme = Theme(rawValue: selectedTheme) ?? .system
-        logger.debug("Current theme: \(theme.rawValue)", category: .ui)
-        return theme
+        Theme(rawValue: selectedTheme) ?? .system
     }
 
     var body: some Scene {
@@ -62,5 +44,15 @@ struct TrackBothApp: App {
                 }
         }
         .modelContainer(sharedModelContainer)
+    }
+
+    private func applyLaunchEnvironmentOverrides() {
+        let env = ProcessInfo.processInfo.environment
+        if env["UI_TEST_RESET"] == "1", let domain = Bundle.main.bundleIdentifier {
+            UserDefaults.standard.removePersistentDomain(forName: domain)
+        }
+        if env["RESET_ONBOARDING"] == "1" {
+            UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+        }
     }
 }

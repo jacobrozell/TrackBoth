@@ -74,26 +74,29 @@ struct ChartsView: View {
                     }
                 }
                 .navigationTitle("Charts")
+                .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
                 .onAppear {
                     logger.info("ChartsView appeared", category: .ui)
                     logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(viewModel.selectedFilter), ChartType: \(viewModel.selectedChartType)", category: .ui)
                 }
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        if metrics.isEmpty {
-                            Button("Try Demo Data") {
-                                logger.logUserAction("Generate demo data")
-                                DemoDataGenerator.generateDemoData(modelContext: modelContext)
+                    if ProductSurface.showsDemoData {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            if metrics.isEmpty {
+                                Button("Try Demo Data") {
+                                    logger.logUserAction("Generate demo data")
+                                    DemoDataGenerator.generateDemoData(modelContext: modelContext)
+                                }
+                                .font(.caption)
+                                .foregroundColor(Color.currentPrimary)
+                            } else if DemoDataGenerator.hasDemoData() {
+                                Button("Undo Demo Data") {
+                                    logger.logUserAction("Clear demo data")
+                                    DemoDataGenerator.clearDemoData(modelContext: modelContext)
+                                }
+                                .font(.caption)
+                                .foregroundColor(Color.currentWarning)
                             }
-                            .font(.caption)
-                            .foregroundColor(Color.currentPrimary)
-                        } else if DemoDataGenerator.hasDemoData() {
-                            Button("Undo Demo Data") {
-                                logger.logUserAction("Clear demo data")
-                                DemoDataGenerator.clearDemoData(modelContext: modelContext)
-                            }
-                            .font(.caption)
-                            .foregroundColor(Color.currentWarning)
                         }
                     }
                     

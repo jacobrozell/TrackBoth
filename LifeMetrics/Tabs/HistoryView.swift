@@ -211,9 +211,9 @@ struct HistoryView: View {
                     }
                 }
             }
-            .padding(.horizontal, 16)
+            .padding(.horizontal, 20)
         }
-        .padding(.vertical, 8)
+        .padding(.vertical, 12)
         .background(Color.currentSecondaryBackground)
     }
     
@@ -299,6 +299,7 @@ struct HistoryView: View {
             }
             .themedBackground()
             .navigationTitle("History")
+            .accessibilityIdentifier(AccessibilityIdentifiers.tabHistory)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {

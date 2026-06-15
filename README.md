@@ -26,11 +26,17 @@ A SwiftUI/SwiftData prototype for tracking positive habits and avoiding vices wi
 
 ## Getting Started
 
-1. Open the project in Xcode 15+
-2. Build and run on iOS 17+ simulator or device
-3. Start by adding your first habit or vice from the Home tab
-4. Toggle daily to build streaks (positive habits) or track clean days (vices)
-5. Set goals and track progress over time
+1. Install [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
+2. Generate the Xcode project and open it:
+
+```bash
+cd LifeMetrics
+xcodegen generate
+open TrackBoth.xcodeproj
+```
+
+3. Build and run on iOS 18+ simulator or device
+4. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for schemes, tests, and CI
 
 ## Data Model
 
@@ -45,10 +51,14 @@ The app follows a simple MVVM pattern with SwiftData:
 - Views handle UI and user interaction
 - SwiftData manages persistence automatically
 
-## Future Enhancements
+## Documentation
 
-- Notifications and reminders
-- Apple Watch companion
-- iCloud sync
-- Data export/import
-- Achievement system
+- **Specs (authoritative):** [`specs/README.md`](specs/README.md)
+- **Lean 1.0 plan:** [`docs/release/lean-1.0-master-plan.md`](docs/release/lean-1.0-master-plan.md)
+- **Feature inventory:** [`docs/feature-inventory.md`](docs/feature-inventory.md)
+
+Legacy drafts in `Specs/` (capital S) are deprecated — see [`Specs/README.md`](Specs/README.md).
+
+## Future Enhancements (post-1.0)
+
+See [`specs/planned/README.md`](specs/planned/README.md) — widgets, watch, notifications, achievements, etc.

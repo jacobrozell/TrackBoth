@@ -25,6 +25,7 @@ struct DemoDataGenerator {
         
         // Insert metrics
         for metric in demoMetrics {
+            metric.hasBeenLogged = true
             modelContext.insert(metric)
         }
         
@@ -50,9 +51,10 @@ struct DemoDataGenerator {
                     let entry = MetricEntry(
                         metricID: metric.id,
                         date: currentDate,
-                        value: true,
+                        value: TrackingSemantics.successValue(habitType: metric.habitType),
                         quantity: quantity,
-                        unit: unit
+                        unit: unit,
+                        hasBeenLogged: true
                     )
                     modelContext.insert(entry)
                 }
@@ -161,7 +163,7 @@ struct DemoDataGenerator {
             try modelContext.delete(model: MetricEntry.self)
             try modelContext.save()
         } catch {
-            print("Error clearing demo data: \(error)")
+            logger.error("Error clearing demo data: \(error.localizedDescription)", category: .data)
         }
     }
     
