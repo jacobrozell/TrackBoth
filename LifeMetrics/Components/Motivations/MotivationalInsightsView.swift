@@ -12,11 +12,13 @@ struct MotivationalInsightsView: View {
         var insights: [Insight] = []
         
         // Calculate basic stats
-        let totalEntries = entries.filter { matchesFilter(entry: $0) }.count
-        let successfulEntries = entries.filter { entry in
-            matchesFilter(entry: entry) && isSuccessfulEntry(entry)
-        }.count
-        let successRate = totalEntries > 0 ? Double(successfulEntries) / Double(totalEntries) : 0
+        let loggedEntries = entries.filter { entry in
+            matchesFilter(entry: entry) && TrackingSemantics.isLoggedForDay(entry: entry)
+        }
+        let successfulEntries = loggedEntries.filter(isLoggedSuccessfulEntry)
+        let successRate = loggedEntries.isEmpty
+            ? 0
+            : Double(successfulEntries.count) / Double(loggedEntries.count)
         
         // Current streak
         let currentStreak = calculateCurrentStreak()
@@ -76,12 +78,10 @@ struct MotivationalInsightsView: View {
         FilterUtils.matchesFilter(filter, entry: entry, metrics: metrics)
     }
     
-    private func isSuccessfulEntry(_ entry: MetricEntry) -> Bool {
-        let metric = metrics.first { $0.id == entry.metricID }
-        let isVice = metric?.habitType == .vice
-        // For positive habits: success when value == true (completed)
-        // For vices: success when value == false (avoided)
-        return isVice ? !entry.value : entry.value
+    private func isLoggedSuccessfulEntry(_ entry: MetricEntry) -> Bool {
+        guard let metric = metrics.first(where: { $0.id == entry.metricID }) else { return false }
+        return TrackingSemantics.isLoggedForDay(entry: entry)
+            && TrackingSemantics.isSuccessful(habitType: metric.habitType, value: entry.value)
     }
     
     private var consistencyTitle: String {
@@ -189,35 +189,30 @@ struct MotivationalInsightsView: View {
     }
     
     private func calculateCurrentStreak() -> Int {
-        let filteredEntries = entries.filter { entry in
-            matchesFilter(entry: entry) && isSuccessfulEntry(entry)
-        }
-        return StreakUtils.calculateCurrentStreak(filteredEntries: filteredEntries)
+        StreakUtils.calculateFilterCurrentStreak(filter: filter, metrics: metrics, entries: entries)
     }
-    
+
     private func calculateWeeklyCompletion() -> Int {
         let startOfWeek = CalendarHelper.startOfWeek(for: Date())
         let endOfWeek = CalendarHelper.endOfWeek(for: Date())
-        
+
         return entries.filter { entry in
             entry.date >= startOfWeek &&
             entry.date < endOfWeek &&
-            isSuccessfulEntry(entry) &&
-            matchesFilter(entry: entry)
+            matchesFilter(entry: entry) &&
+            isLoggedSuccessfulEntry(entry)
         }.count
     }
-    
+
     private func findBestDay() -> (count: Int, dayName: String)? {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEEE"
-        
+
         var dayCounts: [String: Int] = [:]
-        
-        for entry in entries {
-            if isSuccessfulEntry(entry) && matchesFilter(entry: entry) {
-                let dayName = formatter.string(from: entry.date)
-                dayCounts[dayName, default: 0] += 1
-            }
+
+        for entry in entries where matchesFilter(entry: entry) && isLoggedSuccessfulEntry(entry) {
+            let dayName = formatter.string(from: entry.date)
+            dayCounts[dayName, default: 0] += 1
         }
         
         if let bestDay = dayCounts.max(by: { $0.value < $1.value }) {
@@ -307,7 +302,7 @@ struct MotivationalInsightsView: View {
                 }
                 .frame(height: 120)
             } else {
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 12) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 12)], spacing: 12) {
                     ForEach(Array(insights.enumerated()), id: \.element.type) { index, insight in
                         InsightCard(insight: insight)
                             .opacity(animateInsights ? 1.0 : 0.0)
@@ -352,6 +347,8 @@ struct InsightCard: View {
                 .font(.caption2)
                 .foregroundColor(.currentSecondaryText)
                 .multilineTextAlignment(.leading)
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
         .background(Color.currentSecondaryBackground)

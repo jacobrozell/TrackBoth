@@ -21,13 +21,7 @@ struct HeatmapView: View {
                 matchesFilter(entry: entry)
             }
             
-            // For positive habits: count when value == true (completed)
-            // For vices: count when value == false (avoided)
-            let hasSuccessfulEntry = dayEntries.contains { entry in
-                let metric = metrics.first { $0.id == entry.metricID }
-                let isVice = metric?.habitType == .vice
-                return isVice ? !entry.value : entry.value
-            }
+            let hasSuccessfulEntry = !FilterUtils.successfulEntries(filter, entries: dayEntries, metrics: metrics).isEmpty
             
             data.append(HeatmapData(
                 date: currentDate,

@@ -16,19 +16,11 @@ struct BarChartView: View {
         
         var weeklyCounts: [String: Int] = [:]
         
-        for entry in entries {
-            if entry.date >= startDate && entry.date <= endDate && matchesFilter(entry: entry) {
-                // For positive habits: count when value == true (completed)
-                // For vices: count when value == false (avoided)
-                let metric = metrics.first { $0.id == entry.metricID }
-                let isVice = metric?.habitType == .vice
-                let shouldCount = isVice ? !entry.value : entry.value
-                
-                if shouldCount {
-                    let weekStart = CalendarHelper.startOfWeek(for: entry.date)
-                    let weekKey = DateFormatter.weekFormatter.string(from: weekStart)
-                    weeklyCounts[weekKey, default: 0] += 1
-                }
+        for entry in FilterUtils.successfulEntries(filter, entries: entries, metrics: metrics) {
+            if entry.date >= startDate && entry.date <= endDate {
+                let weekStart = CalendarHelper.startOfWeek(for: entry.date)
+                let weekKey = DateFormatter.weekFormatter.string(from: weekStart)
+                weeklyCounts[weekKey, default: 0] += 1
             }
         }
         

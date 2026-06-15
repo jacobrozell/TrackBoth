@@ -24,11 +24,13 @@ struct HistoryEntryCardView: View {
         return formatter.string(from: entry.date)
     }
     
+    private var showsStatusBadge: Bool {
+        metric != nil && TrackingSemantics.isLoggedForDay(entry: entry)
+    }
+
     private var isSuccess: Bool {
-        // For habits: value=true means completed (success)
-        // For vices: value=false means avoided (success)
-        guard let metric = metric else { return false }
-        return metric.habitType == .positive ? entry.value : !entry.value
+        guard let metric else { return false }
+        return TrackingSemantics.isLoggedSuccess(habitType: metric.habitType, entry: entry)
     }
     
     var body: some View {
@@ -56,11 +58,12 @@ struct HistoryEntryCardView: View {
                 }
                 
                 Spacer()
-                
-                // Success indicator
-                Image(systemName: isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundColor(isSuccess ? Color.currentSuccess : Color.currentError)
-                    .font(.system(size: 20))
+
+                if showsStatusBadge {
+                    Image(systemName: isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundColor(isSuccess ? Color.currentSuccess : Color.currentError)
+                        .font(.system(size: 20))
+                }
             }
             .padding(.horizontal, 12)
             .padding(.top, 12)
@@ -111,7 +114,11 @@ struct HistoryEntryCardView: View {
             
             // Bottom accent
             Rectangle()
-                .fill(isSuccess ? Color.currentSuccess.opacity(0.3) : Color.currentError.opacity(0.3))
+                .fill(
+                    showsStatusBadge
+                        ? (isSuccess ? Color.currentSuccess.opacity(0.3) : Color.currentError.opacity(0.3))
+                        : Color.currentSecondaryText.opacity(0.2)
+                )
                 .frame(height: 3)
                 .cornerRadius(1.5)
         }
@@ -119,7 +126,7 @@ struct HistoryEntryCardView: View {
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("History entry for \(metric?.name ?? "Unknown"): \(isSuccess ? "Success" : "Not completed")")
+        .accessibilityLabel("History entry for \(metric?.name ?? "Unknown")\(showsStatusBadge ? ": \(isSuccess ? "Success" : "Not completed")" : "")")
         .onTapGesture {
             showingDetails = true
         }

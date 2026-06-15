@@ -116,10 +116,18 @@ struct GoalHistoryView: View {
             let periodEntries = entries.filter { entry in
                 entry.metricID == metric.id &&
                 entry.date >= startDate &&
-                entry.date <= endDate
+                entry.date < endDate
             }
-            
-            let progress = calculateProgress(for: periodEntries, target: goal.target, isVice: metric.habitType == .vice)
+
+            let progress = Int(
+                GoalUtils.calculateHistoricalGoalProgress(
+                    for: goal,
+                    metric: metric,
+                    entries: periodEntries,
+                    periodStart: startDate,
+                    periodEnd: endDate
+                ).current
+            )
             
             periods.append(HistoricalPeriod(
                 startDate: startDate,
@@ -133,14 +141,6 @@ struct GoalHistoryView: View {
         }
         
         return periods
-    }
-    
-    private func calculateProgress(for entries: [MetricEntry], target: Int, isVice: Bool) -> Int {
-        if isVice {
-            return entries.filter { !$0.value }.count
-        } else {
-            return entries.filter { $0.value }.count
-        }
     }
 }
 

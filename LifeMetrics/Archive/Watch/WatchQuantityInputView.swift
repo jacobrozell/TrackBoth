@@ -151,15 +151,19 @@ struct WatchQuantityInputView: View {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
         
-        // If they log quantity, we know they did it - set boolean to true
+        let loggedValue = metric.habitType == .vice
+            ? TrackingSemantics.failureValue(habitType: .vice)
+            : TrackingSemantics.successValue(habitType: .positive)
+
         MetricEntry.updateOrCreate(
             for: metric.id,
             date: startOfDay,
-            value: true,
+            value: loggedValue,
             quantity: quantity,
             unit: unit.isEmpty ? nil : unit,
             in: modelContext,
-            entries: entries
+            entries: entries,
+            metric: metric
         )
         
         try? modelContext.save()

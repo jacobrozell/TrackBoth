@@ -23,19 +23,11 @@ struct LineChartView: View {
                 matchesFilter(entry: entry)
             }
             
-            // Count successful completions/avoidances for this day
-            let successfulEntries = dayEntries.filter { entry in
-                let metric = metrics.first { $0.id == entry.metricID }
-                let isVice = metric?.habitType == .vice
-                // For positive habits: count when value == true (completed)
-                // For vices: count when value == false (avoided)
-                return isVice ? !entry.value : entry.value
-            }
-            
-            if !successfulEntries.isEmpty {
+            let dayHasSuccess = !FilterUtils.successfulEntries(filter, entries: dayEntries, metrics: metrics).isEmpty
+            if dayHasSuccess {
                 cumulativeCount += 1
             }
-            
+
             data.append(ChartDataPoint(
                 date: currentDate,
                 value: cumulativeCount

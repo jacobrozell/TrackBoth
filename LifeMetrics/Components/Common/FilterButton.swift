@@ -16,7 +16,10 @@ struct FilterButton: View {
                 Text(filter.displayName)
                     .font(.caption)
                     .fontWeight(.medium)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             }
+            .frame(maxWidth: 148, alignment: .leading)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .background(isSelected ? Color.currentAccent : Color.currentSecondaryText.opacity(0.2))

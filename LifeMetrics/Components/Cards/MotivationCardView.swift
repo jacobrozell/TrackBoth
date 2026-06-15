@@ -21,8 +21,14 @@ struct MotivationCardView: View {
         return formatter.string(from: entry.date)
     }
     
+    private var showsStatusBadge: Bool {
+        guard metric != nil else { return false }
+        return TrackingSemantics.isLoggedForDay(entry: entry)
+    }
+
     private var isSuccess: Bool {
-        !entry.value // For vices, value=false means avoided (success)
+        guard let metric else { return false }
+        return TrackingSemantics.isLoggedSuccess(habitType: metric.habitType, entry: entry)
     }
     
     var body: some View {
@@ -51,12 +57,13 @@ struct MotivationCardView: View {
                 }
                 
                 Spacer()
-                
-                // Success indicator with better size
-                Image(systemName: isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundColor(isSuccess ? Color.currentSuccess : Color.currentError)
-                    .font(.system(size: 24))
-                    .shadow(color: (isSuccess ? Color.currentSuccess : Color.currentError).opacity(0.3), radius: 2)
+
+                if showsStatusBadge {
+                    Image(systemName: isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundColor(isSuccess ? Color.currentSuccess : Color.currentError)
+                        .font(.system(size: 24))
+                        .shadow(color: (isSuccess ? Color.currentSuccess : Color.currentError).opacity(0.3), radius: 2)
+                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)
@@ -72,7 +79,11 @@ struct MotivationCardView: View {
             
             // Bottom accent with better visibility
             Rectangle()
-                .fill(isSuccess ? Color.currentSuccess.opacity(0.4) : Color.currentError.opacity(0.4))
+                .fill(
+                    showsStatusBadge
+                        ? (isSuccess ? Color.currentSuccess.opacity(0.4) : Color.currentError.opacity(0.4))
+                        : Color.currentSecondaryText.opacity(0.2)
+                )
                 .frame(height: 4)
                 .cornerRadius(2)
         }

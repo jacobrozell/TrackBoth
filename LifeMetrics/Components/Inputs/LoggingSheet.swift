@@ -153,7 +153,15 @@ struct LoggingSheet: View, Identifiable {
             entry.unit = nil
         }
 
-        MetricEntry.markLogged(entry: entry, metric: metric)
+        if TrackingSemantics.shouldMarkLoggedOnSave(
+            habitType: metric.habitType,
+            value: value,
+            details: details,
+            quantity: quantity,
+            existingEntry: existingEntry
+        ) {
+            MetricEntry.markLogged(entry: entry, metric: metric)
+        }
 
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.impactOccurred()

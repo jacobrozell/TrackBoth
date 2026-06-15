@@ -106,7 +106,9 @@ struct CompactMetricRow: View {
                             if metric.hasBeenLogged, streak > 0 {
                                 HStack(spacing: 4) {
                                     Image(systemName: "flame.fill").foregroundColor(Color.currentWarning).font(.caption)
-                                    Text(metric.habitType == .positive ? "\(streak) day streak" : "\(streak) days clean")
+                                    Text(metric.habitType == .positive
+                                        ? StreakCopy.habitStreak(streak)
+                                        : StreakCopy.viceClean(streak))
                                         .caption()
                                         .foregroundColor(Color.currentSecondaryText)
                                 }

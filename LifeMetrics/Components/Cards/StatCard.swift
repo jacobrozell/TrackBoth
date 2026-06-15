@@ -6,10 +6,15 @@ struct StatCard: View {
     let value: String
     let icon: String
     let color: Color
-    
+    var compact: Bool = false
+
+    private var iconSize: CGFloat { compact ? 36 : 48 }
+    private var verticalPadding: CGFloat { compact ? 12 : 20 }
+    private var horizontalPadding: CGFloat { compact ? 8 : 16 }
+    private var contentSpacing: CGFloat { compact ? 8 : 16 }
+
     var body: some View {
-        VStack(spacing: 16) {
-            // Icon with modern gradient background
+        VStack(spacing: contentSpacing) {
             ZStack {
                 Circle()
                     .fill(
@@ -22,33 +27,33 @@ struct StatCard: View {
                             endPoint: .bottomTrailing
                         )
                     )
-                    .frame(width: 48, height: 48)
-                
+                    .frame(width: iconSize, height: iconSize)
+
                 Image(systemName: icon)
-                    .font(.title2)
+                    .font(compact ? .body : .title2)
                     .fontWeight(.semibold)
                     .foregroundColor(color)
             }
-            
-            // Value with modern typography
+
             Text(value)
-                .h2()
+                .font(compact ? AppTypography.h3 : AppTypography.h2)
                 .foregroundColor(Color.currentText)
                 .minimumScaleFactor(0.7)
-            
-            // Title with improved styling
+                .lineLimit(1)
+
             Text(title)
                 .captionSmall()
-                .foregroundColor(Color.currentSecondaryText)
+                .foregroundColor(Color.currentText.opacity(0.65))
                 .textCase(.uppercase)
                 .tracking(0.8)
                 .frame(height: 16)
                 .minimumScaleFactor(0.8)
                 .multilineTextAlignment(.center)
+                .lineLimit(1)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .padding(.horizontal, 16)
+        .frame(maxWidth: compact ? nil : .infinity)
+        .padding(.vertical, verticalPadding)
+        .padding(.horizontal, horizontalPadding)
         .background(
             RoundedRectangle(cornerRadius: 20)
                 .fill(Color.currentSecondaryBackground)

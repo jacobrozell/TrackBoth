@@ -8,6 +8,8 @@ struct ChartContentView: View {
     let entries: [MetricEntry]
     let metrics: [Metric]
     
+    @Environment(\.usesLandscapeChrome) private var usesLandscapeChrome
+
     var body: some View {
         GeometryReader { geometry in
             ScrollView {
@@ -66,6 +68,7 @@ struct ChartContentView: View {
                     }
                 }
                 .padding()
+                .adaptiveScrollInset()
             }
             .id("chart-\(geometry.size.width > geometry.size.height ? "landscape" : "portrait")-\(geometry.size.width)-\(geometry.size.height)")
         }

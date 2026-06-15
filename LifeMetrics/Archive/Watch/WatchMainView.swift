@@ -201,50 +201,41 @@ struct WatchMainView: View {
     private func toggleMetric(_ metric: Metric) {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
-        
-        let entry = MetricEntry.getOrCreate(
-            for: metric.id,
-            date: startOfDay,
-            in: modelContext,
-            entries: entries,
-            metric: metric
+
+        let existingEntry = MetricEntry.find(for: metric.id, date: startOfDay, in: entries)
+        let newValue = TrackingSemantics.valueAfterQuickToggle(
+            habitType: metric.habitType,
+            existingEntry: existingEntry
         )
-        
-        entry.value.toggle()
-        
-        // Haptic feedback
+
+        let entry: MetricEntry
+        if let existingEntry {
+            entry = existingEntry
+        } else {
+            entry = MetricEntry(metricID: metric.id, date: startOfDay, value: newValue, hasBeenLogged: false)
+            modelContext.insert(entry)
+        }
+
+        entry.value = newValue
+        MetricEntry.markLogged(entry: entry, metric: metric)
+
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
-        
+
         try? modelContext.save()
     }
-    
+
     private func calculateStreak() -> Int? {
-        // Check if any metrics have entries
-        let hasLoggedMetrics = metrics.contains { metric in entries.contains(where: { $0.metricID == metric.id }) }
-        if !hasLoggedMetrics {
-            return nil // No streak if no metrics have been logged
+        let streaks = metrics.compactMap { metric -> Int? in
+            let streak = StreakUtils.calculateCurrentStreak(
+                for: metric,
+                entries: entries,
+                selectedDate: selectedDate
+            )
+            return streak > 0 ? streak : nil
         }
-        
-        // Simple streak calculation - count consecutive days with any completion
-        let calendar = Calendar.current
-        var streak = 0
-        var currentDate = selectedDate
-        
-        while streak < 30 { // Max 30 day streak for performance
-            let dayEntries = entries.filter { entry in
-                calendar.isDate(entry.date, inSameDayAs: currentDate)
-            }
-            
-            if dayEntries.isEmpty || !dayEntries.contains(where: { $0.value }) {
-                break
-            }
-            
-            streak += 1
-            currentDate = calendar.date(byAdding: .day, value: -1, to: currentDate) ?? currentDate
-        }
-        
-        return streak > 0 ? streak : nil
+        guard let best = streaks.max() else { return nil }
+        return best
     }
 }
 

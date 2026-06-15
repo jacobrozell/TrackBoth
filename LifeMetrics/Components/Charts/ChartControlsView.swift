@@ -2,13 +2,15 @@ import SwiftUI
 
 // MARK: - ChartControlsView Component
 struct ChartControlsView: View {
+    @Environment(\.isCompactLandscape) private var isCompactLandscape
+
     @Binding var selectedFilter: MetricFilter
     @Binding var selectedChartType: ChartType
     let metrics: [Metric]
     let isLandscape: Bool
     
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: isCompactLandscape ? 10 : 20) {
             // Filter picker
             VStack(alignment: .leading, spacing: 8) {
                 Text("Filter Data")
@@ -55,7 +57,7 @@ struct ChartControlsView: View {
                 .padding(.horizontal)
             }
         }
-        .padding(.vertical)
+        .padding(.vertical, isCompactLandscape ? 6 : 16)
         .background(Color.currentSecondaryBackground.opacity(0.5))
     }
     

@@ -11,7 +11,7 @@ struct QuantityChartView: View {
     
     private var quantityData: [QuantityDataPoint] {
         let filteredEntries = entries.filter { entry in
-            guard entry.hasQuantity else { return false }
+            guard entry.hasQuantity, TrackingSemantics.isLoggedForDay(entry: entry) else { return false }
             
             switch filter {
             case .all:

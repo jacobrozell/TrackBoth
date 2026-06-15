@@ -97,9 +97,9 @@ struct UnifiedMetricRowView: View {
                                     Image(systemName: "flame.fill")
                                         .foregroundColor(Color.currentWarning)
                                         .font(.caption)
-                                    Text(metric.habitType == .positive ? 
-                                         "\(streak) day streak" : 
-                                         "\(streak) days clean")
+                                    Text(metric.habitType == .positive
+                                        ? StreakCopy.habitStreak(streak)
+                                        : StreakCopy.viceClean(streak))
                                         .font(.caption)
                                         .foregroundColor(Color.currentSecondaryText)
                                 }
@@ -120,9 +120,9 @@ struct UnifiedMetricRowView: View {
                         HStack {
                             Image(systemName: "flame.fill")
                                 .foregroundColor(Color.currentWarning)
-                            Text(metric.habitType == .positive ? 
-                                 "\(streak) day streak" : 
-                                 "\(streak) days clean")
+                            Text(metric.habitType == .positive
+                                ? StreakCopy.habitStreak(streak)
+                                : StreakCopy.viceClean(streak))
                                 .font(.subheadline)
                                 .foregroundColor(Color.currentSecondaryText)
                         }
@@ -153,18 +153,23 @@ struct UnifiedMetricRowView: View {
                     Spacer()
                     
                     if metric.habitType == .positive {
-                        let done = selectedDateEntry?.value == true
-                        Text(done ? "Done" : "Not Done")
+                        let status = TrackingSemantics.statusLabel(
+                            habitType: metric.habitType,
+                            entry: selectedDateEntry
+                        )
+                        Text(status.text)
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(done ? Color.currentSuccess : Color.currentSecondaryText)
+                            .foregroundColor(status.isSuccess ? Color.currentSuccess : Color.currentSecondaryText)
                     } else {
-                        // For vices, absence of an entry means avoided (default good state)
-                        let avoided = selectedDateEntry == nil || selectedDateEntry?.value == false
-                        Text(avoided ? "Avoided" : "Not Avoided")
+                        let status = TrackingSemantics.statusLabel(
+                            habitType: metric.habitType,
+                            entry: selectedDateEntry
+                        )
+                        Text(status.text)
                             .font(.subheadline)
                             .fontWeight(.medium)
-                            .foregroundColor(avoided ? Color.currentSuccess : Color.currentError)
+                            .foregroundColor(status.isSuccess ? Color.currentSuccess : Color.currentError)
                     }
                 }
                 
@@ -351,35 +356,30 @@ struct UnifiedMetricRowView: View {
     
     // MARK: - Private Methods
     private func isMetricCompleted() -> Bool {
-        // Only count as completed if metric has entries
-        guard entries.contains(where: { $0.metricID == metric.id }) else { return false }
-        
-        let isVice = metric.habitType == .vice
-        if isVice {
-            // For vices, completed when explicitly logged as avoided (value == false)
-            return selectedDateEntry?.value == false
-        } else {
-            // For habits, completed when explicitly logged as done (value == true)
-            return selectedDateEntry?.value == true
-        }
+        TrackingSemantics.isCompleted(habitType: metric.habitType, entry: selectedDateEntry)
     }
-    
+
     private func toggleSelectedDateEntry() {
         let startOfDay = CalendarHelper.startOfDay(for: selectedDate)
-        
-        // Use getOrCreate to handle both existing and new entries
-        let entry = MetricEntry.getOrCreate(
-            for: metric.id,
-            date: startOfDay,
-            in: modelContext,
-            entries: entries,
-            metric: metric
+
+        let existingEntry = MetricEntry.find(for: metric.id, date: startOfDay, in: entries)
+        let newValue = TrackingSemantics.valueAfterQuickToggle(
+            habitType: metric.habitType,
+            existingEntry: existingEntry
         )
-        
-        // Toggle the entry value
-        let oldValue = entry.value
-        entry.value.toggle()
-        logger.debug("Toggled entry for \(metric.name) on \(DateFormatter.dateFormatter.string(from: selectedDate)) - From: \(oldValue) to \(entry.value)", category: .data)
+
+        let entry: MetricEntry
+        if let existingEntry {
+            entry = existingEntry
+        } else {
+            entry = MetricEntry(metricID: metric.id, date: startOfDay, value: newValue, hasBeenLogged: false)
+            modelContext.insert(entry)
+        }
+
+        entry.value = newValue
+        MetricEntry.markLogged(entry: entry, metric: metric)
+
+        logger.debug("Toggled entry for \(metric.name) on \(DateFormatter.dateFormatter.string(from: selectedDate)) - Value: \(entry.value)", category: .data)
         
         do {
             try modelContext.save()
