@@ -80,16 +80,7 @@ struct QuantityChartView: View {
     }
     
     private var chartTitle: String {
-        switch filter {
-        case .all:
-            return "Quantity Trends"
-        case .allHabits:
-            return "Positive Habits Quantity"
-        case .allVices:
-            return "Vice Quantities Logged"
-        case .specific(let metric):
-            return "\(metric.name) Quantity"
-        }
+        ChartCopy.title(chartType: .quantity, filter: filter)
     }
     
     private var chartSubtitle: String {

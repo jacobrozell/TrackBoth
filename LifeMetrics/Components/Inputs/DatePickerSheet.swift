@@ -3,7 +3,7 @@ import SwiftUI
 struct DatePickerSheet: View {
     @Binding var selectedDate: Date
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     
     var body: some View {
         NavigationStack {

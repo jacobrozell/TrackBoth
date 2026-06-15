@@ -66,7 +66,7 @@ struct DemoDataGenerator {
         }
         
         // Save the context
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "seed demo data", entity: "Model")
     }
 
     private static func attachDemoGoals(to metrics: [Metric], in modelContext: ModelContext) {

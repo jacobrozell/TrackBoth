@@ -10,7 +10,7 @@ struct BackupSheet: View {
     @Binding var isBackingUp: Bool
     @Binding var backupError: String?
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     
     @State private var backupProgress: String = ""
     @State private var showingSuccessAlert = false

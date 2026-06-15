@@ -9,7 +9,7 @@ struct RestoreSheet: View {
     @Binding var backupError: String?
     let onRestore: (iCloudBackupService.BackupData) throws -> Void
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     
     @State private var backupInfo: BackupInfo?
     @State private var isLoading = true

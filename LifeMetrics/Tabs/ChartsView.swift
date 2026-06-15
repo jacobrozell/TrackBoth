@@ -13,118 +13,96 @@ struct ChartsView: View {
     @State private var exportFormat: ChartExportUtility.ExportFormat = .png
     @State private var isExporting = false
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
-    @Environment(\.usesSidebarSplit) private var usesSidebarSplit
-    
-    // MARK: - Body
+
+    init() {
+        _metrics = QueryDescriptors.allMetrics
+        _entries = QueryDescriptors.entriesForChartLookback()
+    }
+
     var body: some View {
-        NavigationStack {
-            GeometryReader { geometry in
-                Group {
-                    if metrics.isEmpty {
-                        ChartsEmptyStateView()
-                    } else if TabBarLayout.shouldUseSidebarSplit(
-                        size: geometry.size,
-                        horizontal: horizontalSizeClass,
-                        vertical: verticalSizeClass
-                    ) {
-                        LandscapeSplitLayout(
-                            totalWidth: geometry.size.width,
-                            totalHeight: geometry.size.height,
-                            sidebar: {
-                                ChartControlsView(
-                                    selectedFilter: $viewModel.selectedFilter,
-                                    selectedChartType: $viewModel.selectedChartType,
-                                    metrics: metrics,
-                                    isLandscape: true
-                                )
-                            },
-                            content: {
-                                ChartContentView(
-                                    selectedChartType: viewModel.selectedChartType,
-                                    selectedFilter: viewModel.selectedFilter,
-                                    entries: entries,
-                                    metrics: metrics
-                                )
-                            }
-                        )
-                    } else {
-                        VStack(spacing: 0) {
+        MetricTabShell(title: "Charts") { geometry, usesSplit in
+            Group {
+                if metrics.isEmpty {
+                    ChartsEmptyStateView()
+                } else if usesSplit {
+                    LandscapeSplitLayout(
+                        totalWidth: geometry.size.width,
+                        totalHeight: geometry.size.height,
+                        sidebar: {
                             ChartControlsView(
                                 selectedFilter: $viewModel.selectedFilter,
                                 selectedChartType: $viewModel.selectedChartType,
                                 metrics: metrics,
-                                isLandscape: false
+                                isLandscape: true
                             )
-
-                            Divider()
-
+                        },
+                        content: {
                             ChartContentView(
                                 selectedChartType: viewModel.selectedChartType,
                                 selectedFilter: viewModel.selectedFilter,
                                 entries: entries,
                                 metrics: metrics
                             )
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    }
-                }
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-            }
-            .themedBackground()
-            .navigationTitle("Charts")
-            .adaptiveNavigationBarTitleDisplayMode()
-            .onAppear {
-                logger.info("ChartsView appeared", category: .ui)
-                logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(viewModel.selectedFilter), ChartType: \(viewModel.selectedChartType)", category: .ui)
-            }
-            .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        if !metrics.isEmpty {
-                            Menu {
-                                Button("Export as PNG") {
-                                    logger.logUserAction("Export chart as PNG")
-                                    exportFormat = .png
-                                    exportCurrentChart()
-                                }
-                                .disabled(isExporting)
+                    )
+                } else {
+                    VStack(spacing: 0) {
+                        ChartControlsView(
+                            selectedFilter: $viewModel.selectedFilter,
+                            selectedChartType: $viewModel.selectedChartType,
+                            metrics: metrics,
+                            isLandscape: false
+                        )
 
-                                Button("Export as PDF") {
-                                    logger.logUserAction("Export chart as PDF")
-                                    exportFormat = .pdf
-                                    exportCurrentChart()
-                                }
-                                .disabled(isExporting)
-                            } label: {
-                                if isExporting {
-                                    ProgressView()
-                                        .scaleEffect(0.8)
-                                } else {
-                                    Image(systemName: "square.and.arrow.up")
-                                }
-                            }
-                            .disabled(isExporting)
-                        }
-                    }
-                }
+                        Divider()
 
-                .sheet(isPresented: $showingExportSheet) {
-                    if let exportData = exportData {
-                        ShareSheet(activityItems: createShareItems(from: exportData))
-                            .onDisappear {
-                                cleanupTempFiles()
-                            }
+                        ChartContentView(
+                            selectedChartType: viewModel.selectedChartType,
+                            selectedFilter: viewModel.selectedFilter,
+                            entries: entries,
+                            metrics: metrics
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 }
-                .onAppear {
-                    if viewModel.selectedFilter == .all && !metrics.isEmpty {
-                        viewModel.selectedFilter = .all
-                    }
-                }
+            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                if !metrics.isEmpty {
+                    Menu {
+                        Button("Export as PNG") {
+                            exportFormat = .png
+                            exportCurrentChart()
+                        }
+                        .disabled(isExporting)
+
+                        Button("Export as PDF") {
+                            exportFormat = .pdf
+                            exportCurrentChart()
+                        }
+                        .disabled(isExporting)
+                    } label: {
+                        if isExporting {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        } else {
+                            Image(systemName: "square.and.arrow.up")
+                        }
+                    }
+                    .disabled(isExporting)
+                }
+            }
+        }
+        .sheet(isPresented: $showingExportSheet) {
+            if let exportData = exportData {
+                ShareSheet(activityItems: createShareItems(from: exportData))
+                    .onDisappear {
+                        cleanupTempFiles()
+                    }
+            }
+        }
     }
     
     // MARK: - Export Functions
@@ -213,40 +191,7 @@ struct ChartsView: View {
     }
     
     private func getChartTitle() -> String {
-        switch viewModel.selectedChartType {
-        case .line:
-            switch viewModel.selectedFilter {
-            case .allVices: return "30-Day Avoidance Trend"
-            case .allHabits: return "30-Day Completion Trend"
-            case .all: return "30-Day Progress Trend"
-            case .specific(let metric):
-                return metric.habitType == .vice ? "30-Day Avoidance Trend" : "30-Day Completion Trend"
-            }
-        case .bar:
-            switch viewModel.selectedFilter {
-            case .allVices: return "Weekly Avoidance"
-            case .allHabits: return "Weekly Completion"
-            case .all: return "Weekly Progress"
-            case .specific(let metric):
-                return metric.habitType == .vice ? "Weekly Avoidance" : "Weekly Completion"
-            }
-        case .heatmap:
-            switch viewModel.selectedFilter {
-            case .allVices: return "90-Day Avoidance Heatmap"
-            case .allHabits: return "90-Day Completion Heatmap"
-            case .all: return "90-Day Progress Heatmap"
-            case .specific(let metric):
-                return metric.habitType == .vice ? "90-Day Avoidance Heatmap" : "90-Day Completion Heatmap"
-            }
-        case .quantity:
-            switch viewModel.selectedFilter {
-            case .allVices: return "Quantity Tracking - Vices"
-            case .allHabits: return "Quantity Tracking - Habits"
-            case .all: return "Quantity Tracking - All"
-            case .specific(let metric):
-                return "Quantity Tracking - \(metric.name)"
-            }
-        }
+        ChartCopy.title(chartType: viewModel.selectedChartType, filter: viewModel.selectedFilter)
     }
     
     @ViewBuilder

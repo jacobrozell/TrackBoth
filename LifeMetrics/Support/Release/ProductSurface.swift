@@ -26,6 +26,7 @@ enum ProductSurface {
     static var showsNotifications: Bool { false }
     static var showsShortcuts: Bool { false }
     static var showsDebugLogging: Bool { current == .development }
+    static var showsAccessibilityMarketing: Bool { true }
 
     /// Whether a post-1.0 surface should be visible in the current build.
     static func isEnabled(_ feature: LeanFeature) -> Bool {

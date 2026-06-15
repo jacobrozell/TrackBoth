@@ -29,3 +29,19 @@ struct SecondaryButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
     }
 }
+
+// MARK: - Metric Card Style
+struct MetricCardModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(Color.currentSecondaryBackground)
+            .cornerRadius(12)
+            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+    }
+}
+
+extension View {
+    func metricCardStyle() -> some View {
+        modifier(MetricCardModifier())
+    }
+}

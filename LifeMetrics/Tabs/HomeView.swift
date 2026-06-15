@@ -19,6 +19,11 @@ struct HomeView: View {
     @Environment(\.isCompactLandscape) private var isCompactLandscape
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
+    init() {
+        _metrics = QueryDescriptors.allMetrics
+        _entries = QueryDescriptors.entriesForStreakLookback()
+    }
+
     // MARK: - Derived values
     private var weekDays: [Date] {
         // Show last 7 days ending today (no future dates)
@@ -113,6 +118,7 @@ struct HomeView: View {
                 viewModel.showAddMetric()
             }
             .onAppear {
+                WidgetSyncCoordinator.syncIfEnabled(metrics: metrics, entries: entries)
                 // Clamp selectedDate to today if in the future
                 let today = Calendar.current.startOfDay(for: Date())
                 if viewModel.selectedDate > today {
@@ -269,24 +275,14 @@ struct HomeView: View {
     }
 
     private var sidebarStatsColumn: some View {
-        let totalHabits = viewModel.totalHabits(from: metrics)
-        let totalVices = viewModel.totalVices(from: metrics)
-        let activeStreaks = viewModel.activeStreaks(from: metrics, entries: entries)
-        let todayCompleted = viewModel.todayCompleted(from: metrics, entries: entries)
-
-        return VStack(spacing: 8) {
-            if totalHabits > 0 {
-                StatCard(title: "Habits", value: "\(totalHabits)", icon: "checkmark.circle.fill", color: Color.currentSuccess, compact: true)
-            }
-            if totalVices > 0 {
-                StatCard(title: "Vices", value: "\(totalVices)", icon: "xmark.circle.fill", color: Color.currentError, compact: true)
-            }
-            if activeStreaks > 0 {
-                StatCard(title: "Streaks", value: "\(activeStreaks)", icon: "flame.fill", color: Color.currentWarning, compact: true)
-            }
-            StatCard(title: "Today", value: "\(todayCompleted)/\(metrics.count)", icon: "calendar", color: Color.currentPrimary, compact: true)
-        }
-        .frame(maxWidth: .infinity)
+        HomeStatsSection(
+            totalHabits: viewModel.totalHabits(from: metrics),
+            totalVices: viewModel.totalVices(from: metrics),
+            activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
+            todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+            totalMetrics: metrics.count,
+            layout: .verticalColumn
+        )
     }
 
     private var rightPanel: some View {
@@ -322,60 +318,17 @@ struct HomeView: View {
     // MARK: - Components
     @ViewBuilder
     private var quickStatsRow: some View {
-        let totalHabits = viewModel.totalHabits(from: metrics)
-        let totalVices = viewModel.totalVices(from: metrics)
-        let activeStreaks = viewModel.activeStreaks(from: metrics, entries: entries)
-        let todayCompleted = viewModel.todayCompleted(from: metrics, entries: entries)
         let fixedCardWidth: CGFloat = isCompactLandscape ? 76 : 88
 
-        if dynamicTypeSize.usesAccessibilityLayout {
-            LazyVGrid(
-                columns: [GridItem(.flexible())],
-                spacing: 10
-            ) {
-                quickStatCards(
-                    totalHabits: totalHabits,
-                    totalVices: totalVices,
-                    activeStreaks: activeStreaks,
-                    todayCompleted: todayCompleted,
-                    fixedWidth: nil
-                )
-            }
-            .frame(maxWidth: .infinity)
-        } else {
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: isCompactLandscape ? 8 : 10) {
-                    quickStatCards(
-                        totalHabits: totalHabits,
-                        totalVices: totalVices,
-                        activeStreaks: activeStreaks,
-                        todayCompleted: todayCompleted,
-                        fixedWidth: fixedCardWidth
-                    )
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    @ViewBuilder
-    private func quickStatCards(
-        totalHabits: Int,
-        totalVices: Int,
-        activeStreaks: Int,
-        todayCompleted: Int,
-        fixedWidth: CGFloat?
-    ) -> some View {
-        if totalHabits > 0 {
-            statCard(title: "Habits", value: "\(totalHabits)", icon: "checkmark.circle.fill", color: Color.currentSuccess, width: fixedWidth)
-        }
-        if totalVices > 0 {
-            statCard(title: "Vices", value: "\(totalVices)", icon: "xmark.circle.fill", color: Color.currentError, width: fixedWidth)
-        }
-        if activeStreaks > 0 {
-            statCard(title: "Streaks", value: "\(activeStreaks)", icon: "flame.fill", color: Color.currentWarning, width: fixedWidth)
-        }
-        statCard(title: "Today", value: "\(todayCompleted)/\(metrics.count)", icon: "calendar", color: Color.currentPrimary, width: fixedWidth)
+        HomeStatsSection(
+            totalHabits: viewModel.totalHabits(from: metrics),
+            totalVices: viewModel.totalVices(from: metrics),
+            activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
+            todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+            totalMetrics: metrics.count,
+            layout: dynamicTypeSize.usesAccessibilityLayout ? .accessibilityGrid : .horizontalScroll,
+            fixedCardWidth: dynamicTypeSize.usesAccessibilityLayout ? nil : fixedCardWidth
+        )
     }
 
     private var weekMiniCalendar: some View {
@@ -385,16 +338,6 @@ struct HomeView: View {
             usesAccessibilityLayout: dynamicTypeSize.usesAccessibilityLayout,
             onSelect: { viewModel.selectedDate = $0 }
         )
-    }
-
-    @ViewBuilder
-    private func statCard(title: String, value: String, icon: String, color: Color, width: CGFloat?) -> some View {
-        let card = StatCard(title: title, value: value, icon: icon, color: color, compact: true)
-        if let width {
-            card.frame(width: width)
-        } else {
-            card.frame(maxWidth: .infinity)
-        }
     }
 
     private var sectionsList: some View {

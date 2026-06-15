@@ -7,7 +7,7 @@ struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var selectedTab = 0
     @State private var showingOnboarding = Self.shouldShowOnboarding
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     @AppStorage("dismissedStoreRecoveryBanner") private var dismissedStoreRecoveryBanner = false
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -15,7 +15,7 @@ struct ContentView: View {
 
     private static var shouldShowOnboarding: Bool {
         let skipOnboarding = ProcessInfo.processInfo.arguments.contains("-skip_onboarding")
-        let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
+        let hasCompletedOnboarding = UserDefaults.standard.bool(forKey: ThemePreferences.hasCompletedOnboarding)
         return !hasCompletedOnboarding && !skipOnboarding
     }
 
@@ -105,7 +105,7 @@ struct ContentView: View {
             seedDemoDataIfRequested()
             checkFirstLaunch()
         }
-        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("OnboardingCompleted"))) { _ in
+        .onReceive(AppEvent.publisher(for: .onboardingCompleted)) { _ in
             logger.info("Onboarding completed notification received")
             checkFirstLaunch()
         }

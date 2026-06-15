@@ -11,7 +11,7 @@ struct LoggingSheet: View, Identifiable {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     @Query private var entries: [MetricEntry]
 
     @State private var value: Bool = false
@@ -166,7 +166,7 @@ struct LoggingSheet: View, Identifiable {
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.impactOccurred()
 
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "save log entry", entity: "MetricEntry")
         dismiss()
     }
 }

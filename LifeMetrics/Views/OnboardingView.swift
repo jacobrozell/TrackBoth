@@ -3,7 +3,7 @@ import SwiftUI
 // MARK: - OnboardingView
 /// Onboarding flow introducing users to each tab of the app
 struct OnboardingView: View {
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     @State private var currentPage = 0
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.verticalSizeClass) private var verticalSizeClass
@@ -89,9 +89,8 @@ struct OnboardingView: View {
     
     private func completeOnboarding() {
         logger.info("Onboarding completed")
-        UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
-        // Trigger a notification to refresh the ContentView
-        NotificationCenter.default.post(name: NSNotification.Name("OnboardingCompleted"), object: nil)
+        UserDefaults.standard.set(true, forKey: ThemePreferences.hasCompletedOnboarding)
+        AppEvent.post(.onboardingCompleted)
     }
 }
 

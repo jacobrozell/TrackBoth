@@ -4,7 +4,6 @@ import SwiftData
 struct AddMotivationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
     @Query private var entries: [MetricEntry]
     let metrics: [Metric]
     
@@ -21,8 +20,8 @@ struct AddMotivationView: View {
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(Color.currentText)
                         
-                        Text("Write down your reasons for avoiding a vice. This will help you stay strong when you're struggling.")
-                            .font(.system(size: 16, weight: .regular))
+                        Text("Write your own motivation to help you stay strong when struggling.")
+                            .font(.body)
                             .foregroundColor(Color.currentSecondaryText)
                             .lineSpacing(2)
                     }
@@ -30,16 +29,16 @@ struct AddMotivationView: View {
                     
                     // Metric picker with better design
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Select Vice")
-                            .font(.system(size: 18, weight: .semibold))
+                        Text("Select Habit")
+                            .font(.headline)
                             .foregroundColor(Color.currentText)
                         
-                        Picker("Vice", selection: $selectedMetric) {
-                            Text("Choose a vice to motivate against").tag(nil as Metric?)
+                        Picker("Habit", selection: $selectedMetric) {
+                            Text("Choose a habit to motivate for").tag(nil as Metric?)
                             ForEach(metrics) { metric in
                                 HStack(spacing: 12) {
                                     Image(systemName: metric.habitType.icon)
-                                        .foregroundColor(Color.currentError)
+                                        .foregroundColor(metric.habitType == .positive ? Color.currentSuccess : Color.currentError)
                                         .font(.system(size: 16))
                                         .frame(width: 20)
                                     Text(metric.name)
@@ -84,7 +83,7 @@ struct AddMotivationView: View {
                                     if motivationText.isEmpty {
                                         VStack {
                                             HStack {
-                                                Text("Why do you want to avoid this vice?")
+                                                Text("Why is this habit important to you?")
                                                     .font(.system(size: 16))
                                                     .foregroundColor(Color.currentSecondaryText)
                                                     .padding(.leading, 20)
@@ -136,7 +135,7 @@ struct AddMotivationView: View {
             entries: entries
         )
         
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "save motivation", entity: "MetricEntry")
         dismiss()
     }
 }

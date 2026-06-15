@@ -10,10 +10,10 @@ struct ExportImportService {
             throw ExportImportError.unsupportedSchema(payload.schemaVersion)
         }
 
-        let existingMetrics = try context.fetch(FetchDescriptor<Metric>())
-        let existingEntries = try context.fetch(FetchDescriptor<MetricEntry>())
-        existingEntries.forEach { context.delete($0) }
-        existingMetrics.forEach { context.delete($0) }
+        let metricStore = MetricStore(context: context)
+        let entryStore = EntryStore(context: context)
+        try entryStore.deleteAll()
+        try metricStore.deleteAll()
 
         var metricByID: [UUID: Metric] = [:]
         for record in payload.metrics {

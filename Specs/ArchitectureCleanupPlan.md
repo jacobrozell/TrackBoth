@@ -24,16 +24,21 @@ Phased cleanup from the LifeMetrics architecture audit (June 2026). Goal: consis
 
 ---
 
+**Status:** Phase 4 complete.
+
+---
+
 ## Phase 2 — Restore MVVM consistency
 
 | # | Task | Status |
 |---|------|--------|
-| 2.1 | Move `HistoryView` filtering/search/calendar logic into `HistoryViewModel`; delete view duplicates | Pending |
-| 2.2 | Move `MotivationsView` filter/motivation logic into `MotivationViewModel` | Pending |
-| 2.3 | Move `GoalsView` `selectedFilter` into `GoalsViewModel` | Pending |
-| 2.4 | Wire `SettingsView` → `SettingsViewModel` **or** delete VM + tests (pick one) | Pending |
-| 2.5 | Fix `SettingsViewModel.metricsWithGoals` bug if VM is kept | Pending |
-| 2.6 | Remove misleading performance logging on trivial array filters | Pending |
+| 2.1 | Move `HistoryView` filtering/search/calendar logic into `HistoryViewModel`; delete view duplicates | Done |
+| 2.2 | Move `MotivationsView` filter/motivation logic into `MotivationViewModel` | Done |
+| 2.3 | Move `GoalsView` `selectedFilter` into `GoalsViewModel` | Done |
+| 2.4 | Wire `SettingsView` → `SettingsViewModel` **or** delete VM + tests (pick one) | Done (deleted unused VM + tests) |
+| 2.5 | Fix `SettingsViewModel.metricsWithGoals` bug if VM is kept | N/A (VM removed) |
+| 2.6 | Remove misleading performance logging on trivial array filters | Done |
+| 2.7 | Remove compiled-dead components superseded by inline `*View2` types | Done |
 
 **Exit criteria:** Each tab delegates business logic to its ViewModel; views are primarily layout and bindings.
 
@@ -43,15 +48,15 @@ Phased cleanup from the LifeMetrics architecture audit (June 2026). Goal: consis
 
 | # | Task | Status |
 |---|------|--------|
-| 3.1 | Extract `MetricTabShell` (NavigationStack + GeometryReader + split layout) | Pending |
-| 3.2 | Extract `PortraitLandscapeContent` to eliminate portrait/landscape duplication | Pending |
-| 3.3 | Promote `*View2` cards to `Components/`; remove superseded goal/motivation card files | Pending |
-| 3.4 | Add `ChartCopy` + `ChartDataProcessor` in `Domain/` | Pending |
-| 3.5 | Make `ChartControlsView` compose `MetricFilterChipRow` / sidebar | Pending |
-| 3.6 | Unify `StatCard` layout (`StatsSectionView` or shared helper) | Pending |
-| 3.7 | Refactor `GoalsViewModel` six goal-query methods into one parameterized API | Pending |
-| 3.8 | Adopt `cardStyle()` or delete unused modifier infrastructure | Pending |
-| 3.9 | Remove other compiled-dead components (`EntriesListView`, `ThemeSelectionView`, etc.) | Pending |
+| 3.1 | Extract `MetricTabShell` (NavigationStack + GeometryReader + split layout) | Done |
+| 3.2 | Extract `FilteredSplitTabLayout` to eliminate portrait/landscape duplication | Done |
+| 3.3 | Promote `*View2` cards to `Components/`; remove superseded goal/motivation card files | Done |
+| 3.4 | Add `ChartCopy` + `ChartDataProcessor` in `Domain/Charts/` | Done |
+| 3.5 | Make `ChartControlsView` compose `MetricFilterChipRow` / sidebar | Done |
+| 3.6 | Extract `HomeStatsSection` for unified home stats layout | Done |
+| 3.7 | Refactor `GoalsViewModel` six goal-query methods into one parameterized API | Done |
+| 3.8 | Add `metricCardStyle()` view modifier for shared card chrome | Done |
+| 3.9 | Remove other compiled-dead components (`EntriesListView`, `ThemeSelectionView`, etc.) | Done (Phase 2) |
 
 **Exit criteria:** Shared tab shell and card/chart primitives; no `*View2` types living in tab files.
 
@@ -61,15 +66,26 @@ Phased cleanup from the LifeMetrics architecture audit (June 2026). Goal: consis
 
 | # | Task | Status |
 |---|------|--------|
-| 4.1 | Repository layer over SwiftData (`MetricStore`, `EntryStore`) | Pending |
-| 4.2 | Scoped `@Query` predicates per screen instead of full-table fetches | Pending |
-| 4.3 | Migrate `ThemeManager` to `@Observable` + environment injection | Pending |
-| 4.4 | Single source of truth for theme (`@AppStorage` vs `UserDefaults`) | Pending |
-| 4.5 | Typed app events instead of `NotificationCenter` strings | Pending |
-| 4.6 | Re-enable widget sync in main target when `ProductSurface.showsWidget` ships | Pending |
-| 4.7 | Log/surface `modelContext.save()` failures on destructive operations | Pending |
+| 4.1 | Repository layer over SwiftData (`MetricStore`, `EntryStore`) | Done |
+| 4.2 | Scoped `@Query` predicates per screen instead of full-table fetches | Done (History month, Home streak lookback) |
+| 4.3 | Migrate `ThemeManager` to `@Observable` + environment injection | Done |
+| 4.4 | Single source of truth for theme (`ThemePreferences` keys) | Done |
+| 4.5 | Typed app events instead of `NotificationCenter` strings | Done (`AppEvent`) |
+| 4.6 | Re-enable widget sync in main target when `ProductSurface.showsWidget` ships | Done (`WidgetSyncCoordinator` stub) |
+| 4.7 | Log/surface `modelContext.save()` failures on destructive operations | Done (`ModelContext.saveChanges`) |
 
 **Exit criteria:** Data access behind repositories; queries scoped per feature; theme and cross-cutting state unified.
+
+---
+
+## Follow-up (post Phase 4)
+
+| # | Task | Status |
+|---|------|--------|
+| F.1 | Scoped `@Query` for Goals (366d), Motivations (motivation text), Charts (90d) | Done |
+| F.2 | Remove redundant `@Query goals` — use `metric.booleanGoals` / `quantityGoals` | Done |
+| F.3 | Migrate remaining `try? modelContext.save()` in active views/sheets | Done |
+| F.4 | Wire `WidgetDataSync` when `ProductSurface.showsWidget` becomes `true` | Pending |
 
 ---
 

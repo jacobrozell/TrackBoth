@@ -1,125 +1,63 @@
 import SwiftUI
+import Observation
 
 // MARK: - Theme Manager
 /// Manages app theming and provides easy access to themed colors
-class ThemeManager: ObservableObject {
+@Observable
+final class ThemeManager {
     static let shared = ThemeManager()
-    
-    @Published var currentTheme: Theme = .system
-    @Published var currentAppTheme: AppTheme = .ocean
-    @Published var selectedFontDesign: FontDesign = .rounded
-    
+
+    var currentTheme: Theme = .system
+    var currentAppTheme: AppTheme = .ocean
+    var selectedFontDesign: FontDesign = .rounded
+
     private init() {
-        // Load saved theme from UserDefaults
-        if let savedTheme = UserDefaults.standard.string(forKey: "selectedTheme"),
+        if let savedTheme = UserDefaults.standard.string(forKey: ThemePreferences.selectedTheme),
            let theme = Theme(rawValue: savedTheme) {
             currentTheme = theme
             logger.info("Theme loaded from UserDefaults - Theme: \(theme.rawValue)")
         } else {
             logger.info("Using default theme - Theme: \(currentTheme.rawValue)")
         }
-        
-        // Load saved app theme from UserDefaults
-        if let savedAppTheme = UserDefaults.standard.string(forKey: "selectedAppTheme"),
+
+        if let savedAppTheme = UserDefaults.standard.string(forKey: ThemePreferences.selectedAppTheme),
            let appTheme = AppTheme.allThemes.first(where: { $0.name == savedAppTheme }) {
             currentAppTheme = appTheme
             logger.info("App theme loaded from UserDefaults - Theme: \(appTheme.name)")
         } else {
-            // Set default theme based on system appearance
             setDefaultThemeForSystemAppearance()
             logger.info("Using default app theme - Theme: \(currentAppTheme.name)")
         }
-        
-        // Load saved font design from UserDefaults
-        if let savedFontDesign = UserDefaults.standard.string(forKey: "selectedFontDesign"),
+
+        if let savedFontDesign = UserDefaults.standard.string(forKey: ThemePreferences.selectedFontDesign),
            let fontDesign = FontDesign(rawValue: savedFontDesign) {
             selectedFontDesign = fontDesign
             logger.info("Font design loaded from UserDefaults - Design: \(fontDesign.rawValue)")
         } else {
             logger.info("Using default font design - Design: \(selectedFontDesign.rawValue)")
         }
-        
-        // Initialize navigation bar appearance
+
         updateNavigationBarAppearance()
-        
-        // Set up notification observer for theme changes
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(themeDidChange),
-            name: NSNotification.Name("ThemeDidChange"),
-            object: nil
-        )
-        
-        // Set up notification observer for system appearance changes
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(systemAppearanceDidChange),
-            name: NSNotification.Name("SystemAppearanceDidChange"),
-            object: nil
-        )
     }
-    
-    @objc private func themeDidChange() {
-        updateNavigationBarAppearance()
-        updateTabBarAppearance()
-    }
-    
-    @objc private func systemAppearanceDidChange() {
-        // Only update theme if user is using system theme and hasn't manually selected an app theme
-        if currentTheme == .system && UserDefaults.standard.string(forKey: "selectedAppTheme") == nil {
-            logger.info("System appearance changed - updating default theme")
-            setDefaultThemeForSystemAppearance()
-            updateNavigationBarAppearance()
-            updateTabBarAppearance()
-        }
-    }
-    
+
     func updateTheme(_ theme: Theme) {
         logger.logUserAction("Theme updated", details: "From \(currentTheme.rawValue) to \(theme.rawValue)")
         currentTheme = theme
-        UserDefaults.standard.set(theme.rawValue, forKey: "selectedTheme")
+        UserDefaults.standard.set(theme.rawValue, forKey: ThemePreferences.selectedTheme)
     }
-    
+
     func updateAppTheme(_ appTheme: AppTheme) {
         logger.logUserAction("App theme updated", details: "From \(currentAppTheme.name) to \(appTheme.name)")
         currentAppTheme = appTheme
-        UserDefaults.standard.set(appTheme.name, forKey: "selectedAppTheme")
-        
-        // Update navigation bar appearance
-        updateNavigationBarAppearance()
-        
-        // Force UI refresh
-        DispatchQueue.main.async {
-            // Trigger a UI refresh by updating the published property
-            self.objectWillChange.send()
-            
-            // Post notification for theme change
-            NotificationCenter.default.post(name: NSNotification.Name("ThemeDidChange"), object: nil)
-            
-            // Force immediate UI refresh
-            self.forceUIRefresh()
-        }
+        UserDefaults.standard.set(appTheme.name, forKey: ThemePreferences.selectedAppTheme)
+        applyChromeRefresh()
     }
-    
+
     func updateFontDesign(_ fontDesign: FontDesign) {
         logger.logUserAction("Font design updated", details: "From \(selectedFontDesign.rawValue) to \(fontDesign.rawValue)")
         selectedFontDesign = fontDesign
-        UserDefaults.standard.set(fontDesign.rawValue, forKey: "selectedFontDesign")
-        
-        // Update navigation bar appearance
-        updateNavigationBarAppearance()
-        
-        // Force UI refresh
-        DispatchQueue.main.async {
-            // Trigger a UI refresh by updating the published property
-            self.objectWillChange.send()
-            
-            // Post notification for font change
-            NotificationCenter.default.post(name: NSNotification.Name("FontDidChange"), object: nil)
-            
-            // Force immediate UI refresh
-            self.forceUIRefresh()
-        }
+        UserDefaults.standard.set(fontDesign.rawValue, forKey: ThemePreferences.selectedFontDesign)
+        applyChromeRefresh()
     }
     
     /// Sets the default theme based on the current system appearance
@@ -139,24 +77,16 @@ class ThemeManager: ObservableObject {
         }
     }
     
-    /// Resets the app theme to the default based on current system appearance
     func resetToDefaultTheme() {
         logger.logUserAction("Reset to default theme", details: "Based on system appearance")
         setDefaultThemeForSystemAppearance()
-        UserDefaults.standard.set(currentAppTheme.name, forKey: "selectedAppTheme")
-        
-        // Update navigation bar appearance
-        updateNavigationBarAppearance()
-        
-        // Force UI refresh
+        UserDefaults.standard.set(currentAppTheme.name, forKey: ThemePreferences.selectedAppTheme)
+        applyChromeRefresh()
+    }
+
+    private func applyChromeRefresh() {
         DispatchQueue.main.async {
-            // Trigger a UI refresh by updating the published property
-            self.objectWillChange.send()
-            
-            // Post notification for theme change
-            NotificationCenter.default.post(name: NSNotification.Name("ThemeDidChange"), object: nil)
-            
-            // Force immediate UI refresh
+            self.updateNavigationBarAppearance()
             self.forceUIRefresh()
         }
     }

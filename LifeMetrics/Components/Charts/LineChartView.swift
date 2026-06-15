@@ -9,66 +9,17 @@ struct LineChartView: View {
     @State private var animateChart = false
     
     private var chartData: [ChartDataPoint] {
-        let calendar = Calendar.current
-        let endDate = Date()
-        let startDate = calendar.date(byAdding: .day, value: -30, to: endDate) ?? endDate
-        
-        var data: [ChartDataPoint] = []
-        var currentDate = startDate
-        var cumulativeCount = 0
-        
-        while currentDate <= endDate {
-            let dayEntries = entries.filter { entry in
-                calendar.isDate(entry.date, inSameDayAs: currentDate) &&
-                matchesFilter(entry: entry)
-            }
-            
-            let dayHasSuccess = !FilterUtils.successfulEntries(filter, entries: dayEntries, metrics: metrics).isEmpty
-            if dayHasSuccess {
-                cumulativeCount += 1
-            }
+        ChartDataProcessor.cumulativeSuccessTrend(filter: filter, entries: entries, metrics: metrics)
+    }
 
-            data.append(ChartDataPoint(
-                date: currentDate,
-                value: cumulativeCount
-            ))
-            
-            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
-        }
-        
-        return data
-    }
-    
-    private func matchesFilter(entry: MetricEntry) -> Bool {
-        FilterUtils.matchesFilter(filter, entry: entry, metrics: metrics)
-    }
-    
     private var chartTitle: String {
-        switch filter {
-        case .allVices:
-            return "30-Day Avoidance Trend"
-        case .allHabits:
-            return "30-Day Completion Trend"
-        case .all:
-            return "30-Day Progress Trend"
-        case .specific(let metric):
-            return metric.habitType == .vice ? "30-Day Avoidance Trend" : "30-Day Completion Trend"
-        }
+        ChartCopy.title(chartType: .line, filter: filter)
     }
-    
+
     private var emptyStateMessage: String {
-        switch filter {
-        case .allVices:
-            return "Avoid vices to see your progress"
-        case .allHabits:
-            return "Complete habits to see your progress"
-        case .all:
-            return "Start tracking to see your progress"
-        case .specific(let metric):
-            return metric.habitType == .vice ? "Avoid this vice to see your progress" : "Complete this habit to see your progress"
-        }
+        ChartCopy.emptyMessage(chartType: .line, filter: filter)
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             ChartHeaderRow(title: chartTitle) {

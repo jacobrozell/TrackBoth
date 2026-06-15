@@ -5,7 +5,7 @@ struct EditGoalView: View {
     let metric: Metric
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     
     @State private var selectedPeriod: GoalPeriod
     @State private var customTarget: Int
@@ -129,7 +129,7 @@ struct EditGoalView: View {
             modelContext.insert(newGoal)
         }
         
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "save goal edits", entity: "Goal")
         dismiss()
     }
 }

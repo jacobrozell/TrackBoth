@@ -8,40 +8,13 @@ struct HeatmapView: View {
     @State private var animateChart = false
     
     private var heatmapData: [HeatmapData] {
-        let calendar = Calendar.current
-        let endDate = Date()
-        let startDate = calendar.date(byAdding: .day, value: -90, to: endDate) ?? endDate
-        
-        var data: [HeatmapData] = []
-        var currentDate = startDate
-        
-        while currentDate <= endDate {
-            let dayEntries = entries.filter { entry in
-                calendar.isDate(entry.date, inSameDayAs: currentDate) &&
-                matchesFilter(entry: entry)
-            }
-            
-            let hasSuccessfulEntry = !FilterUtils.successfulEntries(filter, entries: dayEntries, metrics: metrics).isEmpty
-            
-            data.append(HeatmapData(
-                date: currentDate,
-                completed: hasSuccessfulEntry
-            ))
-            
-            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
-        }
-        
-        return data
+        ChartDataProcessor.dailySuccessHeatmap(filter: filter, entries: entries, metrics: metrics)
     }
-    
-    private func matchesFilter(entry: MetricEntry) -> Bool {
-        FilterUtils.matchesFilter(filter, entry: entry, metrics: metrics)
-    }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(heatmapTitle)
+                Text(ChartCopy.title(chartType: .heatmap, filter: filter))
                     .font(.headline)
                     .foregroundColor(.currentText)
                 Spacer()
@@ -62,7 +35,7 @@ struct HeatmapView: View {
                         .font(.system(size: 40))
                         .foregroundColor(.currentSecondaryText.opacity(0.6))
                     
-                    Text(emptyStateMessage)
+                    Text(ChartCopy.emptyMessage(chartType: .heatmap, filter: filter))
                         .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
@@ -115,33 +88,7 @@ struct HeatmapView: View {
     }
     
     private var completedDays: Int {
-        heatmapData.filter { $0.completed }.count
-    }
-    
-    private var heatmapTitle: String {
-        switch filter {
-        case .allVices:
-            return "90-Day Avoidance Heatmap"
-        case .allHabits:
-            return "90-Day Completion Heatmap"
-        case .all:
-            return "90-Day Progress Heatmap"
-        case .specific(let metric):
-            return metric.habitType == .vice ? "90-Day Avoidance Heatmap" : "90-Day Completion Heatmap"
-        }
-    }
-    
-    private var emptyStateMessage: String {
-        switch filter {
-        case .allVices:
-            return "Avoid vices to build your consistency map"
-        case .allHabits:
-            return "Complete habits to build your consistency map"
-        case .all:
-            return "Start tracking to build your consistency map"
-        case .specific(let metric):
-            return metric.habitType == .vice ? "Avoid this vice to build your consistency map" : "Complete this habit to build your consistency map"
-        }
+        heatmapData.filter(\.completed).count
     }
 }
 

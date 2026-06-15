@@ -4,7 +4,7 @@ import SwiftData
 struct AddMetricView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     @State private var metricName = ""
     @State private var selectedHabitType: HabitType = .positive
     @State private var primaryMotivation = ""
@@ -251,7 +251,7 @@ struct AddMetricView: View {
         metric.goals?.append(goal)
         modelContext.insert(goal)
         
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "create metric", entity: "Metric")
         dismiss()
     }
 }

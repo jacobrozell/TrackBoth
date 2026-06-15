@@ -371,7 +371,7 @@ struct QuantityInputSheet: View {
             metric: metric
         )
 
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "save quantity input", entity: "MetricEntry")
         dismiss()
     }
 }

@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct TrackBothApp: App {
-    @AppStorage("selectedTheme") private var selectedTheme: String = Theme.system.rawValue
+    @State private var themeManager = ThemeManager.shared
 
     init() {
         logger.info("TrackBothApp initializing", category: .general)
@@ -31,14 +31,11 @@ struct TrackBothApp: App {
         return container
     }()
 
-    private var currentTheme: Theme {
-        Theme(rawValue: selectedTheme) ?? .system
-    }
-
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .preferredColorScheme(currentTheme.colorScheme)
+                .environment(themeManager)
+                .preferredColorScheme(themeManager.currentTheme.colorScheme)
                 .onAppear {
                     logger.info("App window appeared", category: .ui)
                 }
@@ -52,7 +49,7 @@ struct TrackBothApp: App {
             UserDefaults.standard.removePersistentDomain(forName: domain)
         }
         if env["RESET_ONBOARDING"] == "1" {
-            UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+            UserDefaults.standard.set(false, forKey: ThemePreferences.hasCompletedOnboarding)
         }
     }
 }

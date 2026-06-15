@@ -65,10 +65,26 @@ final class MotivationViewModelTests: XCTestCase {
     }
 
     func testResetClearsSelectionAndSheets() {
+        viewModel.selectedFilter = .specific(Metric(name: "Read", habitType: .positive))
         viewModel.selectedMetric = Metric(name: "Read", habitType: .positive)
         viewModel.showingAddMotivation = true
         viewModel.reset()
+        XCTAssertEqual(viewModel.selectedFilter, .all)
         XCTAssertNil(viewModel.selectedMetric)
         XCTAssertFalse(viewModel.showingAddMotivation)
+    }
+
+    func testPrimaryAndDailyMotivationsRespectFilter() {
+        let habit = Metric(name: "Read", habitType: .positive)
+        habit.primaryMotivation = "Books"
+        let vice = Metric(name: "Smoke", habitType: .vice)
+        let entries = [
+            makeEntry(metricID: habit.id, motivation: "Focus"),
+            makeEntry(metricID: vice.id, motivation: "Quit")
+        ]
+
+        viewModel.selectedFilter = .allHabits
+        XCTAssertEqual(viewModel.primaryMotivations([habit, vice]).count, 1)
+        XCTAssertEqual(viewModel.dailyMotivations(entries, metrics: [habit, vice]).count, 1)
     }
 }

@@ -4,7 +4,7 @@ import SwiftData
 struct EditEntryView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
+    @Environment(ThemeManager.self) private var themeManager
     
     let entry: MetricEntry
     let metric: Metric?
@@ -155,7 +155,7 @@ struct EditEntryView: View {
         entry.quantity = editingQuantity > 0 ? editingQuantity : nil
         entry.unit = editingUnit.isEmpty ? nil : editingUnit
         
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "save entry edits", entity: "MetricEntry")
         dismiss()
     }
 }

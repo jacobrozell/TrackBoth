@@ -42,10 +42,22 @@ final class HistoryViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.hasEntriesForSelectedDate(entries, metrics: [metric]))
     }
 
-    func testEntriesGroupedByMonth() {
+    func testRecentEntriesFiltersByMonthAndSearch() {
         let metric = makeMetric(name: "Read", type: .positive)
-        let entry = MetricEntry(metricID: metric.id, date: Date(), value: true, hasBeenLogged: true)
-        let grouped = viewModel.entriesGroupedByMonth([entry], metrics: [metric])
-        XCTAssertEqual(grouped.count, 1)
+        let calendar = Calendar.current
+        let startOfMonth = calendar.dateInterval(of: .month, for: Date())!.start
+        let inMonth = MetricEntry(metricID: metric.id, date: startOfMonth, value: true, details: "Morning read", hasBeenLogged: true)
+        let outOfMonth = MetricEntry(
+            metricID: metric.id,
+            date: calendar.date(byAdding: .month, value: -2, to: startOfMonth)!,
+            value: true,
+            hasBeenLogged: true
+        )
+
+        viewModel.selectedDate = startOfMonth
+        XCTAssertEqual(viewModel.recentEntries([inMonth, outOfMonth], metrics: [metric]).count, 1)
+
+        viewModel.searchText = "morning"
+        XCTAssertEqual(viewModel.recentEntries([inMonth, outOfMonth], metrics: [metric]).count, 1)
     }
 }

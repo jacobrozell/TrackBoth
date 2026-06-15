@@ -9,62 +9,17 @@ struct BarChartView: View {
     @State private var animateChart = false
     
     private var weeklyData: [WeeklyData] {
-        let startTime = Date()
-        let calendar = CalendarHelper.calendar
-        let endDate = Date()
-        let startDate = calendar.date(byAdding: .day, value: -28, to: endDate) ?? endDate
-        
-        var weeklyCounts: [String: Int] = [:]
-        
-        for entry in FilterUtils.successfulEntries(filter, entries: entries, metrics: metrics) {
-            if entry.date >= startDate && entry.date <= endDate {
-                let weekStart = CalendarHelper.startOfWeek(for: entry.date)
-                let weekKey = DateFormatter.weekFormatter.string(from: weekStart)
-                weeklyCounts[weekKey, default: 0] += 1
-            }
-        }
-        
-        let result = weeklyCounts.map { week, count in
-            WeeklyData(week: week, count: count)
-        }.sorted { $0.week < $1.week }
-        
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Bar chart data calculation", duration: duration)
-        logger.debug("Bar chart data calculated - Filter: \(filter), Data points: \(result.count)", category: .performance)
-        
-        return result
+        ChartDataProcessor.weeklySuccessCounts(filter: filter, entries: entries, metrics: metrics)
     }
-    
-    private func matchesFilter(entry: MetricEntry) -> Bool {
-        FilterUtils.matchesFilter(filter, entry: entry, metrics: metrics)
-    }
-    
+
     private var chartTitle: String {
-        switch filter {
-        case .allVices:
-            return "Weekly Avoidance"
-        case .allHabits:
-            return "Weekly Completion"
-        case .all:
-            return "Weekly Progress"
-        case .specific(let metric):
-            return metric.habitType == .vice ? "Weekly Avoidance" : "Weekly Completion"
-        }
+        ChartCopy.title(chartType: .bar, filter: filter)
     }
-    
+
     private var emptyStateMessage: String {
-        switch filter {
-        case .allVices:
-            return "Avoid vices to see weekly patterns"
-        case .allHabits:
-            return "Complete habits to see weekly patterns"
-        case .all:
-            return "Track habits to see weekly patterns"
-        case .specific(let metric):
-            return metric.habitType == .vice ? "Avoid this vice to see weekly patterns" : "Complete this habit to see weekly patterns"
-        }
+        ChartCopy.emptyMessage(chartType: .bar, filter: filter)
     }
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             ChartHeaderRow(title: chartTitle) {

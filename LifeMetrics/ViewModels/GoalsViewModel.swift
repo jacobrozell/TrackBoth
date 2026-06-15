@@ -1,6 +1,5 @@
 import Foundation
 import SwiftData
-import SwiftUI
 
 // MARK: - GoalsViewModel
 /// ViewModel for GoalsView containing goals management logic
@@ -8,20 +7,26 @@ import SwiftUI
 class GoalsViewModel {
     
     // MARK: - Properties
+    var selectedFilter: MetricFilter = .all
     var showingAddGoal = false
     var showingAddMetric = false
 
     // MARK: - Computed Properties
     /// Metrics with goals set (boolean or quantity)
-    func metricsWithGoals(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = metrics.filter { metric in
+    func metricsWithGoals(
+        _ metrics: [Metric],
+        habitType: HabitType? = nil,
+        goalType: GoalType? = nil
+    ) -> [Metric] {
+        metrics.filter { metric in
             GoalUtils.hasAnyGoal(metric)
+                && (habitType == nil || metric.habitType == habitType)
+                && (goalType == nil || GoalUtils.hasGoals(ofType: goalType!, in: metric))
         }
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Metrics with goals calculation", duration: duration)
-        logger.debug("Metrics with goals calculated: \(result.count) out of \(metrics.count)", category: .business)
-        return result
+    }
+
+    func filteredMetricsWithGoals(_ metrics: [Metric]) -> [Metric] {
+        FilterUtils.filteredMetrics(selectedFilter, in: metricsWithGoals(metrics))
     }
     
     /// Metrics without goals
@@ -33,18 +38,11 @@ class GoalsViewModel {
     
     /// Calculate goal progress for a metric
     func goalProgress(for metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> (current: Int, target: Int, percentage: Double) {
-        let startTime = Date()
-        
-        // Use the first boolean goal for progress calculation
         guard let goal = metric.booleanGoals.first else {
-            logger.debug("No boolean goal found for metric: \(metric.name)", category: .business)
             return (current: 0, target: 0, percentage: 0.0)
         }
-        
+
         let result = GoalUtils.calculateGoalProgress(for: goal, metric: metric, entries: entries, selectedDate: selectedDate)
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Goal progress calculation", duration: duration)
-        logger.debug("Goal progress calculated - Metric: \(metric.name), Current: \(Int(result.current))/\(Int(result.target)) (\(String(format: "%.1f", result.percentage))%)", category: .business)
         return (current: Int(result.current), target: Int(result.target), percentage: result.percentage)
     }
     
@@ -72,18 +70,11 @@ class GoalsViewModel {
     
     /// Calculate quantity goal progress for a metric
     func quantityGoalProgress(for metric: Metric, entries: [MetricEntry], selectedDate: Date = Date()) -> (current: Double, target: Double, percentage: Double, unit: String) {
-        let startTime = Date()
-        
-        // Use the first quantity goal for progress calculation
         guard let goal = metric.quantityGoals.first else {
-            logger.debug("No quantity goal found for metric: \(metric.name)", category: .business)
             return (current: 0.0, target: 0.0, percentage: 0.0, unit: "times")
         }
-        
+
         let result = GoalUtils.calculateGoalProgress(for: goal, metric: metric, entries: entries, selectedDate: selectedDate)
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Quantity goal progress calculation", duration: duration)
-        logger.debug("Quantity goal progress calculated - Metric: \(metric.name), Current: \(result.current)/\(result.target) (\(String(format: "%.1f", result.percentage))%)", category: .business)
         return (current: result.current, target: result.target, percentage: result.percentage, unit: result.unit)
     }
     
@@ -124,76 +115,14 @@ class GoalsViewModel {
     
     /// Get metrics with quantity goals
     func metricsWithQuantityGoals(_ metrics: [Metric]) -> [Metric] {
-        return metrics.filter { hasQuantityGoal($0) }
+        metricsWithGoals(metrics, goalType: .quantity)
     }
-    
+
     /// Get metrics with boolean goals only
     func metricsWithBooleanGoals(_ metrics: [Metric]) -> [Metric] {
-        return metrics.filter { metric in
-            !metric.booleanGoals.isEmpty
-        }
+        metricsWithGoals(metrics, goalType: .boolean)
     }
-    
-    /// Habits with goals
-    func habitsWithGoals(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = metricsWithGoals(metrics).filter { $0.habitType == .positive }
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Habits with goals calculation", duration: duration)
-        logger.debug("Habits with goals calculated: \(result.count)", category: .business)
-        return result
-    }
-    
-    /// Vices with goals
-    func vicesWithGoals(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = metricsWithGoals(metrics).filter { $0.habitType == .vice }
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Vices with goals calculation", duration: duration)
-        logger.debug("Vices with goals calculated: \(result.count)", category: .business)
-        return result
-    }
-    
-    /// Habits with boolean goals
-    func habitsWithBooleanGoals(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = habitsWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .boolean, in: $0) }
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Habits with boolean goals calculation", duration: duration)
-        logger.debug("Habits with boolean goals calculated: \(result.count)", category: .business)
-        return result
-    }
-    
-    /// Vices with boolean goals
-    func vicesWithBooleanGoals(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = vicesWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .boolean, in: $0) }
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Vices with boolean goals calculation", duration: duration)
-        logger.debug("Vices with boolean goals calculated: \(result.count)", category: .business)
-        return result
-    }
-    
-    /// Habits with quantity goals
-    func habitsWithQuantityGoals(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = habitsWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .quantity, in: $0) }
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Habits with quantity goals calculation", duration: duration)
-        logger.debug("Habits with quantity goals calculated: \(result.count)", category: .business)
-        return result
-    }
-    
-    /// Vices with quantity goals
-    func vicesWithQuantityGoals(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = vicesWithGoals(metrics).filter { GoalUtils.hasGoals(ofType: .quantity, in: $0) }
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Vices with quantity goals calculation", duration: duration)
-        logger.debug("Vices with quantity goals calculated: \(result.count)", category: .business)
-        return result
-    }
-    
+
     // MARK: - Actions
     /// Show add goal sheet
     func showAddGoal() {
@@ -210,7 +139,7 @@ class GoalsViewModel {
         newGoal.metric = metric
         metric.goals?.append(newGoal)
         modelContext.insert(newGoal)
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "create boolean goal", entity: "Goal")
     }
     
     /// Update existing boolean goal for a metric
@@ -220,19 +149,20 @@ class GoalsViewModel {
             existingGoal.target = target
         } else {
             createGoal(for: metric, period: period, target: target, in: modelContext)
+            return
         }
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "update boolean goal", entity: "Goal")
     }
-    
+
     /// Remove boolean goal from a metric
     func removeGoal(for metric: Metric, in modelContext: ModelContext) {
         if let goal = metric.booleanGoals.first {
             metric.goals?.removeAll { $0.id == goal.id }
             modelContext.delete(goal)
         }
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "remove boolean goal", entity: "Goal")
     }
-    
+
     /// Create a quantity goal for a metric
     func createQuantityGoal(for metric: Metric, goalType: QuantityGoalType, target: Int, period: GoalPeriod, in modelContext: ModelContext) {
         let newGoal = Goal(
@@ -244,9 +174,9 @@ class GoalsViewModel {
         newGoal.metric = metric
         metric.goals?.append(newGoal)
         modelContext.insert(newGoal)
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "create quantity goal", entity: "Goal")
     }
-    
+
     /// Update existing quantity goal for a metric
     func updateQuantityGoal(for metric: Metric, goalType: QuantityGoalType, target: Int, period: GoalPeriod, in modelContext: ModelContext) {
         if let existingGoal = metric.quantityGoals.first {
@@ -255,21 +185,24 @@ class GoalsViewModel {
             existingGoal.period = period
         } else {
             createQuantityGoal(for: metric, goalType: goalType, target: target, period: period, in: modelContext)
+            return
         }
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "update quantity goal", entity: "Goal")
     }
-    
+
     /// Remove quantity goal from a metric
     func removeQuantityGoal(for metric: Metric, in modelContext: ModelContext) {
         if let goal = metric.quantityGoals.first {
             metric.goals?.removeAll { $0.id == goal.id }
             modelContext.delete(goal)
         }
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "remove quantity goal", entity: "Goal")
     }
-    
+
     /// Reset all state
     func reset() {
+        selectedFilter = .all
         showingAddGoal = false
+        showingAddMetric = false
     }
 }

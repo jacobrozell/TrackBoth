@@ -22,10 +22,9 @@ struct SettingsView: View {
     @State private var importErrorMessage: String?
     @State private var importedSummary: String?
     @State private var showingDeleteConfirmation = false
-    @State private var showingShareSheet = false
-    @State private var showingBackupSheet = false
-    @State private var showingRestoreSheet = false
     @State private var exportData: Data?
+    @State private var showingRestoreSheet = false
+    @State private var showingBackupSheet = false
     @State private var backupService = iCloudBackupService()
     @State private var backupInfo: BackupInfo?
     @State private var isBackingUp = false
@@ -33,50 +32,7 @@ struct SettingsView: View {
     @State private var backupError: String?
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
     @State private var currentTime = Date()
-    @StateObject private var themeManager = ThemeManager.shared
-    
-    private var dateJoinedText: String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        
-        // If user has metrics, use the earliest one's creation date
-        if let earliestMetric = metrics.min(by: { $0.createdAt < $1.createdAt }) {
-            return formatter.string(from: earliestMetric.createdAt)
-        }
-        
-        // For new users who just finished onboarding, show today's date
-        return formatter.string(from: Date())
-    }
-    
-    private var appVersion: String {
-        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-    }
-    
-    private var shareAppContent: String {
-        let totalHabits = metrics.filter { $0.habitType == .positive }.count
-        let totalVices = metrics.filter { $0.habitType == .vice }.count
-        logger.debug("Share app content calculated - Habits: \(totalHabits), Vices: \(totalVices)", category: .business)
-        let totalEntries = entries.count
-        
-        return """
-        📱 Check out TrackBoth - my habit tracking app!
-        
-        I've been using it to track \(totalHabits) positive habits and \(totalVices) vices, with \(totalEntries) total entries logged.
-        
-        ✨ Features:
-        • Track both positive habits and vices
-        • Visual progress charts and streaks
-        • Goal setting and tracking
-        • Motivation system
-        • Quantity tracking
-        • Beautiful themes
-        
-        Perfect for building better habits and breaking bad ones! 🎯
-        
-        #HabitTracking #PersonalDevelopment #TrackBoth
-        """
-    }
-    
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -118,13 +74,6 @@ struct SettingsView: View {
                             .listRowBackground(Color.currentSecondaryBackground)
                         }
                     }
-                    
-                    Button("Delete All Data") {
-                        logger.logUserAction("Delete all data button tapped")
-                        showingDeleteConfirmation = true
-                    }
-                    .foregroundColor(Color.currentError)
-                    .listRowBackground(Color.currentSecondaryBackground)
                 }
                 
                 // iCloud Backup Section
@@ -172,185 +121,11 @@ struct SettingsView: View {
                 }
                 
                 // Theme Settings Section
-                Section("Appearance") {
-                    // App Theme Selection
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("App Theme")
-                            .font(.headline)
-                            .themedPrimaryText()
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 12) {
-                                ForEach(AppTheme.allThemes, id: \.name) { theme in
-                                    CompactThemeCard(
-                                        theme: theme,
-                                        isSelected: themeManager.currentAppTheme.name == theme.name
-                                    ) {
-                                        themeManager.updateAppTheme(theme)
-                                    }
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                    }
-                    .padding(.vertical, 8)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    // Theme Preview
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Preview")
-                            .font(.subheadline)
-                            .themedSecondaryText()
-                        
-                        themeManager.currentAppTheme.preview()
-                            .frame(maxWidth: .infinity)
-                    }
-                    .padding(.vertical, 8)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    // Font Design Selection
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("Font")
-                            .font(.headline)
-                            .themedPrimaryText()
-                        
-                        Picker("Font Design", selection: Binding(
-                            get: { themeManager.selectedFontDesign },
-                            set: { themeManager.updateFontDesign($0) }
-                        )) {
-                            ForEach(FontDesign.allCases, id: \.self) { design in
-                                HStack {
-                                    Text(design.displayName)
-                                    if design == themeManager.selectedFontDesign {
-                                        Spacer()
-                                        Image(systemName: "checkmark")
-                                            .foregroundColor(Color.currentPrimary)
-                                    }
-                                }
-                                .tag(design)
-                            }
-                        }
-                        .pickerStyle(.menu)
-                        .listRowBackground(Color.currentSecondaryBackground)
-                        
-                        // Font Preview
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Sample Text")
-                                .font(AppTypography.h3)
-                            Text("This is how the font looks in the app")
-                                .font(AppTypography.body)
-                            Text("Smaller text example")
-                                .font(AppTypography.caption)
-                        }
-                        .padding()
-                        .background(Color.currentSecondaryBackground)
-                        .cornerRadius(8)
-                        .padding(.top, 4)
-                    }
-                    .padding(.vertical, 8)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    // Theme Reset Option
-                    Button("Reset to Default Theme") {
-                        logger.logUserAction("Reset theme button tapped")
-                        themeManager.resetToDefaultTheme()
-                    }
-                    .foregroundColor(Color.currentWarning)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                }
+                SettingsAppearanceSection()
                 
-                // Help & Support Section
-                Section("Help & Support") {
-                    Button("Share App") {
-                        showingShareSheet = true
-                    }
-                    .foregroundColor(Color.currentPrimary)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    Button("View Onboarding Again") {
-                        showOnboardingAgain()
-                    }
-                    .foregroundColor(Color.currentPrimary)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                }
-                
-                // App Information Section
-                Section("App Information") {
-                    HStack {
-                        Text("Version")
-                        Spacer()
-                        Text(appVersion)
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    HStack {
-                        Text("Total Metrics")
-                        Spacer()
-                        Text("\(metrics.count)")
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-
-                    HStack {
-                        Text("Total Habits")
-                        Spacer()
-                        Text("\(metrics.filter { $0.habitType == .positive }.count)")
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    HStack {
-                        Text("Total Vices")
-                        Spacer()
-                        Text("\(metrics.filter { $0.habitType == .vice }.count)")
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-
-                    HStack {
-                        Text("Total Entries")
-                        Spacer()
-                        Text("\(entries.count)")
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    HStack {
-                        Text("Date Joined")
-                        Spacer()
-                        Text(dateJoinedText)
-                            .foregroundColor(Color.currentSecondaryText)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    // Goals are tracked per Metric; no separate count
-                }
-                
-                // Future Features Section
-                Section("Coming Soon") {
-                    HStack {
-                        Image(systemName: "app.badge")
-                            .foregroundColor(Color.currentSecondaryText)
-                        Text("Custom App Icons")
-                        Spacer()
-                        Text("Soon")
-                            .foregroundColor(Color.currentSecondaryText)
-                            .font(.caption)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    HStack {
-                        Image(systemName: "heart.fill")
-                            .foregroundColor(Color.currentSecondaryText)
-                        Text("Donate")
-                        Spacer()
-                        Text("Soon")
-                            .foregroundColor(Color.currentSecondaryText)
-                            .font(.caption)
-                    }
-                    .listRowBackground(Color.currentSecondaryBackground)
-                }
+                SettingsDataSection(showingDeleteConfirmation: $showingDeleteConfirmation)
+                SettingsHelpAndFeedbackSection()
+                SettingsAboutSection(onViewOnboarding: showOnboardingAgain)
                 }
                 .scrollContentBackground(.hidden)
                 .listStyle(.insetGrouped)
@@ -360,8 +135,6 @@ struct SettingsView: View {
             .toolbarBackground(Color.currentBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .onAppear {
-                // Force update when theme changes
-                themeManager.objectWillChange.send()
                 logger.info("SettingsView appeared")
                 logger.debug("Metrics count: \(metrics.count), Entries count: \(entries.count)", category: .data)
                 // Update time every second
@@ -372,9 +145,6 @@ struct SettingsView: View {
                 // Load backup info
                 loadBackupInfo()
             }
-            .onChange(of: themeManager.currentAppTheme) { _, _ in
-                // Force refresh when theme changes
-            }
             .sheet(isPresented: $showingExportSheet) {
                 if let exportData = exportData {
                     ShareSheet(activityItems: [exportData])
@@ -382,12 +152,6 @@ struct SettingsView: View {
                             logger.info("Export data sheet presented")
                         }
                 }
-            }
-            .sheet(isPresented: $showingShareSheet) {
-                ShareSheet(activityItems: [shareAppContent])
-                    .onAppear {
-                        logger.info("Share app sheet presented")
-                    }
             }
             .sheet(isPresented: $showingBackupSheet) {
                 BackupSheet(
@@ -414,13 +178,13 @@ struct SettingsView: View {
                     logger.info("Restore sheet presented")
                 }
             }
-            .alert("Delete All Data", isPresented: $showingDeleteConfirmation) {
+            .alert("Reset All Local Data", isPresented: $showingDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { }
-                Button("Delete All", role: .destructive) {
+                Button("Reset All", role: .destructive) {
                     deleteAllData()
                 }
             } message: {
-                Text("This will permanently delete all habits and entries. This action cannot be undone.")
+                Text("This will permanently delete all habits and entries on this device. This action cannot be undone.")
             }
             .alert("Import Data?", isPresented: $showingImportConfirmation) {
                 Button("Cancel", role: .cancel) {
@@ -509,16 +273,14 @@ struct SettingsView: View {
                 modelContext.delete(metric)
             }
             
-            try? modelContext.save()
+            modelContext.saveChanges(operation: "delete all data", entity: "Model")
         }
     }
     
     private func showOnboardingAgain() {
         // Reset the onboarding completion flag
-        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
-        
-        // Post notification to trigger onboarding
-        NotificationCenter.default.post(name: NSNotification.Name("OnboardingCompleted"), object: nil)
+        UserDefaults.standard.set(false, forKey: ThemePreferences.hasCompletedOnboarding)
+        AppEvent.post(.onboardingCompleted)
     }
     
     private func loadBackupInfo() {
@@ -545,6 +307,205 @@ struct SettingsView: View {
 
 // MARK: - Export Data Models
 // See Domain/Data/TrackBothExport.swift for canonical export types.
+
+// MARK: - Settings Data Section
+private struct SettingsDataSection: View {
+    @Binding var showingDeleteConfirmation: Bool
+
+    var body: some View {
+        Section("Data") {
+            Button("Reset All Local Data", role: .destructive) {
+                logger.logUserAction("Reset all local data button tapped")
+                showingDeleteConfirmation = true
+            }
+            .accessibilityIdentifier(AccessibilityIdentifiers.settingsResetAllData)
+            .listRowBackground(Color.currentSecondaryBackground)
+        }
+    }
+}
+
+// MARK: - Settings Help & Feedback Section
+private struct SettingsHelpAndFeedbackSection: View {
+    var body: some View {
+        Section("Help & Feedback") {
+            settingsLink(
+                destination: AppLinks.support,
+                title: "Support & FAQ",
+                systemImage: "questionmark.circle",
+                identifier: AccessibilityIdentifiers.settingsSupportFAQ
+            )
+
+            settingsLink(
+                destination: AppSupport.feedbackMailtoURL,
+                title: "Send Feedback",
+                systemImage: "envelope",
+                identifier: AccessibilityIdentifiers.settingsSendFeedback
+            )
+
+            if let appStoreReview = AppLinks.appStoreReview {
+                settingsLink(
+                    destination: appStoreReview,
+                    title: "Rate TrackBoth",
+                    systemImage: "star",
+                    identifier: AccessibilityIdentifiers.settingsRateApp
+                )
+            }
+
+            if ProductSurface.showsAccessibilityMarketing {
+                settingsLink(
+                    destination: AppLinks.accessibility,
+                    title: "Accessibility",
+                    systemImage: "accessibility",
+                    identifier: AccessibilityIdentifiers.settingsAccessibility
+                )
+            }
+
+            settingsLink(
+                destination: AppLinks.privacy,
+                title: "Privacy Policy",
+                systemImage: "hand.raised",
+                identifier: AccessibilityIdentifiers.settingsPrivacyPolicy
+            )
+        }
+    }
+
+    private func settingsLink(
+        destination: URL,
+        title: String,
+        systemImage: String,
+        identifier: String
+    ) -> some View {
+        Link(destination: destination) {
+            Label(title, systemImage: systemImage)
+        }
+        .accessibilityIdentifier(identifier)
+        .foregroundColor(Color.currentPrimary)
+        .listRowBackground(Color.currentSecondaryBackground)
+    }
+}
+
+// MARK: - Settings About Section
+private struct SettingsAboutSection: View {
+    let onViewOnboarding: () -> Void
+
+    var body: some View {
+        Section {
+            Button(action: onViewOnboarding) {
+                Label("View Onboarding", systemImage: "book.pages")
+            }
+            .accessibilityIdentifier(AccessibilityIdentifiers.settingsViewOnboarding)
+            .foregroundColor(Color.currentPrimary)
+            .listRowBackground(Color.currentSecondaryBackground)
+
+            Text(AppSupport.versionLabel)
+                .foregroundColor(Color.currentSecondaryText)
+                .listRowBackground(Color.currentSecondaryBackground)
+
+            if let buyDeveloperCoffeeURL = AppLinks.buyDeveloperCoffee {
+                Link(destination: buyDeveloperCoffeeURL) {
+                    Label("Buy Developer a Coffee", systemImage: "cup.and.saucer.fill")
+                }
+                .accessibilityIdentifier(AccessibilityIdentifiers.settingsBuyDeveloperCoffee)
+                .foregroundColor(Color.currentPrimary)
+                .listRowBackground(Color.currentSecondaryBackground)
+            }
+        } header: {
+            Text("About")
+        } footer: {
+            if AppLinks.buyDeveloperCoffee != nil {
+                Text("Optional tip to support development. Opens in Safari.")
+            }
+        }
+    }
+}
+
+// MARK: - Settings Appearance Section
+private struct SettingsAppearanceSection: View {
+    @Environment(ThemeManager.self) private var themeManager
+
+    var body: some View {
+        Section("Appearance") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text("App Theme")
+                    .font(.headline)
+                    .themedPrimaryText()
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        ForEach(AppTheme.allThemes, id: \.name) { theme in
+                            CompactThemeCard(
+                                theme: theme,
+                                isSelected: themeManager.currentAppTheme.name == theme.name
+                            ) {
+                                themeManager.updateAppTheme(theme)
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                }
+            }
+            .padding(.vertical, 8)
+            .listRowBackground(Color.currentSecondaryBackground)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Preview")
+                    .font(.subheadline)
+                    .themedSecondaryText()
+
+                themeManager.currentAppTheme.preview()
+                    .frame(maxWidth: .infinity)
+            }
+            .padding(.vertical, 8)
+            .listRowBackground(Color.currentSecondaryBackground)
+
+            FontDesignPicker()
+
+            Button("Reset to Default Theme") {
+                logger.logUserAction("Reset theme button tapped")
+                themeManager.resetToDefaultTheme()
+            }
+            .foregroundColor(Color.currentWarning)
+            .listRowBackground(Color.currentSecondaryBackground)
+        }
+    }
+}
+
+private struct FontDesignPicker: View {
+    @Environment(ThemeManager.self) private var themeManager
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Font")
+                .font(.headline)
+                .themedPrimaryText()
+
+            Picker("Font Design", selection: Binding(
+                get: { themeManager.selectedFontDesign },
+                set: { themeManager.updateFontDesign($0) }
+            )) {
+                ForEach(FontDesign.allCases, id: \.self) { design in
+                    Text(design.displayName).tag(design)
+                }
+            }
+            .pickerStyle(.menu)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Sample Text")
+                    .font(AppTypography.h3)
+                Text("This is how the font looks in the app")
+                    .font(AppTypography.body)
+                Text("Smaller text example")
+                    .font(AppTypography.caption)
+            }
+            .padding()
+            .background(Color.currentSecondaryBackground)
+            .cornerRadius(8)
+            .padding(.top, 4)
+        }
+        .padding(.vertical, 8)
+        .listRowBackground(Color.currentSecondaryBackground)
+    }
+}
 
 // MARK: - Share Sheet
 struct ShareSheet: UIViewControllerRepresentable {

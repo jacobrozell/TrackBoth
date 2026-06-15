@@ -147,25 +147,20 @@ class HomeViewModel {
         let startTime = Date()
         
         withAnimation {
-            // Delete all associated entries first
-            let entriesToDelete = entries.filter { $0.metricID == metric.id }
-            logger.debug("Deleting \(entriesToDelete.count) entries for metric: \(metric.name)", category: .data)
-            
-            for entry in entriesToDelete {
-                modelContext.delete(entry)
-            }
-            
-            // Delete the metric
-            modelContext.delete(metric)
-            
-            // Save changes
+            let entryStore = EntryStore(context: modelContext)
             do {
-                try modelContext.save()
+                try entryStore.deleteEntries(for: metric.id)
+            } catch {
+                logger.logError(error, context: "Failed to delete entries for metric: \(metric.name)")
+            }
+
+            modelContext.delete(metric)
+
+            if modelContext.saveChanges(operation: "delete metric \(metric.name)", entity: "Metric") {
                 let duration = Date().timeIntervalSince(startTime)
                 logger.logPerformance("Metric deletion", duration: duration)
                 logger.logDataOperation("DELETE", entity: "Metric", success: true)
-            } catch {
-                logger.logError(error, context: "Failed to save after deleting metric")
+            } else {
                 logger.logDataOperation("DELETE", entity: "Metric", success: false)
             }
         }
@@ -203,13 +198,11 @@ class HomeViewModel {
         entry.value = newValue
         MetricEntry.markLogged(entry: entry, metric: metric)
 
-        do {
-            try modelContext.save()
+        if modelContext.saveChanges(operation: "toggle metric \(metric.name)", entity: "MetricEntry") {
             let duration = Date().timeIntervalSince(startTime)
             logger.logPerformance("Metric toggle save", duration: duration)
             logger.logDataOperation("UPDATE", entity: "MetricEntry", success: true)
-        } catch {
-            logger.logError(error, context: "Failed to save after toggling metric")
+        } else {
             logger.logDataOperation("UPDATE", entity: "MetricEntry", success: false)
         }
     }
@@ -244,7 +237,7 @@ class HomeViewModel {
             entry.starred = starred
         }
         
-        try? modelContext.save()
+        modelContext.saveChanges(operation: "update metric entry \(metric.name)", entity: "MetricEntry")
     }
     
     /// Reset all state

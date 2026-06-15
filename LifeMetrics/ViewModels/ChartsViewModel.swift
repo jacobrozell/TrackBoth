@@ -1,6 +1,5 @@
 import Foundation
 import SwiftData
-import SwiftUI
 
 // MARK: - ChartsViewModel
 /// ViewModel for ChartsView containing chart logic and data processing
@@ -15,28 +14,14 @@ class ChartsViewModel {
     // MARK: - Computed Properties
     /// Filtered metrics based on selected filter
     func filteredMetrics(_ metrics: [Metric]) -> [Metric] {
-        let startTime = Date()
-        let result = FilterUtils.filteredMetrics(selectedFilter, in: metrics)
-        
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Metrics filtering", duration: duration)
-        logger.debug("Metrics filtered - Filter: \(selectedFilter), Result: \(result.count) out of \(metrics.count)", category: .business)
-        
-        return result
+        FilterUtils.filteredMetrics(selectedFilter, in: metrics)
     }
     
     /// Filtered entries based on selected filter
     func filteredEntries(_ entries: [MetricEntry], metrics: [Metric]) -> [MetricEntry] {
-        let startTime = Date()
-        let result = entries.filter { entry in
+        entries.filter { entry in
             FilterUtils.matchesFilter(selectedFilter, entry: entry, metrics: metrics)
         }
-        
-        let duration = Date().timeIntervalSince(startTime)
-        logger.logPerformance("Entries filtering", duration: duration)
-        logger.debug("Entries filtered - Filter: \(selectedFilter), Result: \(result.count) out of \(entries.count)", category: .business)
-        
-        return result
     }
     
     /// Check if there's data to display charts
