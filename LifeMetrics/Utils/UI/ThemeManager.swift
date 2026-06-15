@@ -424,7 +424,12 @@ extension Color {
 // MARK: - View Modifiers for Themed Colors
 extension View {
     func themedBackground() -> some View {
-        self.background(Color.currentBackground)
+        self
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background {
+                Color.currentBackground
+                    .ignoresSafeArea()
+            }
     }
     
     func themedSecondaryBackground() -> some View {

@@ -10,6 +10,8 @@ struct ContentView: View {
     @State private var showingOnboarding = Self.shouldShowOnboarding
     @StateObject private var themeManager = ThemeManager.shared
     @AppStorage("dismissedStoreRecoveryBanner") private var dismissedStoreRecoveryBanner = false
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
 
     private static var shouldShowOnboarding: Bool {
         let skipOnboarding = ProcessInfo.processInfo.arguments.contains("-skip_onboarding")
@@ -22,9 +24,12 @@ struct ContentView: View {
     }
 
     var body: some View {
-        Group {
+        ZStack {
+            Color.currentBackground.ignoresSafeArea()
+
             if showingOnboarding {
                 OnboardingView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .onAppear {
                         logger.info("OnboardingView displayed")
                     }
@@ -32,6 +37,7 @@ struct ContentView: View {
                 ZStack(alignment: .top) {
                     TabView(selection: $selectedTab) {
                         HomeView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .tabItem {
                                 Image(systemName: "house.fill")
                                 Text("Home")
@@ -39,6 +45,7 @@ struct ContentView: View {
                             .tag(0)
 
                         GoalsView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .tabItem {
                                 Image(systemName: "target")
                                 Text("Goals")
@@ -46,6 +53,7 @@ struct ContentView: View {
                             .tag(1)
 
                         MotivationsView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .tabItem {
                                 Image(systemName: "heart.fill")
                                 Text("Motivation")
@@ -53,6 +61,7 @@ struct ContentView: View {
                             .tag(2)
 
                         HistoryView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .tabItem {
                                 Image(systemName: "calendar.badge.clock")
                                 Text("History")
@@ -61,6 +70,7 @@ struct ContentView: View {
 
                         if ProductSurface.showsCharts {
                             ChartsView()
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 .tabItem {
                                     Image(systemName: "chart.line.uptrend.xyaxis")
                                     Text("Charts")
@@ -68,7 +78,11 @@ struct ContentView: View {
                                 .tag(4)
                         }
                     }
-                    .themedBackground()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .publishAdaptiveLayoutMode(
+                        horizontal: horizontalSizeClass,
+                        vertical: verticalSizeClass
+                    )
                     .id(themeManager.currentAppTheme.name)
                     .onChange(of: selectedTab) { oldValue, newValue in
                         let tabNames = ["Home", "Goals", "Motivation", "History", "Charts"]
@@ -83,8 +97,10 @@ struct ContentView: View {
                         )
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             logger.info("ContentView appeared")
             MigrationUtils.runMigrationIfNeeded(in: modelContext)
