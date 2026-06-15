@@ -13,35 +13,34 @@ struct ChartsView: View {
     @State private var exportFormat: ChartExportUtility.ExportFormat = .png
     @State private var isExporting = false
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.usesSidebarSplit) private var usesSidebarSplit
     
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            ZStack {
-                GeometryReader { geometry in
+            GeometryReader { geometry in
+                Group {
                     if metrics.isEmpty {
                         ChartsEmptyStateView()
-                    } else {
-                        if geometry.size.width > geometry.size.height {
-                            // Landscape layout
-                            HStack(spacing: 0) {
-                                // Left side - Controls
-                                VStack {
-                                    ChartControlsView(
-                                        selectedFilter: $viewModel.selectedFilter,
-                                        selectedChartType: $viewModel.selectedChartType,
-                                        metrics: metrics,
-                                        isLandscape: true
-                                    )
-                                    Spacer()
-                                }
-                                .frame(width: min(320, geometry.size.width * 0.35))
-                                .background(Color.currentSecondaryBackground.opacity(0.3))
-                                
-                                Divider()
-                                    .frame(height: geometry.size.height)
-                                
-                                // Right side - Chart content
+                    } else if TabBarLayout.shouldUseSidebarSplit(
+                        size: geometry.size,
+                        horizontal: horizontalSizeClass,
+                        vertical: verticalSizeClass
+                    ) {
+                        LandscapeSplitLayout(
+                            totalWidth: geometry.size.width,
+                            totalHeight: geometry.size.height,
+                            sidebar: {
+                                ChartControlsView(
+                                    selectedFilter: $viewModel.selectedFilter,
+                                    selectedChartType: $viewModel.selectedChartType,
+                                    metrics: metrics,
+                                    isLandscape: true
+                                )
+                            },
+                            content: {
                                 ChartContentView(
                                     selectedChartType: viewModel.selectedChartType,
                                     selectedFilter: viewModel.selectedFilter,
@@ -49,10 +48,9 @@ struct ChartsView: View {
                                     metrics: metrics
                                 )
                             }
-                        } else {
-                            // Portrait layout
-                            VStack(spacing: 0) {
-                                // Controls
+                        )
+                    } else {
+                        VStack(spacing: 0) {
                             ChartControlsView(
                                 selectedFilter: $viewModel.selectedFilter,
                                 selectedChartType: $viewModel.selectedChartType,
@@ -60,43 +58,32 @@ struct ChartsView: View {
                                 isLandscape: false
                             )
 
-                                Divider()
+                            Divider()
 
-                                // Chart content
-                                ChartContentView(
-                                    selectedChartType: viewModel.selectedChartType,
-                                    selectedFilter: viewModel.selectedFilter,
-                                    entries: entries,
-                                    metrics: metrics
-                                )
-                            }
+                            ChartContentView(
+                                selectedChartType: viewModel.selectedChartType,
+                                selectedFilter: viewModel.selectedFilter,
+                                entries: entries,
+                                metrics: metrics
+                            )
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                     }
                 }
-                .navigationTitle("Charts")
-                .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
-                .onAppear {
-                    logger.info("ChartsView appeared", category: .ui)
-                    logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(viewModel.selectedFilter), ChartType: \(viewModel.selectedChartType)", category: .ui)
-                }
-                .toolbar {
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+            }
+            .themedBackground()
+            .navigationTitle("Charts")
+            .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
+            .onAppear {
+                logger.info("ChartsView appeared", category: .ui)
+                logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(viewModel.selectedFilter), ChartType: \(viewModel.selectedChartType)", category: .ui)
+            }
+            .toolbar {
                     if ProductSurface.showsDemoData {
                         ToolbarItem(placement: .navigationBarLeading) {
-                            if metrics.isEmpty {
-                                Button("Try Demo Data") {
-                                    logger.logUserAction("Generate demo data")
-                                    DemoDataGenerator.generateDemoData(modelContext: modelContext)
-                                }
-                                .font(.caption)
-                                .foregroundColor(Color.currentPrimary)
-                            } else if DemoDataGenerator.hasDemoData() {
-                                Button("Undo Demo Data") {
-                                    logger.logUserAction("Clear demo data")
-                                    DemoDataGenerator.clearDemoData(modelContext: modelContext)
-                                }
-                                .font(.caption)
-                                .foregroundColor(Color.currentWarning)
-                            }
+                            DemoDataToolbarButton(metricsEmpty: metrics.isEmpty)
                         }
                     }
                     
@@ -154,8 +141,8 @@ struct ChartsView: View {
                         viewModel.selectedFilter = .all
                     }
                 }
-            }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     // MARK: - Export Functions

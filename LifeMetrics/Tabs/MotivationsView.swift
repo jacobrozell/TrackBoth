@@ -12,6 +12,9 @@ struct MotivationsView: View {
     @State private var showingAddMotivation = false
     @State private var selectedFilter: MetricFilter = .all
     @StateObject private var themeManager = ThemeManager.shared
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.usesSidebarSplit) private var usesSidebarSplit
 
     // MARK: - Computed Properties
     private var filteredMetrics: [Metric] {
@@ -75,6 +78,7 @@ struct MotivationsView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
+                Group {
                 if metrics.isEmpty {
                     // No habits/vices - need to create one first
                     EmptyStateView(
@@ -108,81 +112,33 @@ struct MotivationsView: View {
                                     showingAddMotivation = true
                                 }
                                 .accessibilityLabel("Add Motivation")
+                                .padding(.trailing, 20)
+                                .padding(.bottom, 20)
                             }
                         }
                     }
-                } else if geometry.size.width > geometry.size.height {
-                    // Landscape layout
-                    HStack(spacing: 0) {
-                        leftPanel
-                            .background(Color.currentSecondaryBackground)
-
-                        Divider()
-
-                        rightPanel
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.currentBackground)
-                            .overlay(alignment: .bottomTrailing) {
-                                FloatingActionButton {
-                                    logger.logUserAction("Add motivation button tapped")
-                                    showingAddMotivation = true
-                                }
-                                .accessibilityLabel("Add Motivation")
-                            }
+                } else if TabBarLayout.shouldUseSidebarSplit(
+                    size: geometry.size,
+                    horizontal: horizontalSizeClass,
+                    vertical: verticalSizeClass
+                ) {
+                    LandscapeSplitLayout(
+                        totalWidth: geometry.size.width,
+                        totalHeight: geometry.size.height,
+                        sidebar: { leftPanel },
+                        content: { rightPanel }
+                    )
+                    .tabBarFloatingActionButton(isLandscape: true) {
+                        logger.logUserAction("Add motivation button tapped")
+                        showingAddMotivation = true
                     }
                 } else {
                     // Portrait layout
                     VStack(spacing: 0) {
-                        // Filter chips
                         if metrics.count > 0 {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 12) {
-                                    // All filter
-                                    ReactiveFilterButton(
-                                        title: "All",
-                                        isSelected: selectedFilter == .all
-                                    ) {
-                                        selectedFilter = .all
-                                    }
-                                    
-                                    // All Habits filter
-                                    ReactiveFilterButton(
-                                        title: "All Habits",
-                                        isSelected: selectedFilter == .allHabits
-                                    ) {
-                                        selectedFilter = .allHabits
-                                    }
-                                    
-                                    // All Vices filter
-                                    ReactiveFilterButton(
-                                        title: "All Vices",
-                                        isSelected: selectedFilter == .allVices
-                                    ) {
-                                        selectedFilter = .allVices
-                                    }
-
-                                    // Individual metrics
-                                    ForEach(metrics) { metric in
-                                        ReactiveFilterButton(
-                                            title: metric.name,
-                                            isSelected: {
-                                                if case .specific(let selectedMetric) = selectedFilter {
-                                                    return selectedMetric.id == metric.id
-                                                }
-                                                return false
-                                            }()
-                                        ) {
-                                            selectedFilter = .specific(metric)
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                            }
-                            .padding(.vertical, 8)
-                            .background(Color.currentSecondaryBackground)
+                            MetricFilterChipRow(metrics: metrics, selectedFilter: $selectedFilter)
                         }
 
-                        // Motivation content
                         ScrollView {
                             LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
                                 // Primary Motivations Section
@@ -215,17 +171,17 @@ struct MotivationsView: View {
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
+                            .adaptiveScrollInset()
                         }
                         .id("motivations-portrait-\(geometry.size.width)-\(geometry.size.height)")
-                        .overlay(alignment: .bottomTrailing) {
-                            FloatingActionButton {
-                                logger.logUserAction("Add motivation button tapped")
-                                showingAddMotivation = true
-                            }
-                            .accessibilityLabel("Add Motivation")
-                        }
+                    }
+                    .adaptiveFloatingActionButton {
+                        logger.logUserAction("Add motivation button tapped")
+                        showingAddMotivation = true
                     }
                 }
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
             .themedBackground()
             .navigationTitle("Motivation")
@@ -238,6 +194,10 @@ struct MotivationsView: View {
                         Image(systemName: "gear")
                     }
                 }
+            }
+            .adaptiveAddButton(isEmpty: !hasAnyMotivations, label: "Add Motivation") {
+                logger.logUserAction("Add motivation button tapped")
+                showingAddMotivation = true
             }
             .onAppear {
                 logger.info("MotivationsView2 appeared", category: .ui)
@@ -253,64 +213,17 @@ struct MotivationsView: View {
                 AddMotivationView2(metrics: metrics)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Panels
     private var leftPanel: some View {
         VStack(spacing: 12) {
-            // Filter section
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Filter by Habit")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(Color.currentSecondaryText)
-
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 8) {
-                        // All filter
-                        ReactiveFilterButton(
-                            title: "All",
-                            isSelected: selectedFilter == .all
-                        ) {
-                            selectedFilter = .all
-                        }
-                        
-                        // All Habits filter
-                        ReactiveFilterButton(
-                            title: "All Habits",
-                            isSelected: selectedFilter == .allHabits
-                        ) {
-                            selectedFilter = .allHabits
-                        }
-                        
-                        // All Vices filter
-                        ReactiveFilterButton(
-                            title: "All Vices",
-                            isSelected: selectedFilter == .allVices
-                        ) {
-                            selectedFilter = .allVices
-                        }
-
-                        // Individual metrics
-                        ForEach(metrics) { metric in
-                            ReactiveFilterButton(
-                                title: metric.name,
-                                isSelected: {
-                                    if case .specific(let selectedMetric) = selectedFilter {
-                                        return selectedMetric.id == metric.id
-                                    }
-                                    return false
-                                }()
-                            ) {
-                                selectedFilter = .specific(metric)
-                            }
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-
+            MetricFilterSidebar(
+                title: "Filter by Habit",
+                metrics: metrics,
+                selectedFilter: $selectedFilter
+            )
             Spacer(minLength: 0)
         }
         .padding()
@@ -351,6 +264,7 @@ struct MotivationsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
+                    .adaptiveScrollInset()
                 }
                 .id("motivations-landscape-\(geometry.size.width)-\(geometry.size.height)")
             }
@@ -477,11 +391,14 @@ struct DailyMotivationCardView2: View {
         return formatter.string(from: entry.date)
     }
     
+    private var showsStatusBadge: Bool {
+        guard metric != nil else { return false }
+        return TrackingSemantics.isLoggedForDay(entry: entry)
+    }
+
     private var isSuccess: Bool {
-        // For habits: value=true means completed (success)
-        // For vices: value=false means avoided (success)
-        guard let metric = metric else { return false }
-        return metric.habitType == .positive ? entry.value : !entry.value
+        guard let metric else { return false }
+        return TrackingSemantics.isLoggedSuccess(habitType: metric.habitType, entry: entry)
     }
     
     var body: some View {
@@ -509,11 +426,12 @@ struct DailyMotivationCardView2: View {
                 }
                 
                 Spacer()
-                
-                // Success indicator
-                Image(systemName: isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
-                    .foregroundColor(isSuccess ? Color.currentSuccess : Color.currentError)
-                    .font(.system(size: 20))
+
+                if showsStatusBadge {
+                    Image(systemName: isSuccess ? "checkmark.circle.fill" : "xmark.circle.fill")
+                        .foregroundColor(isSuccess ? Color.currentSuccess : Color.currentError)
+                        .font(.system(size: 20))
+                }
             }
             .padding(.horizontal, 12)
             .padding(.top, 12)
@@ -529,7 +447,11 @@ struct DailyMotivationCardView2: View {
             
             // Bottom accent
             Rectangle()
-                .fill(isSuccess ? Color.currentSuccess.opacity(0.3) : Color.currentError.opacity(0.3))
+                .fill(
+                    showsStatusBadge
+                        ? (isSuccess ? Color.currentSuccess.opacity(0.3) : Color.currentError.opacity(0.3))
+                        : Color.currentSecondaryText.opacity(0.2)
+                )
                 .frame(height: 3)
                 .cornerRadius(1.5)
         }
@@ -661,11 +583,10 @@ struct AddMotivationView2: View {
     private func saveMotivation() {
         guard let metric = selectedMetric else { return }
         
-        let now = Date() // Use current date/time instead of start of day
+        let today = CalendarHelper.startOfDay(for: Date())
         MetricEntry.updateOrCreate(
             for: metric.id,
-            date: now,
-            value: metric.habitType == .positive, // true for habits, false for vices
+            date: today,
             motivation: motivationText.trimmingCharacters(in: .whitespacesAndNewlines),
             in: modelContext,
             entries: entries

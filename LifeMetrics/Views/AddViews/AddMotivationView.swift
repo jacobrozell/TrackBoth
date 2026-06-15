@@ -131,7 +131,6 @@ struct AddMotivationView: View {
         MetricEntry.updateOrCreate(
             for: metric.id,
             date: today,
-            value: false,
             motivation: motivationText.trimmingCharacters(in: .whitespacesAndNewlines),
             in: modelContext,
             entries: entries

@@ -13,6 +13,9 @@ struct HistoryView: View {
     @State private var selectedDate = Date()
     @State private var searchText = ""
     @StateObject private var themeManager = ThemeManager.shared
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.usesSidebarSplit) private var usesSidebarSplit
 
     // MARK: - Computed Properties
     private var filteredMetrics: [Metric] {
@@ -141,15 +144,13 @@ struct HistoryView: View {
     }
     
     private var landscapeLayout: some View {
-        HStack(spacing: 0) {
-            leftPanel
-                .background(Color.currentSecondaryBackground)
-
-            Divider()
-
-            rightPanel
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.currentBackground)
+        GeometryReader { geometry in
+            LandscapeSplitLayout(
+                totalWidth: geometry.size.width,
+                totalHeight: geometry.size.height,
+                sidebar: { leftPanel },
+                content: { rightPanel }
+            )
         }
     }
     
@@ -170,51 +171,7 @@ struct HistoryView: View {
     }
     
     private var filterChipsView: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                // All filter
-                ReactiveFilterButton(
-                    title: "All",
-                    isSelected: selectedFilter == MetricFilter.all
-                ) {
-                    selectedFilter = .all
-                }
-                
-                // All Habits filter
-                ReactiveFilterButton(
-                    title: "All Habits",
-                    isSelected: selectedFilter == MetricFilter.allHabits
-                ) {
-                    selectedFilter = .allHabits
-                }
-                
-                // All Vices filter
-                ReactiveFilterButton(
-                    title: "All Vices",
-                    isSelected: selectedFilter == MetricFilter.allVices
-                ) {
-                    selectedFilter = .allVices
-                }
-
-                // Individual metrics
-                ForEach(metrics) { metric in
-                    ReactiveFilterButton(
-                        title: metric.name,
-                        isSelected: {
-                            if case .specific(let selectedMetric) = selectedFilter {
-                                return selectedMetric.id == metric.id
-                            }
-                            return false
-                        }()
-                    ) {
-                        selectedFilter = .specific(metric)
-                    }
-                }
-            }
-            .padding(.horizontal, 20)
-        }
-        .padding(.vertical, 12)
-        .background(Color.currentSecondaryBackground)
+        MetricFilterChipRow(metrics: metrics, selectedFilter: $selectedFilter)
     }
     
     
@@ -278,6 +235,7 @@ struct HistoryView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
+                .adaptiveScrollInset()
             }
             .id("portrait-\(geometry.size.width)-\(geometry.size.height)")
         }
@@ -287,15 +245,22 @@ struct HistoryView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
+                Group {
                 if metrics.isEmpty {
                     noHabitsEmptyState
                 } else if !hasAnyEntries {
                     noHistoryEmptyState
-                } else if geometry.size.width > geometry.size.height {
+                } else if TabBarLayout.shouldUseSidebarSplit(
+                    size: geometry.size,
+                    horizontal: horizontalSizeClass,
+                    vertical: verticalSizeClass
+                ) {
                     landscapeLayout
                 } else {
                     portraitLayout
                 }
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
             .themedBackground()
             .navigationTitle("History")
@@ -320,63 +285,17 @@ struct HistoryView: View {
                 SettingsView()
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Panels
     private var leftPanel: some View {
         VStack(spacing: 12) {
-            // Filter section
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Filter by Habit")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(Color.currentSecondaryText)
-
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 8) {
-                        // All filter
-                        ReactiveFilterButton(
-                            title: "All",
-                            isSelected: selectedFilter == MetricFilter.all
-                        ) {
-                            selectedFilter = .all
-                        }
-                        
-                        // All Habits filter
-                        ReactiveFilterButton(
-                            title: "All Habits",
-                            isSelected: selectedFilter == MetricFilter.allHabits
-                        ) {
-                            selectedFilter = .allHabits
-                        }
-                        
-                        // All Vices filter
-                        ReactiveFilterButton(
-                            title: "All Vices",
-                            isSelected: selectedFilter == MetricFilter.allVices
-                        ) {
-                            selectedFilter = .allVices
-                        }
-
-                        // Individual metrics
-                        ForEach(metrics) { metric in
-                            ReactiveFilterButton(
-                                title: metric.name,
-                                isSelected: {
-                                    if case .specific(let selectedMetric) = selectedFilter {
-                                        return selectedMetric.id == metric.id
-                                    }
-                                    return false
-                                }()
-                            ) {
-                                selectedFilter = .specific(metric)
-                            }
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
+            MetricFilterSidebar(
+                title: "Filter by Habit",
+                metrics: metrics,
+                selectedFilter: $selectedFilter
+            )
         }
         .padding()
     }
@@ -418,6 +337,7 @@ struct HistoryView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
+                    .adaptiveScrollInset()
                 }
                 .id("landscape-\(geometry.size.width)-\(geometry.size.height)")
             }

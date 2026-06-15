@@ -14,8 +14,11 @@ struct HomeView: View {
     // UI State
     @State private var showingLoggingSheetForMetric: Metric? = nil
     @State private var showingRowOptions: Bool = false
-    @State private var hasDemoData: Bool = DemoDataGenerator.hasDemoData()
     @StateObject private var themeManager = ThemeManager.shared
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.adaptiveLayoutMode) private var adaptiveLayoutMode
+    @Environment(\.isCompactLandscape) private var isCompactLandscape
 
     // MARK: - Derived values
     private var weekDays: [Date] {
@@ -37,80 +40,60 @@ struct HomeView: View {
     // MARK: - Body
     var body: some View {
         NavigationStack {
-            GeometryReader { geometry in                if metrics.isEmpty {
-                    EmptyStateView(
-                        icon: "plus.circle.fill",
-                        title: "No Habits Yet",
-                        subtitle: "Start tracking your habits and vices to build a better you",
-                        actionTitle: "Add Your First Habit",
-                        action: { viewModel.showAddMetric() }
-                    )
-                    .background(Color.currentBackground)
-                } else if geometry.size.width > geometry.size.height {
-                    // Landscape: Left (stats + week), Right (list)
-                    HStack(spacing: 0) {
-                        leftPanel
-                            .background(Color.currentSecondaryBackground)
+            ZStack(alignment: .top) {
+                Color.currentBackground.ignoresSafeArea()
 
-                        Divider()
-
-                        rightPanel
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.currentBackground)
-                            .overlay(alignment: .bottomTrailing) {
-                                FloatingActionButton { viewModel.showAddMetric() }
-                            }
-                    }
-                } else {
-                    // Portrait: Header (stats + week), then list + FAB
-                    VStack(spacing: 0) {
-                        VStack(spacing: 12) {
-                            quickStatsRow
-                            weekMiniCalendar
-                            HStack {
-                                Button(showingRowOptions ? "Done" : "Edit") {
-                                    showingRowOptions.toggle()
-                                }
-                                .caption()
-                                .foregroundColor(Color.currentPrimary)
-
-                                Spacer()
-
-                                if !viewModel.isToday {
-                                    Button("Today") { viewModel.goToToday() }
-                                        .caption()
-                                        .foregroundColor(Color.currentPrimary)
-                                }
-                            }
+                GeometryReader { geometry in
+                Group {
+                    if metrics.isEmpty {
+                        EmptyStateView(
+                            icon: "plus.circle.fill",
+                            title: "No Habits Yet",
+                            subtitle: "Start tracking your habits and vices to build a better you",
+                            actionTitle: "Add Your First Habit",
+                            action: { viewModel.showAddMetric() }
+                        )
+                    } else if TabBarLayout.shouldUseSidebarSplit(
+                        size: geometry.size,
+                        horizontal: horizontalSizeClass,
+                        vertical: verticalSizeClass
+                    ) {
+                        LandscapeSplitLayout(
+                            totalWidth: geometry.size.width,
+                            totalHeight: geometry.size.height,
+                            sidebar: { leftPanel },
+                            content: { rightPanel }
+                        )
+                        .tabBarFloatingActionButton(isLandscape: true) {
+                            viewModel.showAddMetric()
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background(Color.currentSecondaryBackground)
+                    } else {
+                        VStack(spacing: 0) {
+                            homeHeader
 
-                        sectionsList
-                            .overlay(alignment: .bottomTrailing) {
-                                FloatingActionButton { viewModel.showAddMetric() }
-                            }
+                            sectionsList
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                        .adaptiveFloatingActionButton {
+                            viewModel.showAddMetric()
+                        }
                     }
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 }
             }
-            .themedBackground()
             .navigationTitle("TrackBoth")
+            .navigationBarTitleDisplayMode(isCompactLandscape ? .inline : .large)
             .accessibilityIdentifier(AccessibilityIdentifiers.tabHome)
             .toolbar {
-                if ProductSurface.showsDemoData && (metrics.isEmpty || hasDemoData) {
+                if ProductSurface.showsDemoData {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        Button {
-                            hasDemoData ? DemoDataGenerator.clearDemoData(modelContext: modelContext) : DemoDataGenerator.generateDemoData(modelContext: modelContext)
-                            hasDemoData.toggle()
-                        } label: {
-                            Text(hasDemoData ? "Clear Demo" : "Try Demo")
-                                .caption()
-                        }
+                        DemoDataToolbarButton(metricsEmpty: metrics.isEmpty)
                     }
                 }
 
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         viewModel.showSettings()
                     } label: {
@@ -119,6 +102,9 @@ struct HomeView: View {
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
                     .accessibilityLabel("Settings")
                 }
+            }
+            .adaptiveAddButton(isEmpty: metrics.isEmpty) {
+                viewModel.showAddMetric()
             }
             .onAppear {
                 // Clamp selectedDate to today if in the future
@@ -143,13 +129,75 @@ struct HomeView: View {
                 LoggingSheet(metric: metric, selectedDate: viewModel.selectedDate)
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Panels
-    private var leftPanel: some View {
+    private var homeHeader: some View {
+        Group {
+            if isCompactLandscape {
+                compactLandscapeHeader
+            } else {
+                portraitHeader
+            }
+        }
+    }
+
+    private var compactLandscapeHeader: some View {
+        HStack(alignment: .top, spacing: 10) {
+            quickStatsRow
+                .frame(maxWidth: 300)
+
+            VStack(spacing: 4) {
+                weekHeaderRow
+                weekMiniCalendar
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color.currentSecondaryBackground)
+    }
+
+    private var portraitHeader: some View {
         VStack(spacing: 12) {
             quickStatsRow
-                .padding(.horizontal)
+            weekMiniCalendar
+            weekHeaderRow
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Color.currentSecondaryBackground)
+    }
+
+    private var weekHeaderRow: some View {
+        HStack {
+            Button(showingRowOptions ? "Done" : "Edit") {
+                showingRowOptions.toggle()
+            }
+            .caption()
+            .foregroundColor(Color.currentPrimary)
+
+            Spacer()
+
+            Text(weekHeaderTitle)
+                .caption()
+                .foregroundColor(Color.currentSecondaryText)
+
+            if !viewModel.isToday {
+                Button("Today") { viewModel.goToToday() }
+                    .caption()
+                    .foregroundColor(Color.currentPrimary)
+            }
+        }
+    }
+
+    private var leftPanel: some View {
+        VStack(spacing: 12) {
+            sidebarStatsColumn
+                .padding(.horizontal, 8)
                 .padding(.top, 8)
 
             Spacer(minLength: 0)
@@ -157,6 +205,27 @@ struct HomeView: View {
             weekMiniCalendar
         }
         .padding()
+    }
+
+    private var sidebarStatsColumn: some View {
+        let totalHabits = viewModel.totalHabits(from: metrics)
+        let totalVices = viewModel.totalVices(from: metrics)
+        let activeStreaks = viewModel.activeStreaks(from: metrics, entries: entries)
+        let todayCompleted = viewModel.todayCompleted(from: metrics, entries: entries)
+
+        return VStack(spacing: 8) {
+            if totalHabits > 0 {
+                StatCard(title: "Habits", value: "\(totalHabits)", icon: "checkmark.circle.fill", color: Color.currentSuccess, compact: true)
+            }
+            if totalVices > 0 {
+                StatCard(title: "Vices", value: "\(totalVices)", icon: "xmark.circle.fill", color: Color.currentError, compact: true)
+            }
+            if activeStreaks > 0 {
+                StatCard(title: "Streaks", value: "\(activeStreaks)", icon: "flame.fill", color: Color.currentWarning, compact: true)
+            }
+            StatCard(title: "Today", value: "\(todayCompleted)/\(metrics.count)", icon: "calendar", color: Color.currentPrimary, compact: true)
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var rightPanel: some View {
@@ -182,6 +251,7 @@ struct HomeView: View {
             .padding(.vertical, 8)
 
             sectionsList
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
@@ -191,23 +261,31 @@ struct HomeView: View {
         let totalVices = viewModel.totalVices(from: metrics)
         let activeStreaks = viewModel.activeStreaks(from: metrics, entries: entries)
         let todayCompleted = viewModel.todayCompleted(from: metrics, entries: entries)
+        let cardWidth: CGFloat = isCompactLandscape ? 76 : 88
 
-        return HStack(spacing: 12) {
-            if totalHabits > 0 {
-                StatCard(title: "Habits", value: "\(totalHabits)", icon: "checkmark.circle.fill", color: Color.currentSuccess)
+        return ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: isCompactLandscape ? 8 : 10) {
+                if totalHabits > 0 {
+                    StatCard(title: "Habits", value: "\(totalHabits)", icon: "checkmark.circle.fill", color: Color.currentSuccess, compact: true)
+                        .frame(width: cardWidth)
+                }
+                if totalVices > 0 {
+                    StatCard(title: "Vices", value: "\(totalVices)", icon: "xmark.circle.fill", color: Color.currentError, compact: true)
+                        .frame(width: cardWidth)
+                }
+                if activeStreaks > 0 {
+                    StatCard(title: "Streaks", value: "\(activeStreaks)", icon: "flame.fill", color: Color.currentWarning, compact: true)
+                        .frame(width: cardWidth)
+                }
+                StatCard(title: "Today", value: "\(todayCompleted)/\(metrics.count)", icon: "calendar", color: Color.currentPrimary, compact: true)
+                    .frame(width: cardWidth)
             }
-            if totalVices > 0 {
-                StatCard(title: "Vices", value: "\(totalVices)", icon: "xmark.circle.fill", color: Color.currentError)
-            }
-            if activeStreaks > 0 {
-                StatCard(title: "Streaks", value: "\(activeStreaks)", icon: "flame.fill", color: Color.currentWarning)
-            }
-            StatCard(title: "Today", value: "\(todayCompleted)/\(metrics.count)", icon: "calendar", color: Color.currentPrimary)
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var weekMiniCalendar: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 0) {
             ForEach(weekDays, id: \.self) { day in
                 let isSelected = Calendar.current.isDate(day, inSameDayAs: viewModel.selectedDate)
                 let isToday = Calendar.current.isDateInToday(day)
@@ -215,26 +293,28 @@ struct HomeView: View {
                     Text(shortWeekday(for: day))
                         .font(.caption2)
                         .foregroundColor(Color.currentSecondaryText)
-                        .frame(height: 12)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     Text(dayOfMonth(for: day))
-                        .font(.subheadline)
+                        .font(.caption)
                         .monospacedDigit()
                         .fontWeight(isSelected ? .semibold : .regular)
                         .foregroundColor(isSelected ? Color.currentBackground : Color.currentText)
-                        .frame(width: 28, height: 28)
+                        .frame(width: 26, height: 26)
                         .background(
                             Circle()
                                 .fill(isSelected ? Color.currentPrimary : (isToday ? Color.currentPrimary.opacity(0.12) : Color.clear))
                         )
                 }
-                .frame(width: 36)
+                .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     viewModel.selectedDate = day
                 }
             }
         }
-        .padding(.horizontal, 12)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: 12)
@@ -247,51 +327,48 @@ struct HomeView: View {
     }
 
     private var sectionsList: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                    Section(header: sectionHeader(title: "Habits", items: habits)) {
-                        ForEach(habits) { metric in
-                            CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
-                                // primary toggle
-                                viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
-                            } onLog: {
-                                showingLoggingSheetForMetric = metric
-                            } onEdit: {
-                                viewModel.showEditMetric(metric)
-                            } onDelete: {
-                                viewModel.metricToDelete = metric
-                                viewModel.showingDeleteConfirmation = true
-                            }
+        ScrollView {
+            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                Section(header: sectionHeader(title: "Habits", items: habits)) {
+                    ForEach(habits) { metric in
+                        CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
+                            viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                        } onLog: {
+                            showingLoggingSheetForMetric = metric
+                        } onEdit: {
+                            viewModel.showEditMetric(metric)
+                        } onDelete: {
+                            viewModel.metricToDelete = metric
+                            viewModel.showingDeleteConfirmation = true
                         }
                     }
+                }
 
-                    Section(header: sectionHeader(title: "Vices", items: vices)) {
-                        ForEach(vices) { metric in
-                            CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
-                                viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
-                            } onLog: {
-                                showingLoggingSheetForMetric = metric
-                            } onEdit: {
-                                viewModel.showEditMetric(metric)
-                            } onDelete: {
-                                viewModel.metricToDelete = metric
-                                viewModel.showingDeleteConfirmation = true
-                            }
+                Section(header: sectionHeader(title: "Vices", items: vices)) {
+                    ForEach(vices) { metric in
+                        CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
+                            viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                        } onLog: {
+                            showingLoggingSheetForMetric = metric
+                        } onEdit: {
+                            viewModel.showEditMetric(metric)
+                        } onDelete: {
+                            viewModel.metricToDelete = metric
+                            viewModel.showingDeleteConfirmation = true
                         }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
             }
-            .id("home-\(geometry.size.width > geometry.size.height ? "landscape" : "portrait")-\(geometry.size.width)-\(geometry.size.height)")
-            .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
-                Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
-                Button("Delete", role: .destructive) { viewModel.deleteMetric(in: modelContext, entries: entries) }
-            } message: {
-                if let metric = viewModel.metricToDelete {
-                    Text("Are you sure you want to delete '\(metric.name)'? This will also delete all associated entries and cannot be undone.")
-                }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .adaptiveScrollInset()
+        }
+        .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
+            Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
+            Button("Delete", role: .destructive) { viewModel.deleteMetric(in: modelContext, entries: entries) }
+        } message: {
+            if let metric = viewModel.metricToDelete {
+                Text("Are you sure you want to delete '\(metric.name)'? This will also delete all associated entries and cannot be undone.")
             }
         }
     }

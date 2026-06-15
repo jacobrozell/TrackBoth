@@ -13,11 +13,15 @@ struct GoalsView: View {
     @State private var selectedDate = Date()
     @State private var selectedFilter: MetricFilter = .all
     @StateObject private var themeManager = ThemeManager.shared
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.usesSidebarSplit) private var usesSidebarSplit
 
-    // MARK: - Computed Properties
+    private var metricsWithGoals: [Metric] {
+        viewModel.metricsWithGoals(metrics)
+    }
+
     private var filteredMetrics: [Metric] {
-        let metricsWithGoals = viewModel.metricsWithGoals(metrics)
-        
         switch selectedFilter {
         case .all:
             return metricsWithGoals
@@ -50,6 +54,7 @@ struct GoalsView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
+                Group {
                 if metrics.isEmpty {
                     EmptyStateView(
                         icon: "plus.circle.fill",
@@ -62,7 +67,7 @@ struct GoalsView: View {
                         }
                     )
                     .background(Color.currentBackground)
-                } else if viewModel.metricsWithGoals(metrics).isEmpty {
+                } else if metricsWithGoals.isEmpty {
                     EmptyStateView(
                         icon: "target",
                         title: "No Goals Set",
@@ -74,65 +79,34 @@ struct GoalsView: View {
                         }
                     )
                     .background(Color.currentBackground)
-                } else if geometry.size.width > geometry.size.height {
-                    // Landscape layout
-                    HStack(spacing: 0) {
-                        leftPanel
-                            .background(Color.currentSecondaryBackground)
-
-                        Divider()
-
-                        rightPanel
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(Color.currentBackground)
-                            .overlay(alignment: .bottomTrailing) {
-                                FloatingActionButton {
-                                    logger.logUserAction("Add goal button tapped")
-                                    viewModel.showingAddGoal = true
-                                }
-                            }
+                } else if TabBarLayout.shouldUseSidebarSplit(
+                    size: geometry.size,
+                    horizontal: horizontalSizeClass,
+                    vertical: verticalSizeClass
+                ) {
+                    LandscapeSplitLayout(
+                        totalWidth: geometry.size.width,
+                        totalHeight: geometry.size.height,
+                        sidebar: { leftPanel },
+                        content: { rightPanel }
+                    )
+                    .tabBarFloatingActionButton(isLandscape: true) {
+                        logger.logUserAction("Add goal button tapped")
+                        viewModel.showingAddGoal = true
                     }
                 } else {
                     // Portrait layout
                     VStack(spacing: 0) {
-                        // Filter chips
-                        if viewModel.metricsWithGoals(metrics).count > 0 {
-                            ScrollView(.horizontal, showsIndicators: false) {
-                                HStack(spacing: 12) {
-                                    // All filter
-                                    ReactiveFilterButton(
-                                        title: "All",
-                                        isSelected: selectedFilter == .all
-                                    ) {
-                                        selectedFilter = .all
-                                    }
-                                    
-                                    // All Habits filter
-                                    ReactiveFilterButton(
-                                        title: "All Habits",
-                                        isSelected: selectedFilter == .allHabits
-                                    ) {
-                                        selectedFilter = .allHabits
-                                    }
-                                    
-                                    // All Vices filter
-                                    ReactiveFilterButton(
-                                        title: "All Vices",
-                                        isSelected: selectedFilter == .allVices
-                                    ) {
-                                        selectedFilter = .allVices
-                                    }
-                                }
-                                .padding(.horizontal, 16)
-                            }
-                            .padding(.vertical, 8)
-                            .background(Color.currentSecondaryBackground)
+                        if metricsWithGoals.count > 0 {
+                            MetricFilterChipRow(
+                                metrics: metricsWithGoals,
+                                selectedFilter: $selectedFilter,
+                                includeIndividualMetrics: false
+                            )
                         }
 
-                        // Goals content
                         ScrollView {
                             LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                                // Boolean Goals Section
                                 if !booleanGoals.isEmpty {
                                     Section(header: sectionHeader(
                                         title: "Completion Goals",
@@ -162,16 +136,19 @@ struct GoalsView: View {
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
+                            .adaptiveScrollInset()
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                         .id("goals-portrait-\(geometry.size.width)-\(geometry.size.height)")
-                        .overlay(alignment: .bottomTrailing) {
-                            FloatingActionButton {
-                                logger.logUserAction("Add goal button tapped")
-                                viewModel.showingAddGoal = true
-                            }
-                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .adaptiveFloatingActionButton {
+                        logger.logUserAction("Add goal button tapped")
+                        viewModel.showingAddGoal = true
                     }
                 }
+                }
+                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
             }
             .themedBackground()
             .navigationTitle("Goals")
@@ -184,6 +161,10 @@ struct GoalsView: View {
                         Image(systemName: "gear")
                     }
                 }
+            }
+            .adaptiveAddButton(isEmpty: metricsWithGoals.isEmpty, label: "Add Goal") {
+                logger.logUserAction("Add goal button tapped")
+                viewModel.showingAddGoal = true
             }
             .onAppear {
                 logger.info("GoalsView2 appeared", category: .ui)
@@ -208,49 +189,18 @@ struct GoalsView: View {
                     }
             }
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     // MARK: - Panels
     private var leftPanel: some View {
         VStack(spacing: 12) {
-            // Filter section
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Filter Goals")
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(Color.currentSecondaryText)
-
-                ScrollView(.vertical, showsIndicators: false) {
-                    VStack(spacing: 8) {
-                        // All filter
-                        ReactiveFilterButton(
-                            title: "All",
-                            isSelected: selectedFilter == .all
-                        ) {
-                            selectedFilter = .all
-                        }
-                        
-                        // All Habits filter
-                        ReactiveFilterButton(
-                            title: "All Habits",
-                            isSelected: selectedFilter == .allHabits
-                        ) {
-                            selectedFilter = .allHabits
-                        }
-                        
-                        // All Vices filter
-                        ReactiveFilterButton(
-                            title: "All Vices",
-                            isSelected: selectedFilter == .allVices
-                        ) {
-                            selectedFilter = .allVices
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
-
+            MetricFilterSidebar(
+                title: "Filter Goals",
+                metrics: metricsWithGoals,
+                selectedFilter: $selectedFilter,
+                includeIndividualMetrics: false
+            )
             Spacer(minLength: 0)
         }
         .padding()
@@ -291,6 +241,7 @@ struct GoalsView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
+                    .adaptiveScrollInset()
                 }
                 .id("goals-landscape-\(geometry.size.width)-\(geometry.size.height)")
             }

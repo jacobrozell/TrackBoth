@@ -19,16 +19,15 @@ struct OnboardingView: View {
             .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Page content
                 TabView(selection: $currentPage) {
                     ForEach(pages.indices, id: \.self) { index in
                         OnboardingPageView(page: pages[index])
                             .tag(index)
                     }
                 }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-                .animation(.easeInOut, value: currentPage)
-                
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
                 // Bottom controls
                 VStack(spacing: 24) {
                     // Page indicator dots
@@ -41,9 +40,10 @@ struct OnboardingView: View {
                                 .animation(.easeInOut(duration: 0.2), value: currentPage)
                         }
                     }
+                    .frame(maxWidth: .infinity)
                     
                     // Navigation buttons
-                    HStack(spacing: 16) {
+                    VStack(spacing: 12) {
                         if currentPage > 0 {
                             Button("Previous") {
                                 withAnimation {
@@ -51,10 +51,9 @@ struct OnboardingView: View {
                                 }
                             }
                             .buttonStyle(SecondaryButtonStyle())
+                            .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        
-                        Spacer()
-                        
+
                         if currentPage < pages.count - 1 {
                             Button("Next") {
                                 withAnimation {
@@ -62,20 +61,24 @@ struct OnboardingView: View {
                                 }
                             }
                             .buttonStyle(PrimaryButtonStyle())
+                            .frame(maxWidth: .infinity)
                         } else {
                             Button("Get Started") {
                                 logger.logUserAction("Complete onboarding")
                                 completeOnboarding()
                             }
                             .buttonStyle(PrimaryButtonStyle())
+                            .frame(maxWidth: .infinity)
                             .accessibilityIdentifier(AccessibilityIdentifiers.onboardingGetStarted)
                         }
                     }
                     .padding(.horizontal, 32)
                 }
-                .padding(.bottom, 50)
+                .padding(.bottom, 24)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
     
     private func completeOnboarding() {
@@ -108,21 +111,23 @@ struct OnboardingPageView: View {
             // Content
             VStack(spacing: 16) {
                 Text(page.title)
-                    .displaySmall()
+                    .h2()
                     .foregroundColor(Color.currentText)
                     .multilineTextAlignment(.center)
-                
+                    .fixedSize(horizontal: false, vertical: true)
+
                 Text(page.description)
                     .bodyLarge()
                     .foregroundColor(Color.currentSecondaryText)
                     .multilineTextAlignment(.center)
                     .lineSpacing(4)
-                    .padding(.horizontal, 20)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            
+            .padding(.horizontal, 8)
+
             Spacer()
         }
-        .padding(.horizontal, 40)
+        .padding(.horizontal, 24)
     }
 }
 
