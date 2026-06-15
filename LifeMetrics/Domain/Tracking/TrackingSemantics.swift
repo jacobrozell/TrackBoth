@@ -62,6 +62,26 @@ enum TrackingSemantics {
         countsTowardTodayCompleted(habitType: habitType, entry: entry)
     }
 
+    /// Logged entry that counts as success for charts, history, and insights.
+    static func isLoggedSuccess(habitType: HabitType, entry: MetricEntry) -> Bool {
+        guard isLoggedForDay(entry: entry) else { return false }
+        return isSuccessful(habitType: habitType, value: entry.value)
+    }
+
+    /// Whether an explicit LoggingSheet save should mark the entry logged.
+    static func shouldMarkLoggedOnSave(
+        habitType: HabitType,
+        value: Bool,
+        details: String,
+        quantity: Int?,
+        existingEntry: MetricEntry?
+    ) -> Bool {
+        if existingEntry?.hasBeenLogged == true { return true }
+        if let quantity, quantity > 0 { return true }
+        if !details.isEmpty { return true }
+        return isSuccessful(habitType: habitType, value: value)
+    }
+
     // MARK: - Toggle
 
     /// Value to persist after the user taps quick-toggle on a row.

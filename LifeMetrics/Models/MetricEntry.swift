@@ -132,7 +132,7 @@ extension MetricEntry {
             entry.unit = unit.isEmpty ? nil : unit
         }
 
-        if value != nil || details != nil || motivation != nil || quantity != nil {
+        if value != nil || details != nil || quantity != nil {
             MetricEntry.markLogged(entry: entry, metric: metric)
         }
 

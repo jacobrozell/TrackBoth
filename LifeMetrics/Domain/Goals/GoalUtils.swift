@@ -25,10 +25,12 @@ struct GoalUtils {
 
         let current: Double
         if goal.goalType == .boolean {
-            let successfulDays = relevantEntries.filter { entry in
-                TrackingSemantics.isSuccessful(habitType: metric.habitType, value: entry.value)
-            }.count
-            current = Double(successfulDays)
+            let successfulDays = Set(
+                relevantEntries
+                    .filter { TrackingSemantics.isSuccessful(habitType: metric.habitType, value: $0.value) }
+                    .map { Calendar.current.startOfDay(for: $0.date) }
+            )
+            current = Double(successfulDays.count)
         } else {
             let quantityEntries = relevantEntries.filter(\.hasQuantity)
             switch goal.quantityGoalType ?? .totalPeriod {
@@ -72,9 +74,12 @@ struct GoalUtils {
 
         let current: Double
         if goal.goalType == .boolean {
-            current = Double(relevantEntries.filter { entry in
-                TrackingSemantics.isSuccessful(habitType: metric.habitType, value: entry.value)
-            }.count)
+            let successfulDays = Set(
+                relevantEntries
+                    .filter { TrackingSemantics.isSuccessful(habitType: metric.habitType, value: $0.value) }
+                    .map { Calendar.current.startOfDay(for: $0.date) }
+            )
+            current = Double(successfulDays.count)
         } else {
             let quantityEntries = relevantEntries.filter(\.hasQuantity)
             switch goal.quantityGoalType ?? .totalPeriod {

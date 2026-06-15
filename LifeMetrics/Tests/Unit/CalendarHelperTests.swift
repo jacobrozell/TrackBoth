@@ -52,4 +52,28 @@ final class CalendarHelperTests: XCTestCase {
         let next = CalendarHelper.addDays(1, to: date)
         XCTAssertEqual(CalendarHelper.daysBetween(date, next), 1)
     }
+
+    func testStartAndEndOfMonth() {
+        let date = calendar.date(from: DateComponents(year: 2026, month: 6, day: 14))!
+        let monthStart = CalendarHelper.startOfMonth(for: date)
+        let monthEnd = CalendarHelper.endOfMonth(for: date)
+        XCTAssertTrue(monthStart < monthEnd)
+        XCTAssertEqual(calendar.component(.month, from: monthStart), 6)
+    }
+
+    func testStartOfPeriodMonthlyAndYearly() {
+        let date = calendar.date(from: DateComponents(year: 2026, month: 6, day: 14))!
+        XCTAssertEqual(
+            CalendarHelper.startOfPeriod(.monthly, for: date),
+            CalendarHelper.startOfMonth(for: date)
+        )
+        XCTAssertEqual(
+            CalendarHelper.startOfPeriod(.yearly, for: date),
+            CalendarHelper.startOfYear(for: date)
+        )
+    }
+
+    func testIsToday() {
+        XCTAssertTrue(CalendarHelper.isToday(Date()))
+    }
 }
