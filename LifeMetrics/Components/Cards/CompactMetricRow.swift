@@ -14,6 +14,7 @@ struct CompactMetricRow: View {
 
     @Query private var entries: [MetricEntry]
     @State private var refreshTrigger = UUID()
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var selectedDateEntry: MetricEntry? {
         let calendar = Calendar.current
@@ -40,120 +41,14 @@ struct CompactMetricRow: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            HStack(spacing: 12) {
-                // Left side - tappable for logging
-                HStack(spacing: 12) {
-                    // Toggle for completion status
-                    Button(action: {
-                        logger.debug("Toggle button tapped for metric: \(metric.name)", category: .ui)
-                        onToggle()
-                        // Small delay to allow SwiftData to process the change
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            refreshTrigger = UUID()
-                        }
-                    }) {
-                        let isCompleted = isMetricCompleted()
-                        let isLogged = TrackingSemantics.isLoggedForDay(entry: selectedDateEntry)
-
-                        if metric.habitType == .vice {
-                            if isCompleted {
-                                Image(systemName: "checkmark.shield.fill")
-                                    .font(.title3)
-                                    .foregroundColor(Color.currentSuccess)
-                            } else if isLogged {
-                                Image(systemName: "xmark.circle.fill")
-                                    .font(.title3)
-                                    .foregroundColor(Color.currentError)
-                            } else {
-                                Image(systemName: "circle")
-                                    .font(.title3)
-                                    .foregroundColor(Color.currentSecondaryText)
-                            }
-                        } else {
-                            Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                                .font(.title3)
-                                .foregroundColor(isCompleted ? Color.currentSuccess : Color.currentSecondaryText)
-                        }
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .accessibilityIdentifier(AccessibilityIdentifiers.metricToggle(metric.id))
-                    .accessibilityLabel("\(metric.name), \(statusInfo.text)")
-                    .accessibilityHint(metric.habitType == .positive ? "Toggle completion" : "Toggle avoided status")
-                    .id(refreshTrigger)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack {
-                            Text(metric.name)
-                                .h4()
-                                .foregroundColor(Color.currentText)
-                            
-                            Spacer()
-                            
-                            // Status label moved to top right
-                            Text(statusInfo.text)
-                                .caption()
-                                .foregroundColor(statusInfo.color)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 2)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .fill(statusInfo.color.opacity(0.15))
-                                )
-                        }
-
-                        HStack(spacing: 10) {
-                            let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
-                            if metric.hasBeenLogged, streak > 0 {
-                                HStack(spacing: 4) {
-                                    Image(systemName: "flame.fill").foregroundColor(Color.currentWarning).font(.caption)
-                                    Text(metric.habitType == .positive
-                                        ? StreakCopy.habitStreak(streak)
-                                        : StreakCopy.viceClean(streak))
-                                        .caption()
-                                        .foregroundColor(Color.currentSecondaryText)
-                                }
-                            }
-
-                            if let goal = metric.booleanGoals.first {
-                                let progress = GoalUtils.calculateGoalProgress(for: goal, metric: metric, entries: entries, selectedDate: selectedDate)
-                                HStack(spacing: 4) {
-                                    Image(systemName: "target").foregroundColor(Color.currentPrimary).font(.caption)
-                                    Text("\(Int(progress.current))/\(Int(progress.target))")
-                                        .caption()
-                                        .foregroundColor(Color.currentSecondaryText)
-                                }
-                            }
-                            
-                            Spacer()
-                            
-                            // Quantity label in bottom right
-                            if let quantityString = selectedDateEntry?.quantityString {
-                                Text(quantityString)
-                                    .captionSmall()
-                                    .foregroundColor(Color.currentSecondaryText)
-                            }
-                        }
-                    }
-                    .onTapGesture {
-                        onLog()
-                    }
-                    .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
-
-                    Spacer()
-                }
-                .contentShape(Rectangle())
+            if dynamicTypeSize.usesAccessibilityLayout {
+                accessibilityRow
+            } else {
+                compactRow
             }
 
             if showOptions {
-                HStack(spacing: 12) {
-                    Button(action: onLog) { Label("Log", systemImage: "square.and.pencil") }
-                        .buttonStyle(.bordered)
-                    Button(action: onEdit) { Label("Edit Habit", systemImage: "pencil") }
-                        .buttonStyle(.bordered)
-                    Button(role: .destructive, action: onDelete) { Label("Delete", systemImage: "trash") }
-                        .buttonStyle(.bordered)
-                    Spacer()
-                }
+                optionsRow
             }
         }
         .padding(12)
@@ -164,6 +59,163 @@ struct CompactMetricRow: View {
             Button(action: onLog) { Label("Log", systemImage: "square.and.pencil") }
             Button(action: onEdit) { Label("Edit Habit", systemImage: "pencil") }
             Button(role: .destructive, action: onDelete) { Label("Delete", systemImage: "trash") }
+        }
+    }
+
+    private var compactRow: some View {
+        HStack(spacing: 12) {
+            HStack(spacing: 12) {
+                toggleButton
+                metricDetails
+                Spacer()
+            }
+            .contentShape(Rectangle())
+        }
+    }
+
+    private var accessibilityRow: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                toggleButton
+                Text(metric.name)
+                    .font(.headline)
+                    .foregroundColor(Color.currentText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+
+            Text(statusInfo.text)
+                .font(.caption)
+                .foregroundColor(statusInfo.color)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(statusInfo.color.opacity(0.15))
+                )
+
+            metadataRow
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { onLog() }
+    }
+
+    private var toggleButton: some View {
+        Button(action: {
+            logger.debug("Toggle button tapped for metric: \(metric.name)", category: .ui)
+            onToggle()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                refreshTrigger = UUID()
+            }
+        }) {
+            toggleIcon
+        }
+        .buttonStyle(PlainButtonStyle())
+        .accessibilityIdentifier(AccessibilityIdentifiers.metricToggle(metric.id))
+        .accessibilityLabel("\(metric.name), \(statusInfo.text)")
+        .accessibilityHint(metric.habitType == .positive ? "Toggle completion" : "Toggle avoided status")
+        .id(refreshTrigger)
+    }
+
+    @ViewBuilder
+    private var toggleIcon: some View {
+        let isCompleted = isMetricCompleted()
+        let isLogged = TrackingSemantics.isLoggedForDay(entry: selectedDateEntry)
+
+        if metric.habitType == .vice {
+            if isCompleted {
+                Image(systemName: "checkmark.shield.fill")
+                    .font(.title3)
+                    .foregroundColor(Color.currentSuccess)
+            } else if isLogged {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title3)
+                    .foregroundColor(Color.currentError)
+            } else {
+                Image(systemName: "circle")
+                    .font(.title3)
+                    .foregroundColor(Color.currentSecondaryText)
+            }
+        } else {
+            Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
+                .font(.title3)
+                .foregroundColor(isCompleted ? Color.currentSuccess : Color.currentSecondaryText)
+        }
+    }
+
+    private var metricDetails: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(metric.name)
+                    .font(.headline)
+                    .foregroundColor(Color.currentText)
+
+                Spacer()
+
+                Text(statusInfo.text)
+                    .font(.caption)
+                    .foregroundColor(statusInfo.color)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 2)
+                    .background(
+                        RoundedRectangle(cornerRadius: 6)
+                            .fill(statusInfo.color.opacity(0.15))
+                    )
+            }
+
+            metadataRow
+        }
+        .onTapGesture { onLog() }
+        .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
+    }
+
+    private var metadataRow: some View {
+        HStack(spacing: 10) {
+            let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
+            if metric.hasBeenLogged, streak > 0 {
+                HStack(spacing: 4) {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(Color.currentWarning)
+                        .font(.caption)
+                    Text(metric.habitType == .positive
+                        ? StreakCopy.habitStreak(streak)
+                        : StreakCopy.viceClean(streak))
+                        .font(.caption)
+                        .foregroundColor(Color.currentSecondaryText)
+                }
+            }
+
+            if let goal = metric.booleanGoals.first {
+                let progress = GoalUtils.calculateGoalProgress(for: goal, metric: metric, entries: entries, selectedDate: selectedDate)
+                HStack(spacing: 4) {
+                    Image(systemName: "target")
+                        .foregroundColor(Color.currentPrimary)
+                        .font(.caption)
+                    Text("\(Int(progress.current))/\(Int(progress.target))")
+                        .font(.caption)
+                        .foregroundColor(Color.currentSecondaryText)
+                }
+            }
+
+            Spacer()
+
+            if let quantityString = selectedDateEntry?.quantityString {
+                Text(quantityString)
+                    .font(.caption2)
+                    .foregroundColor(Color.currentSecondaryText)
+            }
+        }
+    }
+
+    private var optionsRow: some View {
+        HStack(spacing: 12) {
+            Button(action: onLog) { Label("Log", systemImage: "square.and.pencil") }
+                .buttonStyle(.bordered)
+            Button(action: onEdit) { Label("Edit Habit", systemImage: "pencil") }
+                .buttonStyle(.bordered)
+            Button(role: .destructive, action: onDelete) { Label("Delete", systemImage: "trash") }
+                .buttonStyle(.bordered)
+            Spacer()
         }
     }
 }

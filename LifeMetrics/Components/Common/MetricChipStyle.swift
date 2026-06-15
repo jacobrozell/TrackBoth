@@ -43,7 +43,10 @@ struct ReactiveFilterButton: View {
     var body: some View {
         Button(action: action) {
             Text(title)
-                .bodyMedium()
+                .font(.body)
+                .fontWeight(.medium)
+                .fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.center)
                 .padding(.horizontal, 20)
                 .padding(.vertical, 12)
                 .background(

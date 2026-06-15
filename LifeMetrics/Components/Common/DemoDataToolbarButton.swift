@@ -23,7 +23,7 @@ struct DemoDataToolbarButton: View {
                 }
             } label: {
                 Text(hasDemoData ? "Clear Demo" : "Try Demo")
-                    .caption()
+                    .font(.caption)
             }
             .foregroundColor(hasDemoData ? Color.currentWarning : Color.currentPrimary)
         }

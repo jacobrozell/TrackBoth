@@ -16,6 +16,7 @@ struct HistoryView: View {
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.usesSidebarSplit) private var usesSidebarSplit
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // MARK: - Computed Properties
     private var filteredMetrics: [Metric] {
@@ -202,13 +203,16 @@ struct HistoryView: View {
     private var historyContentView: some View {
         GeometryReader { geometry in
             ScrollView {
-                LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                LazyVStack(
+                    spacing: 16,
+                    pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                ) {
                     // Calendar Section
-                    Section(header: sectionHeader(
+                    Section(header: AdaptiveSectionHeader(
                         title: "Calendar View",
+                        subtitle: "Monthly overview of your progress",
                         icon: "calendar",
-                        iconColor: Color.currentPrimary,
-                        subtitle: "Monthly overview of your progress"
+                        iconColor: Color.currentPrimary
                     )) {
                         CalendarGridView(
                             entries: calendarEntries,
@@ -221,11 +225,11 @@ struct HistoryView: View {
 
                     // Recent Entries Section
                     if !filteredEntries.isEmpty {
-                        Section(header: sectionHeader(
+                        Section(header: AdaptiveSectionHeader(
                             title: "Recent Entries",
+                            subtitle: "Your latest activity",
                             icon: "clock",
-                            iconColor: Color.currentSecondaryText,
-                            subtitle: "Your latest activity"
+                            iconColor: Color.currentSecondaryText
                         )) {
                             ForEach(filteredEntries.prefix(20)) { entry in
                                 HistoryEntryCardView(entry: entry, metrics: metrics)
@@ -264,7 +268,7 @@ struct HistoryView: View {
             }
             .themedBackground()
             .navigationTitle("History")
-            .accessibilityIdentifier(AccessibilityIdentifiers.tabHistory)
+            .adaptiveNavigationBarTitleDisplayMode()
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -272,6 +276,8 @@ struct HistoryView: View {
                     } label: {
                         Image(systemName: "gear")
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
+                    .accessibilityLabel("Settings")
                 }
             }
             .onAppear {
@@ -304,13 +310,16 @@ struct HistoryView: View {
         GeometryReader { geometry in
             VStack(spacing: 0) {
                 ScrollView {
-                    LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
+                    LazyVStack(
+                        spacing: 16,
+                        pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                    ) {
                         // Calendar Section
-                        Section(header: sectionHeader(
+                        Section(header: AdaptiveSectionHeader(
                             title: "Calendar View",
+                            subtitle: "Monthly overview of your progress",
                             icon: "calendar",
-                            iconColor: Color.currentPrimary,
-                            subtitle: "Monthly overview of your progress"
+                            iconColor: Color.currentPrimary
                         )) {
                             CalendarGridView(
                                 entries: calendarEntries,
@@ -323,11 +332,11 @@ struct HistoryView: View {
 
                         // Recent Entries Section
                         if !filteredEntries.isEmpty {
-                            Section(header: sectionHeader(
+                            Section(header: AdaptiveSectionHeader(
                                 title: "Recent Entries",
+                                subtitle: "Your latest activity",
                                 icon: "clock",
-                                iconColor: Color.currentSecondaryText,
-                                subtitle: "Your latest activity"
+                                iconColor: Color.currentSecondaryText
                             )) {
                                 ForEach(filteredEntries.prefix(20)) { entry in
                                     HistoryEntryCardView(entry: entry, metrics: metrics)
@@ -345,43 +354,6 @@ struct HistoryView: View {
     }
 
     // MARK: - Components
-    private func sectionHeader(title: String, icon: String, iconColor: Color, subtitle: String) -> some View {
-        HStack(spacing: 12) {
-            // Icon with background circle
-            ZStack {
-                Circle()
-                    .fill(iconColor.opacity(0.15))
-                    .frame(width: 32, height: 32)
-                
-                Image(systemName: icon)
-                    .foregroundColor(iconColor)
-                    .font(.system(size: 16, weight: .semibold))
-            }
-            
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundColor(Color.currentText)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundColor(Color.currentSecondaryText)
-            }
-            
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color.currentSecondaryBackground)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(iconColor.opacity(0.2), lineWidth: 1)
-                )
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityHeading(.h2)
-    }
 }
 
 // MARK: - HistoryEntryCardView

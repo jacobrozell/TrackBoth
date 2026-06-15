@@ -75,7 +75,7 @@ struct ChartsView: View {
             }
             .themedBackground()
             .navigationTitle("Charts")
-            .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
+            .adaptiveNavigationBarTitleDisplayMode()
             .onAppear {
                 logger.info("ChartsView appeared", category: .ui)
                 logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(viewModel.selectedFilter), ChartType: \(viewModel.selectedChartType)", category: .ui)
@@ -121,6 +121,8 @@ struct ChartsView: View {
                             } label: {
                                 Image(systemName: "gear")
                             }
+                            .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
+                            .accessibilityLabel("Settings")
                         }
                     }
                 }

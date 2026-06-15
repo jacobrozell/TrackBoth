@@ -63,7 +63,6 @@ enum TabBarLayout {
     static func fabBottomInset(isLandscape: Bool) -> CGFloat {
         isLandscape ? landscapeFabBottomInset : fabBottomInset
     }
-
     static func isLandscape(_ size: CGSize) -> Bool {
         size.isLandscapeLayout
     }
@@ -95,14 +94,30 @@ extension View {
     }
 
     func tabBarFloatingActionButton(isLandscape: Bool = false, action: @escaping () -> Void) -> some View {
-        safeAreaInset(edge: .bottom, alignment: .trailing, spacing: 0) {
-            FloatingActionButton(action: action)
-                .padding(.trailing, TabBarLayout.fabTrailingInset)
-                .padding(.top, 8)
-        }
+        modifier(TabBarFloatingActionButtonModifier(isLandscape: isLandscape, action: action))
     }
 
     func landscapeSidebarWidth(_ totalWidth: CGFloat) -> some View {
         frame(width: TabBarLayout.sidebarWidth(for: totalWidth))
+    }
+}
+
+private struct TabBarFloatingActionButtonModifier: ViewModifier {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    let isLandscape: Bool
+    let action: () -> Void
+
+    func body(content: Content) -> some View {
+        content.overlay(alignment: .bottomTrailing) {
+            FloatingActionButton(action: action)
+                .padding(.trailing, TabBarLayout.fabTrailingInset)
+                .padding(
+                    .bottom,
+                    TabBarLayout.fabOverlayClearance(
+                        isLandscape: isLandscape,
+                        dynamicTypeSize: dynamicTypeSize
+                    )
+                )
+        }
     }
 }

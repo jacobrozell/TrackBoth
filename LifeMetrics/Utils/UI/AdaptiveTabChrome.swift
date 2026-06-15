@@ -47,9 +47,13 @@ private struct AdaptiveAddButtonModifier: ViewModifier {
 
 private struct AdaptiveScrollInsetModifier: ViewModifier {
     @Environment(\.adaptiveLayoutMode) private var layoutMode
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     func body(content: Content) -> some View {
-        content.padding(.bottom, TabBarLayout.scrollBottomInset(for: layoutMode))
+        content.padding(
+            .bottom,
+            TabBarLayout.scrollBottomInset(for: layoutMode, dynamicTypeSize: dynamicTypeSize)
+        )
     }
 }
 

@@ -17,8 +17,9 @@ struct HomeView: View {
     @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-    @Environment(\.adaptiveLayoutMode) private var adaptiveLayoutMode
+    @Environment(\.usesSidebarSplit) private var usesSidebarSplit
     @Environment(\.isCompactLandscape) private var isCompactLandscape
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     // MARK: - Derived values
     private var weekDays: [Date] {
@@ -43,7 +44,6 @@ struct HomeView: View {
             ZStack(alignment: .top) {
                 Color.currentBackground.ignoresSafeArea()
 
-                GeometryReader { geometry in
                 Group {
                     if metrics.isEmpty {
                         EmptyStateView(
@@ -53,39 +53,44 @@ struct HomeView: View {
                             actionTitle: "Add Your First Habit",
                             action: { viewModel.showAddMetric() }
                         )
-                    } else if TabBarLayout.shouldUseSidebarSplit(
-                        size: geometry.size,
-                        horizontal: horizontalSizeClass,
-                        vertical: verticalSizeClass
-                    ) {
-                        LandscapeSplitLayout(
-                            totalWidth: geometry.size.width,
-                            totalHeight: geometry.size.height,
-                            sidebar: { leftPanel },
-                            content: { rightPanel }
-                        )
-                        .tabBarFloatingActionButton(isLandscape: true) {
-                            viewModel.showAddMetric()
+                    } else if usesSidebarSplit {
+                        GeometryReader { geometry in
+                            LandscapeSplitLayout(
+                                totalWidth: geometry.size.width,
+                                totalHeight: geometry.size.height,
+                                sidebar: { leftPanel },
+                                content: { rightPanel }
+                            )
+                            .tabBarFloatingActionButton(isLandscape: true) {
+                                viewModel.showAddMetric()
+                            }
                         }
                     } else {
-                        VStack(spacing: 0) {
-                            homeHeader
-
-                            sectionsList
+                        GeometryReader { geometry in
+                            VStack(spacing: 0) {
+                                ScrollView {
+                                    LazyVStack(
+                                        spacing: 16,
+                                        pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                                    ) {
+                                        homeHeader
+                                        metricsSections
+                                    }
+                                    .adaptiveScrollInset()
+                                }
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                        .adaptiveFloatingActionButton {
-                            viewModel.showAddMetric()
+                            }
+                            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
+                            .adaptiveFloatingActionButton {
+                                viewModel.showAddMetric()
+                            }
                         }
                     }
                 }
-                .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
-                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
             .navigationTitle("TrackBoth")
-            .navigationBarTitleDisplayMode(isCompactLandscape ? .inline : .large)
-            .accessibilityIdentifier(AccessibilityIdentifiers.tabHome)
+            .adaptiveNavigationBarTitleDisplayMode(isCompactLandscape: isCompactLandscape)
             .toolbar {
                 if ProductSurface.showsDemoData {
                     ToolbarItem(placement: .navigationBarLeading) {
@@ -128,6 +133,14 @@ struct HomeView: View {
             .sheet(item: $showingLoggingSheetForMetric) { metric in
                 LoggingSheet(metric: metric, selectedDate: viewModel.selectedDate)
             }
+            .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
+                Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
+                Button("Delete", role: .destructive) { viewModel.deleteMetric(in: modelContext, entries: entries) }
+            } message: {
+                if let metric = viewModel.metricToDelete {
+                    Text("Are you sure you want to delete '\(metric.name)'? This will also delete all associated entries and cannot be undone.")
+                }
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -161,35 +174,64 @@ struct HomeView: View {
     }
 
     private var portraitHeader: some View {
-        VStack(spacing: 12) {
-            quickStatsRow
-            weekMiniCalendar
-            weekHeaderRow
+        VStack(spacing: dynamicTypeSize.usesAccessibilityLayout ? 8 : 12) {
+            if dynamicTypeSize.usesAccessibilityLayout {
+                weekHeaderRow
+                quickStatsRow
+                weekMiniCalendar
+            } else {
+                quickStatsRow
+                weekMiniCalendar
+                weekHeaderRow
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.vertical, dynamicTypeSize.usesAccessibilityLayout ? 4 : 8)
         .background(Color.currentSecondaryBackground)
     }
 
     private var weekHeaderRow: some View {
-        HStack {
-            Button(showingRowOptions ? "Done" : "Edit") {
-                showingRowOptions.toggle()
-            }
-            .caption()
-            .foregroundColor(Color.currentPrimary)
-
-            Spacer()
-
-            Text(weekHeaderTitle)
-                .caption()
-                .foregroundColor(Color.currentSecondaryText)
-
-            if !viewModel.isToday {
-                Button("Today") { viewModel.goToToday() }
+        Group {
+            if dynamicTypeSize.usesAccessibilityLayout {
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(weekHeaderTitle)
+                        .font(.subheadline)
+                        .foregroundColor(Color.currentSecondaryText)
+                    HStack {
+                        Button(showingRowOptions ? "Done" : "Edit") {
+                            showingRowOptions.toggle()
+                        }
+                        .font(.caption)
+                        .foregroundColor(Color.currentPrimary)
+                        Spacer()
+                        if !viewModel.isToday {
+                            Button("Today") { viewModel.goToToday() }
+                                .font(.caption)
+                                .foregroundColor(Color.currentPrimary)
+                        }
+                    }
+                }
+            } else {
+                HStack {
+                    Button(showingRowOptions ? "Done" : "Edit") {
+                        showingRowOptions.toggle()
+                    }
                     .caption()
                     .foregroundColor(Color.currentPrimary)
+
+                    Spacer()
+
+                    Text(weekHeaderTitle)
+                        .caption()
+                        .foregroundColor(Color.currentSecondaryText)
+
+                    if !viewModel.isToday {
+                        Button("Today") { viewModel.goToToday() }
+                            .caption()
+                            .foregroundColor(Color.currentPrimary)
+                    }
+                }
             }
         }
     }
@@ -250,66 +292,200 @@ struct HomeView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
 
-            sectionsList
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            ScrollView {
+                sectionsList
+                    .adaptiveScrollInset()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
     // MARK: - Components
+    @ViewBuilder
     private var quickStatsRow: some View {
         let totalHabits = viewModel.totalHabits(from: metrics)
         let totalVices = viewModel.totalVices(from: metrics)
         let activeStreaks = viewModel.activeStreaks(from: metrics, entries: entries)
         let todayCompleted = viewModel.todayCompleted(from: metrics, entries: entries)
-        let cardWidth: CGFloat = isCompactLandscape ? 76 : 88
+        let fixedCardWidth: CGFloat = isCompactLandscape ? 76 : 88
 
-        return ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: isCompactLandscape ? 8 : 10) {
-                if totalHabits > 0 {
-                    StatCard(title: "Habits", value: "\(totalHabits)", icon: "checkmark.circle.fill", color: Color.currentSuccess, compact: true)
-                        .frame(width: cardWidth)
-                }
-                if totalVices > 0 {
-                    StatCard(title: "Vices", value: "\(totalVices)", icon: "xmark.circle.fill", color: Color.currentError, compact: true)
-                        .frame(width: cardWidth)
-                }
-                if activeStreaks > 0 {
-                    StatCard(title: "Streaks", value: "\(activeStreaks)", icon: "flame.fill", color: Color.currentWarning, compact: true)
-                        .frame(width: cardWidth)
-                }
-                StatCard(title: "Today", value: "\(todayCompleted)/\(metrics.count)", icon: "calendar", color: Color.currentPrimary, compact: true)
-                    .frame(width: cardWidth)
+        if dynamicTypeSize.usesAccessibilityLayout {
+            LazyVGrid(
+                columns: [GridItem(.flexible())],
+                spacing: 10
+            ) {
+                quickStatCards(
+                    totalHabits: totalHabits,
+                    totalVices: totalVices,
+                    activeStreaks: activeStreaks,
+                    todayCompleted: todayCompleted,
+                    fixedWidth: nil
+                )
             }
+            .frame(maxWidth: .infinity)
+        } else {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: isCompactLandscape ? 8 : 10) {
+                    quickStatCards(
+                        totalHabits: totalHabits,
+                        totalVices: totalVices,
+                        activeStreaks: activeStreaks,
+                        todayCompleted: todayCompleted,
+                        fixedWidth: fixedCardWidth
+                    )
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private func quickStatCards(
+        totalHabits: Int,
+        totalVices: Int,
+        activeStreaks: Int,
+        todayCompleted: Int,
+        fixedWidth: CGFloat?
+    ) -> some View {
+        if totalHabits > 0 {
+            statCard(title: "Habits", value: "\(totalHabits)", icon: "checkmark.circle.fill", color: Color.currentSuccess, width: fixedWidth)
+        }
+        if totalVices > 0 {
+            statCard(title: "Vices", value: "\(totalVices)", icon: "xmark.circle.fill", color: Color.currentError, width: fixedWidth)
+        }
+        if activeStreaks > 0 {
+            statCard(title: "Streaks", value: "\(activeStreaks)", icon: "flame.fill", color: Color.currentWarning, width: fixedWidth)
+        }
+        statCard(title: "Today", value: "\(todayCompleted)/\(metrics.count)", icon: "calendar", color: Color.currentPrimary, width: fixedWidth)
     }
 
     private var weekMiniCalendar: some View {
-        HStack(spacing: 0) {
-            ForEach(weekDays, id: \.self) { day in
-                let isSelected = Calendar.current.isDate(day, inSameDayAs: viewModel.selectedDate)
-                let isToday = Calendar.current.isDateInToday(day)
-                VStack(spacing: 4) {
-                    Text(shortWeekday(for: day))
-                        .font(.caption2)
-                        .foregroundColor(Color.currentSecondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                    Text(dayOfMonth(for: day))
-                        .font(.caption)
-                        .monospacedDigit()
-                        .fontWeight(isSelected ? .semibold : .regular)
-                        .foregroundColor(isSelected ? Color.currentBackground : Color.currentText)
-                        .frame(width: 26, height: 26)
-                        .background(
-                            Circle()
-                                .fill(isSelected ? Color.currentPrimary : (isToday ? Color.currentPrimary.opacity(0.12) : Color.clear))
-                        )
+        WeekMiniCalendarRow(
+            days: weekDays,
+            selectedDate: viewModel.selectedDate,
+            usesAccessibilityLayout: dynamicTypeSize.usesAccessibilityLayout,
+            onSelect: { viewModel.selectedDate = $0 }
+        )
+    }
+
+    @ViewBuilder
+    private func statCard(title: String, value: String, icon: String, color: Color, width: CGFloat?) -> some View {
+        let card = StatCard(title: title, value: value, icon: icon, color: color, compact: true)
+        if let width {
+            card.frame(width: width)
+        } else {
+            card.frame(maxWidth: .infinity)
+        }
+    }
+
+    private var sectionsList: some View {
+        metricsSections
+    }
+
+    private var metricsSections: some View {
+        LazyVStack(
+            spacing: 16,
+            pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+        ) {
+            Section(header: sectionHeader(title: "Habits", items: habits)) {
+                ForEach(habits) { metric in
+                    CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
+                        viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                    } onLog: {
+                        showingLoggingSheetForMetric = metric
+                    } onEdit: {
+                        viewModel.showEditMetric(metric)
+                    } onDelete: {
+                        viewModel.metricToDelete = metric
+                        viewModel.showingDeleteConfirmation = true
+                    }
                 }
-                .frame(maxWidth: .infinity)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    viewModel.selectedDate = day
+            }
+
+            Section(header: sectionHeader(title: "Vices", items: vices)) {
+                ForEach(vices) { metric in
+                    CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
+                        viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                    } onLog: {
+                        showingLoggingSheetForMetric = metric
+                    } onEdit: {
+                        viewModel.showEditMetric(metric)
+                    } onDelete: {
+                        viewModel.metricToDelete = metric
+                        viewModel.showingDeleteConfirmation = true
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+    }
+
+    private func sectionHeader(title: String, items: [Metric]) -> some View {
+        let completed = completedCount(for: items)
+        return Group {
+            if dynamicTypeSize.usesAccessibilityLayout {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(Color.currentText)
+                    Text("\(completed)/\(items.count) today")
+                        .font(.subheadline)
+                        .foregroundColor(Color.currentSecondaryText)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                HStack {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundColor(Color.currentText)
+                    Spacer()
+                    Text("\(completed)/\(items.count) today")
+                        .font(.caption)
+                        .foregroundColor(Color.currentSecondaryText)
+                }
+            }
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 8)
+        .background(Color.currentSecondaryBackground)
+    }
+
+    // MARK: - Helpers
+    private var weekHeaderTitle: String {
+        let df = DateFormatter()
+        df.dateFormat = "EEE, MMM d"
+        return df.string(from: viewModel.selectedDate)
+    }
+
+}
+
+// MARK: - WeekMiniCalendarRow
+private struct WeekMiniCalendarRow: View {
+    let days: [Date]
+    let selectedDate: Date
+    let usesAccessibilityLayout: Bool
+    let onSelect: (Date) -> Void
+
+    @ScaledMetric(relativeTo: .caption) private var dayBadgeSize: CGFloat = 28
+
+    var body: some View {
+        Group {
+            if usesAccessibilityLayout {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(days, id: \.self) { day in
+                            dayCell(for: day)
+                                .frame(minWidth: dayBadgeSize + 16)
+                        }
+                    }
+                    .padding(.horizontal, 4)
+                }
+            } else {
+                HStack(spacing: 0) {
+                    ForEach(days, id: \.self) { day in
+                        dayCell(for: day)
+                    }
                 }
             }
         }
@@ -326,86 +502,56 @@ struct HomeView: View {
         )
     }
 
-    private var sectionsList: some View {
-        ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                Section(header: sectionHeader(title: "Habits", items: habits)) {
-                    ForEach(habits) { metric in
-                        CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
-                            viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
-                        } onLog: {
-                            showingLoggingSheetForMetric = metric
-                        } onEdit: {
-                            viewModel.showEditMetric(metric)
-                        } onDelete: {
-                            viewModel.metricToDelete = metric
-                            viewModel.showingDeleteConfirmation = true
-                        }
-                    }
-                }
+    @ViewBuilder
+    private func dayCell(for day: Date) -> some View {
+        let isSelected = Calendar.current.isDate(day, inSameDayAs: selectedDate)
+        let isToday = Calendar.current.isDateInToday(day)
 
-                Section(header: sectionHeader(title: "Vices", items: vices)) {
-                    ForEach(vices) { metric in
-                        CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
-                            viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
-                        } onLog: {
-                            showingLoggingSheetForMetric = metric
-                        } onEdit: {
-                            viewModel.showEditMetric(metric)
-                        } onDelete: {
-                            viewModel.metricToDelete = metric
-                            viewModel.showingDeleteConfirmation = true
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .adaptiveScrollInset()
-        }
-        .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
-            Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
-            Button("Delete", role: .destructive) { viewModel.deleteMetric(in: modelContext, entries: entries) }
-        } message: {
-            if let metric = viewModel.metricToDelete {
-                Text("Are you sure you want to delete '\(metric.name)'? This will also delete all associated entries and cannot be undone.")
-            }
-        }
-    }
-
-    private func sectionHeader(title: String, items: [Metric]) -> some View {
-        let completed = completedCount(for: items)
-        return HStack {
-            Text(title)
-                .font(.headline)
-                .foregroundColor(Color.currentText)
-            Spacer()
-            Text("\(completed)/\(items.count) today")
-                .font(.caption)
+        VStack(spacing: 4) {
+            Text(weekdayLabel(for: day))
+                .font(.caption2)
                 .foregroundColor(Color.currentSecondaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(usesAccessibilityLayout ? 1 : 0.8)
+                .padding(.top, usesAccessibilityLayout ? 2 : 0)
+
+            Text(dayNumber(for: day))
+                .font(.caption)
+                .monospacedDigit()
+                .fontWeight(isSelected ? .semibold : .regular)
+                .foregroundColor(isSelected ? Color.currentBackground : Color.currentText)
+                .frame(minWidth: dayBadgeSize, minHeight: dayBadgeSize)
+                .background(
+                    Circle()
+                        .fill(isSelected ? Color.currentPrimary : (isToday ? Color.currentPrimary.opacity(0.12) : Color.clear))
+                )
         }
-        .padding(.horizontal, 4)
-        .padding(.vertical, 8)
-        .background(Color.currentSecondaryBackground)
+        .padding(.vertical, usesAccessibilityLayout ? 4 : 0)
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .onTapGesture { onSelect(day) }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel(for: day, isSelected: isSelected))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    // MARK: - Helpers
-    private var weekHeaderTitle: String {
-        let df = DateFormatter()
-        df.dateFormat = "EEE, MMM d"
-        return df.string(from: viewModel.selectedDate)
+    private func weekdayLabel(for date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = usesAccessibilityLayout ? "EEEEE" : "EEE"
+        return formatter.string(from: date)
     }
 
-    private func shortWeekday(for date: Date) -> String {
-        let df = DateFormatter()
-        df.dateFormat = "E"
-        return df.string(from: date)
+    private func dayNumber(for date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d"
+        return formatter.string(from: date)
     }
 
-    private func dayOfMonth(for date: Date) -> String {
-        let df = DateFormatter()
-        df.dateFormat = "d"
-        return df.string(from: date)
+    private func accessibilityLabel(for date: Date, isSelected: Bool) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        let prefix = isSelected ? "Selected, " : ""
+        return "\(prefix)\(formatter.string(from: date))"
     }
 }
 

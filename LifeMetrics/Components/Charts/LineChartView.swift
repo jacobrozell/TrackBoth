@@ -71,11 +71,7 @@ struct LineChartView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(chartTitle)
-                    .font(.headline)
-                    .foregroundColor(.currentText)
-                Spacer()
+            ChartHeaderRow(title: chartTitle) {
                 if chartData.count < 7 {
                     Text("Building momentum...")
                         .font(.caption)

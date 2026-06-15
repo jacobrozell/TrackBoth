@@ -8,6 +8,8 @@ struct CalendarDayView: View {
     let isCurrentMonth: Bool
     let metrics: [Metric]
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     private var dayNumber: String {
         Calendar.current.component(.day, from: date).description
     }
@@ -68,7 +70,7 @@ struct CalendarDayView: View {
             }
 
         }
-        .frame(minHeight: 36)
+        .frame(minHeight: dynamicTypeSize.usesAccessibilityLayout ? 48 : 36)
         .background(
             RoundedRectangle(cornerRadius: 8)
                 .fill(isToday ? Color.currentAccent.opacity(0.2) : Color.clear)

@@ -30,11 +30,14 @@ final class DemoDataGeneratorTests: XCTestCase {
 
         let metrics = try! context.fetch(FetchDescriptor<Metric>())
         let entries = try! context.fetch(FetchDescriptor<MetricEntry>())
+        let goals = try! context.fetch(FetchDescriptor<Goal>())
         XCTAssertGreaterThan(metrics.count, 0)
         XCTAssertGreaterThan(entries.count, 0)
+        XCTAssertGreaterThan(goals.count, 0)
 
         DemoDataGenerator.clearDemoData(modelContext: context)
         XCTAssertFalse(DemoDataGenerator.hasDemoData())
         XCTAssertEqual(try! context.fetch(FetchDescriptor<Metric>()).count, 0)
+        XCTAssertEqual(try! context.fetch(FetchDescriptor<Goal>()).count, 0)
     }
 }

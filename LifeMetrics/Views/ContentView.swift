@@ -12,6 +12,7 @@ struct ContentView: View {
     @AppStorage("dismissedStoreRecoveryBanner") private var dismissedStoreRecoveryBanner = false
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private static var shouldShowOnboarding: Bool {
         let skipOnboarding = ProcessInfo.processInfo.arguments.contains("-skip_onboarding")
@@ -38,42 +39,47 @@ struct ContentView: View {
                     TabView(selection: $selectedTab) {
                         HomeView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .accessibilityIdentifier(AccessibilityIdentifiers.tabHome)
                             .tabItem {
                                 Image(systemName: "house.fill")
-                                Text("Home")
+                                Text(AccessibilityCopy.tabLabel(.home, accessibility: dynamicTypeSize.usesAccessibilityLayout))
                             }
                             .tag(0)
 
                         GoalsView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
                             .tabItem {
                                 Image(systemName: "target")
-                                Text("Goals")
+                                Text(AccessibilityCopy.tabLabel(.goals, accessibility: dynamicTypeSize.usesAccessibilityLayout))
                             }
                             .tag(1)
 
                         MotivationsView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
                             .tabItem {
                                 Image(systemName: "heart.fill")
-                                Text("Motivation")
+                                Text(AccessibilityCopy.tabLabel(.motivation, accessibility: dynamicTypeSize.usesAccessibilityLayout))
                             }
                             .tag(2)
 
                         HistoryView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .accessibilityIdentifier(AccessibilityIdentifiers.tabHistory)
                             .tabItem {
                                 Image(systemName: "calendar.badge.clock")
-                                Text("History")
+                                Text(AccessibilityCopy.tabLabel(.history, accessibility: dynamicTypeSize.usesAccessibilityLayout))
                             }
                             .tag(3)
 
                         if ProductSurface.showsCharts {
                             ChartsView()
                                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
                                 .tabItem {
                                     Image(systemName: "chart.line.uptrend.xyaxis")
-                                    Text("Charts")
+                                    Text(AccessibilityCopy.tabLabel(.charts, accessibility: dynamicTypeSize.usesAccessibilityLayout))
                                 }
                                 .tag(4)
                         }

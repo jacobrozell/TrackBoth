@@ -8,9 +8,17 @@ struct StatCard: View {
     let color: Color
     var compact: Bool = false
 
-    private var iconSize: CGFloat { compact ? 36 : 48 }
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var iconSize: CGFloat {
+        if compact && dynamicTypeSize.usesAccessibilityLayout { return 28 }
+        return compact ? 36 : 48
+    }
     private var verticalPadding: CGFloat { compact ? 12 : 20 }
-    private var horizontalPadding: CGFloat { compact ? 8 : 16 }
+    private var horizontalPadding: CGFloat {
+        if compact && dynamicTypeSize.usesAccessibilityLayout { return 12 }
+        return compact ? 8 : 16
+    }
     private var contentSpacing: CGFloat { compact ? 8 : 16 }
 
     var body: some View {
@@ -36,23 +44,35 @@ struct StatCard: View {
             }
 
             Text(value)
-                .font(compact ? AppTypography.h3 : AppTypography.h2)
+                .font(compact ? (dynamicTypeSize.usesAccessibilityLayout ? .title2 : .title3) : .title2)
+                .fontWeight(.semibold)
                 .foregroundColor(Color.currentText)
                 .minimumScaleFactor(0.7)
                 .lineLimit(1)
 
-            Text(title)
-                .captionSmall()
-                .foregroundColor(Color.currentText.opacity(0.65))
-                .textCase(.uppercase)
-                .tracking(0.8)
-                .frame(height: 16)
-                .minimumScaleFactor(0.8)
-                .multilineTextAlignment(.center)
-                .lineLimit(1)
+            Group {
+                if dynamicTypeSize.usesAccessibilityLayout {
+                    Text(title)
+                        .font(compact ? .caption : .subheadline)
+                        .foregroundColor(Color.currentText.opacity(0.65))
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text(title)
+                        .font(compact ? .caption2 : .caption)
+                        .foregroundColor(Color.currentText.opacity(0.65))
+                        .textCase(.uppercase)
+                        .tracking(0.8)
+                        .minimumScaleFactor(0.8)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                }
+            }
+                .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: compact ? nil : .infinity)
-        .padding(.vertical, verticalPadding)
+        .frame(maxWidth: compact ? .infinity : nil)
+        .padding(.vertical, dynamicTypeSize.usesAccessibilityLayout ? verticalPadding + 4 : verticalPadding)
         .padding(.horizontal, horizontalPadding)
         .background(
             RoundedRectangle(cornerRadius: 20)

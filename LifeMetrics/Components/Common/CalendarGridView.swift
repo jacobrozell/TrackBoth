@@ -6,6 +6,8 @@ struct CalendarGridView: View {
     let selectedFilter: MetricFilter
     @Binding var selectedDate: Date
     let metrics: [Metric]
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     
     private let calendar = CalendarHelper.calendar
     private let dateFormatter: DateFormatter = {
@@ -58,6 +60,8 @@ struct CalendarGridView: View {
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundColor(.currentText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
                 
                 Spacer()
                 
@@ -74,18 +78,20 @@ struct CalendarGridView: View {
             
             // Weekday headers
             HStack {
-                ForEach(["S", "M", "T", "W", "T", "F", "S"], id: \.self) { day in
+                ForEach(weekdaySymbols, id: \.self) { day in
                     Text(day)
                         .font(.caption)
                         .fontWeight(.medium)
                         .foregroundColor(.currentSecondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
                         .frame(maxWidth: .infinity)
                 }
             }
             .padding(.horizontal)
-            
+
             // Calendar grid
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 7), spacing: 4) {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 4), count: 7), spacing: dynamicTypeSize.usesAccessibilityLayout ? 8 : 4) {
                 ForEach(monthDays, id: \.self) { date in
                     CalendarDayView(
                         date: date,
@@ -100,5 +106,9 @@ struct CalendarGridView: View {
         }
         .background(Color.currentSecondaryBackground)
         .cornerRadius(12)
+    }
+
+    private var weekdaySymbols: [String] {
+        CalendarHelper.calendar.shortWeekdaySymbols.map { String($0.prefix(1)) }
     }
 }

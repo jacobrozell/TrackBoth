@@ -28,6 +28,8 @@ struct DemoDataGenerator {
             metric.hasBeenLogged = true
             modelContext.insert(metric)
         }
+
+        attachDemoGoals(to: demoMetrics, in: modelContext)
         
         // Generate entries for the last 30 days
         let calendar = Calendar.current
@@ -65,6 +67,64 @@ struct DemoDataGenerator {
         
         // Save the context
         try? modelContext.save()
+    }
+
+    private static func attachDemoGoals(to metrics: [Metric], in modelContext: ModelContext) {
+        func metric(named name: String) -> Metric? {
+            metrics.first { $0.name == name }
+        }
+
+        func addBooleanGoal(
+            to metric: Metric,
+            period: GoalPeriod,
+            target: Int
+        ) {
+            let goal = Goal(goalType: .boolean, period: period, target: target)
+            goal.metric = metric
+            metric.goals?.append(goal)
+            modelContext.insert(goal)
+        }
+
+        func addQuantityGoal(
+            to metric: Metric,
+            period: GoalPeriod,
+            target: Int,
+            quantityGoalType: QuantityGoalType,
+            defaultUnit: String
+        ) {
+            let goal = Goal(
+                goalType: .quantity,
+                period: period,
+                target: target,
+                quantityGoalType: quantityGoalType,
+                defaultUnit: defaultUnit
+            )
+            goal.metric = metric
+            metric.goals?.append(goal)
+            modelContext.insert(goal)
+        }
+
+        if let exercise = metric(named: "Morning Exercise") {
+            addBooleanGoal(to: exercise, period: .weekly, target: 5)
+        }
+        if let reading = metric(named: "Read 30 minutes") {
+            addBooleanGoal(to: reading, period: .monthly, target: 20)
+        }
+        if let water = metric(named: "Drink Water") {
+            addBooleanGoal(to: water, period: .weekly, target: 7)
+        }
+        if let social = metric(named: "Social Media") {
+            addBooleanGoal(to: social, period: .weekly, target: 1)
+        }
+        if let steps = metric(named: "Steps Walked") {
+            addQuantityGoal(
+                to: steps,
+                period: .weekly,
+                target: 10_000,
+                quantityGoalType: .maxDaily,
+                defaultUnit: "steps"
+            )
+        }
     }
     
     private static func generateCompletionProbability(
@@ -161,6 +221,7 @@ struct DemoDataGenerator {
         do {
             try modelContext.delete(model: Metric.self)
             try modelContext.delete(model: MetricEntry.self)
+            try modelContext.delete(model: Goal.self)
             try modelContext.save()
         } catch {
             logger.error("Error clearing demo data: \(error.localizedDescription)", category: .data)

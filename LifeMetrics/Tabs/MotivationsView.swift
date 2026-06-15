@@ -185,7 +185,7 @@ struct MotivationsView: View {
             }
             .themedBackground()
             .navigationTitle("Motivation")
-            .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
+            .adaptiveNavigationBarTitleDisplayMode()
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button {
@@ -193,6 +193,8 @@ struct MotivationsView: View {
                     } label: {
                         Image(systemName: "gear")
                     }
+                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
+                    .accessibilityLabel("Settings")
                 }
             }
             .adaptiveAddButton(isEmpty: !hasAnyMotivations, label: "Add Motivation") {

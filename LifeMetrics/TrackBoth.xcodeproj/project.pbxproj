@@ -118,12 +118,15 @@
 		D7D38621FCBD1F1F4760214C /* WCAGContrast.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1598BF3F0DFC33AD1C2419E0 /* WCAGContrast.swift */; };
 		D81A5BAB673D9A5005813F83 /* HistoryViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1A2740DA023F7436BBBBF1 /* HistoryViewModelTests.swift */; };
 		D9289F08B01629BA6D7A4108 /* FilterButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11807125360401A92EFCF0D3 /* FilterButton.swift */; };
+		A1B2C3D4E5F6012345678AB /* AdaptiveSectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6012345678AA /* AdaptiveSectionHeader.swift */; };
+		A1B2C3D4E5F6022345678AB /* ChartHeaderRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6022345678AA /* ChartHeaderRow.swift */; };
 		D9985C130D543EC5C55DE659 /* SharedStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 995EEAE84675DE3803201BA7 /* SharedStateManager.swift */; };
 		DA6CF2316DBA3680CF44DBB8 /* CompactMetricRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D49920E6E7070F292716933 /* CompactMetricRow.swift */; };
 		DBE4470D5FAB4DAF2023770E /* AddGoalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE2008ED6B8FBA9522B18B5F /* AddGoalView.swift */; };
 		DCD99ACD3982F169797198ED /* BuildConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5793974EAD29C29150F53CDF /* BuildConfigurationTests.swift */; };
 		DD9B59B8097DD25586536B7A /* BootstrapStoreRecovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD48DAA0678BB4D859DA832B /* BootstrapStoreRecovery.swift */; };
 		DE4A8D4858DEB1612A848425 /* AdaptiveTabChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6C67E0CEF5585CE7D2E89A /* AdaptiveTabChrome.swift */; };
+		F1A2C3D4E5F6789012345679 /* AccessibilityLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A2C3D4E5F6789012345678 /* AccessibilityLayout.swift */; };
 		DF2230222866924305CC8EBC /* MotivationViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B5B0722A1FFE684127D563 /* MotivationViewModelTests.swift */; };
 		E07811A8220615111D4DF7C1 /* EditableEntryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C12C190852116E61A7E62646 /* EditableEntryCell.swift */; };
 		E25A4F1D1D1E798B7653372D /* DatePickerSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8984034577186E26E68ABD6D /* DatePickerSheet.swift */; };
@@ -164,6 +167,8 @@
 		0D0814BF63F97AC7656DF047 /* SettingsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModelTests.swift; sourceTree = "<group>"; };
 		0DE6A0F15D09D114E723E06E /* GoalsViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsViewModelTests.swift; sourceTree = "<group>"; };
 		11807125360401A92EFCF0D3 /* FilterButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterButton.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6012345678AA /* AdaptiveSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveSectionHeader.swift; sourceTree = "<group>"; };
+		A1B2C3D4E5F6022345678AA /* ChartHeaderRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartHeaderRow.swift; sourceTree = "<group>"; };
 		11CDC71CB104E1E91A35E9A1 /* MigrationRecoveryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationRecoveryView.swift; sourceTree = "<group>"; };
 		124BA9CD64AFF61E9A26932F /* Goal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Goal.swift; sourceTree = "<group>"; };
 		130A8C6333DC8F76EFB81403 /* BarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarChartView.swift; sourceTree = "<group>"; };
@@ -205,6 +210,7 @@
 		5B4ED332C570C45C0479B781 /* HistoryEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryEntryDetailView.swift; sourceTree = "<group>"; };
 		5C14AE771530193CEB9ADC98 /* MotivationalInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotivationalInsightsView.swift; sourceTree = "<group>"; };
 		5D6C67E0CEF5585CE7D2E89A /* AdaptiveTabChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveTabChrome.swift; sourceTree = "<group>"; };
+		F1A2C3D4E5F6789012345678 /* AccessibilityLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityLayout.swift; sourceTree = "<group>"; };
 		5E700097472F417EC9FAFCCD /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		603BC4C6C36A0EF9FFF61C22 /* DateNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateNavigationView.swift; sourceTree = "<group>"; };
 		62E67A8BA1659D0A4BC07AA8 /* TrackBoth.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TrackBoth.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -334,9 +340,11 @@
 		1E8A16C2C2B55B3603036CAD /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				A1B2C3D4E5F6012345678AA /* AdaptiveSectionHeader.swift */,
 				F79B34743FF2C29D61BF9F19 /* CalendarDayView.swift */,
 				ED415AF54588D13559BDFD78 /* CalendarGridView.swift */,
 				603BC4C6C36A0EF9FFF61C22 /* DateNavigationView.swift */,
+				A1B2C3D4E5F6022345678AA /* ChartHeaderRow.swift */,
 				194A8450B4C7ACBAF89A0E11 /* DemoDataToolbarButton.swift */,
 				C12C190852116E61A7E62646 /* EditableEntryCell.swift */,
 				9BEDEB7B32EAB56B58F2F75F /* EmptyStateView.swift */,
@@ -681,6 +689,7 @@
 			isa = PBXGroup;
 			children = (
 				DD3B83F8CD25136E132B6C3C /* AdaptiveLayoutEnvironment.swift */,
+				F1A2C3D4E5F6789012345678 /* AccessibilityLayout.swift */,
 				5D6C67E0CEF5585CE7D2E89A /* AdaptiveTabChrome.swift */,
 				FEA5B8CF7561962FDC109AAF /* ChartExportUtility.swift */,
 				AB38A2AC65C16EE4941790D2 /* TabBarLayout.swift */,
@@ -882,6 +891,7 @@
 				06EEE205CC898A3CA3910730 /* AccessibilityIdentifiers.swift in Sources */,
 				63172EABAE0F56F6D13022A0 /* AdaptiveLayoutEnvironment.swift in Sources */,
 				DE4A8D4858DEB1612A848425 /* AdaptiveTabChrome.swift in Sources */,
+				F1A2C3D4E5F6789012345679 /* AccessibilityLayout.swift in Sources */,
 				DBE4470D5FAB4DAF2023770E /* AddGoalView.swift in Sources */,
 				76009D7FAB015FF006F7EFC2 /* AddMetricView.swift in Sources */,
 				421EFB2CF0A69D76FB14D0D6 /* AddMotivationView.swift in Sources */,
@@ -916,6 +926,8 @@
 				8CEF400F12620DC128843244 /* Enums.swift in Sources */,
 				EF4A0AF0A25679C8F434C2F6 /* ExportImportService.swift in Sources */,
 				D9289F08B01629BA6D7A4108 /* FilterButton.swift in Sources */,
+				A1B2C3D4E5F6012345678AB /* AdaptiveSectionHeader.swift in Sources */,
+				A1B2C3D4E5F6022345678AB /* ChartHeaderRow.swift in Sources */,
 				D44616A82525B7B3C9FC3C88 /* FilterUtils.swift in Sources */,
 				B17A5E679C8A0367D72F7F5B /* FloatingActionButton.swift in Sources */,
 				C71154F6068432BD6F7DA6B3 /* Goal.swift in Sources */,
