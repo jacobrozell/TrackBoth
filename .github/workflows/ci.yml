@@ -47,14 +47,23 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify --renderer github-actions
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage
         working-directory: LifeMetrics
         run: |
           set -eo pipefail
+          RESULT_BUNDLE="$RUNNER_TEMP/TrackBothTestResults.xcresult"
+          rm -rf "$RESULT_BUNDLE"
           xcodebuild test \
             -project TrackBoth.xcodeproj \
             -scheme TrackBoth \
             -destination "$SIM_DESTINATION" \
             -only-testing:TrackBothTests \
+            -enableCodeCoverage YES \
+            -resultBundlePath "$RESULT_BUNDLE" \
             CODE_SIGNING_ALLOWED=NO \
             | xcbeautify --renderer github-actions
+
+      - name: Check coverage gate
+        run: |
+          chmod +x Scripts/check-coverage.sh
+          Scripts/check-coverage.sh "$RUNNER_TEMP/TrackBothTestResults.xcresult" 50
