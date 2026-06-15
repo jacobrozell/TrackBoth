@@ -3,24 +3,27 @@ import SwiftUI
 // MARK: - ChartControlsView Component
 struct ChartControlsView: View {
     @Environment(\.isCompactLandscape) private var isCompactLandscape
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     @Binding var selectedFilter: MetricFilter
     @Binding var selectedChartType: ChartType
     let metrics: [Metric]
     let isLandscape: Bool
-    
+
+    private var usesCompactFilter: Bool {
+        dynamicTypeSize.usesExpandedChrome && !isLandscape
+    }
+
     var body: some View {
         VStack(spacing: isCompactLandscape ? 10 : 20) {
-            // Filter picker
             VStack(alignment: .leading, spacing: 8) {
                 Text("Filter Data")
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundColor(.currentSecondaryText)
                     .padding(.horizontal)
-                
+
                 if isLandscape {
-                    // Landscape: vertical list (sidebar)
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 8) {
                             filterButtons
@@ -28,8 +31,13 @@ struct ChartControlsView: View {
                         .padding(.horizontal)
                     }
                     .id("controls-landscape")
+                } else if usesCompactFilter {
+                    MetricFilterMenu(
+                        metrics: metrics,
+                        selectedFilter: $selectedFilter
+                    )
+                    .padding(.vertical, 4)
                 } else {
-                    // Portrait: horizontal chips row
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 12) {
                             filterButtons
@@ -40,14 +48,13 @@ struct ChartControlsView: View {
                 }
             }
 
-            // Chart type picker
             VStack(alignment: .leading, spacing: 8) {
                 Text("Chart Type")
                     .font(.subheadline)
                     .fontWeight(.medium)
                     .foregroundColor(.currentSecondaryText)
                     .padding(.horizontal)
-                
+
                 Picker("Chart Type", selection: $selectedChartType) {
                     ForEach(ChartType.allCases, id: \.self) { type in
                         Text(type.displayName).tag(type)
@@ -60,38 +67,28 @@ struct ChartControlsView: View {
         .padding(.vertical, isCompactLandscape ? 6 : 16)
         .background(Color.currentSecondaryBackground.opacity(0.5))
     }
-    
+
     @ViewBuilder
     private var filterButtons: some View {
-        // All filter
-        FilterButton(
-            filter: .all,
-            isSelected: selectedFilter == .all
-        ) {
+        ReactiveFilterButton(title: MetricFilter.all.displayName, isSelected: selectedFilter == .all) {
             selectedFilter = .all
         }
-
-        // All Habits filter
-        FilterButton(
-            filter: .allHabits,
-            isSelected: selectedFilter == .allHabits
-        ) {
+        ReactiveFilterButton(title: MetricFilter.allHabits.displayName, isSelected: selectedFilter == .allHabits) {
             selectedFilter = .allHabits
         }
-
-        // All Vices filter
-        FilterButton(
-            filter: .allVices,
-            isSelected: selectedFilter == .allVices
-        ) {
+        ReactiveFilterButton(title: MetricFilter.allVices.displayName, isSelected: selectedFilter == .allVices) {
             selectedFilter = .allVices
         }
 
-        // Individual metrics
         ForEach(metrics) { metric in
-            FilterButton(
-                filter: .specific(metric),
-                isSelected: selectedFilter == .specific(metric)
+            ReactiveFilterButton(
+                title: metric.name,
+                isSelected: {
+                    if case .specific(let selected) = selectedFilter {
+                        return selected.id == metric.id
+                    }
+                    return false
+                }()
             ) {
                 selectedFilter = .specific(metric)
             }

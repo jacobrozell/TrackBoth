@@ -55,16 +55,7 @@ struct StreakUtils {
     // MARK: - Filter-based streaks (charts / insights)
 
     static func filteredMetrics(for filter: MetricFilter, in metrics: [Metric]) -> [Metric] {
-        switch filter {
-        case .all:
-            return metrics
-        case .allHabits:
-            return metrics.filter { $0.habitType == .positive }
-        case .allVices:
-            return metrics.filter { $0.habitType == .vice }
-        case .specific(let metric):
-            return [metric]
-        }
+        FilterUtils.filteredMetrics(filter, in: metrics)
     }
 
     static func calculateFilterCurrentStreak(

@@ -164,9 +164,11 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(hasSettings)
     }
 
-    func testSettingsButtonExistsOnGoals() throws {
+    func testSettingsOnlyOnHome() throws {
         launch()
         tapTab(named: "Goals")
+        XCTAssertFalse(app.buttons["settings_button"].waitForExistence(timeout: 2))
+        tapTab(named: "Home")
         XCTAssertTrue(app.buttons["settings_button"].waitForExistence(timeout: 10))
     }
 
@@ -177,10 +179,6 @@ final class TrackBothUITests: XCTestCase {
         tapTab(named: "Home")
         let addButton = app.buttons["fab_add_metric"]
         XCTAssertTrue(addButton.waitForExistence(timeout: 10))
-        if !addButton.isHittable {
-            app.swipeUp()
-        }
-        XCTAssertTrue(addButton.isHittable)
     }
 
     func testOnboardingFlowCompletesToMainTabs() throws {

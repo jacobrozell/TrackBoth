@@ -11,6 +11,26 @@ final class FilterUtilsTests: XCTestCase {
         MetricEntry(metricID: metricID, date: Date(), value: value, hasBeenLogged: logged)
     }
 
+    func testFilteredMetricsAllHabits() {
+        let habit = makeMetric(name: "Habit", type: .positive)
+        let vice = makeMetric(name: "Vice", type: .vice)
+        let metrics = [habit, vice]
+
+        let filtered = FilterUtils.filteredMetrics(.allHabits, in: metrics)
+        XCTAssertEqual(filtered.count, 1)
+        XCTAssertEqual(filtered.first?.id, habit.id)
+    }
+
+    func testFilteredMetricsSpecificMetric() {
+        let habit = makeMetric(name: "Habit", type: .positive)
+        let vice = makeMetric(name: "Vice", type: .vice)
+        let metrics = [habit, vice]
+
+        let filtered = FilterUtils.filteredMetrics(.specific(vice), in: metrics)
+        XCTAssertEqual(filtered.count, 1)
+        XCTAssertEqual(filtered.first?.id, vice.id)
+    }
+
     func testAllFilterIncludesEveryEntry() {
         let habit = makeMetric(name: "Habit", type: .positive)
         let vice = makeMetric(name: "Vice", type: .vice)

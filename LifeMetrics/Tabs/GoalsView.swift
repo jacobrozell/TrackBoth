@@ -12,7 +12,6 @@ struct GoalsView: View {
     @State private var viewModel = GoalsViewModel()
     @State private var selectedDate = Date()
     @State private var selectedFilter: MetricFilter = .all
-    @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.usesSidebarSplit) private var usesSidebarSplit
@@ -23,16 +22,7 @@ struct GoalsView: View {
     }
 
     private var filteredMetrics: [Metric] {
-        switch selectedFilter {
-        case .all:
-            return metricsWithGoals
-        case .allHabits:
-            return metricsWithGoals.filter { $0.habitType == .positive }
-        case .allVices:
-            return metricsWithGoals.filter { $0.habitType == .vice }
-        case .specific(let selectedMetric):
-            return metricsWithGoals.filter { $0.id == selectedMetric.id }
-        }
+        FilterUtils.filteredMetrics(selectedFilter, in: metricsWithGoals)
     }
     
     private var booleanGoals: [Metric] {
@@ -162,17 +152,6 @@ struct GoalsView: View {
             .themedBackground()
             .navigationTitle("Goals")
             .adaptiveNavigationBarTitleDisplayMode()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        viewModel.showSettings()
-                    } label: {
-                        Image(systemName: "gear")
-                    }
-                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
-                    .accessibilityLabel("Settings")
-                }
-            }
             .adaptiveAddButton(isEmpty: metricsWithGoals.isEmpty, label: "Add Goal") {
                 logger.logUserAction("Add goal button tapped")
                 viewModel.showingAddGoal = true
@@ -185,12 +164,6 @@ struct GoalsView: View {
                 AddGoalView()
                     .onAppear {
                         logger.info("AddGoalView sheet presented")
-                    }
-            }
-            .sheet(isPresented: $viewModel.showingSettings) {
-                SettingsView()
-                    .onAppear {
-                        logger.info("SettingsView sheet presented")
                     }
             }
             .sheet(isPresented: $viewModel.showingAddMetric) {

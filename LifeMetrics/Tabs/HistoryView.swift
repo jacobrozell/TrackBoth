@@ -20,16 +20,7 @@ struct HistoryView: View {
 
     // MARK: - Computed Properties
     private var filteredMetrics: [Metric] {
-        switch selectedFilter {
-        case .all:
-            return metrics
-        case .allHabits:
-            return metrics.filter { $0.habitType == .positive }
-        case .allVices:
-            return metrics.filter { $0.habitType == .vice }
-        case .specific(let selectedMetric):
-            return [selectedMetric]
-        }
+        FilterUtils.filteredMetrics(selectedFilter, in: metrics)
     }
     
     private var filteredEntries: [MetricEntry] {
@@ -41,20 +32,7 @@ struct HistoryView: View {
             entry.date >= startOfMonth && entry.date < endOfMonth
         }
         
-        // Apply metric filter
-        switch selectedFilter {
-        case .all:
-            break
-        case .allHabits:
-            let habitMetricIDs = Set(metrics.filter { $0.habitType == .positive }.map { $0.id })
-            filtered = filtered.filter { habitMetricIDs.contains($0.metricID) }
-        case .allVices:
-            let viceMetricIDs = Set(metrics.filter { $0.habitType == .vice }.map { $0.id })
-            filtered = filtered.filter { viceMetricIDs.contains($0.metricID) }
-        case .specific(let selectedMetric):
-            filtered = filtered.filter { $0.metricID == selectedMetric.id }
-        }
-        
+        filtered = FilterUtils.filteredEntries(selectedFilter, entries: filtered, metrics: metrics)
         
         // Apply search filter
         if !searchText.isEmpty {
@@ -78,36 +56,11 @@ struct HistoryView: View {
             entry.date >= startOfMonth && entry.date < endOfMonth
         }
         
-        // Apply metric filter
-        switch selectedFilter {
-        case .all:
-            break
-        case .allHabits:
-            let habitMetricIDs = Set(metrics.filter { $0.habitType == .positive }.map { $0.id })
-            filtered = filtered.filter { habitMetricIDs.contains($0.metricID) }
-        case .allVices:
-            let viceMetricIDs = Set(metrics.filter { $0.habitType == .vice }.map { $0.id })
-            filtered = filtered.filter { viceMetricIDs.contains($0.metricID) }
-        case .specific(let selectedMetric):
-            filtered = filtered.filter { $0.metricID == selectedMetric.id }
-        }
+        filtered = FilterUtils.filteredEntries(selectedFilter, entries: filtered, metrics: metrics)
         
         // Group by date
         return Dictionary(grouping: filtered) { entry in
             calendar.startOfDay(for: entry.date)
-        }
-    }
-    
-    private var currentMetricFilter: MetricFilter {
-        switch selectedFilter {
-        case .all:
-            return .all
-        case .allHabits:
-            return .allHabits
-        case .allVices:
-            return .allVices
-        case .specific(let metric):
-            return .specific(metric)
         }
     }
     
@@ -216,7 +169,7 @@ struct HistoryView: View {
                     )) {
                         CalendarGridView(
                             entries: calendarEntries,
-                            selectedFilter: currentMetricFilter,
+                            selectedFilter: selectedFilter,
                             selectedDate: $selectedDate,
                             metrics: metrics
                         )
@@ -269,26 +222,12 @@ struct HistoryView: View {
             .themedBackground()
             .navigationTitle("History")
             .adaptiveNavigationBarTitleDisplayMode()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        viewModel.showSettings()
-                    } label: {
-                        Image(systemName: "gear")
-                    }
-                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
-                    .accessibilityLabel("Settings")
-                }
-            }
             .onAppear {
                 logger.info("HistoryView2 appeared", category: .ui)
                 logger.debug("History data - Total metrics: \(metrics.count), Total entries: \(entries.count), Filter: \(selectedFilter.displayName)", category: .ui)
             }
             .sheet(isPresented: $viewModel.showingAddMetric) {
                 AddMetricView()
-            }
-            .sheet(isPresented: $viewModel.showingSettings) {
-                SettingsView()
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -323,7 +262,7 @@ struct HistoryView: View {
                         )) {
                             CalendarGridView(
                                 entries: calendarEntries,
-                                selectedFilter: currentMetricFilter,
+                                selectedFilter: selectedFilter,
                                 selectedDate: $selectedDate,
                                 metrics: metrics
                             )

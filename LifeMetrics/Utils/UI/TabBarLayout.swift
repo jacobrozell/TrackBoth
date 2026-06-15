@@ -14,22 +14,24 @@ enum InterfaceLayout {
 // MARK: - TabBarLayout
 /// Shared spacing and layout decisions for tab content, FABs, and landscape adaptation.
 enum TabBarLayout {
-    /// Extra scroll padding inside the content area (FAB clearance handled via safeAreaInset).
+    /// Extra scroll padding inside the content area.
     static let contentScrollPadding: CGFloat = 16
     /// Bottom inset for scroll content above the tab bar (portrait).
     static let scrollBottomInset: CGFloat = 96
-    /// Portrait scroll padding below list content.
-    static let portraitScrollBottomInset: CGFloat = contentScrollPadding
-    /// Bottom inset for floating action buttons (portrait).
+    /// Portrait scroll padding below list content (tab bar + breathing room).
+    static let portraitScrollBottomInset: CGFloat = scrollBottomInset
+    /// Bottom inset for floating action buttons (portrait) — legacy overlay positioning.
     static let fabBottomInset: CGFloat = 96
     static let fabDiameter: CGFloat = 56
-    /// Landscape tab bar is ~64pt; keep content and FAB above it.
+    /// Landscape tab bar is ~64pt; keep content above it.
     static let landscapeTabBarHeight: CGFloat = 64
     static let landscapeScrollBottomInset: CGFloat = landscapeTabBarHeight + 8
     static let landscapeFabBottomInset: CGFloat = landscapeTabBarHeight + 12
     /// iPad sidebar split: modest trailing scroll padding (FAB uses safeAreaInset).
     static let sidebarScrollBottomInset: CGFloat = contentScrollPadding
     static let fabTrailingInset: CGFloat = 20
+    /// Vertical padding inside the FAB safe-area inset bar.
+    static let fabInsetVerticalPadding: CGFloat = 8
 
     /// Maximum width for filter / stats sidebars on wide layouts (iPad, Plus landscape).
     static let sidebarMaxWidth: CGFloat = 300
@@ -68,9 +70,12 @@ enum TabBarLayout {
         horizontal: UserInterfaceSizeClass?,
         vertical: UserInterfaceSizeClass?
     ) -> Bool {
-        usesSidebarSplit(horizontal: horizontal, vertical: vertical)
-            && size.isLandscapeLayout
-            && InterfaceLayout.isLandscape
+        guard usesSidebarSplit(horizontal: horizontal, vertical: vertical) else {
+            return false
+        }
+        if size.isLandscapeLayout { return true }
+        // iPad landscape: tab chrome can leave a portrait-shaped content area.
+        return InterfaceLayout.isLandscape
     }
 
     static func fabBottomInset(isLandscape: Bool) -> CGFloat {
@@ -121,16 +126,18 @@ private struct TabBarFloatingActionButtonModifier: ViewModifier {
     let action: () -> Void
 
     func body(content: Content) -> some View {
-        content.overlay(alignment: .bottomTrailing) {
-            FloatingActionButton(action: action)
-                .padding(.trailing, TabBarLayout.fabTrailingInset)
-                .padding(
-                    .bottom,
-                    TabBarLayout.fabOverlayClearance(
-                        isLandscape: isLandscape,
-                        dynamicTypeSize: dynamicTypeSize
-                    )
-                )
+        content.safeAreaInset(edge: .bottom, spacing: 0) {
+            HStack {
+                Spacer(minLength: 0)
+                FloatingActionButton(action: action)
+                    .padding(.trailing, TabBarLayout.fabTrailingInset)
+            }
+            .padding(.top, TabBarLayout.fabInsetVerticalPadding)
+            .padding(.bottom, fabInsetBottomPadding)
         }
+    }
+
+    private var fabInsetBottomPadding: CGFloat {
+        dynamicTypeSize.usesExpandedChrome ? 4 : 0
     }
 }

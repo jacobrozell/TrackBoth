@@ -11,7 +11,6 @@ struct MotivationsView: View {
     @State private var viewModel = MotivationViewModel()
     @State private var showingAddMotivation = false
     @State private var selectedFilter: MetricFilter = .all
-    @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.usesSidebarSplit) private var usesSidebarSplit
@@ -19,16 +18,7 @@ struct MotivationsView: View {
 
     // MARK: - Computed Properties
     private var filteredMetrics: [Metric] {
-        switch selectedFilter {
-        case .all:
-            return metrics
-        case .allHabits:
-            return metrics.filter { $0.habitType == .positive }
-        case .allVices:
-            return metrics.filter { $0.habitType == .vice }
-        case .specific(let selectedMetric):
-            return [selectedMetric]
-        }
+        FilterUtils.filteredMetrics(selectedFilter, in: metrics)
     }
     
     private var primaryMotivations: [Metric] {
@@ -44,23 +34,10 @@ struct MotivationsView: View {
     
     private var dailyMotivations: [MetricEntry] {
         let startTime = Date()
-        let filteredEntries = entries.filter { entry in
+        let motivationEntries = entries.filter { entry in
             entry.motivation != nil && !entry.motivation!.isEmpty
         }
-        
-        let result: [MetricEntry]
-        switch selectedFilter {
-        case .all:
-            result = filteredEntries
-        case .allHabits:
-            let habitMetricIDs = Set(metrics.filter { $0.habitType == .positive }.map { $0.id })
-            result = filteredEntries.filter { habitMetricIDs.contains($0.metricID) }
-        case .allVices:
-            let viceMetricIDs = Set(metrics.filter { $0.habitType == .vice }.map { $0.id })
-            result = filteredEntries.filter { viceMetricIDs.contains($0.metricID) }
-        case .specific(let selectedMetric):
-            result = filteredEntries.filter { $0.metricID == selectedMetric.id }
-        }
+        let result = FilterUtils.filteredEntries(selectedFilter, entries: motivationEntries, metrics: metrics)
         
         let sortedResult = result.sorted { $0.date > $1.date }
         let duration = Date().timeIntervalSince(startTime)
@@ -190,17 +167,6 @@ struct MotivationsView: View {
             .themedBackground()
             .navigationTitle("Motivation")
             .adaptiveNavigationBarTitleDisplayMode()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        viewModel.showSettings()
-                    } label: {
-                        Image(systemName: "gear")
-                    }
-                    .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
-                    .accessibilityLabel("Settings")
-                }
-            }
             .adaptiveAddButton(isEmpty: !hasAnyMotivations, label: "Add Motivation") {
                 logger.logUserAction("Add motivation button tapped")
                 showingAddMotivation = true
@@ -211,9 +177,6 @@ struct MotivationsView: View {
             }
             .sheet(isPresented: $viewModel.showingAddMetric) {
                 AddMetricView()
-            }
-            .sheet(isPresented: $viewModel.showingSettings) {
-                SettingsView()
             }
             .sheet(isPresented: $showingAddMotivation) {
                 AddMotivationView2(metrics: metrics)

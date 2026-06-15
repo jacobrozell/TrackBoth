@@ -5,6 +5,7 @@ Post-1.0 code kept for reference. **Not compiled** into the lean 1.0 app target.
 | Path | Status | Target release |
 |------|--------|----------------|
 | `Archive/Watch/` | Apple Watch UI prototypes (formerly `Views/WatchViews/`) | 1.2 |
+| `Archive/UnifiedMetricRowView.swift` | Pre-1.0 home row (replaced by `CompactMetricRow`) | — |
 | `TrackBoth-Widget/` | Widget extension target (use `TrackBothWidget` scheme) | 1.1 |
 | `Widgets/` | Legacy duplicate widget experiments | 1.1 — consolidate into `TrackBoth-Widget/` |
 

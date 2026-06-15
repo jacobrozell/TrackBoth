@@ -6,40 +6,42 @@ extension DynamicTypeSize {
     var usesAccessibilityLayout: Bool {
         isAccessibilitySize
     }
+
+    /// Larger text sizes that need relaxed layouts (accessibility sizes and XLarge+).
+    var usesExpandedChrome: Bool {
+        isAccessibilitySize || self >= .xLarge
+    }
 }
 
 extension EnvironmentValues {
     var usesAccessibilityLayout: Bool {
         dynamicTypeSize.usesAccessibilityLayout
     }
+
+    var usesExpandedChrome: Bool {
+        dynamicTypeSize.usesExpandedChrome
+    }
 }
 
 extension TabBarLayout {
-    /// Extra scroll padding when tab labels and content grow at accessibility sizes.
+    /// Extra scroll padding when tab labels and content grow at larger text sizes.
     static func scrollBottomInset(for mode: LayoutMode, dynamicTypeSize: DynamicTypeSize) -> CGFloat {
         let base = scrollBottomInset(for: mode)
-        guard dynamicTypeSize.usesAccessibilityLayout else { return base }
+        guard dynamicTypeSize.usesExpandedChrome else { return base }
         switch mode {
         case .portrait:
-            return max(base + 160, TabBarLayout.fabBottomInset + 96)
+            return base + 32
         case .compactLandscape:
-            return max(base + 120, TabBarLayout.landscapeFabBottomInset + 80)
+            return base + 24
         case .sidebarSplit:
-            return base + 48
+            return base + 16
         }
-    }
-
-    /// Bottom padding so the FAB clears the floating tab bar.
-    static func fabOverlayClearance(isLandscape: Bool, dynamicTypeSize: DynamicTypeSize) -> CGFloat {
-        let base = fabBottomInset(isLandscape: isLandscape)
-        guard dynamicTypeSize.usesAccessibilityLayout else { return base }
-        return base + 44
     }
 }
 
 // MARK: - Adaptive navigation chrome
 extension View {
-    /// Use inline nav titles in compact landscape and accessibility text sizes.
+    /// Use inline nav titles in compact landscape and larger text sizes.
     func adaptiveNavigationBarTitleDisplayMode(isCompactLandscape: Bool = false) -> some View {
         modifier(AdaptiveNavTitleModifier(isCompactLandscape: isCompactLandscape))
     }
@@ -51,7 +53,7 @@ private struct AdaptiveNavTitleModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content.navigationBarTitleDisplayMode(
-            (isCompactLandscape || dynamicTypeSize.usesAccessibilityLayout) ? .inline : .large
+            (isCompactLandscape || dynamicTypeSize.usesExpandedChrome) ? .inline : .large
         )
     }
 }
@@ -64,9 +66,8 @@ enum AccessibilityCopy {
         return title
     }
 
-    static func tabLabel(_ tab: TabItem, accessibility: Bool) -> String {
-        guard accessibility else { return tab.standardTitle }
-        return tab.accessibilityTitle
+    static func tabLabel(_ tab: TabItem, iconOnly: Bool) -> String {
+        iconOnly ? "" : tab.standardTitle
     }
 
     enum TabItem {
@@ -82,14 +83,6 @@ enum AccessibilityCopy {
             }
         }
 
-        var accessibilityTitle: String {
-            switch self {
-            case .home: return "Home"
-            case .goals: return "Goals"
-            case .motivation: return "Motiv"
-            case .history: return "Past"
-            case .charts: return "Stats"
-            }
-        }
+        var accessibilityTitle: String { standardTitle }
     }
 }

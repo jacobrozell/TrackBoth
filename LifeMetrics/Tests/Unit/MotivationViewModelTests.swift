@@ -66,9 +66,9 @@ final class MotivationViewModelTests: XCTestCase {
 
     func testResetClearsSelectionAndSheets() {
         viewModel.selectedMetric = Metric(name: "Read", habitType: .positive)
-        viewModel.showingSettings = true
+        viewModel.showingAddMotivation = true
         viewModel.reset()
         XCTAssertNil(viewModel.selectedMetric)
-        XCTAssertFalse(viewModel.showingSettings)
+        XCTAssertFalse(viewModel.showingAddMotivation)
     }
 }

@@ -11,24 +11,12 @@ class ChartsViewModel {
     var selectedFilter: MetricFilter = .all
     var selectedChartType: ChartType = .line
     var showingAddMetric = false
-    var showingSettings = false
     
     // MARK: - Computed Properties
     /// Filtered metrics based on selected filter
     func filteredMetrics(_ metrics: [Metric]) -> [Metric] {
         let startTime = Date()
-        let result: [Metric]
-        
-        switch selectedFilter {
-        case .all:
-            result = metrics
-        case .allHabits:
-            result = metrics.filter { $0.habitType == .positive }
-        case .allVices:
-            result = metrics.filter { $0.habitType == .vice }
-        case .specific(let metric):
-            result = [metric]
-        }
+        let result = FilterUtils.filteredMetrics(selectedFilter, in: metrics)
         
         let duration = Date().timeIntervalSince(startTime)
         logger.logPerformance("Metrics filtering", duration: duration)
@@ -74,16 +62,10 @@ class ChartsViewModel {
         showingAddMetric = true
     }
     
-    /// Show settings sheet
-    func showSettings() {
-        showingSettings = true
-    }
-    
     /// Reset all state
     func reset() {
         selectedFilter = .all
         selectedChartType = .line
         showingAddMetric = false
-        showingSettings = false
     }
 }

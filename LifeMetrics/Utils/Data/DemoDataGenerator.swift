@@ -197,18 +197,18 @@ struct DemoDataGenerator {
         return Double.random(in: 0...1) < baseProbability
     }
     
+    /// Demo quantity samples for the quantity chart.
+    /// Only Steps Walked (habit) and Cups of Coffee (vice) log quantities — other metrics
+    /// stay boolean so "All" filters aren't dominated by mixing steps (thousands) with
+    /// pages/cigarettes (single digits).
     private static func generateQuantityData(for metric: Metric) -> (Int?, String?) {
         switch metric.name {
         case "Steps Walked":
-            return (Int.random(in: 3000...15000), "steps")
-        case "Pages Read":
-            return (Int.random(in: 5...50), "pages")
-        case "Cigarettes Smoked":
-            return (Int.random(in: 1...20), "cigarettes")
+            // Realistic daily steps, capped near the 10k weekly max-daily goal
+            return (Int.random(in: 5_500...9_500), "steps")
         case "Cups of Coffee":
-            return (Int.random(in: 1...8), "cups")
+            return (Int.random(in: 1...3), "cups")
         default:
-            // For boolean-type metrics, return nil for quantity
             return (nil, nil)
         }
     }

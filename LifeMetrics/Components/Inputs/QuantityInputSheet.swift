@@ -8,7 +8,6 @@ struct QuantityInputSheet: View {
     let selectedDate: Date
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @StateObject private var themeManager = ThemeManager.shared
     @Query private var entries: [MetricEntry]
     
     @State private var quantity: Int = 1
@@ -47,60 +46,22 @@ struct QuantityInputSheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
-                // Header with habit info
-                VStack(spacing: 8) {
-                    HStack {
-                        Image(systemName: metric.habitType.icon)
-                            .foregroundColor(isVice ? .currentError : .currentSuccess)
-                            .font(.title2)
-                        
-                        Text(metric.name)
-                            .font(.title2)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.currentText)
-                    }
-                    
-                    Text(DateFormatter.dayFormatter.string(from: selectedDate))
-                        .font(.subheadline)
-                        .foregroundColor(.currentSecondaryText)
-                }
-                .padding(.top, 16)
-                
-                // Main input section
-                VStack(spacing: 20) {
+            ScrollView {
+                VStack(spacing: 24) {
+                    headerSection
+
                     if isVice {
-                        // Vice-specific UI with safety messaging
                         viceInputSection
                     } else {
-                        // Positive habit UI
                         habitInputSection
                     }
                 }
-                
-                Spacer()
-                
-                // Action buttons
-                HStack(spacing: 16) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                    .foregroundColor(.currentSecondaryText)
-                    
-                    Spacer()
-                    
-                    Button(isVice ? "Log Amount" : "Save") {
-                        saveQuantity()
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(isVice ? Color.currentWarning : Color.currentPrimary)
-                    .cornerRadius(8)
-                    .fontWeight(.medium)
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 8)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                actionButtons
             }
             .background(Color.currentBackground)
         }
@@ -116,6 +77,50 @@ struct QuantityInputSheet: View {
         }
     }
     
+    private var headerSection: some View {
+        VStack(spacing: 8) {
+            HStack {
+                Image(systemName: metric.habitType.icon)
+                    .foregroundColor(isVice ? .currentError : .currentSuccess)
+                    .font(.title2)
+
+                Text(metric.name)
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.currentText)
+            }
+
+            Text(DateFormatter.dayFormatter.string(from: selectedDate))
+                .font(.subheadline)
+                .foregroundColor(.currentSecondaryText)
+        }
+    }
+
+    private var actionButtons: some View {
+        HStack(spacing: 16) {
+            Button("Cancel") {
+                dismiss()
+            }
+            .foregroundColor(.currentSecondaryText)
+
+            Spacer()
+
+            Button(isVice ? "Log Amount" : "Save") {
+                saveQuantity()
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 24)
+            .padding(.vertical, 12)
+            .background(isVice ? Color.currentWarning : Color.currentPrimary)
+            .cornerRadius(8)
+            .fontWeight(.medium)
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
+        .background(Color.currentBackground)
+    }
+
     // MARK: - Vice Input Section (Safe Design)
     private var viceInputSection: some View {
         VStack(spacing: 16) {
@@ -376,7 +381,6 @@ struct UnitPickerSheet: View {
     @Binding var selectedUnit: String
     let units: [String]
     @Environment(\.dismiss) private var dismiss
-    @StateObject private var themeManager = ThemeManager.shared
     @State private var customUnit: String = ""
     @State private var showingCustomInput = false
     

@@ -9,6 +9,7 @@ struct StatCard: View {
     var compact: Bool = false
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.isCompactLandscape) private var isCompactLandscape
 
     private var iconSize: CGFloat {
         if compact && dynamicTypeSize.usesAccessibilityLayout { return 28 }
@@ -20,6 +21,10 @@ struct StatCard: View {
         return compact ? 8 : 16
     }
     private var contentSpacing: CGFloat { compact ? 8 : 16 }
+
+    private var usesReadableTitleStyle: Bool {
+        dynamicTypeSize.usesExpandedChrome || isCompactLandscape
+    }
 
     var body: some View {
         VStack(spacing: contentSpacing) {
@@ -51,7 +56,7 @@ struct StatCard: View {
                 .lineLimit(1)
 
             Group {
-                if dynamicTypeSize.usesAccessibilityLayout {
+                if usesReadableTitleStyle {
                     Text(title)
                         .font(compact ? .caption : .subheadline)
                         .foregroundColor(Color.currentText.opacity(0.65))

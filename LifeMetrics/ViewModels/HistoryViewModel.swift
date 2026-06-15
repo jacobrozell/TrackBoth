@@ -12,26 +12,13 @@ class HistoryViewModel {
     var selectedDate = Date()
     var searchText = ""
     var showingAddMetric = false
-    var showingSettings = false
     var entryTypeFilter: EntryTypeFilter = .all
     
     // MARK: - Computed Properties
     /// Filtered metrics based on selected filter and search text
     func filteredMetrics(_ metrics: [Metric]) -> [Metric] {
         let startTime = Date()
-        var filtered = metrics
-        
-        // Apply filter
-        switch selectedFilter {
-        case .all:
-            break
-        case .allHabits:
-            filtered = filtered.filter { $0.habitType == .positive }
-        case .allVices:
-            filtered = filtered.filter { $0.habitType == .vice }
-        case .specific(let metric):
-            filtered = [metric]
-        }
+        var filtered = FilterUtils.filteredMetrics(selectedFilter, in: metrics)
         
         // Apply search
         if !searchText.isEmpty {
@@ -104,16 +91,7 @@ class HistoryViewModel {
             }
             
             // Apply metric filter
-            switch selectedFilter {
-            case .all:
-                return true
-            case .allHabits:
-                return metrics.first { $0.id == entry.metricID }?.habitType == .positive
-            case .allVices:
-                return metrics.first { $0.id == entry.metricID }?.habitType == .vice
-            case .specific(let metric):
-                return entry.metricID == metric.id
-            }
+            return FilterUtils.matchesFilter(selectedFilter, entry: entry, metrics: metrics)
         }
         
         let result = Dictionary(grouping: filteredEntries) { entry in
@@ -151,11 +129,6 @@ class HistoryViewModel {
         showingAddMetric = true
     }
     
-    /// Show settings sheet
-    func showSettings() {
-        showingSettings = true
-    }
-    
     /// Update entry type filter
     func updateEntryTypeFilter(_ filter: EntryTypeFilter) {
         logger.logUserAction("History entry type filter updated", details: "From \(entryTypeFilter) to \(filter)")
@@ -185,7 +158,6 @@ class HistoryViewModel {
         selectedDate = Date()
         searchText = ""
         showingAddMetric = false
-        showingSettings = false
         entryTypeFilter = .all
     }
 }

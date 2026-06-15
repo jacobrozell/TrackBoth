@@ -29,9 +29,14 @@ extension View {
     /// Call on the root container (e.g. TabView) to publish layout mode to all tabs.
     func publishAdaptiveLayoutMode(
         horizontal: UserInterfaceSizeClass?,
-        vertical: UserInterfaceSizeClass?
+        vertical: UserInterfaceSizeClass?,
+        size: CGSize? = nil
     ) -> some View {
-        let mode = TabBarLayout.layoutMode(horizontal: horizontal, vertical: vertical)
+        let mode = TabBarLayout.layoutMode(
+            horizontal: horizontal,
+            vertical: vertical,
+            size: size
+        )
         return environment(\.adaptiveLayoutMode, mode)
     }
 }
@@ -39,14 +44,27 @@ extension View {
 extension TabBarLayout {
     static func layoutMode(
         horizontal: UserInterfaceSizeClass?,
-        vertical: UserInterfaceSizeClass?
+        vertical: UserInterfaceSizeClass?,
+        size: CGSize? = nil
     ) -> LayoutMode {
-        if usesSidebarSplit(horizontal: horizontal, vertical: vertical), InterfaceLayout.isLandscape {
-            return .sidebarSplit
+        if usesSidebarSplit(horizontal: horizontal, vertical: vertical) {
+            let isLandscape: Bool
+            if let size {
+                isLandscape = size.isLandscapeLayout || InterfaceLayout.isLandscape
+            } else {
+                isLandscape = InterfaceLayout.isLandscape
+            }
+            if isLandscape { return .sidebarSplit }
         }
+
         if isCompactLandscape(horizontal: horizontal, vertical: vertical) {
             return .compactLandscape
         }
+
+        if let size, size.isLandscapeLayout {
+            return .compactLandscape
+        }
+
         return .portrait
     }
 }

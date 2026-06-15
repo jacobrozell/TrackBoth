@@ -12,17 +12,7 @@ struct QuantityChartView: View {
     private var quantityData: [QuantityDataPoint] {
         let filteredEntries = entries.filter { entry in
             guard entry.hasQuantity, TrackingSemantics.isLoggedForDay(entry: entry) else { return false }
-            
-            switch filter {
-            case .all:
-                return true
-            case .allHabits:
-                return metrics.first { $0.id == entry.metricID }?.habitType == .positive
-            case .allVices:
-                return metrics.first { $0.id == entry.metricID }?.habitType == .vice
-            case .specific(let metric):
-                return entry.metricID == metric.id
-            }
+            return FilterUtils.matchesFilter(filter, entry: entry, metrics: metrics)
         }
         
         return filteredEntries.compactMap { entry in
@@ -71,6 +61,24 @@ struct QuantityChartView: View {
         !quantityData.isEmpty
     }
     
+    private var distinctUnits: [String] {
+        Array(Set(quantityData.compactMap(\.unit))).sorted()
+    }
+    
+    private var hasMixedUnits: Bool {
+        distinctUnits.count > 1
+    }
+    
+    private var maxDailyTotal: Int {
+        let calendar = Calendar.current
+        let groupedByDay = Dictionary(grouping: quantityData) {
+            calendar.startOfDay(for: $0.date)
+        }
+        return groupedByDay.values
+            .map { $0.reduce(0) { $0 + $1.quantity } }
+            .max() ?? 0
+    }
+    
     private var chartTitle: String {
         switch filter {
         case .all:
@@ -87,10 +95,13 @@ struct QuantityChartView: View {
     private var chartSubtitle: String {
         if hasQuantityData {
             let totalEntries = quantityData.count
+            if hasMixedUnits {
+                return "\(totalEntries) entries • Mixed units"
+            }
             let totalQuantity = quantityData.reduce(0) { $0 + $1.quantity }
             let averageQuantity = Double(totalQuantity) / Double(totalEntries)
-            
-            return "\(totalEntries) entries • Avg: \(String(format: "%.1f", averageQuantity))"
+            let unit = distinctUnits.first ?? ""
+            return "\(totalEntries) entries • Avg: \(String(format: "%.1f", averageQuantity)) \(unit)"
         } else {
             return "No quantity data available"
         }
@@ -230,21 +241,23 @@ struct QuantityChartView: View {
                 
                 StatCard(
                     title: "Total Quantity",
-                    value: "\(quantityData.reduce(0) { $0 + $1.quantity })",
+                    value: hasMixedUnits ? "Mixed units" : "\(quantityData.reduce(0) { $0 + $1.quantity })",
                     icon: "number",
                     color: .currentSuccess
                 )
                 
                 StatCard(
                     title: "Average",
-                    value: String(format: "%.1f", Double(quantityData.reduce(0) { $0 + $1.quantity }) / Double(quantityData.count)),
+                    value: hasMixedUnits
+                        ? "Mixed units"
+                        : String(format: "%.1f", Double(quantityData.reduce(0) { $0 + $1.quantity }) / Double(quantityData.count)),
                     icon: "chart.bar",
                     color: .currentWarning
                 )
                 
                 StatCard(
                     title: "Max Daily",
-                    value: "\(quantityData.map { $0.quantity }.max() ?? 0)",
+                    value: hasMixedUnits ? "Mixed units" : "\(maxDailyTotal)",
                     icon: "arrow.up",
                     color: .currentError
                 )

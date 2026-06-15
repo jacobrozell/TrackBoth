@@ -11,7 +11,7 @@ struct OnboardingView: View {
     private let pages = OnboardingPage.allPages
     
     private var usesCompactLayout: Bool {
-        dynamicTypeSize.usesAccessibilityLayout || verticalSizeClass == .compact
+        dynamicTypeSize.usesExpandedChrome || verticalSizeClass == .compact
     }
     
     var body: some View {
@@ -35,7 +35,7 @@ struct OnboardingView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 // Bottom controls
-                VStack(spacing: 24) {
+                VStack(spacing: usesCompactLayout ? 12 : 24) {
                     // Page indicator dots
                     HStack(spacing: 8) {
                         ForEach(pages.indices, id: \.self) { index in
@@ -80,7 +80,7 @@ struct OnboardingView: View {
                     }
                     .padding(.horizontal, 32)
                 }
-                .padding(.bottom, 24)
+                .padding(.bottom, usesCompactLayout ? 12 : 24)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }

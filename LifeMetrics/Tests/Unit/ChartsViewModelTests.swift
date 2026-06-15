@@ -63,10 +63,8 @@ final class ChartsViewModelTests: XCTestCase {
     func testResetRestoresDefaults() {
         viewModel.selectedFilter = .allVices
         viewModel.selectedChartType = .bar
-        viewModel.showingSettings = true
         viewModel.reset()
         XCTAssertEqual(viewModel.selectedFilter, .all)
         XCTAssertEqual(viewModel.selectedChartType, .line)
-        XCTAssertFalse(viewModel.showingSettings)
     }
 }

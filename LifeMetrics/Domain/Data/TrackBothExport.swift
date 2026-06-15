@@ -76,8 +76,3 @@ enum TrackBothExport {
         try decode(data)
     }
 }
-
-// Legacy typealiases used by SettingsView share sheet.
-typealias ExportData = TrackBothExport.Payload
-typealias ExportMetric = TrackBothExport.MetricRecord
-typealias ExportEntry = TrackBothExport.EntryRecord

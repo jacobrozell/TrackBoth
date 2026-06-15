@@ -11,7 +11,6 @@ class MotivationViewModel {
     var selectedMetric: Metric?
     var showingAddMotivation = false
     var showingAddMetric = false
-    var showingSettings = false
     
     // MARK: - Computed Properties
     /// Entries with motivation content
@@ -154,12 +153,6 @@ class MotivationViewModel {
         showingAddMetric = true
     }
     
-    /// Show settings sheet
-    func showSettings() {
-        logger.logUserAction("Show settings")
-        showingSettings = true
-    }
-    
     /// Add motivation to an entry
     func addMotivation(
         to entry: MetricEntry,
@@ -224,6 +217,5 @@ class MotivationViewModel {
         selectedMetric = nil
         showingAddMotivation = false
         showingAddMetric = false
-        showingSettings = false
     }
 }

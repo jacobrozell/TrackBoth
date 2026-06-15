@@ -8,8 +8,14 @@ import SwiftData
 @Observable
 class iCloudBackupService {
 
+    private static let containerIdentifier = "iCloud.com.jacobrozell.TrackBoth"
+
+    private var cloudContainer: CKContainer {
+        CKContainer(identifier: Self.containerIdentifier)
+    }
+
     private func cloudDatabase() -> CKDatabase {
-        CKContainer.default().privateCloudDatabase
+        cloudContainer.privateCloudDatabase
     }
     
     // MARK: - Backup Data Models
@@ -245,7 +251,7 @@ class iCloudBackupService {
     /// Check if iCloud is available
     func checkiCloudAvailability() async -> Bool {
         do {
-            let status = try await CKContainer.default().accountStatus()
+            let status = try await cloudContainer.accountStatus()
             return status == .available
         } catch {
             return false
@@ -254,6 +260,10 @@ class iCloudBackupService {
     
     /// Get backup info
     func getBackupInfo() async throws -> BackupInfo {
+        guard await checkiCloudAvailability() else {
+            throw BackupError.iCloudUnavailable
+        }
+
         let query = CKQuery(recordType: "TrackBothBackup", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "timestamp", ascending: false)]
         

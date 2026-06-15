@@ -9,7 +9,6 @@ class GoalsViewModel {
     
     // MARK: - Properties
     var showingAddGoal = false
-    var showingSettings = false
     var showingAddMetric = false
 
     // MARK: - Computed Properties
@@ -199,11 +198,6 @@ class GoalsViewModel {
     /// Show add goal sheet
     func showAddGoal() {
         showingAddGoal = true
-    }
-    
-    /// Show settings sheet
-    func showSettings() {
-        showingSettings = true
     }
     
     /// Create a new boolean goal for a metric

@@ -14,7 +14,6 @@ struct HomeView: View {
     // UI State
     @State private var showingLoggingSheetForMetric: Metric? = nil
     @State private var showingRowOptions: Bool = false
-    @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.isCompactLandscape) private var isCompactLandscape
@@ -54,6 +53,11 @@ struct HomeView: View {
                         )
                     } else {
                         GeometryReader { geometry in
+                            let layoutMode = TabBarLayout.layoutMode(
+                                horizontal: horizontalSizeClass,
+                                vertical: verticalSizeClass,
+                                size: geometry.size
+                            )
                             if TabBarLayout.shouldUseSidebarSplit(
                                 size: geometry.size,
                                 horizontal: horizontalSizeClass,
@@ -75,7 +79,7 @@ struct HomeView: View {
                                             spacing: 16,
                                             pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
                                         ) {
-                                            homeHeader
+                                            homeHeader(layoutMode: layoutMode)
                                             metricsSections
                                         }
                                         .adaptiveScrollInset()
@@ -95,12 +99,6 @@ struct HomeView: View {
             .navigationTitle("TrackBoth")
             .adaptiveNavigationBarTitleDisplayMode(isCompactLandscape: isCompactLandscape)
             .toolbar {
-                if ProductSurface.showsDemoData {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        DemoDataToolbarButton(metricsEmpty: metrics.isEmpty)
-                    }
-                }
-
                 ToolbarItemGroup(placement: .navigationBarTrailing) {
                     Button {
                         viewModel.showSettings()
@@ -149,9 +147,9 @@ struct HomeView: View {
     }
 
     // MARK: - Panels
-    private var homeHeader: some View {
+    private func homeHeader(layoutMode: TabBarLayout.LayoutMode) -> some View {
         Group {
-            if isCompactLandscape {
+            if layoutMode == .compactLandscape {
                 compactLandscapeHeader
             } else {
                 portraitHeader
@@ -185,13 +183,31 @@ struct HomeView: View {
             } else {
                 quickStatsRow
                 weekMiniCalendar
-                weekHeaderRow
+                portraitDateActions
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, dynamicTypeSize.usesAccessibilityLayout ? 4 : 8)
         .background(Color.currentSecondaryBackground)
+    }
+
+    private var portraitDateActions: some View {
+        HStack {
+            Button(showingRowOptions ? "Done" : "Edit") {
+                showingRowOptions.toggle()
+            }
+            .caption()
+            .foregroundColor(Color.currentPrimary)
+
+            Spacer()
+
+            if !viewModel.isToday {
+                Button("Today") { viewModel.goToToday() }
+                    .caption()
+                    .foregroundColor(Color.currentPrimary)
+            }
+        }
     }
 
     private var weekHeaderRow: some View {

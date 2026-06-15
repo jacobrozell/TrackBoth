@@ -101,13 +101,22 @@ struct SettingsView: View {
                     .foregroundColor(Color.currentPrimary)
                     .listRowBackground(Color.currentSecondaryBackground)
                     
-                    if ProductSurface.showsDemoData && !metrics.isEmpty && DemoDataGenerator.hasDemoData() {
-                        Button("Clear Demo Data") {
-                            logger.logUserAction("Clear demo data button tapped")
-                            DemoDataGenerator.clearDemoData(modelContext: modelContext)
+                    if ProductSurface.showsDemoData {
+                        if DemoDataGenerator.hasDemoData() {
+                            Button("Clear Demo Data") {
+                                logger.logUserAction("Clear demo data button tapped")
+                                DemoDataGenerator.clearDemoData(modelContext: modelContext)
+                            }
+                            .foregroundColor(Color.currentWarning)
+                            .listRowBackground(Color.currentSecondaryBackground)
+                        } else {
+                            Button("Try Demo Data") {
+                                logger.logUserAction("Generate demo data button tapped")
+                                DemoDataGenerator.generateDemoData(modelContext: modelContext)
+                            }
+                            .foregroundColor(Color.currentPrimary)
+                            .listRowBackground(Color.currentSecondaryBackground)
                         }
-                        .foregroundColor(Color.currentWarning)
-                        .listRowBackground(Color.currentSecondaryBackground)
                     }
                     
                     Button("Delete All Data") {
@@ -514,16 +523,21 @@ struct SettingsView: View {
     
     private func loadBackupInfo() {
         Task {
+            guard await backupService.checkiCloudAvailability() else {
+                await MainActor.run { self.backupInfo = nil }
+                return
+            }
+
             do {
                 let info = try await backupService.getBackupInfo()
                 await MainActor.run {
                     self.backupInfo = info
                 }
+            } catch BackupError.noBackupFound {
+                await MainActor.run { self.backupInfo = nil }
             } catch {
-                // Silently fail - backup info is optional
-                await MainActor.run {
-                    self.backupInfo = nil
-                }
+                logger.debug("Could not load iCloud backup info: \(error.localizedDescription)", category: .network)
+                await MainActor.run { self.backupInfo = nil }
             }
         }
     }

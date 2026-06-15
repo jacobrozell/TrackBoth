@@ -3,6 +3,19 @@ import Foundation
 // MARK: - Filter Utilities
 struct FilterUtils {
 
+    static func filteredMetrics(_ filter: MetricFilter, in metrics: [Metric]) -> [Metric] {
+        switch filter {
+        case .all:
+            return metrics
+        case .allHabits:
+            return metrics.filter { $0.habitType == .positive }
+        case .allVices:
+            return metrics.filter { $0.habitType == .vice }
+        case .specific(let metric):
+            return [metric]
+        }
+    }
+
     static func matchesFilter(_ filter: MetricFilter, entry: MetricEntry, metrics: [Metric]) -> Bool {
         switch filter {
         case .all:
@@ -33,18 +46,6 @@ struct FilterUtils {
                 return false
             }
             return TrackingSemantics.isSuccessful(habitType: metric.habitType, value: entry.value)
-        }
-    }
-
-    @available(*, deprecated, message: "Use successfulEntries for semantic success filtering")
-    static func filteredEntries(
-        _ filter: MetricFilter,
-        entries: [MetricEntry],
-        metrics: [Metric],
-        value: Bool
-    ) -> [MetricEntry] {
-        entries.filter { entry in
-            matchesFilter(filter, entry: entry, metrics: metrics) && entry.value == value
         }
     }
 }

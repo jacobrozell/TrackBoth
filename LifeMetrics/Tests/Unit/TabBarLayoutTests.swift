@@ -14,9 +14,46 @@ final class TabBarLayoutTests: XCTestCase {
     }
 
     func testLayoutModeSidebarSplitOnIPadLandscape() {
-        let mode = TabBarLayout.layoutMode(horizontal: .regular, vertical: .regular)
-        // Unit tests run without a window scene; layout mode falls back to portrait.
+        let landscape = CGSize(width: 1024, height: 768)
+        let mode = TabBarLayout.layoutMode(
+            horizontal: .regular,
+            vertical: .regular,
+            size: landscape
+        )
+        XCTAssertEqual(mode, .sidebarSplit)
+    }
+
+    func testLayoutModePortraitOnIPadPortrait() {
+        let portrait = CGSize(width: 768, height: 1024)
+        let mode = TabBarLayout.layoutMode(
+            horizontal: .regular,
+            vertical: .regular,
+            size: portrait
+        )
         XCTAssertEqual(mode, .portrait)
+    }
+
+    func testLayoutModeCompactLandscapeUsesGeometryWhenTraitsLag() {
+        let landscape = CGSize(width: 844, height: 390)
+        let mode = TabBarLayout.layoutMode(
+            horizontal: .compact,
+            vertical: .regular,
+            size: landscape
+        )
+        XCTAssertEqual(mode, .compactLandscape)
+    }
+
+    func testShouldUseSidebarSplitUsesInterfaceOrientationOnIPad() throws {
+        // Simulates iPad landscape where tab chrome leaves portrait-shaped content geometry.
+        try XCTSkipUnless(InterfaceLayout.isLandscape, "Requires landscape window scene")
+        let portraitShapedContent = CGSize(width: 768, height: 1024)
+        XCTAssertTrue(
+            TabBarLayout.shouldUseSidebarSplit(
+                size: portraitShapedContent,
+                horizontal: .regular,
+                vertical: .regular
+            )
+        )
     }
 
     func testShouldUseSidebarSplitRequiresLandscapeGeometry() {
@@ -39,10 +76,10 @@ final class TabBarLayoutTests: XCTestCase {
         )
     }
 
-    func testPortraitScrollInsetUsesContentPadding() {
+    func testPortraitScrollInsetIncludesTabBarClearance() {
         XCTAssertEqual(
             TabBarLayout.scrollBottomInset(for: .portrait),
-            TabBarLayout.contentScrollPadding
+            TabBarLayout.scrollBottomInset
         )
         XCTAssertEqual(
             TabBarLayout.scrollBottomInset(for: .compactLandscape),

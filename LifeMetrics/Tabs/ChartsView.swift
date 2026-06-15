@@ -81,55 +81,35 @@ struct ChartsView: View {
                 logger.debug("Charts data - Metrics: \(metrics.count), Entries: \(entries.count), Filter: \(viewModel.selectedFilter), ChartType: \(viewModel.selectedChartType)", category: .ui)
             }
             .toolbar {
-                    if ProductSurface.showsDemoData {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            DemoDataToolbarButton(metricsEmpty: metrics.isEmpty)
-                        }
-                    }
-                    
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        HStack {
-                            if !metrics.isEmpty {
-                                Menu {
-                                    Button("Export as PNG") {
-                                        logger.logUserAction("Export chart as PNG")
-                                        exportFormat = .png
-                                        exportCurrentChart()
-                                    }
-                                    .disabled(isExporting)
-                                    
-                                    Button("Export as PDF") {
-                                        logger.logUserAction("Export chart as PDF")
-                                        exportFormat = .pdf
-                                        exportCurrentChart()
-                                    }
-                                    .disabled(isExporting)
-                                } label: {
-                                    if isExporting {
-                                        ProgressView()
-                                            .scaleEffect(0.8)
-                                    } else {
-                                        Image(systemName: "square.and.arrow.up")
-                                    }
+                        if !metrics.isEmpty {
+                            Menu {
+                                Button("Export as PNG") {
+                                    logger.logUserAction("Export chart as PNG")
+                                    exportFormat = .png
+                                    exportCurrentChart()
                                 }
                                 .disabled(isExporting)
-                            }
-                            
-                            Button {
-                                logger.logUserAction("Show settings")
-                                viewModel.showingSettings = true
+
+                                Button("Export as PDF") {
+                                    logger.logUserAction("Export chart as PDF")
+                                    exportFormat = .pdf
+                                    exportCurrentChart()
+                                }
+                                .disabled(isExporting)
                             } label: {
-                                Image(systemName: "gear")
+                                if isExporting {
+                                    ProgressView()
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Image(systemName: "square.and.arrow.up")
+                                }
                             }
-                            .accessibilityIdentifier(AccessibilityIdentifiers.settingsButton)
-                            .accessibilityLabel("Settings")
+                            .disabled(isExporting)
                         }
                     }
                 }
 
-                .sheet(isPresented: $viewModel.showingSettings) {
-                    SettingsView()
-                }
                 .sheet(isPresented: $showingExportSheet) {
                     if let exportData = exportData {
                         ShareSheet(activityItems: createShareItems(from: exportData))
