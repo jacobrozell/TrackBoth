@@ -160,6 +160,7 @@ class HomeViewModel {
                 let duration = Date().timeIntervalSince(startTime)
                 logger.logPerformance("Metric deletion", duration: duration)
                 logger.logDataOperation("DELETE", entity: "Metric", success: true)
+                WidgetSyncCoordinator.syncIfEnabled(context: modelContext)
             } else {
                 logger.logDataOperation("DELETE", entity: "Metric", success: false)
             }
@@ -202,6 +203,7 @@ class HomeViewModel {
             let duration = Date().timeIntervalSince(startTime)
             logger.logPerformance("Metric toggle save", duration: duration)
             logger.logDataOperation("UPDATE", entity: "MetricEntry", success: true)
+            WidgetSyncCoordinator.onHabitLogged(metric: metric, entry: entry, context: modelContext)
         } else {
             logger.logDataOperation("UPDATE", entity: "MetricEntry", success: false)
         }

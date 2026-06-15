@@ -172,6 +172,7 @@ struct SettingsView: View {
                     backupError: $backupError,
                     onRestore: { backupData in
                         try backupService.restoreFromBackup(backupData, context: modelContext)
+                        WidgetSyncCoordinator.onDataChanged(context: modelContext)
                     }
                 )
                 .onAppear {
@@ -242,6 +243,7 @@ struct SettingsView: View {
             let counts = try ExportImportService.importPayload(payload, into: modelContext)
             importedSummary = "Imported \(counts.metrics) habits and \(counts.entries) entries."
             showingImportSuccess = true
+            WidgetSyncCoordinator.onDataChanged(context: modelContext)
             logger.info("JSON import succeeded — \(counts.metrics) metrics, \(counts.entries) entries", category: .data)
         } catch {
             importErrorMessage = error.localizedDescription
@@ -274,6 +276,7 @@ struct SettingsView: View {
             }
             
             modelContext.saveChanges(operation: "delete all data", entity: "Model")
+            WidgetSyncCoordinator.onDataChanged(context: modelContext)
         }
     }
     

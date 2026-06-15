@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E40B39FEC5E849E5B67ADE00 /* WidgetSyncCoordinatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEE9FD983AD240029B3A0E70 /* WidgetSyncCoordinatorTests.swift */; };
+		A77421CAD71446D4BAF6505B /* WidgetLifecycleObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D21101085654987B9CD79F3 /* WidgetLifecycleObserver.swift */; };
 		03B7B647DFB516C07A3D532C /* DateFormatterUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58BFE33E38C314AB1C3C248F /* DateFormatterUtils.swift */; };
 		04454C9F42810DC41419AE08 /* RestoreSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE05248F447ABA95476871B6 /* RestoreSheet.swift */; };
 		06EEE205CC898A3CA3910730 /* AccessibilityIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D2038EEFF1A11D9D82672EB /* AccessibilityIdentifiers.swift */; };
@@ -168,6 +170,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BEE9FD983AD240029B3A0E70 /* WidgetSyncCoordinatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSyncCoordinatorTests.swift; sourceTree = "<group>"; };
+		6D21101085654987B9CD79F3 /* WidgetLifecycleObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetLifecycleObserver.swift; sourceTree = "<group>"; };
 		01EF96ACF39EB7C158999F67 /* EditEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditEntryView.swift; sourceTree = "<group>"; };
 		025147C3E960937D8C6AED18 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		054047926F182E806917192B /* BackupSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSheet.swift; sourceTree = "<group>"; };
@@ -363,6 +367,7 @@
 		1E8A16C2C2B55B3603036CAD /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				6D21101085654987B9CD79F3 /* WidgetLifecycleObserver.swift */,
 				0B80CF32BC1BE1314DCC3C58 /* AdaptiveSectionHeader.swift */,
 				F79B34743FF2C29D61BF9F19 /* CalendarDayView.swift */,
 				ED415AF54588D13559BDFD78 /* CalendarGridView.swift */,
@@ -502,6 +507,7 @@
 		5016D03DB62504801D27AFE9 /* Unit */ = {
 			isa = PBXGroup;
 			children = (
+				BEE9FD983AD240029B3A0E70 /* WidgetSyncCoordinatorTests.swift */,
 				734B5800A656986B2E38BF8C /* AccessibilityIdentifiersTests.swift */,
 				7DB0CD38B606CC72C5408DC8 /* AppSupportTests.swift */,
 				75F520226920E3440DA3A134 /* BootstrapStoreRecoveryTests.swift */,
@@ -901,6 +907,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E40B39FEC5E849E5B67ADE00 /* WidgetSyncCoordinatorTests.swift in Sources */,
 				447BD7710FB5D360835F35FB /* AccessibilityIdentifiersTests.swift in Sources */,
 				38B0B178E911C9495FB4FB97 /* AppSupportTests.swift in Sources */,
 				5CF6BB64302C536F32F69135 /* BootstrapStoreRecoveryTests.swift in Sources */,
@@ -937,6 +944,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A77421CAD71446D4BAF6505B /* WidgetLifecycleObserver.swift in Sources */,
 				06EEE205CC898A3CA3910730 /* AccessibilityIdentifiers.swift in Sources */,
 				9B8408F9F62CD39074939795 /* AccessibilityLayout.swift in Sources */,
 				63172EABAE0F56F6D13022A0 /* AdaptiveLayoutEnvironment.swift in Sources */,

@@ -99,6 +99,9 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background {
+            WidgetLifecycleObserver()
+        }
         .onAppear {
             logger.info("ContentView appeared")
             MigrationUtils.runMigrationIfNeeded(in: modelContext)

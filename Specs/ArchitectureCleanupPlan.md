@@ -85,7 +85,7 @@ Phased cleanup from the LifeMetrics architecture audit (June 2026). Goal: consis
 | F.1 | Scoped `@Query` for Goals (366d), Motivations (motivation text), Charts (90d) | Done |
 | F.2 | Remove redundant `@Query goals` — use `metric.booleanGoals` / `quantityGoals` | Done |
 | F.3 | Migrate remaining `try? modelContext.save()` in active views/sheets | Done |
-| F.4 | Wire `WidgetDataSync` when `ProductSurface.showsWidget` becomes `true` | Pending |
+| F.4 | Wire `WidgetDataSync` when `ProductSurface.showsWidget` becomes `true` | Done |
 
 ---
 

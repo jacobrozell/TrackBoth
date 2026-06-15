@@ -118,7 +118,7 @@ struct HomeView: View {
                 viewModel.showAddMetric()
             }
             .onAppear {
-                WidgetSyncCoordinator.syncIfEnabled(metrics: metrics, entries: entries)
+                WidgetSyncCoordinator.syncIfEnabled(context: modelContext)
                 // Clamp selectedDate to today if in the future
                 let today = Calendar.current.startOfDay(for: Date())
                 if viewModel.selectedDate > today {
