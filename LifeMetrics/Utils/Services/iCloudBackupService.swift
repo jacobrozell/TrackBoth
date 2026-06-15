@@ -39,6 +39,7 @@ class iCloudBackupService {
         let createdAt: Date
         let habitType: String?
         let primaryMotivation: String?
+        let costPerUnit: String?
         let goals: [BackupGoal]
     }
     
@@ -63,6 +64,7 @@ class iCloudBackupService {
         let details: String?
         let quantity: Int?
         let unit: String?
+        let mood: String?
     }
     
     // MARK: - Initialization
@@ -95,6 +97,7 @@ class iCloudBackupService {
                 createdAt: metric.createdAt,
                 habitType: metric.habitType.rawValue,
                 primaryMotivation: metric.primaryMotivation,
+                costPerUnit: MetricCostStore.encodedCostPerUnit(for: metric.id),
                 goals: backupGoals
             )
         }
@@ -109,7 +112,8 @@ class iCloudBackupService {
                 starred: entry.starred,
                 details: entry.details,
                 quantity: entry.quantity,
-                unit: entry.unit
+                unit: entry.unit,
+                mood: entry.mood
             )
         }
         
@@ -183,7 +187,9 @@ class iCloudBackupService {
         
         // Clear existing data
         try clearAllData(context: context)
-        
+        MetricCostStore.clearAll()
+        MetricDisplayPreferences.clearAll()
+
         // Restore metrics
         for backupMetric in backupData.metrics {
             let metric = Metric(
@@ -194,7 +200,8 @@ class iCloudBackupService {
             
             // Set the original ID
             metric.id = UUID(uuidString: backupMetric.id) ?? UUID()
-            
+            MetricCostStore.applyEncodedCostPerUnit(backupMetric.costPerUnit, for: metric.id)
+
             // Restore goals
             for backupGoal in backupMetric.goals {
                 let goal = Goal(
@@ -227,6 +234,7 @@ class iCloudBackupService {
                 details: backupEntry.details,
                 quantity: backupEntry.quantity,
                 unit: backupEntry.unit,
+                mood: backupEntry.mood,
                 hasBeenLogged: true
             )
 

@@ -9,6 +9,11 @@ struct AddMotivationView: View {
     
     @State private var selectedMetric: Metric?
     @State private var motivationText = ""
+
+    init(metrics: [Metric], preselectedMetric: Metric? = nil) {
+        self.metrics = metrics
+        _selectedMetric = State(initialValue: preselectedMetric)
+    }
     
     var body: some View {
         NavigationStack {

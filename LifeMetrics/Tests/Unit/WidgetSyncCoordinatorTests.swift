@@ -15,22 +15,29 @@ final class WidgetSyncCoordinatorTests: XCTestCase {
         context = ModelContext(container)
     }
 
-    func testSyncIsNoOpWhenWidgetSurfaceDisabled() {
+    func testSyncRespectsWidgetSurfaceGate() {
+        #if DEBUG
+        XCTAssertTrue(ProductSurface.showsWidget)
+        #else
         XCTAssertFalse(ProductSurface.showsWidget)
-        MetricStore(context: context).insert(Metric(name: "Read", habitType: .positive))
+        #endif
 
+        MetricStore(context: context).insert(Metric(name: "Read", habitType: .positive))
         WidgetSyncCoordinator.syncIfEnabled(context: context)
         WidgetSyncCoordinator.onDataChanged(context: context)
         WidgetSyncCoordinator.handleLifecycle(phase: .active, context: context)
     }
 
-    func testHabitLoggedSyncIsNoOpWhenWidgetSurfaceDisabled() throws {
-        XCTAssertFalse(ProductSurface.showsWidget)
+    func testHabitLoggedSyncRespectsWidgetSurfaceGate() throws {
         let metric = Metric(name: "Read", habitType: .positive)
         MetricStore(context: context).insert(metric)
         let entry = MetricEntry(metricID: metric.id, date: Date(), value: true, hasBeenLogged: true)
         EntryStore(context: context).insert(entry)
 
         WidgetSyncCoordinator.onHabitLogged(metric: metric, entry: entry, context: context)
+
+        #if DEBUG
+        XCTAssertNotNil(WidgetSnapshotStore.load())
+        #endif
     }
 }

@@ -73,12 +73,14 @@ enum TrackingSemantics {
         habitType: HabitType,
         value: Bool,
         details: String,
+        mood: String = "",
         quantity: Int?,
         existingEntry: MetricEntry?
     ) -> Bool {
         if existingEntry?.hasBeenLogged == true { return true }
         if let quantity, quantity > 0 { return true }
         if !details.isEmpty { return true }
+        if !mood.isEmpty { return true }
         return isSuccessful(habitType: habitType, value: value)
     }
 

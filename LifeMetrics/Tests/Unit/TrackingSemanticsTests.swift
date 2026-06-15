@@ -110,6 +110,16 @@ final class TrackingSemanticsTests: XCTestCase {
                 existingEntry: existing
             )
         )
+        XCTAssertTrue(
+            TrackingSemantics.shouldMarkLoggedOnSave(
+                habitType: .positive,
+                value: false,
+                details: "",
+                mood: "🙂",
+                quantity: nil,
+                existingEntry: nil
+            )
+        )
     }
 
     func testIsLoggedSuccessRequiresLoggedEntry() {

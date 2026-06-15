@@ -275,6 +275,8 @@ struct SettingsView: View {
                 modelContext.delete(metric)
             }
             
+            MetricCostStore.clearAll()
+            MetricDisplayPreferences.clearAll()
             modelContext.saveChanges(operation: "delete all data", entity: "Model")
             WidgetSyncCoordinator.onDataChanged(context: modelContext)
         }

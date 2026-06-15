@@ -2,222 +2,216 @@ import Foundation
 import SwiftData
 
 // MARK: - DemoDataGenerator
+/// Deterministic demo dataset tuned for screenshots: habits + vices, streaks, savings, recovery timer.
 struct DemoDataGenerator {
-    
+
+    private struct DemoMetricPlan {
+        let name: String
+        let habitType: HabitType
+        let primaryMotivation: String?
+        let costPerUnit: Decimal?
+        let showRecoveryTimer: Bool
+        let monthlyGoal: Int
+        /// Day offsets from today (0 = today) where the metric was successfully logged.
+        let successOffsets: [Int]
+        /// Vice only — day offsets where the user slipped (`value == true`).
+        let slipOffsets: [Int]
+        let moodToday: String?
+    }
+
     static func generateDemoData(modelContext: ModelContext) {
-        // Mark that demo data has been generated
         UserDefaults.standard.set(true, forKey: "hasDemoData")
-        
-        // Create demo metrics (all marked as logged since they will have entries)
-        let demoMetrics = [
-            Metric(name: "Morning Exercise", habitType: .positive),
-            Metric(name: "Read 30 minutes", habitType: .positive),
-            Metric(name: "Meditation", habitType: .positive),
-            Metric(name: "Drink Water", habitType: .positive),
-            Metric(name: "Social Media", habitType: .vice),
-            Metric(name: "Late Night Snacks", habitType: .vice),
-            // Quantity-type metrics for testing quantity charts
-            Metric(name: "Steps Walked", habitType: .positive),
-            Metric(name: "Pages Read", habitType: .positive),
-            Metric(name: "Cigarettes Smoked", habitType: .vice),
-            Metric(name: "Cups of Coffee", habitType: .vice)
-        ]
-        
-        // Insert metrics
-        for metric in demoMetrics {
+        MetricCostStore.clearAll()
+        MetricDisplayPreferences.clearAll()
+        MilestoneStore.clearAll()
+
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+
+        let plans = demoPlans()
+        var metrics: [Metric] = []
+
+        for plan in plans {
+            let metric = Metric(
+                name: plan.name,
+                habitType: plan.habitType,
+                primaryMotivation: plan.primaryMotivation
+            )
             metric.hasBeenLogged = true
             modelContext.insert(metric)
+            metrics.append(metric)
+
+            if let cost = plan.costPerUnit {
+                MetricCostStore.setCostPerUnit(cost, for: metric.id)
+            }
+            if plan.showRecoveryTimer {
+                MetricDisplayPreferences.setShowTimeSinceSlip(true, for: metric.id)
+            }
+
+            let goal = Goal(goalType: .boolean, period: .monthly, target: plan.monthlyGoal)
+            goal.metric = metric
+            metric.goals?.append(goal)
+            modelContext.insert(goal)
         }
 
-        attachDemoGoals(to: demoMetrics, in: modelContext)
-        
-        // Generate entries for the last 30 days
-        let calendar = Calendar.current
-        let endDate = Date()
-        let startDate = calendar.date(byAdding: .day, value: -30, to: endDate) ?? endDate
-        
-        var currentDate = startDate
-        while currentDate <= endDate {
-            // Generate entries for each metric
-            for metric in demoMetrics {
-                let shouldComplete = generateCompletionProbability(
-                    for: metric,
-                    on: currentDate,
-                    daysSinceStart: calendar.dateComponents([.day], from: startDate, to: currentDate).day ?? 0
-                )
-                
-                if shouldComplete {
-                    // Generate quantity data for quantity-type metrics
-                    let (quantity, unit) = generateQuantityData(for: metric)
-                    
-                    let entry = MetricEntry(
-                        metricID: metric.id,
-                        date: currentDate,
-                        value: TrackingSemantics.successValue(habitType: metric.habitType),
-                        quantity: quantity,
-                        unit: unit,
-                        hasBeenLogged: true
-                    )
-                    modelContext.insert(entry)
+        for plan in plans {
+            guard let metric = metrics.first(where: { $0.name == plan.name }) else { continue }
+
+            let slipOffsets = Set(plan.slipOffsets)
+            let successOffsets = Set(plan.successOffsets)
+
+            for offset in 0...44 {
+                guard let date = calendar.date(byAdding: .day, value: -offset, to: today) else { continue }
+
+                let isSlip = plan.habitType == .vice && slipOffsets.contains(offset)
+                let isSuccess = successOffsets.contains(offset)
+
+                guard isSlip || isSuccess else { continue }
+
+                let value: Bool
+                if plan.habitType == .positive {
+                    value = true
+                } else {
+                    value = isSlip
                 }
+
+                let mood: String?
+                if offset == 0 {
+                    mood = plan.moodToday
+                } else if offset == 1, plan.habitType == .positive {
+                    mood = "🙂"
+                } else {
+                    mood = nil
+                }
+
+                let (quantity, unit) = quantityData(for: plan.name, offset: offset, isSuccess: isSuccess && !isSlip)
+
+                let entry = MetricEntry(
+                    metricID: metric.id,
+                    date: date,
+                    value: value,
+                    quantity: quantity,
+                    unit: unit,
+                    mood: mood,
+                    hasBeenLogged: true
+                )
+                modelContext.insert(entry)
             }
-            
-            currentDate = calendar.date(byAdding: .day, value: 1, to: currentDate) ?? currentDate
         }
-        
-        // Save the context
+
         modelContext.saveChanges(operation: "seed demo data", entity: "Model")
     }
 
-    private static func attachDemoGoals(to metrics: [Metric], in modelContext: ModelContext) {
-        func metric(named name: String) -> Metric? {
-            metrics.first { $0.name == name }
-        }
+    // MARK: - Curated plans (deterministic — safe for screenshots)
 
-        func addBooleanGoal(
-            to metric: Metric,
-            period: GoalPeriod,
-            target: Int
-        ) {
-            let goal = Goal(goalType: .boolean, period: period, target: target)
-            goal.metric = metric
-            metric.goals?.append(goal)
-            modelContext.insert(goal)
-        }
+    private static func demoPlans() -> [DemoMetricPlan] {
+        let habitSuccess = { (streak: Int) in Array(0..<streak) }
 
-        func addQuantityGoal(
-            to metric: Metric,
-            period: GoalPeriod,
-            target: Int,
-            quantityGoalType: QuantityGoalType,
-            defaultUnit: String
-        ) {
-            let goal = Goal(
-                goalType: .quantity,
-                period: period,
-                target: target,
-                quantityGoalType: quantityGoalType,
-                defaultUnit: defaultUnit
+        return [
+            DemoMetricPlan(
+                name: "Exercise",
+                habitType: .positive,
+                primaryMotivation: "More energy for my kids",
+                costPerUnit: nil,
+                showRecoveryTimer: false,
+                monthlyGoal: 20,
+                successOffsets: habitSuccess(12) + [14, 16, 18, 20, 22, 25, 28, 30, 33, 36],
+                slipOffsets: [],
+                moodToday: "💪"
+            ),
+            DemoMetricPlan(
+                name: "Reading",
+                habitType: .positive,
+                primaryMotivation: "Learn something new every day",
+                costPerUnit: nil,
+                showRecoveryTimer: false,
+                monthlyGoal: 20,
+                successOffsets: habitSuccess(8) + [10, 12, 15, 18, 21, 24, 27, 30, 35, 40],
+                slipOffsets: [],
+                moodToday: "😊"
+            ),
+            DemoMetricPlan(
+                name: "Meditation",
+                habitType: .positive,
+                primaryMotivation: nil,
+                costPerUnit: nil,
+                showRecoveryTimer: false,
+                monthlyGoal: 15,
+                successOffsets: habitSuccess(7) + [9, 11, 14, 17, 20, 26, 32],
+                slipOffsets: [],
+                moodToday: "🙂"
+            ),
+            DemoMetricPlan(
+                name: "Drink water",
+                habitType: .positive,
+                primaryMotivation: nil,
+                costPerUnit: nil,
+                showRecoveryTimer: false,
+                monthlyGoal: 25,
+                successOffsets: habitSuccess(15) + [17, 19, 22, 25, 28, 31, 34, 38, 42],
+                slipOffsets: [],
+                moodToday: nil
+            ),
+            DemoMetricPlan(
+                name: "Social media",
+                habitType: .vice,
+                primaryMotivation: "I want my attention back for things that matter",
+                costPerUnit: nil,
+                showRecoveryTimer: true,
+                monthlyGoal: 8,
+                successOffsets: habitSuccess(14) + Array(15...28) + [30, 32, 34, 36, 38, 40, 42],
+                slipOffsets: [14, 29],
+                moodToday: "🙂"
+            ),
+            DemoMetricPlan(
+                name: "Late-night snacks",
+                habitType: .vice,
+                primaryMotivation: "Better sleep and mornings",
+                costPerUnit: 5,
+                showRecoveryTimer: false,
+                monthlyGoal: 10,
+                successOffsets: habitSuccess(9) + [11, 13, 16, 19, 22, 26, 30, 35],
+                slipOffsets: [10],
+                moodToday: nil
+            ),
+            DemoMetricPlan(
+                name: "Smoking",
+                habitType: .vice,
+                primaryMotivation: "Breathe easier and save money",
+                costPerUnit: 12,
+                showRecoveryTimer: false,
+                monthlyGoal: 5,
+                successOffsets: habitSuccess(21) + [23, 25, 28, 31, 34, 37, 40, 43],
+                slipOffsets: [],
+                moodToday: nil
+            ),
+            DemoMetricPlan(
+                name: "Alcohol",
+                habitType: .vice,
+                primaryMotivation: "Clearer weekends",
+                costPerUnit: 15,
+                showRecoveryTimer: true,
+                monthlyGoal: 8,
+                successOffsets: habitSuccess(6) + [8, 10, 12, 15, 18, 21, 24, 27, 33, 39],
+                slipOffsets: [7, 20],
+                moodToday: nil
             )
-            goal.metric = metric
-            metric.goals?.append(goal)
-            modelContext.insert(goal)
-        }
+        ]
+    }
 
-        if let exercise = metric(named: "Morning Exercise") {
-            addBooleanGoal(to: exercise, period: .weekly, target: 5)
-        }
-        if let reading = metric(named: "Read 30 minutes") {
-            addBooleanGoal(to: reading, period: .monthly, target: 20)
-        }
-        if let water = metric(named: "Drink Water") {
-            addBooleanGoal(to: water, period: .weekly, target: 7)
-        }
-        if let social = metric(named: "Social Media") {
-            addBooleanGoal(to: social, period: .weekly, target: 1)
-        }
-        if let steps = metric(named: "Steps Walked") {
-            addQuantityGoal(
-                to: steps,
-                period: .weekly,
-                target: 10_000,
-                quantityGoalType: .maxDaily,
-                defaultUnit: "steps"
-            )
-        }
+    private static func quantityData(for name: String, offset: Int, isSuccess: Bool) -> (Int?, String?) {
+        guard isSuccess else { return (nil, nil) }
+        _ = name
+        _ = offset
+        return (nil, nil)
     }
-    
-    private static func generateCompletionProbability(
-        for metric: Metric,
-        on date: Date,
-        daysSinceStart: Int
-    ) -> Bool {
-        let calendar = Calendar.current
-        let dayOfWeek = calendar.component(.weekday, from: date)
-        
-        // Base probability based on metric type
-        var baseProbability: Double
-        switch metric.habitType {
-        case .positive:
-            baseProbability = 0.6 // 60% base chance for habits
-        case .vice:
-            baseProbability = 0.3 // 30% base chance for vices (we want to avoid them)
-        }
-        
-        // Adjust based on days since start (habits get easier, vices get harder to avoid)
-        let progressFactor = Double(daysSinceStart) / 30.0
-        if metric.habitType == .positive {
-            baseProbability += progressFactor * 0.2 // Habits get easier over time
-        } else {
-            baseProbability -= progressFactor * 0.1 // Vices get harder to avoid over time
-        }
-        
-        // Weekend adjustment
-        if dayOfWeek == 1 || dayOfWeek == 7 { // Sunday or Saturday
-            if metric.habitType == .positive {
-                baseProbability *= 0.8 // Habits are harder on weekends
-            } else {
-                baseProbability *= 1.3 // Vices are more likely on weekends
-            }
-        }
-        
-        // Specific metric adjustments
-        switch metric.name {
-        case "Morning Exercise":
-            baseProbability *= 0.7 // Exercise is harder
-        case "Read 30 minutes":
-            baseProbability *= 1.1 // Reading is easier
-        case "Meditation":
-            baseProbability *= 0.8 // Meditation requires discipline
-        case "Drink Water":
-            baseProbability *= 1.2 // Drinking water is easier
-        case "Social Media":
-            baseProbability *= 1.1 // Social media is tempting
-        case "Late Night Snacks":
-            baseProbability *= 0.9 // Snacks are moderately tempting
-        case "Steps Walked":
-            baseProbability *= 1.0 // Moderate difficulty
-        case "Pages Read":
-            baseProbability *= 0.9 // Reading pages requires effort
-        case "Cigarettes Smoked":
-            baseProbability *= 0.8 // Smoking is a vice to avoid
-        case "Cups of Coffee":
-            baseProbability *= 1.2 // Coffee is tempting but trackable
-        default:
-            break
-        }
-        
-        // Add some randomness
-        let randomFactor = Double.random(in: 0.8...1.2)
-        baseProbability *= randomFactor
-        
-        // Ensure probability is between 0 and 1
-        baseProbability = max(0.0, min(1.0, baseProbability))
-        
-        return Double.random(in: 0...1) < baseProbability
-    }
-    
-    /// Demo quantity samples for the quantity chart.
-    /// Only Steps Walked (habit) and Cups of Coffee (vice) log quantities — other metrics
-    /// stay boolean so "All" filters aren't dominated by mixing steps (thousands) with
-    /// pages/cigarettes (single digits).
-    private static func generateQuantityData(for metric: Metric) -> (Int?, String?) {
-        switch metric.name {
-        case "Steps Walked":
-            // Realistic daily steps, capped near the 10k weekly max-daily goal
-            return (Int.random(in: 5_500...9_500), "steps")
-        case "Cups of Coffee":
-            return (Int.random(in: 1...3), "cups")
-        default:
-            return (nil, nil)
-        }
-    }
-    
+
     static func clearDemoData(modelContext: ModelContext) {
-        // Clear the demo data flag
         UserDefaults.standard.set(false, forKey: "hasDemoData")
-        
-        // Delete all metrics and entries
+        MetricCostStore.clearAll()
+        MetricDisplayPreferences.clearAll()
+        MilestoneStore.clearAll()
+
         do {
             try modelContext.delete(model: Metric.self)
             try modelContext.delete(model: MetricEntry.self)
@@ -227,8 +221,8 @@ struct DemoDataGenerator {
             logger.error("Error clearing demo data: \(error.localizedDescription)", category: .data)
         }
     }
-    
+
     static func hasDemoData() -> Bool {
-        return UserDefaults.standard.bool(forKey: "hasDemoData")
+        UserDefaults.standard.bool(forKey: "hasDemoData")
     }
 }

@@ -62,6 +62,9 @@ enum WidgetSyncCoordinator {
         context: ModelContext
     ) {
         guard ProductSurface.showsWidget else { return }
+        if phase == .active {
+            WidgetPendingLogProcessor.drainIfNeeded(context: context)
+        }
         WidgetDataSync.shared.handleAppLifecycle(
             phase: phase,
             metrics: (try? MetricStore(context: context).fetchAll(sortedByName: false)) ?? [],

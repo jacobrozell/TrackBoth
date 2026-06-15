@@ -12,6 +12,8 @@ struct EditMetricView: View {
     @State private var goalPeriod: GoalPeriod = .monthly
     @State private var goalTarget: Int = 20
     @State private var primaryMotivation: String = ""
+    @State private var costPerUnitText: String = ""
+    @State private var showTimeSinceSlip: Bool = false
     
     private var maxTargetForEditPeriod: Int {
         goalPeriod.maxDays
@@ -67,6 +69,10 @@ struct EditMetricView: View {
         _goalPeriod = State(initialValue: metric.booleanGoals.first?.period ?? .monthly)
         _goalTarget = State(initialValue: metric.booleanGoals.first?.target ?? 20)
         _primaryMotivation = State(initialValue: metric.primaryMotivation ?? "")
+        if let cost = MetricCostStore.costPerUnit(for: metric.id) {
+            _costPerUnitText = State(initialValue: NSDecimalNumber(decimal: cost).stringValue)
+        }
+        _showTimeSinceSlip = State(initialValue: MetricDisplayPreferences.showTimeSinceSlip(for: metric.id))
     }
 
     var body: some View {
@@ -100,9 +106,26 @@ struct EditMetricView: View {
                 } header: {
                     Text("Primary Motivation")
                 } footer: {
-                    Text(habitType == .vice ? 
+                    Text(habitType == .vice ?
                          "Your main reason for avoiding this vice. Used to keep you focused." :
                          "Your main motivation for doing this habit. Helps keep you focused on your goals.")
+                }
+
+                if habitType == .vice {
+                    Section {
+                        TextField("Amount", text: $costPerUnitText)
+                            .keyboardType(.decimalPad)
+                    } header: {
+                        Text("Money Saved")
+                    } footer: {
+                        Text("Optional cost per day or unit avoided. Shows estimated savings on Home during clean streaks.")
+                    }
+
+                    Section {
+                        Toggle("Show recovery timer", isOn: $showTimeSinceSlip)
+                    } footer: {
+                        Text("Shows how long you've been recovering since your last slip. Off by default.")
+                    }
                 }
 
                 Section {
@@ -223,6 +246,23 @@ struct EditMetricView: View {
         metric.habitType = habitType
         let trimmedMotivation = primaryMotivation.trimmingCharacters(in: .whitespacesAndNewlines)
         metric.primaryMotivation = trimmedMotivation.isEmpty ? nil : trimmedMotivation
+
+        if habitType == .vice {
+            let trimmedCost = costPerUnitText.trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmedCost.isEmpty {
+                MetricCostStore.setCostPerUnit(nil, for: metric.id)
+            } else if let cost = Decimal(string: trimmedCost), cost > 0 {
+                MetricCostStore.setCostPerUnit(cost, for: metric.id)
+            }
+        } else {
+            MetricCostStore.setCostPerUnit(nil, for: metric.id)
+        }
+
+        if habitType == .vice {
+            MetricDisplayPreferences.setShowTimeSinceSlip(showTimeSinceSlip, for: metric.id)
+        } else {
+            MetricDisplayPreferences.remove(for: metric.id)
+        }
         
         // Update or create boolean goal
         if let existingGoal = metric.booleanGoals.first {

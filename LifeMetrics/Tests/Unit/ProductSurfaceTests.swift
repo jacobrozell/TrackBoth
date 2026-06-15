@@ -4,7 +4,11 @@ import XCTest
 final class ProductSurfaceTests: XCTestCase {
 
     func testLeanFeaturesDisabledInCurrentBuild() {
+        #if DEBUG
+        XCTAssertTrue(ProductSurface.showsWidget)
+        #else
         XCTAssertFalse(ProductSurface.showsWidget)
+        #endif
         XCTAssertFalse(ProductSurface.showsWatch)
         XCTAssertFalse(ProductSurface.showsMotivationGame)
         XCTAssertFalse(ProductSurface.showsAchievements)
@@ -31,7 +35,11 @@ final class ProductSurfaceTests: XCTestCase {
     }
 
     func testPostOnePointZeroFeaturesDisabledViaIsEnabled() {
+        #if DEBUG
+        XCTAssertTrue(ProductSurface.isEnabled(.widget))
+        #else
         XCTAssertFalse(ProductSurface.isEnabled(.widget))
+        #endif
         XCTAssertFalse(ProductSurface.isEnabled(.watch))
         XCTAssertFalse(ProductSurface.isEnabled(.motivationGame))
     }

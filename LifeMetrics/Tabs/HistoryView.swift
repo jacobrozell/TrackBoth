@@ -26,12 +26,14 @@ private struct HistoryViewContent: View {
 
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
+    @Query private var streakEntries: [MetricEntry]
 
     init(viewModel: HistoryViewModel, dynamicTypeSize: DynamicTypeSize) {
         self.viewModel = viewModel
         self.dynamicTypeSize = dynamicTypeSize
         _metrics = QueryDescriptors.allMetrics
         _entries = QueryDescriptors.entriesInMonth(of: viewModel.selectedDate)
+        _streakEntries = QueryDescriptors.entriesForStreakLookback()
     }
 
     var body: some View {
@@ -115,7 +117,7 @@ private struct HistoryViewContent: View {
                         iconColor: Color.currentSecondaryText
                     )) {
                         ForEach(recentEntries.prefix(20)) { entry in
-                            HistoryEntryCardView(entry: entry, metrics: metrics)
+                            HistoryEntryCardView(entry: entry, metrics: metrics, entries: streakEntries)
                         }
                     }
                 }

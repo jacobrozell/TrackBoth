@@ -19,7 +19,7 @@ enum ProductSurface {
 
     static var showsDemoData: Bool { current == .development }
     static var showsCharts: Bool { true }
-    static var showsWidget: Bool { false }
+    static var showsWidget: Bool { current == .development }
     static var showsWatch: Bool { false }
     static var showsMotivationGame: Bool { false }
     static var showsAchievements: Bool { false }

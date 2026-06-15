@@ -28,9 +28,13 @@ targets:
       - path: Utils
       - path: ViewModels
       - path: Views
+      - path: WidgetShared
       - path: TrackBoth-Info.plist
         type: file
         buildPhase: none
+    dependencies:
+      - target: TrackBoth-WidgetExtension
+        embed: true
     entitlements:
       path: TrackBoth.entitlements
     settings:
@@ -55,15 +59,20 @@ targets:
     type: app-extension
     platform: iOS
     sources:
+      - path: WidgetShared
       - path: TrackBoth-Widget
         excludes:
           - Info.plist
+          - TrackBoth-Widget.entitlements
       - path: TrackBoth-Widget/Info.plist
         type: file
         buildPhase: none
+    entitlements:
+      path: TrackBoth-Widget/TrackBoth-Widget.entitlements
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.jacobrozell.TrackBoth.TrackBoth-Widget
+        CODE_SIGN_ENTITLEMENTS: TrackBoth-Widget/TrackBoth-Widget.entitlements
         MARKETING_VERSION: 1.0.0
         CURRENT_PROJECT_VERSION: 3
         GENERATE_INFOPLIST_FILE: NO

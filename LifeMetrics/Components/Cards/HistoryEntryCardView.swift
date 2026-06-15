@@ -5,7 +5,8 @@ import SwiftUI
 struct HistoryEntryCardView: View {
     let entry: MetricEntry
     let metrics: [Metric]
-    
+    let entries: [MetricEntry]
+
     @State private var showingDetails = false
     
     private var metric: Metric? {
@@ -33,6 +34,13 @@ struct HistoryEntryCardView: View {
         return TrackingSemantics.isLoggedSuccess(habitType: metric.habitType, entry: entry)
     }
     
+    private var savingsSubtitle: String? {
+        guard let metric, metric.habitType == .vice, isSuccess else { return nil }
+        let cost = MetricCostStore.costPerUnit(for: metric.id)
+        let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: entry.date)
+        return ViceSavingsCalculator.savingsLabel(streak: streak, costPerUnit: cost)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
@@ -55,6 +63,14 @@ struct HistoryEntryCardView: View {
                         .font(.caption)
                         .foregroundColor(.currentSecondaryText)
                         .padding(.leading, 28) // Align with metric name
+
+                    if let savingsSubtitle {
+                        Text(savingsSubtitle)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                            .foregroundColor(Color.currentSuccess)
+                            .padding(.leading, 28)
+                    }
                 }
                 
                 Spacer()
@@ -95,7 +111,13 @@ struct HistoryEntryCardView: View {
                             .multilineTextAlignment(.leading)
                     }
                 }
-                
+
+                if let mood = entry.mood, !mood.isEmpty {
+                    Text("Mood: \(mood)")
+                        .font(.caption)
+                        .foregroundColor(.currentSecondaryText)
+                }
+
                 if let quantityString = entry.quantityString {
                     HStack {
                         Text("Quantity:")
@@ -139,7 +161,8 @@ struct HistoryEntryCardView: View {
 #Preview {
     HistoryEntryCardView(
         entry: MetricEntry(metricID: UUID(), date: Date(), value: true),
-        metrics: [Metric(name: "Exercise", habitType: .positive)]
+        metrics: [Metric(name: "Exercise", habitType: .positive)],
+        entries: []
     )
     .padding()
 }

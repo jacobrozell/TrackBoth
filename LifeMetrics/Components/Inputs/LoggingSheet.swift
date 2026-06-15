@@ -19,6 +19,7 @@ struct LoggingSheet: View, Identifiable {
     @State private var motivation: String = ""
     @State private var quantity: Int?
     @State private var unit: String = "times"
+    @State private var mood: String?
     @State private var showingQuantitySheet: Bool = false
 
     private var existingEntry: MetricEntry? {
@@ -43,6 +44,14 @@ struct LoggingSheet: View, Identifiable {
 
                 Section(header: Text("Daily Details")) {
                     TextField("Optional details", text: $details, axis: .vertical)
+                }
+
+                Section {
+                    MoodChipPicker(selectedMood: $mood)
+                } header: {
+                    Text("How are you feeling?")
+                } footer: {
+                    Text("Optional — tap an emoji to log your mood for the day.")
                 }
 
                 Section(header: Text("Daily Motivation")) {
@@ -111,6 +120,7 @@ struct LoggingSheet: View, Identifiable {
             value = entry.value
             details = entry.details ?? ""
             motivation = entry.motivation ?? ""
+            mood = entry.mood
             quantity = entry.quantity
             unit = entry.unit ?? (metric.quantityGoals.first?.safeDefaultUnit ?? "times")
         } else {
@@ -144,6 +154,7 @@ struct LoggingSheet: View, Identifiable {
         entry.value = value
         entry.details = details.isEmpty ? nil : details
         entry.motivation = motivation.isEmpty ? nil : motivation
+        entry.mood = mood
 
         if let quantity, quantity > 0 {
             entry.quantity = quantity
@@ -157,6 +168,7 @@ struct LoggingSheet: View, Identifiable {
             habitType: metric.habitType,
             value: value,
             details: details,
+            mood: mood ?? "",
             quantity: quantity,
             existingEntry: existingEntry
         ) {

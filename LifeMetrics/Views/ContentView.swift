@@ -115,6 +115,10 @@ struct ContentView: View {
         .onChange(of: themeManager.currentAppTheme) { _, _ in
             // Force TabView refresh when theme changes
         }
+        .onOpenURL { url in
+            guard url.scheme == "trackboth" else { return }
+            selectedTab = 0
+        }
     }
 
     @ViewBuilder
@@ -132,11 +136,12 @@ struct ContentView: View {
     private func seedDemoDataIfRequested() {
         let force = ProcessInfo.processInfo.arguments.contains("-force_seed_demo")
         let seed = ProcessInfo.processInfo.arguments.contains("-seed_demo_data")
-        guard force || seed else { return }
-        if force {
+        let screenshot = ProcessInfo.processInfo.arguments.contains("-screenshot_demo")
+        guard force || seed || screenshot else { return }
+        if force || screenshot {
             DemoDataGenerator.clearDemoData(modelContext: modelContext)
         }
-        guard force || !DemoDataGenerator.hasDemoData() else { return }
+        guard force || screenshot || !DemoDataGenerator.hasDemoData() else { return }
         DemoDataGenerator.generateDemoData(modelContext: modelContext)
     }
 }

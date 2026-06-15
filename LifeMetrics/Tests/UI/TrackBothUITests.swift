@@ -185,7 +185,7 @@ final class TrackBothUITests: XCTestCase {
         launch(skipOnboarding: false)
         XCTAssertTrue(app.staticTexts["Welcome to TrackBoth"].waitForExistence(timeout: 10))
 
-        for _ in 0..<5 {
+        for _ in 0..<3 {
             let next = app.buttons["Next"]
             XCTAssertTrue(next.waitForExistence(timeout: 5))
             next.tap()

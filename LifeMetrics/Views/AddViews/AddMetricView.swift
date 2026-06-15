@@ -10,6 +10,8 @@ struct AddMetricView: View {
     @State private var primaryMotivation = ""
     @State private var selectedGoalPeriod: GoalPeriod = .monthly
     @State private var goalTarget: Int = 20
+    @State private var viceNeedingMotivation: Metric?
+    @State private var showingViceMotivationPrompt = false
     
     private var maxTargetForPeriod: Int {
         selectedGoalPeriod.maxDays
@@ -66,9 +68,45 @@ struct AddMetricView: View {
                 } header: {
                     Text("Habit Name")
                 } footer: {
-                    Text(selectedHabitType == .positive ? 
+                    Text(selectedHabitType == .positive ?
                          "Enter a name for your positive habit (e.g., 'Exercise', 'Read', 'Meditate')" :
                          "Enter a name for the habit you want to avoid (e.g., 'Smoking', 'Junk Food', 'Social Media')")
+                }
+
+                Section {
+                    let presets = MetricPreset.presets(for: selectedHabitType)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 10)], spacing: 10) {
+                        ForEach(presets) { preset in
+                            let isSelected = metricName == preset.name
+                            Button {
+                                metricName = preset.name
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: preset.icon)
+                                        .font(.subheadline)
+                                    Text(preset.name)
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                    Spacer(minLength: 0)
+                                }
+                                .foregroundColor(isSelected ? Color.currentBackground : Color.currentText)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 10)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .fill(isSelected ? Color.currentPrimary : Color.currentSecondaryBackground)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                } header: {
+                    Text("Quick Add")
+                } footer: {
+                    Text("Tap a suggestion to fill the name — you can edit it above.")
                 }
                 
                 Section {
@@ -78,6 +116,9 @@ struct AddMetricView: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                    .onChange(of: selectedHabitType) { _, _ in
+                        metricName = ""
+                    }
                 } header: {
                     Text("Habit Type")
                 } footer: {
@@ -225,6 +266,15 @@ struct AddMetricView: View {
                     .disabled(metricName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
                 }
             }
+            .sheet(isPresented: $showingViceMotivationPrompt) {
+                if let vice = viceNeedingMotivation {
+                    ViceMotivationPromptSheet(metric: vice) {
+                        showingViceMotivationPrompt = false
+                        viceNeedingMotivation = nil
+                        dismiss()
+                    }
+                }
+            }
         }
     }
     
@@ -252,6 +302,12 @@ struct AddMetricView: View {
         modelContext.insert(goal)
         
         modelContext.saveChanges(operation: "create metric", entity: "Metric")
-        dismiss()
+
+        if selectedHabitType == .vice && trimmedMotivation.isEmpty {
+            viceNeedingMotivation = metric
+            showingViceMotivationPrompt = true
+        } else {
+            dismiss()
+        }
     }
 }

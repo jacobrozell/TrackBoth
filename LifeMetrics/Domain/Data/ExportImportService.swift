@@ -14,6 +14,8 @@ struct ExportImportService {
         let entryStore = EntryStore(context: context)
         try entryStore.deleteAll()
         try metricStore.deleteAll()
+        MetricCostStore.clearAll()
+        MetricDisplayPreferences.clearAll()
 
         var metricByID: [UUID: Metric] = [:]
         for record in payload.metrics {
@@ -21,12 +23,17 @@ struct ExportImportService {
                   let habitType = HabitType(rawValue: record.habitType) else {
                 continue
             }
-            let metric = Metric(name: record.name, habitType: habitType)
+            let metric = Metric(
+                name: record.name,
+                habitType: habitType,
+                primaryMotivation: record.primaryMotivation
+            )
             metric.id = id
             metric.createdAt = record.createdAt
             metric.hasBeenLogged = record.hasBeenLogged ?? false
             context.insert(metric)
             metricByID[id] = metric
+            MetricCostStore.applyEncodedCostPerUnit(record.costPerUnit, for: id)
         }
 
         var importedEntries = 0
@@ -46,6 +53,7 @@ struct ExportImportService {
                 details: record.details,
                 quantity: record.quantity,
                 unit: record.unit,
+                mood: record.mood,
                 hasBeenLogged: record.hasBeenLogged ?? false
             )
             entry.id = id

@@ -15,10 +15,11 @@ class MetricEntry {
     var details: String?
     var quantity: Int?
     var unit: String?
+    var mood: String?
     var hasBeenLogged: Bool = false // Tracks if this specific entry has been logged
     
     // MARK: - Initialization
-    init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil, quantity: Int? = nil, unit: String? = nil, hasBeenLogged: Bool = false) {
+    init(metricID: UUID, date: Date, value: Bool, motivation: String? = nil, starred: Bool? = nil, details: String? = nil, quantity: Int? = nil, unit: String? = nil, mood: String? = nil, hasBeenLogged: Bool = false) {
         logger.debug("Creating new MetricEntry - MetricID: \(metricID.uuidString), Date: \(DateFormatter.dateFormatter.string(from: date)), Value: \(value)", category: .data)
         
         self.metricID = metricID
@@ -29,6 +30,7 @@ class MetricEntry {
         self.details = details
         self.quantity = quantity
         self.unit = unit
+        self.mood = mood
         self.hasBeenLogged = hasBeenLogged
     }
     
@@ -43,6 +45,7 @@ class MetricEntry {
         if hasBeenLogged { return true }
         return (details != nil && !details!.isEmpty) ||
                (motivation != nil && !motivation!.isEmpty) ||
+               (mood != nil && !mood!.isEmpty) ||
                (quantity != nil && quantity! > 0)
     }
     
@@ -106,6 +109,7 @@ extension MetricEntry {
         starred: Bool? = nil,
         quantity: Int? = nil,
         unit: String? = nil,
+        mood: String? = nil,
         in context: ModelContext,
         entries: [MetricEntry],
         metric: Metric? = nil
@@ -131,8 +135,11 @@ extension MetricEntry {
         if let unit = unit {
             entry.unit = unit.isEmpty ? nil : unit
         }
+        if let mood = mood {
+            entry.mood = mood.isEmpty ? nil : mood
+        }
 
-        if value != nil || details != nil || quantity != nil {
+        if value != nil || details != nil || quantity != nil || mood != nil {
             MetricEntry.markLogged(entry: entry, metric: metric)
         }
 

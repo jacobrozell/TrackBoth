@@ -63,6 +63,17 @@ final class iCloudBackupServiceTests: XCTestCase {
         XCTAssertEqual(decoded.entries.first?.quantity, 8)
     }
 
+    func testCreateBackupIncludesCostPerUnit() async throws {
+        let metric = Metric(name: "Alcohol", habitType: .vice)
+        context.insert(metric)
+        MetricCostStore.setCostPerUnit(12, for: metric.id)
+        try context.save()
+
+        let backup = try await service.createBackup(metrics: [metric], entries: [])
+
+        XCTAssertEqual(backup.metrics.first?.costPerUnit, "12")
+    }
+
     func testRestoreReplacesExistingData() async throws {
         let oldMetric = Metric(name: "Old", habitType: .vice)
         context.insert(oldMetric)
@@ -81,5 +92,20 @@ final class iCloudBackupServiceTests: XCTestCase {
         XCTAssertEqual(entries.count, 1)
         XCTAssertTrue(entries.first?.hasBeenLogged == true)
         XCTAssertTrue(metrics.first?.hasBeenLogged == true)
+    }
+
+    func testRestoreRoundTripsCostPerUnit() async throws {
+        let metric = Metric(name: "Smoking", habitType: .vice)
+        context.insert(metric)
+        MetricCostStore.setCostPerUnit(9, for: metric.id)
+        try context.save()
+
+        let backup = try await service.createBackup(metrics: [metric], entries: [])
+        MetricCostStore.clearAll()
+        try service.restoreFromBackup(backup, context: context)
+
+        let restored = try context.fetch(FetchDescriptor<Metric>()).first
+        XCTAssertEqual(restored?.name, "Smoking")
+        XCTAssertEqual(MetricCostStore.costPerUnit(for: restored!.id), 9)
     }
 }

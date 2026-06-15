@@ -56,6 +56,48 @@ final class ExportImportTests: XCTestCase {
         XCTAssertTrue(importedEntries.first?.hasBeenLogged == true)
     }
 
+    func testExportImportRoundTripsCostPerUnit() throws {
+        let metric = Metric(name: "Smoking", habitType: .vice, primaryMotivation: "For my health")
+        metric.hasBeenLogged = true
+        context.insert(metric)
+        MetricCostStore.setCostPerUnit(8, for: metric.id)
+
+        let day = Calendar.current.startOfDay(for: Date())
+        let entry = MetricEntry(metricID: metric.id, date: day, value: false, hasBeenLogged: true)
+        context.insert(entry)
+        try context.save()
+
+        let data = try TrackBothExport.encode(metrics: [metric], entries: [entry])
+        let payload = try TrackBothExport.decode(data)
+        XCTAssertEqual(payload.schemaVersion, 3)
+        XCTAssertEqual(payload.metrics.first?.costPerUnit, "8")
+        XCTAssertEqual(payload.metrics.first?.primaryMotivation, "For my health")
+
+        MetricCostStore.clearAll()
+        _ = try ExportImportService.importPayload(payload, into: context)
+
+        XCTAssertEqual(MetricCostStore.costPerUnit(for: metric.id), 8)
+        let importedMetrics = try context.fetch(FetchDescriptor<Metric>())
+        XCTAssertEqual(importedMetrics.first?.primaryMotivation, "For my health")
+    }
+
+    func testExportImportRoundTripsMood() throws {
+        let metric = Metric(name: "Exercise", habitType: .positive)
+        context.insert(metric)
+
+        let day = Calendar.current.startOfDay(for: Date())
+        let entry = MetricEntry(metricID: metric.id, date: day, value: true, mood: "😊", hasBeenLogged: true)
+        context.insert(entry)
+        try context.save()
+
+        let payload = try ExportImportService.exportRoundTrip(metrics: [metric], entries: [entry])
+        XCTAssertEqual(payload.entries.first?.mood, "😊")
+
+        _ = try ExportImportService.importPayload(payload, into: context)
+        let importedEntries = try context.fetch(FetchDescriptor<MetricEntry>())
+        XCTAssertEqual(importedEntries.first?.mood, "😊")
+    }
+
     func testLegacyExportWithoutOptionalFieldsStillDecodes() throws {
         let metricID = UUID()
         let entryID = UUID()
@@ -67,7 +109,9 @@ final class ExportImportTests: XCTestCase {
                     name: "Read",
                     createdAt: Date(timeIntervalSince1970: 0),
                     habitType: "positive",
-                    hasBeenLogged: nil
+                    hasBeenLogged: nil,
+                    primaryMotivation: nil,
+                    costPerUnit: nil
                 )
             ],
             entries: [
@@ -81,6 +125,7 @@ final class ExportImportTests: XCTestCase {
                     starred: nil,
                     quantity: nil,
                     unit: nil,
+                    mood: nil,
                     hasBeenLogged: nil
                 )
             ],

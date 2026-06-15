@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Export / Import
 /// Versioned JSON export format for TrackBoth data.
 enum TrackBothExport {
-    static let currentSchemaVersion = 2
+    static let currentSchemaVersion = 3
 
     struct Payload: Codable, Equatable {
         let schemaVersion: Int
@@ -18,6 +18,8 @@ enum TrackBothExport {
         let createdAt: Date
         let habitType: String
         let hasBeenLogged: Bool?
+        let primaryMotivation: String?
+        let costPerUnit: String?
     }
 
     struct EntryRecord: Codable, Equatable {
@@ -30,6 +32,7 @@ enum TrackBothExport {
         let starred: Bool?
         let quantity: Int?
         let unit: String?
+        let mood: String?
         let hasBeenLogged: Bool?
     }
 
@@ -42,7 +45,9 @@ enum TrackBothExport {
                     name: metric.name,
                     createdAt: metric.createdAt,
                     habitType: metric.habitType.rawValue,
-                    hasBeenLogged: metric.hasBeenLogged
+                    hasBeenLogged: metric.hasBeenLogged,
+                    primaryMotivation: metric.primaryMotivation,
+                    costPerUnit: MetricCostStore.encodedCostPerUnit(for: metric.id)
                 )
             },
             entries: entries.map { entry in
@@ -56,6 +61,7 @@ enum TrackBothExport {
                     starred: entry.starred,
                     quantity: entry.quantity,
                     unit: entry.unit,
+                    mood: entry.mood,
                     hasBeenLogged: entry.hasBeenLogged
                 )
             },

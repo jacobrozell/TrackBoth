@@ -464,7 +464,8 @@ enum ProductSurface {
 | [`docs/release/1.0.0-ship-checklist.md`](1.0.0-ship-checklist.md) | Pre-submission checklist (create in Phase 9) |
 | [`specs/TrackingSemanticsSpec.md`](../../specs/TrackingSemanticsSpec.md) | Habit/vice boolean rules, streaks, logged status |
 | [`specs/HomeSpec.md`](../../specs/HomeSpec.md) | Home UX spec |
-| [`specs/planned/README.md`](../../specs/planned/README.md) | Post-1.0 features (widget, watch, etc.) |
+| [`docs/product/competitive-strategy.md`](../product/competitive-strategy.md) | Naming, Clean Slate analysis, post-1.0 competitive roadmap |
+| [`specs/planned/CompetitiveFeaturesSpec.md`](../../specs/planned/CompetitiveFeaturesSpec.md) | Actionable 1.1/1.2 features from competitive analysis |
 | [`TODOs/TODO.md`](../../TODOs/TODO.md) | Legacy TODO — superseded by specs + this plan for 1.0 |
 
 ---

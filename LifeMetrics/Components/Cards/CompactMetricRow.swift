@@ -64,13 +64,11 @@ struct CompactMetricRow: View {
 
     private var compactRow: some View {
         HStack(spacing: 12) {
-            HStack(spacing: 12) {
-                toggleButton
-                metricDetails
-                Spacer()
-            }
-            .contentShape(Rectangle())
+            toggleButton
+            metricDetails
+            streakBadge
         }
+        .contentShape(Rectangle())
     }
 
     private var accessibilityRow: some View {
@@ -95,9 +93,91 @@ struct CompactMetricRow: View {
                 )
 
             metadataRow
+
+            if let badge = streakBadgeModel {
+                HStack(spacing: 6) {
+                    Image(systemName: "flame.fill")
+                        .foregroundColor(Color.currentWarning)
+                    Text(badge.label)
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundColor(Color.currentText)
+                }
+            }
+
+            if let recovery = recoveryBadgeLabel {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.up.heart.fill")
+                        .foregroundColor(Color.currentSuccess)
+                    Text(recovery)
+                        .font(.caption)
+                        .foregroundColor(Color.currentSuccess)
+                }
+            }
         }
         .contentShape(Rectangle())
         .onTapGesture { onLog() }
+    }
+
+    private struct StreakBadgeModel {
+        let count: Int
+        let label: String
+    }
+
+    private var streakBadgeModel: StreakBadgeModel? {
+        let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
+        guard metric.hasBeenLogged, streak > 0 else { return nil }
+        let label = metric.habitType == .positive
+            ? StreakCopy.habitStreak(streak)
+            : StreakCopy.viceClean(streak)
+        return StreakBadgeModel(count: streak, label: label)
+    }
+
+    @ViewBuilder
+    private var streakBadge: some View {
+        if let badge = streakBadgeModel {
+            VStack(spacing: 2) {
+                Text("\(badge.count)")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .monospacedDigit()
+                    .foregroundColor(Color.currentWarning)
+                Text(metric.habitType == .positive ? "streak" : "clean")
+                    .font(.caption2)
+                    .foregroundColor(Color.currentSecondaryText)
+                    .textCase(.uppercase)
+
+                if let recovery = recoveryBadgeLabel {
+                    Text(recovery)
+                        .font(.caption2)
+                        .fontWeight(.medium)
+                        .foregroundColor(Color.currentSuccess)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                }
+            }
+            .frame(minWidth: 52)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(streakBadgeAccessibilityLabel(badge: badge))
+        }
+    }
+
+    private var recoveryBadgeLabel: String? {
+        guard metric.habitType == .vice,
+              MetricDisplayPreferences.showTimeSinceSlip(for: metric.id) else { return nil }
+        return ViceSlipTimer.compactRecoveryLabel(
+            metricID: metric.id,
+            entries: entries,
+            asOf: selectedDate
+        )
+    }
+
+    private func streakBadgeAccessibilityLabel(badge: StreakBadgeModel) -> String {
+        if let recovery = recoveryBadgeLabel {
+            return "\(badge.label). \(recovery)"
+        }
+        return badge.label
     }
 
     private var toggleButton: some View {
@@ -165,26 +245,13 @@ struct CompactMetricRow: View {
 
             metadataRow
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .onTapGesture { onLog() }
         .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
     }
 
     private var metadataRow: some View {
         HStack(spacing: 10) {
-            let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
-            if metric.hasBeenLogged, streak > 0 {
-                HStack(spacing: 4) {
-                    Image(systemName: "flame.fill")
-                        .foregroundColor(Color.currentWarning)
-                        .font(.caption)
-                    Text(metric.habitType == .positive
-                        ? StreakCopy.habitStreak(streak)
-                        : StreakCopy.viceClean(streak))
-                        .font(.caption)
-                        .foregroundColor(Color.currentSecondaryText)
-                }
-            }
-
             if let goal = metric.booleanGoals.first {
                 let progress = GoalUtils.calculateGoalProgress(for: goal, metric: metric, entries: entries, selectedDate: selectedDate)
                 HStack(spacing: 4) {
@@ -197,6 +264,18 @@ struct CompactMetricRow: View {
                 }
             }
 
+            if metric.habitType == .vice,
+               let savings = viceSavingsLabel {
+                HStack(spacing: 4) {
+                    Image(systemName: "dollarsign.circle.fill")
+                        .foregroundColor(Color.currentSuccess)
+                        .font(.caption)
+                    Text(savings)
+                        .font(.caption)
+                        .foregroundColor(Color.currentSuccess)
+                }
+            }
+
             Spacer()
 
             if let quantityString = selectedDateEntry?.quantityString {
@@ -205,6 +284,12 @@ struct CompactMetricRow: View {
                     .foregroundColor(Color.currentSecondaryText)
             }
         }
+    }
+
+    private var viceSavingsLabel: String? {
+        let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
+        let cost = MetricCostStore.costPerUnit(for: metric.id)
+        return ViceSavingsCalculator.savingsLabel(streak: streak, costPerUnit: cost)
     }
 
     private var optionsRow: some View {

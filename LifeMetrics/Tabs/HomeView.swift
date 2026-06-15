@@ -14,6 +14,7 @@ struct HomeView: View {
     // UI State
     @State private var showingLoggingSheetForMetric: Metric? = nil
     @State private var showingRowOptions: Bool = false
+    @State private var activeMilestone: MilestoneAnnouncement? = nil
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.isCompactLandscape) private var isCompactLandscape
@@ -52,7 +53,7 @@ struct HomeView: View {
                         EmptyStateView(
                             icon: "plus.circle.fill",
                             title: "No Habits Yet",
-                            subtitle: "Start tracking your habits and vices to build a better you",
+                            subtitle: "Build good habits and break bad ones — add your first metric to get started",
                             actionTitle: "Add Your First Habit",
                             action: { viewModel.showAddMetric() }
                         )
@@ -124,6 +125,10 @@ struct HomeView: View {
                 if viewModel.selectedDate > today {
                     viewModel.selectedDate = today
                 }
+                refreshMilestoneBanner()
+            }
+            .onChange(of: entries.count) { _, _ in
+                refreshMilestoneBanner()
             }
             .sheet(item: $viewModel.metricToEdit) { metric in
                 EditMetricView(metric: metric)
@@ -137,7 +142,9 @@ struct HomeView: View {
                         logger.info("SettingsView sheet presented")
                     }
             }
-            .sheet(item: $showingLoggingSheetForMetric) { metric in
+            .sheet(item: $showingLoggingSheetForMetric, onDismiss: {
+                refreshMilestoneBanner()
+            }) { metric in
                 LoggingSheet(metric: metric, selectedDate: viewModel.selectedDate)
             }
             .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
@@ -349,10 +356,13 @@ struct HomeView: View {
             spacing: 16,
             pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
         ) {
+            milestoneBannerSection
+
             Section(header: sectionHeader(title: "Habits", items: habits)) {
                 ForEach(habits) { metric in
                     CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
                         viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                        refreshMilestoneBanner()
                     } onLog: {
                         showingLoggingSheetForMetric = metric
                     } onEdit: {
@@ -368,6 +378,7 @@ struct HomeView: View {
                 ForEach(vices) { metric in
                     CompactMetricRow(metric: metric, selectedDate: viewModel.selectedDate, showOptions: showingRowOptions) {
                         viewModel.toggleMetricCompletion(metric, in: modelContext, entries: entries)
+                        refreshMilestoneBanner()
                     } onLog: {
                         showingLoggingSheetForMetric = metric
                     } onEdit: {
@@ -418,6 +429,25 @@ struct HomeView: View {
         let df = DateFormatter()
         df.dateFormat = "EEE, MMM d"
         return df.string(from: viewModel.selectedDate)
+    }
+
+    @ViewBuilder
+    private var milestoneBannerSection: some View {
+        if let activeMilestone {
+            MilestoneBannerView(announcement: activeMilestone) {
+                MilestoneStore.markAwarded(metricID: activeMilestone.metricID, threshold: activeMilestone.threshold)
+                refreshMilestoneBanner()
+            }
+            .padding(.horizontal, 4)
+        }
+    }
+
+    private func refreshMilestoneBanner() {
+        activeMilestone = MilestoneEvaluator.firstPending(
+            metrics: metrics,
+            entries: entries,
+            awardedLookup: MilestoneStore.awarded(for:)
+        )
     }
 
 }
