@@ -28,6 +28,7 @@ targets:
       - path: Utils
       - path: ViewModels
       - path: Views
+      - path: Features
       - path: WidgetShared
       - path: TrackBoth-Info.plist
         type: file

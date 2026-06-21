@@ -17,8 +17,18 @@ enum ProductSurface {
         #endif
     }
 
+    /// Forces Confidence 1.0 navigation in DEBUG (UI tests, screenshots).
+    static var forceLeanUI: Bool {
+        ProcessInfo.processInfo.arguments.contains("-lean_ui")
+    }
+
     static var showsDemoData: Bool { current == .development }
-    static var showsCharts: Bool { true }
+    static var showsGoals: Bool { current == .development && !forceLeanUI }
+    static var showsMotivation: Bool { current == .development && !forceLeanUI }
+    static var showsCharts: Bool { current == .development && !forceLeanUI }
+    static var showsMilestoneBanners: Bool { current == .development && !forceLeanUI }
+    static var showsExtendedRowMetadata: Bool { current == .development && !forceLeanUI }
+    static var showsExtendedThemes: Bool { current == .development && !forceLeanUI }
     static var showsWidget: Bool { current == .development }
     static var showsWatch: Bool { false }
     static var showsMotivationGame: Bool { false }
@@ -28,7 +38,12 @@ enum ProductSurface {
     static func isEnabled(_ feature: LeanFeature) -> Bool {
         switch feature {
         case .demoData: showsDemoData
+        case .goals: showsGoals
+        case .motivation: showsMotivation
         case .charts: showsCharts
+        case .milestoneBanners: showsMilestoneBanners
+        case .extendedRowMetadata: showsExtendedRowMetadata
+        case .extendedThemes: showsExtendedThemes
         case .widget: showsWidget
         case .watch: showsWatch
         case .motivationGame: showsMotivationGame
@@ -38,7 +53,12 @@ enum ProductSurface {
 
 enum LeanFeature {
     case demoData
+    case goals
+    case motivation
     case charts
+    case milestoneBanners
+    case extendedRowMetadata
+    case extendedThemes
     case widget
     case watch
     case motivationGame

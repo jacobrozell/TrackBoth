@@ -84,6 +84,16 @@ struct AppTheme: Equatable {
         .sunset,
         .midnight
     ]
+
+    /// Lean 1.0 ships light + dark only.
+    static let shipThemes: [AppTheme] = [
+        .ocean,
+        .midnight
+    ]
+
+    static var availableThemes: [AppTheme] {
+        ProductSurface.showsExtendedThemes ? allThemes : shipThemes
+    }
 }
 
 // MARK: - Theme Preview Helper

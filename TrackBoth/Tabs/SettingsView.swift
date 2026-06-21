@@ -27,22 +27,22 @@ struct SettingsView: View {
                 Color.currentBackground.ignoresSafeArea()
                 List {
                 Section {
-                    Button("Export Data") {
+                    Button {
                         logger.logUserAction("Export data button tapped")
                         exportData = generateExportData()
                         showingExportSheet = true
+                    } label: {
+                        Label("Export Data", systemImage: "square.and.arrow.up")
                     }
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsExportData)
-                    .foregroundColor(Color.currentPrimary)
-                    .listRowBackground(Color.currentSecondaryBackground)
 
-                    Button("Import Data") {
+                    Button {
                         logger.logUserAction("Import data button tapped")
                         showingImportPicker = true
+                    } label: {
+                        Label("Import Data", systemImage: "square.and.arrow.down")
                     }
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsImportData)
-                    .foregroundColor(Color.currentPrimary)
-                    .listRowBackground(Color.currentSecondaryBackground)
 
                     if ProductSurface.showsDemoData {
                         if DemoDataGenerator.hasDemoData() {
@@ -90,6 +90,7 @@ struct SettingsView: View {
                 .environment(\.defaultMinListRowHeight, 44)
             }
             .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Color.currentBackground, for: .navigationBar)
             .toolbarBackground(.visible, for: .navigationBar)
             .onAppear {
@@ -246,14 +247,12 @@ private struct SettingsHelpAndFeedbackSection: View {
                 identifier: AccessibilityIdentifiers.settingsSendFeedback
             )
 
-            if let appStoreReview = AppLinks.appStoreReview {
-                settingsLink(
-                    destination: appStoreReview,
-                    title: "Rate TrackBoth",
-                    systemImage: "star",
-                    identifier: AccessibilityIdentifiers.settingsRateApp
-                )
-            }
+            settingsLink(
+                destination: AppLinks.appStoreReview,
+                title: "Rate TrackBoth",
+                systemImage: "star",
+                identifier: AccessibilityIdentifiers.settingsRateApp
+            )
 
             if ProductSurface.showsAccessibilityMarketing {
                 settingsLink(
@@ -283,7 +282,6 @@ private struct SettingsHelpAndFeedbackSection: View {
             Label(title, systemImage: systemImage)
         }
         .accessibilityIdentifier(identifier)
-        .foregroundColor(Color.currentPrimary)
         .listRowBackground(Color.currentSecondaryBackground)
     }
 }
@@ -298,27 +296,14 @@ private struct SettingsAboutSection: View {
                 Label("View Onboarding", systemImage: "book.pages")
             }
             .accessibilityIdentifier(AccessibilityIdentifiers.settingsViewOnboarding)
-            .foregroundColor(Color.currentPrimary)
             .listRowBackground(Color.currentSecondaryBackground)
 
             Text(AppSupport.versionLabel)
                 .foregroundColor(Color.currentSecondaryText)
                 .listRowBackground(Color.currentSecondaryBackground)
 
-            if let buyDeveloperCoffeeURL = AppLinks.buyDeveloperCoffee {
-                Link(destination: buyDeveloperCoffeeURL) {
-                    Label("Buy Developer a Coffee", systemImage: "cup.and.saucer.fill")
-                }
-                .accessibilityIdentifier(AccessibilityIdentifiers.settingsBuyDeveloperCoffee)
-                .foregroundColor(Color.currentPrimary)
-                .listRowBackground(Color.currentSecondaryBackground)
-            }
         } header: {
             Text("About")
-        } footer: {
-            if AppLinks.buyDeveloperCoffee != nil {
-                Text("Optional tip to support development. Opens in Safari.")
-            }
         }
     }
 }
@@ -328,49 +313,72 @@ private struct SettingsAppearanceSection: View {
     @Environment(ThemeManager.self) private var themeManager
 
     var body: some View {
-        Section("Appearance") {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("App Theme")
-                    .font(.headline)
-                    .themedPrimaryText()
+        Section {
+            if ProductSurface.showsExtendedThemes {
+                extendedThemePicker
+            } else {
+                leanThemePicker
+            }
 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
-                        ForEach(AppTheme.allThemes, id: \.name) { theme in
-                            CompactThemeCard(
-                                theme: theme,
-                                isSelected: themeManager.currentAppTheme.name == theme.name
-                            ) {
-                                themeManager.updateAppTheme(theme)
-                            }
-                        }
+            if ProductSurface.showsExtendedThemes {
+                FontDesignPicker()
+            }
+        } header: {
+            Text("Appearance")
+        } footer: {
+            Text("Theme colors apply across Track, History, and Settings.")
+                .font(.footnote)
+        }
+    }
+
+    private var leanThemePicker: some View {
+        ForEach(AppTheme.availableThemes, id: \.name) { theme in
+            Button {
+                themeManager.updateAppTheme(theme)
+            } label: {
+                HStack {
+                    Label(theme.name, systemImage: themeIcon(for: theme))
+                    Spacer()
+                    if themeManager.currentAppTheme.name == theme.name {
+                        Image(systemName: "checkmark")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(Color.currentPrimary)
                     }
-                    .padding(.horizontal)
                 }
             }
-            .padding(.vertical, 8)
+            .foregroundStyle(Color.currentText)
             .listRowBackground(Color.currentSecondaryBackground)
+        }
+    }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Preview")
-                    .font(.subheadline)
-                    .themedSecondaryText()
-
-                themeManager.currentAppTheme.preview()
-                    .frame(maxWidth: .infinity)
+    private var extendedThemePicker: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(AppTheme.availableThemes, id: \.name) { theme in
+                        CompactThemeCard(
+                            theme: theme,
+                            isSelected: themeManager.currentAppTheme.name == theme.name
+                        ) {
+                            themeManager.updateAppTheme(theme)
+                        }
+                    }
+                }
             }
-            .padding(.vertical, 8)
-            .listRowBackground(Color.currentSecondaryBackground)
-
-            FontDesignPicker()
 
             Button("Reset to Default Theme") {
                 logger.logUserAction("Reset theme button tapped")
                 themeManager.resetToDefaultTheme()
             }
-            .foregroundColor(Color.currentWarning)
-            .listRowBackground(Color.currentSecondaryBackground)
+            .font(.subheadline)
+            .foregroundStyle(Color.currentWarning)
         }
+        .padding(.vertical, 4)
+        .listRowBackground(Color.currentSecondaryBackground)
+    }
+
+    private func themeIcon(for theme: AppTheme) -> String {
+        theme.name == "Midnight" ? "moon.fill" : "sun.max.fill"
     }
 }
 

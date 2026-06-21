@@ -7,6 +7,7 @@ struct OnboardingView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     @State private var currentPage = 0
     @State private var selectedHabitPresets: Set<MetricPreset> = []
@@ -18,30 +19,60 @@ struct OnboardingView: View {
         dynamicTypeSize.usesExpandedChrome || verticalSizeClass == .compact
     }
 
+    private var isIPad: Bool {
+        horizontalSizeClass == .regular && verticalSizeClass == .regular
+    }
+
     var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [Color.currentPrimary.opacity(0.1), Color.currentAccent.opacity(0.1)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-            .ignoresSafeArea()
+        GeometryReader { geometry in
+            let isLandscape = geometry.size.width > geometry.size.height
 
-            VStack(spacing: 0) {
-                TabView(selection: $currentPage) {
-                    ForEach(pages.indices, id: \.self) { index in
-                        pageContent(for: pages[index])
-                            .tag(index)
-                    }
+            ZStack {
+                LinearGradient(
+                    colors: [Color.currentPrimary.opacity(0.1), Color.currentAccent.opacity(0.1)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .ignoresSafeArea()
+
+                if isIPad {
+                    iPadLayout(isLandscape: isLandscape, size: geometry.size)
+                } else {
+                    phoneLayout
                 }
-                .tabViewStyle(.page(indexDisplayMode: .never))
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                bottomControls
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var phoneLayout: some View {
+        VStack(spacing: 0) {
+            TabView(selection: $currentPage) {
+                ForEach(pages.indices, id: \.self) { index in
+                    pageContent(for: pages[index])
+                        .tag(index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            bottomControls
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    @ViewBuilder
+    private func iPadLayout(isLandscape: Bool, size: CGSize) -> some View {
+        VStack(spacing: 0) {
+            pageContent(for: pages[currentPage])
+                .id(currentPage)
+                .frame(maxWidth: isLandscape ? 700 : 600)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+            bottomControls
+                .frame(maxWidth: isLandscape ? 400 : 500)
+                .padding(.bottom, isLandscape ? 24 : 32)
+        }
     }
 
     @ViewBuilder
@@ -87,11 +118,22 @@ struct OnboardingView: View {
 
             VStack(spacing: 12) {
                 if currentPage > 0 {
-                    Button("Previous") {
-                        withAnimation { currentPage -= 1 }
+                    HStack {
+                        Button("Previous") {
+                            withAnimation { currentPage -= 1 }
+                        }
+                        .buttonStyle(SecondaryButtonStyle())
+
+                        Spacer()
+
+                        if currentPage < pages.count - 1 && currentPage > 0 {
+                            Button("Skip") {
+                                logger.logUserAction("Skip onboarding")
+                                completeOnboarding()
+                            }
+                            .foregroundColor(Color.currentSecondaryText)
+                        }
                     }
-                    .buttonStyle(SecondaryButtonStyle())
-                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
 
                 if currentPage < pages.count - 1 {
@@ -312,7 +354,7 @@ struct OnboardingPage {
         OnboardingPage(
             kind: .ready,
             title: "One tap a day",
-            description: "Log each habit or vice with a single tap. We handle streaks, goals, charts, and your motivation library.",
+            description: "Log each habit or vice with a single tap on Track. Review your progress anytime in History.",
             icon: "hand.tap.fill",
             color: Color.currentAccent
         )

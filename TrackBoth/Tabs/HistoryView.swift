@@ -23,6 +23,7 @@ struct HistoryView: View {
 private struct HistoryViewContent: View {
     @Bindable var viewModel: HistoryViewModel
     let dynamicTypeSize: DynamicTypeSize
+    @Environment(\.deviceLayout) private var deviceLayout
 
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
@@ -37,29 +38,54 @@ private struct HistoryViewContent: View {
     }
 
     var body: some View {
-        MetricTabShell(title: "History") { geometry, usesSplit in
+        NavigationStack {
             Group {
                 if metrics.isEmpty {
                     noHabitsEmptyState
                 } else if !metrics.contains(where: \.hasBeenLogged) {
                     noHistoryEmptyState
                 } else {
-                    FilteredSplitTabLayout(
-                        geometry: geometry,
-                        usesSplit: usesSplit,
-                        filterMetrics: metrics,
-                        selectedFilter: $viewModel.selectedFilter
-                    ) {
-                        historyScrollContent(idPrefix: usesSplit ? "landscape" : "portrait", geometry: geometry)
-                    }
+                    historyLayout
                 }
             }
+            .themedBackground()
+            .navigationTitle("History")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbarBackground(Color.currentBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onAppear {
             logger.info("HistoryView appeared", category: .ui)
         }
         .sheet(isPresented: $viewModel.showingAddMetric) {
             AddMetricView()
+        }
+    }
+
+    @ViewBuilder
+    private var historyLayout: some View {
+        switch deviceLayout {
+        case .padLandscape:
+            GeometryReader { geometry in
+                HistoryPadLandscapeLayout(
+                    viewModel: viewModel,
+                    metrics: metrics,
+                    entries: entries,
+                    streakEntries: streakEntries,
+                    dynamicTypeSize: dynamicTypeSize,
+                    totalWidth: geometry.size.width,
+                    totalHeight: geometry.size.height
+                )
+            }
+        default:
+            HistoryCompactLayout(
+                viewModel: viewModel,
+                metrics: metrics,
+                entries: entries,
+                streakEntries: streakEntries,
+                dynamicTypeSize: dynamicTypeSize
+            )
         }
     }
 
@@ -83,50 +109,6 @@ private struct HistoryViewContent: View {
             action: { viewModel.showAddMetric() }
         )
         .background(Color.currentBackground)
-    }
-
-    @ViewBuilder
-    private func historyScrollContent(idPrefix: String, geometry: GeometryProxy?) -> some View {
-        let recentEntries = viewModel.recentEntries(entries, metrics: metrics)
-
-        ScrollView {
-            LazyVStack(
-                spacing: 16,
-                pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
-            ) {
-                Section(header: AdaptiveSectionHeader(
-                    title: "Calendar View",
-                    subtitle: "Monthly overview of your progress",
-                    icon: "calendar",
-                    iconColor: Color.currentPrimary
-                )) {
-                    CalendarGridView(
-                        entries: viewModel.calendarEntries(entries, metrics: metrics),
-                        selectedFilter: viewModel.selectedFilter,
-                        selectedDate: $viewModel.selectedDate,
-                        metrics: metrics
-                    )
-                    .padding(.horizontal, 16)
-                }
-
-                if !recentEntries.isEmpty {
-                    Section(header: AdaptiveSectionHeader(
-                        title: "Recent Entries",
-                        subtitle: "Your latest activity",
-                        icon: "clock",
-                        iconColor: Color.currentSecondaryText
-                    )) {
-                        ForEach(recentEntries.prefix(20)) { entry in
-                            HistoryEntryCardView(entry: entry, metrics: metrics, entries: streakEntries)
-                        }
-                    }
-                }
-            }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .adaptiveScrollInset()
-        }
-        .id("history-\(idPrefix)-\(Int(geometry?.size.width ?? 0))-\(Int(geometry?.size.height ?? 0))")
     }
 }
 

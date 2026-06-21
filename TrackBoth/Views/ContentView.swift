@@ -5,7 +5,7 @@ import SwiftData
 /// Main container view with tab navigation
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var selectedTab = 0
+    @State private var selectedTab = MainTab.track.rawValue
     @State private var showingOnboarding = Self.shouldShowOnboarding
     @Environment(ThemeManager.self) private var themeManager
     @AppStorage("dismissedStoreRecoveryBanner") private var dismissedStoreRecoveryBanner = false
@@ -41,48 +41,55 @@ struct ContentView: View {
                 GeometryReader { geometry in
                     ZStack(alignment: .top) {
                         TabView(selection: $selectedTab) {
-                            HomeView()
-                                .accessibilityIdentifier(AccessibilityIdentifiers.tabHome)
-                                .tabItem { tabItem(for: .home, systemImage: "house.fill") }
-                                .tag(0)
-
-                            GoalsView()
-                                .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
-                                .tabItem { tabItem(for: .goals, systemImage: "target") }
-                                .tag(1)
-
-                            MotivationsView()
-                                .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
-                                .tabItem { tabItem(for: .motivation, systemImage: "heart.fill") }
-                                .tag(2)
+                            TrackScreen()
+                                .accessibilityIdentifier(AccessibilityIdentifiers.tabTrack)
+                                .tabItem { tabItem(for: .track, systemImage: "checkmark.circle.fill") }
+                                .tag(MainTab.track.rawValue)
 
                             HistoryView()
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabHistory)
                                 .tabItem { tabItem(for: .history, systemImage: "calendar.badge.clock") }
-                                .tag(3)
+                                .tag(MainTab.history.rawValue)
+
+                            SettingsView()
+                                .accessibilityIdentifier(AccessibilityIdentifiers.tabSettings)
+                                .tabItem { tabItem(for: .settings, systemImage: "gear") }
+                                .tag(MainTab.settings.rawValue)
+
+                            if ProductSurface.showsGoals {
+                                GoalsView()
+                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
+                                    .tabItem { tabItem(for: .goals, systemImage: "target") }
+                                    .tag(MainTab.goals.rawValue)
+                            }
+
+                            if ProductSurface.showsMotivation {
+                                MotivationsView()
+                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
+                                    .tabItem { tabItem(for: .motivation, systemImage: "heart.fill") }
+                                    .tag(MainTab.motivation.rawValue)
+                            }
 
                             if ProductSurface.showsCharts {
                                 ChartsView()
                                     .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
                                     .tabItem { tabItem(for: .charts, systemImage: "chart.line.uptrend.xyaxis") }
-                                    .tag(4)
+                                    .tag(MainTab.charts.rawValue)
                             }
                         }
-                        .publishAdaptiveLayoutMode(
+                        .publishDeviceLayout(
                             horizontal: horizontalSizeClass,
                             vertical: verticalSizeClass,
                             size: geometry.size
                         )
                         .id(themeManager.currentAppTheme.name)
                         .onChange(of: selectedTab) { oldValue, newValue in
-                            let tabNames = ["Home", "Goals", "Motivation", "History", "Charts"]
-                            let tabName = newValue < tabNames.count ? tabNames[newValue] : "Unknown"
-                            logger.logUserAction("Tab changed", details: "From \(oldValue) to \(newValue) (\(tabName))")
+                            logger.logUserAction("Tab changed", details: "From \(oldValue) to \(newValue) (\(MainTab(rawValue: newValue)?.logName ?? "Unknown"))")
                         }
 
                         if shouldShowRecoveryBanner {
                             MigrationRecoveryView(
-                                onExportTapped: { selectedTab = 0 },
+                                onExportTapped: { selectedTab = MainTab.settings.rawValue },
                                 onDismiss: { dismissedStoreRecoveryBanner = true }
                             )
                         }
@@ -109,7 +116,7 @@ struct ContentView: View {
         }
         .onOpenURL { url in
             guard url.scheme == "trackboth" else { return }
-            selectedTab = 0
+            selectedTab = MainTab.track.rawValue
         }
     }
 
@@ -135,6 +142,27 @@ struct ContentView: View {
         }
         guard force || screenshot || !DemoDataGenerator.hasDemoData() else { return }
         DemoDataGenerator.generateDemoData(modelContext: modelContext)
+    }
+}
+
+// MARK: - MainTab
+private enum MainTab: Int {
+    case track = 0
+    case history = 1
+    case settings = 2
+    case goals = 3
+    case motivation = 4
+    case charts = 5
+
+    var logName: String {
+        switch self {
+        case .track: return "Track"
+        case .history: return "History"
+        case .settings: return "Settings"
+        case .goals: return "Goals"
+        case .motivation: return "Motivation"
+        case .charts: return "Charts"
+        }
     }
 }
 

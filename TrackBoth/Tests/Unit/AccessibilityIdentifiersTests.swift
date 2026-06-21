@@ -4,7 +4,8 @@ import XCTest
 final class AccessibilityIdentifiersTests: XCTestCase {
 
     func testCoreIdentifiersAreNonEmpty() {
-        XCTAssertFalse(AccessibilityIdentifiers.tabHome.isEmpty)
+        XCTAssertFalse(AccessibilityIdentifiers.tabTrack.isEmpty)
+        XCTAssertFalse(AccessibilityIdentifiers.tabSettings.isEmpty)
         XCTAssertFalse(AccessibilityIdentifiers.fabAddMetric.isEmpty)
         XCTAssertFalse(AccessibilityIdentifiers.settingsButton.isEmpty)
         XCTAssertFalse(AccessibilityIdentifiers.loggingSaveButton.isEmpty)

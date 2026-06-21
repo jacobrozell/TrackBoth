@@ -73,11 +73,13 @@ enum AccessibilityCopy {
     }
 
     enum TabItem {
-        case home, goals, motivation, history, charts
+        case track, home, settings, goals, motivation, history, charts
 
         var standardTitle: String {
             switch self {
+            case .track: return "Track"
             case .home: return "Home"
+            case .settings: return "Settings"
             case .goals: return "Goals"
             case .motivation: return "Motivation"
             case .history: return "History"

@@ -63,6 +63,7 @@ struct MetricFilterChipRow: View {
     let metrics: [Metric]
     @Binding var selectedFilter: MetricFilter
     var includeIndividualMetrics: Bool = true
+    var usesBarBackground: Bool = true
 
     private var verticalPadding: CGFloat { isCompactLandscape ? 4 : 8 }
     private var usesCompactFilter: Bool { dynamicTypeSize.usesExpandedChrome }
@@ -85,7 +86,11 @@ struct MetricFilterChipRow: View {
             }
         }
         .padding(.vertical, verticalPadding)
-        .background(Color.currentSecondaryBackground)
+        .background {
+            if usesBarBackground {
+                Color.currentSecondaryBackground
+            }
+        }
     }
 
     @ViewBuilder
@@ -128,10 +133,12 @@ struct MetricFilterSidebar: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.subheadline)
-                .fontWeight(.medium)
-                .foregroundColor(Color.currentSecondaryText)
+            if !title.isEmpty {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.medium)
+                    .foregroundColor(Color.currentSecondaryText)
+            }
 
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: 8) {

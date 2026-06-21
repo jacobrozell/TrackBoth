@@ -9,41 +9,31 @@ struct CompactThemeCard: View {
         Button(action: onTap) {
             VStack(spacing: 8) {
                 HStack(spacing: 4) {
-                    Circle()
-                        .fill(theme.primaryColor)
-                        .frame(width: 16, height: 16)
-
-                    Circle()
-                        .fill(theme.secondaryColor)
-                        .frame(width: 16, height: 16)
-
-                    Circle()
-                        .fill(theme.accentColor)
-                        .frame(width: 16, height: 16)
+                    Circle().fill(theme.primaryColor).frame(width: 14, height: 14)
+                    Circle().fill(theme.accentColor).frame(width: 14, height: 14)
+                    Circle().fill(theme.successColor).frame(width: 14, height: 14)
                 }
 
                 Text(theme.name)
-                    .font(.caption)
-                    .foregroundColor(theme.textColor)
-
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(theme.textColor)
+            }
+            .frame(width: 88, height: 72)
+            .background(theme.backgroundColor, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isSelected ? theme.primaryColor : Color.clear, lineWidth: 2)
+            }
+            .overlay(alignment: .topTrailing) {
                 if isSelected {
-                    Image(systemName: "checkmark")
+                    Image(systemName: "checkmark.circle.fill")
                         .font(.caption)
-                        .foregroundColor(theme.primaryColor)
+                        .foregroundStyle(theme.primaryColor)
+                        .padding(6)
                 }
             }
-            .padding(8)
-            .background(theme.backgroundColor)
-            .cornerRadius(8)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(
-                        isSelected ? theme.primaryColor : Color.clear,
-                        lineWidth: 2
-                    )
-            )
         }
-        .buttonStyle(PlainButtonStyle())
-        .frame(width: 80)
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

@@ -21,10 +21,11 @@ final class TrackBothUITests: XCTestCase {
         UIDevice.current.userInterfaceIdiom == .pad
     }
 
-    private func launch(skipOnboarding: Bool = true, seedDemo: Bool = false) {
+    private func launch(skipOnboarding: Bool = true, seedDemo: Bool = false, leanUI: Bool = true) {
         var args: [String] = []
         if skipOnboarding { args.append("-skip_onboarding") }
         if seedDemo { args.append("-force_seed_demo") }
+        if leanUI { args.append("-lean_ui") }
         app.launchArguments = args
         app.launchEnvironment = [
             "UI_TEST_RESET": "1",
@@ -35,6 +36,14 @@ final class TrackBothUITests: XCTestCase {
 
     private func launchWithDemoData() {
         launch(seedDemo: true)
+    }
+
+    private var leanTabNames: [String] {
+        ["Track", "History", "Settings"]
+    }
+
+    private var devTabNames: [String] {
+        leanTabNames + ["Goals", "Motivation", "Charts"]
     }
 
     /// iPhone uses a bottom tab bar; iPad uses a floating top tab strip with nested cells.
@@ -60,7 +69,8 @@ final class TrackBothUITests: XCTestCase {
 
     private func tabIdentifier(for name: String) -> String? {
         switch name {
-        case "Home": return "tab_home"
+        case "Track", "Home": return "tab_track"
+        case "Settings": return "tab_settings"
         case "Goals": return "tab_goals"
         case "Motivation": return "tab_motivation"
         case "History": return "tab_history"
@@ -71,6 +81,7 @@ final class TrackBothUITests: XCTestCase {
 
     private func tabLabels(for name: String) -> [String] {
         switch name {
+        case "Track", "Home": return ["Track", "Home"]
         case "Motivation": return ["Motiv", "Motivation"]
         case "History": return ["Past", "History"]
         case "Charts": return ["Stats", "Charts"]
@@ -88,21 +99,32 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(tab(named: name).waitForExistence(timeout: 10), "Missing tab: \(name)")
     }
 
-    func testLaunchShowsMainTabs() throws {
+    func testLaunchShowsLeanMainTabs() throws {
         launch()
         XCTAssertTrue(app.wait(for: .runningForeground, timeout: 10))
-        for name in ["Home", "Goals", "Motivation", "History", "Charts"] {
+        for name in leanTabNames {
             assertTabExists(named: name)
+        }
+    }
+
+    func testAllLeanTabsAreReachable() throws {
+        launch()
+        for name in ["History", "Settings", "Track"] {
+            tapTab(named: name)
+            assertOnTab(named: name)
         }
     }
 
     private func assertOnTab(named name: String) {
         switch name {
-        case "Home":
+        case "Track", "Home":
             XCTAssertTrue(
-                app.navigationBars["TrackBoth"].waitForExistence(timeout: 10)
-                    || app.staticTexts["HABITS"].waitForExistence(timeout: 5)
+                app.navigationBars["Track"].waitForExistence(timeout: 10)
+                    || app.staticTexts["Habits"].waitForExistence(timeout: 5)
+                    || app.staticTexts["No Habits Yet"].waitForExistence(timeout: 5)
             )
+        case "Settings":
+            XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 10))
         case "Goals":
             XCTAssertTrue(
                 app.navigationBars["Goals"].waitForExistence(timeout: 10)
@@ -132,14 +154,6 @@ final class TrackBothUITests: XCTestCase {
         }
     }
 
-    func testAllPrimaryTabsAreReachable() throws {
-        launch()
-        for name in ["Goals", "Motivation", "History", "Charts", "Home"] {
-            tapTab(named: name)
-            assertOnTab(named: name)
-        }
-    }
-
     func testHistoryTabNavigation() throws {
         launch()
         tapTab(named: "History")
@@ -148,47 +162,22 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(onHistory)
     }
 
-    func testChartsTabShowsTitleOrEmptyState() throws {
+    func testSettingsTabOpens() throws {
         launch()
-        tapTab(named: "Charts")
-        let onCharts = app.navigationBars["Charts"].waitForExistence(timeout: 10)
-            || app.staticTexts["Your Journey Starts Here"].waitForExistence(timeout: 5)
-        XCTAssertTrue(onCharts)
-    }
-
-    func testSettingsButtonExistsOnHome() throws {
-        launch()
-        tapTab(named: "Home")
-        let hasSettings = app.buttons["settings_button"].waitForExistence(timeout: 10)
-            || app.buttons["Settings"].waitForExistence(timeout: 5)
-        XCTAssertTrue(hasSettings)
-    }
-
-    func testSettingsOnlyOnHome() throws {
-        launch()
-        tapTab(named: "Goals")
-        XCTAssertFalse(app.buttons["settings_button"].waitForExistence(timeout: 2))
-        tapTab(named: "Home")
-        XCTAssertTrue(app.buttons["settings_button"].waitForExistence(timeout: 10))
-    }
-
-    func testSettingsSheetOpens() throws {
-        launch()
-        tapTab(named: "Home")
-        let settingsButton = app.buttons["settings_button"].exists
-            ? app.buttons["settings_button"]
-            : app.buttons["Settings"]
-        XCTAssertTrue(settingsButton.waitForExistence(timeout: 10))
-        settingsButton.tap()
+        tapTab(named: "Settings")
         XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["Appearance"].waitForExistence(timeout: 5))
+        XCTAssertTrue(
+            app.staticTexts["Appearance"].waitForExistence(timeout: 5)
+                || app.buttons["settings_export_data"].waitForExistence(timeout: 5)
+        )
     }
 
     func testPortraitFABHasCorrectIdentifier() throws {
         try XCTSkipIf(isPad, "Portrait FAB is iPhone-only")
 
-        launchWithDemoData()
-        tapTab(named: "Home")
+        launch(seedDemo: true)
+        tapTab(named: "Track")
+        XCTAssertTrue(app.staticTexts["Habits"].waitForExistence(timeout: 10))
         let addButton = app.buttons["fab_add_metric"]
         XCTAssertTrue(addButton.waitForExistence(timeout: 10))
     }
@@ -207,28 +196,38 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(getStarted.waitForExistence(timeout: 5))
         getStarted.tap()
 
-        assertTabExists(named: "Home")
-        assertOnTab(named: "Home")
+        assertTabExists(named: "Track")
+        assertOnTab(named: "Track")
     }
 
-    func testGoalsTabShowsDemoGoals() throws {
-        launchWithDemoData()
-        tapTab(named: "Goals")
-        XCTAssertFalse(app.staticTexts["No Goals Set"].waitForExistence(timeout: 2))
-        XCTAssertTrue(app.staticTexts["Completion Goals"].waitForExistence(timeout: 10))
+    func testOnboardingSkipCompletesToMainTabs() throws {
+        launch(skipOnboarding: false)
+        XCTAssertTrue(app.staticTexts["Welcome to TrackBoth"].waitForExistence(timeout: 10))
+
+        let next = app.buttons["Next"]
+        XCTAssertTrue(next.waitForExistence(timeout: 5))
+        next.tap()
+
+        let skip = app.buttons["Skip"]
+        XCTAssertTrue(skip.waitForExistence(timeout: 5))
+        skip.tap()
+
+        assertTabExists(named: "Track")
+        assertOnTab(named: "Track")
     }
 
-    func testHomeShowsTrackBothTitle() throws {
+    func testTrackShowsNavigationTitle() throws {
         launch()
-        XCTAssertTrue(app.navigationBars["TrackBoth"].waitForExistence(timeout: 10)
-            || app.staticTexts["TrackBoth"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.navigationBars["Track"].waitForExistence(timeout: 10)
+            || app.staticTexts["Track"].waitForExistence(timeout: 5))
     }
 
-    func testCompactLandscapeShowsToolbarAddOnHome() throws {
+    func testCompactLandscapeShowsToolbarAddOnTrack() throws {
         try XCTSkipIf(isPad, "Compact landscape is iPhone-only")
 
-        launchWithDemoData()
-        tapTab(named: "Home")
+        launch(seedDemo: true)
+        tapTab(named: "Track")
+        XCTAssertTrue(app.staticTexts["Habits"].waitForExistence(timeout: 10))
 
         XCUIDevice.shared.orientation = .landscapeLeft
         addTeardownBlock {
@@ -240,41 +239,7 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(addButton.isHittable)
     }
 
-    func testCompactLandscapeGoalsTabReachable() throws {
-        try XCTSkipIf(isPad, "Compact landscape is iPhone-only")
-
-        launchWithDemoData()
-        XCUIDevice.shared.orientation = .landscapeLeft
-        addTeardownBlock {
-            XCUIDevice.shared.orientation = .portrait
-        }
-
-        tapTab(named: "Goals")
-
-        XCTAssertTrue(
-            app.navigationBars["Goals"].waitForExistence(timeout: 10)
-                || app.buttons["fab_add_metric"].waitForExistence(timeout: 5)
-        )
-    }
-
-    func testCompactLandscapeChartsTabReachable() throws {
-        try XCTSkipIf(isPad, "Compact landscape is iPhone-only")
-
-        launchWithDemoData()
-        XCUIDevice.shared.orientation = .landscapeLeft
-        addTeardownBlock {
-            XCUIDevice.shared.orientation = .portrait
-        }
-
-        tapTab(named: "Charts")
-
-        XCTAssertTrue(
-            app.navigationBars["Charts"].waitForExistence(timeout: 10)
-                || app.staticTexts["Your Journey Starts Here"].waitForExistence(timeout: 5)
-        )
-    }
-
-    func testIPadLandscapeHomeUsesSidebarLayout() throws {
+    func testIPadLandscapeTrackUsesSidebarLayout() throws {
         try XCTSkipIf(isPhone, "Requires iPad simulator")
 
         launchWithDemoData()
@@ -283,6 +248,8 @@ final class TrackBothUITests: XCTestCase {
             XCUIDevice.shared.orientation = .portrait
         }
 
+        tapTab(named: "Track")
+
         let habitsStat = app.staticTexts.matching(
             NSPredicate(format: "label CONTAINS[c] %@", "HABITS")
         ).firstMatch
@@ -290,4 +257,30 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Habits"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["fab_add_metric"].waitForExistence(timeout: 5))
     }
+
+    #if DEBUG
+    func testDevBuildShowsExtendedTabs() throws {
+        try XCTSkipIf(isPhone, "Extended tabs require iPad tab bar space")
+        launch(leanUI: false)
+        for name in devTabNames {
+            assertTabExists(named: name)
+        }
+    }
+
+    func testGoalsTabShowsDemoGoals() throws {
+        launch(seedDemo: true, leanUI: false)
+        tapTab(named: "Goals")
+        XCTAssertFalse(app.staticTexts["No Goals Set"].waitForExistence(timeout: 2))
+        XCTAssertTrue(app.staticTexts["Completion Goals"].waitForExistence(timeout: 10))
+    }
+
+    func testChartsTabShowsTitleOrEmptyState() throws {
+        try XCTSkipIf(isPhone, "Charts tab requires iPad when extended tabs are shown")
+        launch(leanUI: false)
+        tapTab(named: "Charts")
+        let onCharts = app.navigationBars["Charts"].waitForExistence(timeout: 10)
+            || app.staticTexts["Your Journey Starts Here"].waitForExistence(timeout: 5)
+        XCTAssertTrue(onCharts)
+    }
+    #endif
 }
