@@ -10,7 +10,7 @@ Prevent spec drift, duplication conflicts, and ambiguous ownership so implementa
 
 | Topic | Authoritative spec |
 |-------|-------------------|
-| Persistence models and migration policy | `specs/SwiftData.md`, `specs/DataSchemaSpec.md` |
+| Persistence models and migration policy | `Specs/SwiftData.md`, `Specs/DataSchemaSpec.md`, [`docs/release/1.0.0-schema-baseline.md`](../docs/release/1.0.0-schema-baseline.md) |
 | Architecture boundaries | `specs/ArchitectureSpec.md` |
 | Runtime dependencies | `specs/TechStackSpec.md` |
 | Habit/vice boolean rules, streaks, logged status | `specs/TrackingSemanticsSpec.md` |
@@ -39,6 +39,8 @@ If two specs disagree, the authoritative spec above wins.
 |-----|------|------------------|
 | `README.md` | Repo entry, build steps | Feature specs |
 | `docs/release/lean-1.0-master-plan.md` | Phased release plan, timeline | Feature specs (link only) |
+| `docs/release/1.0.0-core-scope.md` | Locked 1.0 features + cut list + iteration rules | Feature specs (link only) |
+| `docs/release/1.0.0-schema-baseline.md` | Pre-release schema lock, export v4, no migration yet | Feature specs (link only) |
 | `docs/feature-inventory.md` | Shipped / partial / planned register | Feature specs (behavior) |
 | `TODOs/` | Legacy task lists | Superseded by specs + master plan for 1.0 |
 | `Specs/` (legacy) | Historical drafts | Do not edit — migrate to `specs/` |

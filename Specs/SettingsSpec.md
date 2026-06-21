@@ -14,8 +14,8 @@ Related: [`DeleteAllDataSpec.md`](DeleteAllDataSpec.md), [`ExportImportSpec.md`]
 
 ### In scope
 - Export Data (JSON share sheet)
-- Delete All Data (confirmed destructive)
-- iCloud Backup / Restore
+- Import Data (JSON file)
+- Reset All Local Data (confirmed destructive)
 - Theme selection (curated themes for lean 1.0)
 - Light / Dark / System appearance
 - Week start day preference
@@ -37,8 +37,7 @@ Grouped list sections:
 
 | Section | Contents |
 |---------|----------|
-| Data Management | Export, Delete All, Clear Demo (dev) |
-| iCloud Backup | Backup, Restore |
+| Data Management | Export, Import, Clear Demo (dev) |
 | Appearance | Theme picker, light/dark/system |
 | Preferences | Week start day |
 | About | Version, date joined, share app |

@@ -14,7 +14,7 @@ Define the concrete technical stack for TrackBoth lean 1.0.0.
 | UI | SwiftUI |
 | Persistence | SwiftData |
 | Charts | Swift Charts (Apple framework) |
-| Cloud backup | CloudKit via `iCloudBackupService` |
+| Cloud sync | None (local-only SwiftData for 1.0) |
 | Testing | XCTest (unit + UI); Swift Testing optional |
 | Min deployment | iOS 17+ (SwiftData requirement) |
 

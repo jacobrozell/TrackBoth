@@ -19,10 +19,9 @@ Authoritative field lists live here. Feature specs link back — do not duplicat
 | `createdAt` | Date | Creation timestamp |
 | `habitType` | HabitType | `.positive` or `.vice` |
 | `primaryMotivation` | String? | Set at creation for vices |
+| `hasBeenLogged` | Bool | User has ever explicitly logged (default `false`) |
+| `costPerUnit` | String? | Decimal string for vice savings estimate |
 | `goals` | [Goal]? | Cascade relationship |
-| `hasBeenLogged` | Bool | **Target:** user has ever logged this metric (default `false`) |
-
-> **Implementation note:** `hasBeenLogged` is specified on `Metric` per [`TrackingSemanticsSpec.md`](TrackingSemanticsSpec.md). Current code partially implements on `MetricEntry` — migrate in Phase 1.
 
 ### MetricEntry
 
@@ -37,6 +36,8 @@ Authoritative field lists live here. Feature specs link back — do not duplicat
 | `details` | String? | Habit detail subtitle |
 | `quantity` | Int? | Quantity tracking |
 | `unit` | String? | e.g. "minutes", "times" |
+| `mood` | String? | Emoji mood on log |
+| `hasBeenLogged` | Bool | Entry explicitly saved by user (default `false`) |
 
 **Uniqueness invariant:** At most one entry per `(metricID, calendar day)`.
 
@@ -48,6 +49,7 @@ Authoritative field lists live here. Feature specs link back — do not duplicat
 | `goalType` | GoalType | `.boolean` or `.quantity` |
 | `period` | GoalPeriod | `.weekly`, `.monthly`, `.yearly` |
 | `target` | Int | Target count |
+| `createdAt` | Date | Creation timestamp |
 | `quantityGoalType` | QuantityGoalType? | For quantity goals |
 | `defaultUnit` | String? | Default unit for quantity |
 | `maxDailyQuantity` | Int? | Vice max daily |
@@ -80,7 +82,7 @@ See `Models/Enums.swift`:
 
 - **Delete metric:** Removes metric, goals, and all entries.
 - **Delete all data:** See [`DeleteAllDataSpec.md`](DeleteAllDataSpec.md).
-- **iCloud backup:** JSON snapshot; not live sync. See [`ExportImportSpec.md`](ExportImportSpec.md).
+- **Portability:** JSON export/import (schema v4). See [`ExportImportSpec.md`](ExportImportSpec.md).
 
 ---
 
@@ -98,6 +100,6 @@ See `Models/Enums.swift`:
 | Field | Value |
 |-------|--------|
 | **Estimated release** | `1.0.0` |
-| **Last verified** | 2026-06-14 |
+| **Last verified** | 2026-06-15 |
 | **Commit** | (current) |
 | **Code** | `Models/Metric.swift`, `MetricEntry.swift`, `Goal.swift` |

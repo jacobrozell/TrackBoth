@@ -14,7 +14,7 @@ Define calendar-based history view, entry list, filtering, search, and editing.
 - Calendar grid with color-coded success/failure per day
 - Filter bar: All, All Habits, All Vices, Boolean, Quantity, specific metric
 - Entries list below calendar
-- Tap entry → edit sheet (`EditEntryView`)
+- Tap entry → edit sheet (`HistoryEntryDetailView`)
 - Search by habit details text
 - Month/year navigation
 
@@ -36,7 +36,7 @@ Define calendar-based history view, entry list, filtering, search, and editing.
 - Adequate horizontal padding on filter row (known polish item)
 
 ### Entry list
-- `HistoryEntryCardView` / `EditableEntryCell`
+- `HistoryEntryCardView` / `HistoryEntryDetailView`
 - Shows metric name, date, status, details/motivation snippet
 - Edit affordance
 

@@ -2,7 +2,9 @@
 
 ## 1. Purpose
 
-Define JSON export format and iCloud backup contract for user data portability.
+Define JSON export/import format for user data portability. Cross-device sync is out of scope for 1.0 (local-only SwiftData).
+
+**Pre-release baseline:** [`docs/release/1.0.0-schema-baseline.md`](../docs/release/1.0.0-schema-baseline.md)
 
 ---
 
@@ -11,60 +13,47 @@ Define JSON export format and iCloud backup contract for user data portability.
 ### Trigger
 Settings → **Export Data** → share sheet
 
-### Payload structure
+### Payload structure (schema v4)
 
 ```json
 {
-  "version": "1.0",
-  "exportedAt": "ISO8601",
+  "schemaVersion": 4,
+  "exportDate": "ISO8601",
   "metrics": [...],
-  "entries": [...]
+  "entries": [...],
+  "goals": [...]
 }
 ```
 
-Metric and entry fields mirror [`DataSchemaSpec.md`](DataSchemaSpec.md). Goals are embedded in metric export (via `iCloudBackupService.BackupMetric.goals`).
+- **metrics** — id, name, habitType, costPerUnit, primaryMotivation, hasBeenLogged
+- **entries** — id, metricID, date, value, quantity, unit, mood, etc.
+- **goals** — id, metricID, goalType, period, target, quantity fields (v4+)
+
+Schema versions 1–3 import without goals; v4 round-trips goals.
 
 ### Rules
-- Include schema `version` for future import compatibility
-- UTF-8 JSON, pretty-printed for human readability
+- Include `schemaVersion` for import compatibility
+- UTF-8 JSON
 - No encryption in 1.0 (user responsible for share destination)
 
-### Import (1.0)
-- **Out of scope** for lean 1.0 unless already working — export-only is minimum bar
-- If import added: validate version, merge or replace policy, user confirmation
+### Import
+Settings → **Import Data** — destructive replace-all after confirmation.
 
 ---
 
-## 3. iCloud Backup
+## 3. Testing
 
-Service: `iCloudBackupService` (CloudKit private database)
-
-| Field | Notes |
-|-------|-------|
-| Record type | Single backup record per device/user |
-| Payload | Same logical schema as JSON export |
-| Restore | Settings → Restore from iCloud — replaces local data |
-
-### Rules
-- User-initiated only (no background sync)
-- Requires iCloud sign-in; graceful error if unavailable
-- Restore must confirm destructive overwrite of local data
+- Export produces valid JSON decodable to `TrackBothExport.Payload`
+- Round-trip: export → import → counts match (metrics, entries, goals)
+- Legacy v1–v3 exports still import
 
 ---
 
-## 4. Testing
-
-- Export produces valid JSON decodable to backup models
-- Round-trip: export → parse → counts match
-- Restore integration (mock CloudKit or test hooks)
-
----
-
-## 5. Verification
+## 4. Verification
 
 | Field | Value |
 |-------|--------|
 | **Estimated release** | `1.0.0` |
-| **Last verified** | 2026-06-14 |
+| **Last verified** | 2026-06-15 |
 | **Commit** | (current) |
-| **Code** | `SettingsView.swift`, `iCloudBackupService.swift`, `BackupSheet.swift`, `RestoreSheet.swift` |
+| **Code** | `TrackBothExport.swift`, `ExportImportService.swift`, `SettingsView.swift` |

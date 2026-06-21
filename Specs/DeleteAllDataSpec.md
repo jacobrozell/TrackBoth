@@ -2,7 +2,7 @@
 
 ## 1. Purpose
 
-Define what **Delete All Data** must wipe and how tests prevent inventory drift.
+Define what **Reset All Local Data** must wipe and how tests prevent inventory drift.
 
 **Entry point:** [`SettingsSpec.md`](SettingsSpec.md). Schema: [`DataSchemaSpec.md`](DataSchemaSpec.md).
 
@@ -11,21 +11,22 @@ Define what **Delete All Data** must wipe and how tests prevent inventory drift.
 ## 2. Lean 1.0 Scope
 
 ### In scope
-- Settings → **Delete All Data** (destructive, confirmed)
+- Settings → **Reset All Local Data** (destructive, confirmed)
 - Migration recovery → reset (same end state)
-- Clears all SwiftData entities and relevant UserDefaults
+- Clears all SwiftData entities and relevant UserDefaults on **this device only**
 
 ### Out of scope
 - Selective delete (single metric)
 - Automatic pre-delete export prompt
+- Cloud sync / iCloud purge (local-only for 1.0)
 
 ---
 
 ## 3. User-Facing Behavior
 
-1. User taps **Delete All Data** in Settings.
-2. Confirmation alert with destructive action.
-3. On confirm: delete all `Metric`, `MetricEntry`, `Goal`; clear `hasCompletedOnboarding` if full reset desired (product decision: keep or reset onboarding — **default: keep onboarding completed**).
+1. User taps **Reset All Local Data** in Settings.
+2. Confirmation alert: *"This deletes all habits and entries on this device. This cannot be undone."*
+3. On confirm: delete all `Metric`, `MetricEntry`, `Goal`; clear side stores.
 4. Clear demo data flag (`hasDemoData`).
 5. On failure: show error; user may retry.
 
@@ -35,13 +36,13 @@ Define what **Delete All Data** must wipe and how tests prevent inventory drift.
 
 | Surface | Action |
 |---------|--------|
-| SwiftData `Metric` | Delete all |
-| SwiftData `MetricEntry` | Delete all |
-| SwiftData `Goal` | Delete all |
+| SwiftData `Metric` | Delete all (local) |
+| SwiftData `MetricEntry` | Delete all (local) |
+| SwiftData `Goal` | Delete all (local) |
 | UserDefaults `hasDemoData` | Remove |
+| UserDefaults `metricCostPerUnit` (legacy) | Clear |
 | UserDefaults `selectedTheme` | Keep (user preference) |
 | UserDefaults `weekStartDay` | Keep |
-| iCloud | Not affected (backup remains until overwritten) |
 
 ---
 
@@ -59,6 +60,6 @@ Define what **Delete All Data** must wipe and how tests prevent inventory drift.
 | Field | Value |
 |-------|--------|
 | **Estimated release** | `1.0.0` |
-| **Last verified** | 2026-06-14 |
+| **Last verified** | 2026-06-15 |
 | **Commit** | (current) |
 | **Code** | `SettingsView.swift`, `DemoDataGenerator.swift` |

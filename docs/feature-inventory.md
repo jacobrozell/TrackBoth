@@ -2,8 +2,9 @@
 
 Living register of what exists vs what ships in lean 1.0.0. Updated alongside the [Lean 1.0 Master Plan](release/lean-1.0-master-plan.md).
 
-**Last reviewed:** 2026-06-14  
-**App status:** Release candidate — engineering complete; device QA + TestFlight pending.  
+**Last reviewed:** 2026-06-15  
+**App status:** Release candidate — core locked; device QA + TestFlight pending.  
+**Scope lock:** [`release/1.0.0-core-scope.md`](release/1.0.0-core-scope.md)  
 **Spec catalog:** [`specs/README.md`](../specs/README.md)  
 **Product strategy:** [Competitive strategy](product/competitive-strategy.md) · [Planned competitive features](../specs/planned/CompetitiveFeaturesSpec.md)
 
@@ -39,16 +40,15 @@ Living register of what exists vs what ships in lean 1.0.0. Updated alongside th
 | Charts — quantity | **Partial** | Manual QA with demo data |
 | Motivations — basic feed | **Ships 1.0** | |
 | Motivations — primary motivation | **Ships 1.0** | |
-| Settings — export JSON | **Ships 1.0** | Schema v2 |
+| Settings — export JSON | **Ships 1.0** | Schema v4 |
 | Settings — import JSON | **Ships 1.0** | File picker + confirm |
 | Settings — delete all data | **Ships 1.0** | |
-| Settings — iCloud backup/restore | **Ships 1.0** | Restore sets `hasBeenLogged` |
 | Settings — themes | **Ships 1.0** | 4 curated themes; WCAG tests |
 | Settings — share app | **Ships 1.0** | |
 | Onboarding | **Ships 1.0** | Emotional flow + habit/vice presets create metrics |
 | Home — milestone banners | **Ships 1.0** | 7–365 day thresholds; dismissible |
 | Home — prominent streak badge | **Ships 1.0** | Large day count on metric rows |
-| Vice — money saved estimate | **Ships 1.0** | Home + History detail; export/iCloud schema v3 |
+| Vice — money saved estimate | **Ships 1.0** | Home + History detail; `Metric.costPerUnit` syncs via SwiftData |
 | Add Metric — preset chips | **Ships 1.0** | Quick-add suggestions by habit type |
 | Vice — slip timer (optional) | **Ships 1.0** | Per-vice toggle in Edit; days/hours on Home |
 | Logging — mood chips | **Ships 1.0** | Emoji mood on LoggingSheet; History + export |
@@ -76,12 +76,13 @@ Living register of what exists vs what ships in lean 1.0.0. Updated alongside th
 
 | Area | Status | Notes |
 |------|--------|-------|
-| Unit tests | **Ships 1.0** | 45+ tests — domain, export, iCloud, a11y |
+| Unit tests | **Ships 1.0** | Domain, export v4, bootstrap recovery, a11y |
 | UI smoke tests | **Ships 1.0** | 5 flows |
 | CI (GitHub Actions) | **Ships 1.0** | Build + unit tests |
 | XcodeGen | **Ships 1.0** | `TrackBoth/project.yml` |
 | ProductSurface gating | **Ships 1.0** | Demo, widget, watch flags |
-| BootstrapStoreRecovery | **Ships 1.0** | In-memory fallback + banner |
+| BootstrapStoreRecovery | **Ships 1.0** | Local-only persistent + in-memory fallback |
+| Schema baseline | **Ships 1.0** | `TrackBothSchemaV1` + export v4 — see `docs/release/1.0.0-schema-baseline.md` |
 | Domain layer | **Ships 1.0** | Tracking, streaks, goals, export |
 | Accessibility IDs | **Ships 1.0** | `Support/Accessibility/` |
 | Privacy page | **Ships 1.0** | `docs/privacy.html` |

@@ -22,7 +22,7 @@
 - [ ] ⏰ **Smart Notifications**: Implement smart notifications with context-aware reminders
 - [ ] 🖼 **Home Screen Widgets**: Add home screen widgets for quick daily check-ins
 - [ ] ⌚ **Apple Watch App**: Create Apple Watch companion app for quick logging
-- [x ] ☁️ **iCloud Sync**: Implement iCloud sync for cross-device data synchronization
+- [ ] **iCloud sync** — deferred post-1.0 (local-only + JSON export for 1.0)
 - [ ] 🏆 **Achievement System**: Add achievement system with badges for milestones
 - [ ] 📊 **Advanced Analytics**: Implement advanced analytics with year-over-year comparisons
 - [ x] 🎨 **Theme Customization**: Add theme customization with color schemes and visual themes

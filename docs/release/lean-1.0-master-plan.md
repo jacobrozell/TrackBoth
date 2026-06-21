@@ -29,7 +29,7 @@ Lean 1.0 strips the app to **daily habit/vice logging, goals, history, basic cha
 | **History** | Calendar view, entry list, edit past entries, filters |
 | **Charts** | Line, bar, heatmap — re-enabled in tab bar |
 | **Motivations** | Basic feed: add/view motivations tied to vices (not the gamified scroll system) |
-| **Settings** | Export JSON, delete all data, iCloud backup/restore, themes, onboarding reset |
+| **Settings** | Export/import JSON, delete all data, themes, week start, share app |
 | **Onboarding** | First-launch intro |
 
 ### Supporting infrastructure (must ship)
