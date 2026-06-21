@@ -22,8 +22,11 @@ Plans and projects **in implementation** — approved, specced, and actively bei
 | Core scope (locked) | [`docs/release/1.0.0-core-scope.md`](../docs/release/1.0.0-core-scope.md) | Approved | 5-tab Release surface |
 | App Store copy | [`docs/release/app-store-copy.md`](../docs/release/app-store-copy.md) | Draft | Screenshots deferred |
 
+> Last updated: 2026-06-21
+
 ## See also
 
+- Project status: [`docs/project-status.md`](../docs/project-status.md)
 - Ship checklist: [`docs/release/1.0.0-ship-checklist.md`](../docs/release/1.0.0-ship-checklist.md)
 - Deferred post-1.0: [`docs/plans/swiftdata-icloud-migration.md`](../docs/plans/swiftdata-icloud-migration.md)
 

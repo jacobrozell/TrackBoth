@@ -32,6 +32,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for schemes, tests, and CI.
 
 | Doc | Purpose |
 |-----|---------|
+| [`docs/project-status.md`](docs/project-status.md) | At-a-glance stage, version, focus |
 | [`docs/release/1.0.0-ship-checklist.md`](docs/release/1.0.0-ship-checklist.md) | Pre-submit gate |
 | [`docs/release/app-store-copy.md`](docs/release/app-store-copy.md) | Listing copy |
 | [`docs/feature-inventory.md`](docs/feature-inventory.md) | What ships vs dev-only |
