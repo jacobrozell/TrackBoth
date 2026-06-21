@@ -29,6 +29,8 @@ enum ProductSurface {
     static var showsMilestoneBanners: Bool { current == .development && !forceLeanUI }
     static var showsExtendedRowMetadata: Bool { current == .development && !forceLeanUI }
     static var showsExtendedThemes: Bool { current == .development && !forceLeanUI }
+    static var showsAdvancedMetricSetup: Bool { current == .development && !forceLeanUI }
+    static var showsExtendedLogging: Bool { current == .development && !forceLeanUI }
     static var showsWidget: Bool { current == .development }
     static var showsWatch: Bool { false }
     static var showsMotivationGame: Bool { false }
@@ -44,6 +46,8 @@ enum ProductSurface {
         case .milestoneBanners: showsMilestoneBanners
         case .extendedRowMetadata: showsExtendedRowMetadata
         case .extendedThemes: showsExtendedThemes
+        case .advancedMetricSetup: showsAdvancedMetricSetup
+        case .extendedLogging: showsExtendedLogging
         case .widget: showsWidget
         case .watch: showsWatch
         case .motivationGame: showsMotivationGame
@@ -59,6 +63,8 @@ enum LeanFeature {
     case milestoneBanners
     case extendedRowMetadata
     case extendedThemes
+    case advancedMetricSetup
+    case extendedLogging
     case widget
     case watch
     case motivationGame

@@ -47,24 +47,25 @@ struct HistoryPadLandscapeLayout: View {
     }
 
     private var contentPanel: some View {
-        let recentEntries = viewModel.recentEntries(entries, metrics: metrics)
+        let dayEntries = viewModel.dayEntries(entries, metrics: metrics)
 
         return ScrollView {
             LazyVStack(spacing: 12) {
                 ScreenSectionHeader(
-                    title: "Recent",
-                    trailing: recentEntries.isEmpty ? nil : "\(min(recentEntries.count, 20))"
+                    title: viewModel.selectedDaySectionTitle(),
+                    trailing: dayEntries.isEmpty ? nil : (dayEntries.count == 1 ? "1 entry" : "\(dayEntries.count) entries")
                 )
                 .padding(.horizontal, 16)
 
-                if recentEntries.isEmpty {
-                    Text("No entries for this filter yet.")
+                if dayEntries.isEmpty {
+                    Text(emptyDayMessage)
                         .font(.subheadline)
                         .foregroundStyle(Color.currentSecondaryText)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
                 } else {
-                    ForEach(recentEntries.prefix(20)) { entry in
+                    ForEach(dayEntries) { entry in
                         HistoryEntryCardView(entry: entry, metrics: metrics, entries: streakEntries)
                             .padding(.horizontal, 16)
                     }
@@ -73,5 +74,12 @@ struct HistoryPadLandscapeLayout: View {
             .padding(.vertical, 8)
             .adaptiveScrollInset()
         }
+    }
+
+    private var emptyDayMessage: String {
+        if CalendarHelper.isToday(viewModel.selectedDate) {
+            return "Nothing logged yet today. Switch to Track to log your habits and vices."
+        }
+        return "No entries on this day for the current filter."
     }
 }

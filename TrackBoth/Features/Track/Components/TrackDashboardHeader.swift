@@ -10,39 +10,46 @@ struct TrackDashboardHeader: View {
     let totalMetrics: Int
     let showingRowOptions: Bool
     let usesAccessibilityLayout: Bool
+    var showsWeekCalendar: Bool = true
     let onToggleEdit: () -> Void
     let onGoToToday: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            TrackWeekCalendar(
-                days: weekDays,
-                selectedDate: selectedDate,
-                usesAccessibilityLayout: usesAccessibilityLayout,
-                onSelect: { selectedDate = $0 }
-            )
+            if showsWeekCalendar {
+                TrackWeekCalendar(
+                    days: weekDays,
+                    selectedDate: selectedDate,
+                    usesAccessibilityLayout: usesAccessibilityLayout,
+                    onSelect: { selectedDate = $0 }
+                )
+            }
 
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(dayTitle)
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(Color.currentText)
+            dayContextRow
+        }
+    }
 
-                    Text(progressSubtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(Color.currentSecondaryText)
-                }
+    private var dayContextRow: some View {
+        HStack(alignment: .firstTextBaseline) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(dayTitle)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Color.currentText)
 
-                Spacer(minLength: 12)
+                Text(progressSubtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.currentSecondaryText)
+            }
 
-                if !isToday {
-                    Button("Today", action: onGoToToday)
-                        .font(.subheadline.weight(.medium))
-                }
+            Spacer(minLength: 12)
 
-                Button(showingRowOptions ? "Done" : "Edit", action: onToggleEdit)
+            if !isToday {
+                Button("Today", action: onGoToToday)
                     .font(.subheadline.weight(.medium))
             }
+
+            Button(showingRowOptions ? "Done" : "Edit", action: onToggleEdit)
+                .font(.subheadline.weight(.medium))
         }
     }
 
@@ -54,7 +61,7 @@ struct TrackDashboardHeader: View {
     }
 
     private var progressSubtitle: String {
-        guard totalMetrics > 0 else { return "No habits yet" }
+        guard totalMetrics > 0 else { return "Add habits and vices to start logging" }
         return "\(todayCompleted) of \(totalMetrics) logged"
     }
 }

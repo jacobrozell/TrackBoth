@@ -48,6 +48,7 @@ struct TrackPhonePortraitLayout: View {
                 metricsList
             }
             .padding(.bottom, 16)
+            .adaptiveScrollInset()
         }
     }
 

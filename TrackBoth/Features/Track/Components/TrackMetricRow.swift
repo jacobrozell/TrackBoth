@@ -93,38 +93,41 @@ struct TrackMetricRow: View {
         HStack(alignment: .center, spacing: 14) {
             toggleButton
 
-            VStack(alignment: .leading, spacing: 3) {
-                Text(metric.name)
-                    .font(.body.weight(.medium))
-                    .foregroundStyle(Color.currentText)
+            Button(action: onLog) {
+                HStack(alignment: .center, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(metric.name)
+                            .font(.body.weight(.medium))
+                            .foregroundStyle(Color.currentText)
 
-                HStack(spacing: 6) {
-                    Text(statusInfo.text)
-                        .font(.subheadline)
-                        .foregroundStyle(statusInfo.color)
+                        HStack(spacing: 6) {
+                            Text(statusInfo.text)
+                                .font(.subheadline)
+                                .foregroundStyle(statusInfo.color)
 
-                    if let streakCaption {
-                        Text("·")
-                            .foregroundStyle(Color.currentSecondaryText)
-                        Text(streakCaption)
-                            .font(.subheadline)
-                            .foregroundStyle(Color.currentSecondaryText)
+                            if let streakCaption {
+                                Text("·")
+                                    .foregroundStyle(Color.currentSecondaryText)
+                                Text(streakCaption)
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color.currentSecondaryText)
+                            }
+                        }
                     }
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .contentShape(Rectangle())
-            .onTapGesture { onLog() }
-            .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
+                    .frame(maxWidth: .infinity, alignment: .leading)
 
-            Image(systemName: "chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(Color.currentSecondaryText.opacity(0.6))
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Color.currentSecondaryText.opacity(0.6))
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
+            .accessibilityHint("Opens logging details for this day")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-        .contentShape(Rectangle())
     }
 
     private var accessibilityRow: some View {

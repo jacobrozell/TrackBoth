@@ -22,11 +22,9 @@ struct TrackScreen: View {
     }
 
     private var weekDays: [Date] {
-        let calendar = Calendar.current
-        let today = calendar.startOfDay(for: Date())
-        return (0..<7).compactMap { offset in
-            calendar.date(byAdding: .day, value: -6 + offset, to: today)
-        }
+        let calendar = CalendarHelper.calendar
+        let weekStart = CalendarHelper.startOfWeek(for: viewModel.selectedDate)
+        return (0..<7).compactMap { calendar.date(byAdding: .day, value: $0, to: weekStart) }
     }
 
     private var habits: [Metric] { metrics.filter { $0.habitType == .positive } }
@@ -50,9 +48,9 @@ struct TrackScreen: View {
                 if metrics.isEmpty {
                     EmptyStateView(
                         icon: "plus.circle.fill",
-                        title: "No Habits Yet",
-                        subtitle: "Build good habits and break bad ones — add your first metric to get started",
-                        actionTitle: "Add Your First Habit",
+                        title: "Nothing to Track Yet",
+                        subtitle: "Add a habit you want to build or a vice you want to break, then log with one tap each day.",
+                        actionTitle: "Add Habit or Vice",
                         action: { viewModel.showAddMetric() }
                     )
                 } else {
@@ -86,6 +84,9 @@ struct TrackScreen: View {
                 clampSelectedDate()
                 refreshMilestoneBanner()
             }
+            .onReceive(AppEvent.publisher(for: .presentAddMetric)) { _ in
+                viewModel.showAddMetric()
+            }
             .onChange(of: entries.count) { _, _ in
                 refreshMilestoneBanner()
             }
@@ -100,7 +101,7 @@ struct TrackScreen: View {
             }) { metric in
                 LoggingSheet(metric: metric, selectedDate: viewModel.selectedDate)
             }
-            .alert("Delete Habit", isPresented: $viewModel.showingDeleteConfirmation) {
+            .alert("Delete Metric", isPresented: $viewModel.showingDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
                 Button("Delete", role: .destructive) {
                     viewModel.deleteMetric(in: modelContext, entries: entries)

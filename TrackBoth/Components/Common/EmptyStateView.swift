@@ -10,8 +10,8 @@ struct EmptyStateView: View {
     
     init(
         icon: String = "plus.circle",
-        title: String = "No habits yet",
-        subtitle: String = "Tap the + button below to add your first habit",
+        title: String = "Nothing to track yet",
+        subtitle: String = "Use the add button to create your first habit or vice.",
         actionTitle: String? = nil,
         action: (() -> Void)? = nil
     ) {

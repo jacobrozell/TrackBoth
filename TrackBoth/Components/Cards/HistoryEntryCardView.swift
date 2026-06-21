@@ -13,10 +13,8 @@ struct HistoryEntryCardView: View {
         metrics.first { $0.id == entry.metricID }
     }
 
-    private var timeAgo: String {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .abbreviated
-        return formatter.localizedString(for: entry.date, relativeTo: Date())
+    private var subtitleText: String {
+        "\(dayLabel) · \(statusText)"
     }
 
     private var dayLabel: String {
@@ -52,7 +50,7 @@ struct HistoryEntryCardView: View {
                         .foregroundStyle(Color.currentText)
                         .multilineTextAlignment(.leading)
 
-                    Text("\(dayLabel) · \(statusText) · \(timeAgo)")
+                    Text(subtitleText)
                         .font(.subheadline)
                         .foregroundStyle(Color.currentSecondaryText)
                         .multilineTextAlignment(.leading)

@@ -32,7 +32,7 @@ struct HistoryCompactLayout: View {
                     .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
 
-                recentEntriesSection
+                dayEntriesSection
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
@@ -41,19 +41,36 @@ struct HistoryCompactLayout: View {
     }
 
     @ViewBuilder
-    private var recentEntriesSection: some View {
-        let recentEntries = viewModel.recentEntries(entries, metrics: metrics)
-        if !recentEntries.isEmpty {
-            Section(header: ScreenSectionHeader(
-                title: "Recent",
-                trailing: "\(min(recentEntries.count, 20))"
-            )) {
+    private var dayEntriesSection: some View {
+        let dayEntries = viewModel.dayEntries(entries, metrics: metrics)
+        Section(header: ScreenSectionHeader(
+            title: viewModel.selectedDaySectionTitle(),
+            trailing: dayEntries.isEmpty ? nil : entryCountLabel(dayEntries.count)
+        )) {
+            if dayEntries.isEmpty {
+                Text(emptyDayMessage)
+                    .font(.subheadline)
+                    .foregroundStyle(Color.currentSecondaryText)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 8)
+            } else {
                 LazyVStack(spacing: 8) {
-                    ForEach(recentEntries.prefix(20)) { entry in
+                    ForEach(dayEntries) { entry in
                         HistoryEntryCardView(entry: entry, metrics: metrics, entries: streakEntries)
                     }
                 }
             }
         }
+    }
+
+    private var emptyDayMessage: String {
+        if CalendarHelper.isToday(viewModel.selectedDate) {
+            return "Nothing logged yet today. Switch to Track to log your habits and vices."
+        }
+        return "No entries on this day for the current filter."
+    }
+
+    private func entryCountLabel(_ count: Int) -> String {
+        count == 1 ? "1 entry" : "\(count) entries"
     }
 }

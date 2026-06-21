@@ -111,6 +111,16 @@ struct ContentView: View {
             logger.info("Onboarding completed notification received")
             checkFirstLaunch()
         }
+        .onReceive(AppEvent.publisher(for: .switchToTrack)) { _ in
+            selectedTab = MainTab.track.rawValue
+        }
+        .onReceive(AppEvent.publisher(for: .openAddMetric)) { _ in
+            selectedTab = MainTab.track.rawValue
+            // TrackScreen owns the add sheet; post after tab switch settles.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                AppEvent.post(.presentAddMetric)
+            }
+        }
         .onChange(of: themeManager.currentAppTheme) { _, _ in
             // Force TabView refresh when theme changes
         }

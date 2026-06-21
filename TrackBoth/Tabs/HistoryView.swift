@@ -8,14 +8,6 @@ struct HistoryView: View {
 
     var body: some View {
         HistoryViewContent(viewModel: viewModel, dynamicTypeSize: dynamicTypeSize)
-            .id(historyMonthKey(for: viewModel.selectedDate))
-    }
-
-    private func historyMonthKey(for date: Date) -> String {
-        let calendar = Calendar.current
-        let year = calendar.component(.year, from: date)
-        let month = calendar.component(.month, from: date)
-        return "\(year)-\(month)"
     }
 }
 
@@ -92,9 +84,9 @@ private struct HistoryViewContent: View {
     private var noHabitsEmptyState: some View {
         EmptyStateView(
             icon: "plus.circle.fill",
-            title: "No Habits Yet",
-            subtitle: "Start tracking your habits and vices to see your history",
-            actionTitle: "Add Your First Habit",
+            title: "No Habits or Vices Yet",
+            subtitle: "Add what you want to build or break — then log each day on Track.",
+            actionTitle: "Add Your First",
             action: { viewModel.showAddMetric() }
         )
         .background(Color.currentBackground)
@@ -102,11 +94,11 @@ private struct HistoryViewContent: View {
 
     private var noHistoryEmptyState: some View {
         EmptyStateView(
-            icon: "calendar.badge.exclamationmark",
-            title: "No History Yet",
-            subtitle: "Start logging your habits and vices to build your history",
-            actionTitle: "Start Logging",
-            action: { viewModel.showAddMetric() }
+            icon: "hand.tap.fill",
+            title: "No Logs Yet",
+            subtitle: "Your habits and vices are ready. Go to Track and tap each row to log today.",
+            actionTitle: "Go to Track",
+            action: { AppEvent.post(.switchToTrack) }
         )
         .background(Color.currentBackground)
     }

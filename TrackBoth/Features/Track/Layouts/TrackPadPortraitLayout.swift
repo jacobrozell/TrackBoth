@@ -64,6 +64,7 @@ struct TrackPadPortraitLayout: View {
                 .frame(maxWidth: .infinity)
             }
             .padding(.bottom, 16)
+            .adaptiveScrollInset()
         }
     }
 }

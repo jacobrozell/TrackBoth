@@ -28,6 +28,26 @@ class HistoryViewModel {
         return filtered
     }
 
+    /// Entries for the selected calendar day, sorted by metric name.
+    func dayEntries(_ entries: [MetricEntry], metrics: [Metric]) -> [MetricEntry] {
+        entriesForSelectedDate(entries, metrics: metrics)
+            .sorted { lhs, rhs in
+                let lhsName = metrics.first { $0.id == lhs.metricID }?.name ?? ""
+                let rhsName = metrics.first { $0.id == rhs.metricID }?.name ?? ""
+                if lhsName != rhsName { return lhsName < rhsName }
+                return lhs.date > rhs.date
+            }
+    }
+
+    func selectedDaySectionTitle() -> String {
+        if CalendarHelper.isToday(selectedDate) {
+            return "Today"
+        }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, MMM d"
+        return formatter.string(from: selectedDate)
+    }
+
     /// Entries for the selected month, filter, and optional search text.
     func recentEntries(_ entries: [MetricEntry], metrics: [Metric]) -> [MetricEntry] {
         let calendar = Calendar.current

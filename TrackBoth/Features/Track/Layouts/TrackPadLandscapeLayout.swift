@@ -55,22 +55,18 @@ struct TrackPadLandscapeLayout: View {
 
     private var contentPanel: some View {
         VStack(spacing: 0) {
-            HStack {
-                Text(weekHeaderTitle)
-                    .h4()
-                    .foregroundColor(Color.currentText)
-                Spacer()
-                Button(showingRowOptions ? "Done" : "Edit") {
-                    showingRowOptions.toggle()
-                }
-                .caption()
-                .foregroundColor(Color.currentPrimary)
-                if !viewModel.isToday {
-                    Button("Today") { viewModel.goToToday() }
-                        .caption()
-                        .foregroundColor(Color.currentPrimary)
-                }
-            }
+            TrackDashboardHeader(
+                weekDays: weekDays,
+                selectedDate: $viewModel.selectedDate,
+                isToday: viewModel.isToday,
+                todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+                totalMetrics: metrics.count,
+                showingRowOptions: showingRowOptions,
+                usesAccessibilityLayout: usesAccessibilityLayout,
+                showsWeekCalendar: false,
+                onToggleEdit: { showingRowOptions.toggle() },
+                onGoToToday: { viewModel.goToToday() }
+            )
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
 
@@ -90,12 +86,7 @@ struct TrackPadLandscapeLayout: View {
                     onDelete: onDelete
                 )
             }
+            .adaptiveScrollInset()
         }
-    }
-
-    private var weekHeaderTitle: String {
-        let df = DateFormatter()
-        df.dateFormat = "EEE, MMM d"
-        return df.string(from: viewModel.selectedDate)
     }
 }

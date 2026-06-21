@@ -3,7 +3,7 @@ import SwiftData
 import UIKit
 
 // MARK: - LoggingSheet Component
-/// Sheet component for logging metric entries with details and motivation
+/// Sheet for optional logging details beyond the one-tap toggle on Track.
 struct LoggingSheet: View, Identifiable {
     let id = UUID()
     let metric: Metric
@@ -11,7 +11,6 @@ struct LoggingSheet: View, Identifiable {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Environment(ThemeManager.self) private var themeManager
     @Query private var entries: [MetricEntry]
 
     @State private var value: Bool = false
@@ -21,6 +20,7 @@ struct LoggingSheet: View, Identifiable {
     @State private var unit: String = "times"
     @State private var mood: String?
     @State private var showingQuantitySheet: Bool = false
+    @State private var showsMoreOptions = false
 
     private var existingEntry: MetricEntry? {
         let start = Calendar.current.startOfDay(for: selectedDate)
@@ -32,66 +32,50 @@ struct LoggingSheet: View, Identifiable {
         return "\(quantity) \(unit)"
     }
 
+    private var statusLabel: String {
+        metric.habitType == .positive ? "Did it" : "Avoided it"
+    }
+
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("Status")) {
+                Section {
                     Toggle(isOn: statusToggleBinding) {
-                        Text(metric.habitType == .positive ? "Did it" : "Avoided")
+                        Text(statusLabel)
                     }
                     .accessibilityIdentifier(AccessibilityIdentifiers.loggingStatusToggle)
-                }
-
-                Section(header: Text("Daily Details")) {
-                    TextField("Optional details", text: $details, axis: .vertical)
-                }
-
-                Section {
-                    MoodChipPicker(selectedMood: $mood)
                 } header: {
-                    Text("How are you feeling?")
+                    Text("Status")
                 } footer: {
-                    Text("Optional — tap an emoji to log your mood for the day.")
+                    Text(metric.habitType == .positive
+                         ? "Turn on when you completed this habit today."
+                         : "Turn on when you successfully avoided this vice today.")
                 }
 
-                Section(header: Text("Daily Motivation")) {
-                    TextField("Why?", text: $motivation, axis: .vertical)
+                Section(header: Text("Notes")) {
+                    TextField("Optional notes for this day", text: $details, axis: .vertical)
+                        .lineLimit(2...4)
                 }
 
-                Section(header: Text("Quantity")) {
-                    if (quantity ?? 0) > 0 {
-                        Stepper(value: Binding(
-                            get: { quantity ?? 1 },
-                            set: { quantity = max(1, $0) }
-                        ), in: 1...999) {
-                            Text(quantitySummary)
+                if ProductSurface.showsExtendedLogging {
+                    extendedLoggingSections
+                } else if showsMoreOptions {
+                    extendedLoggingSections
+                } else {
+                    Section {
+                        Button("More options") {
+                            withAnimation { showsMoreOptions = true }
                         }
-
-                        Button("Advanced quantity editor") {
-                            showingQuantitySheet = true
-                        }
-                        .foregroundColor(.currentPrimary)
-
-                        Button("Clear quantity", role: .destructive) {
-                            quantity = nil
-                        }
-                    } else {
-                        Button("Add quantity") {
-                            quantity = 1
-                            unit = metric.quantityGoals.first?.safeDefaultUnit ?? "times"
-                        }
-                        .foregroundColor(.currentPrimary)
-
-                        Button("Open quantity editor") {
-                            showingQuantitySheet = true
-                        }
-                        .foregroundColor(.currentSecondaryText)
+                        .foregroundStyle(Color.currentPrimary)
+                    } footer: {
+                        Text("Add mood, motivation, or quantity if you want extra context.")
                     }
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Color.currentBackground)
             .navigationTitle(metric.name)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
@@ -104,6 +88,55 @@ struct LoggingSheet: View, Identifiable {
             .onAppear { seedDefaults() }
             .sheet(isPresented: $showingQuantitySheet, onDismiss: syncQuantityFromStore) {
                 QuantityInputSheet(metric: metric, selectedDate: selectedDate)
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
+    }
+
+    @ViewBuilder
+    private var extendedLoggingSections: some View {
+        Section {
+            MoodChipPicker(selectedMood: $mood)
+        } header: {
+            Text("How are you feeling?")
+        } footer: {
+            Text("Optional — tap an emoji to log your mood for the day.")
+        }
+
+        Section(header: Text("Motivation")) {
+            TextField("Why does this matter today?", text: $motivation, axis: .vertical)
+                .lineLimit(2...4)
+        }
+
+        Section(header: Text("Quantity")) {
+            if (quantity ?? 0) > 0 {
+                Stepper(value: Binding(
+                    get: { quantity ?? 1 },
+                    set: { quantity = max(1, $0) }
+                ), in: 1...999) {
+                    Text(quantitySummary)
+                }
+
+                Button("Advanced quantity editor") {
+                    showingQuantitySheet = true
+                }
+                .foregroundColor(.currentPrimary)
+
+                Button("Clear quantity", role: .destructive) {
+                    quantity = nil
+                }
+            } else {
+                Button("Add quantity") {
+                    quantity = 1
+                    unit = metric.quantityGoals.first?.safeDefaultUnit ?? "times"
+                }
+                .foregroundColor(.currentPrimary)
+
+                Button("Open quantity editor") {
+                    showingQuantitySheet = true
+                }
+                .foregroundColor(.currentSecondaryText)
             }
         }
     }
@@ -123,6 +156,8 @@ struct LoggingSheet: View, Identifiable {
             mood = entry.mood
             quantity = entry.quantity
             unit = entry.unit ?? (metric.quantityGoals.first?.safeDefaultUnit ?? "times")
+            showsMoreOptions = ProductSurface.showsExtendedLogging
+                || !(motivation.isEmpty && (mood ?? "").isEmpty && quantity == nil)
         } else {
             value = TrackingSemantics.failureValue(habitType: metric.habitType)
             quantity = nil
@@ -137,6 +172,7 @@ struct LoggingSheet: View, Identifiable {
         if entry.hasBeenLogged {
             value = entry.value
         }
+        showsMoreOptions = true
     }
 
     private func saveAndClose() {

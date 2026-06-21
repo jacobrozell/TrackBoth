@@ -64,10 +64,15 @@ struct OnboardingView: View {
     @ViewBuilder
     private func iPadLayout(isLandscape: Bool, size: CGSize) -> some View {
         VStack(spacing: 0) {
-            pageContent(for: pages[currentPage])
-                .id(currentPage)
-                .frame(maxWidth: isLandscape ? 700 : 600)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            TabView(selection: $currentPage) {
+                ForEach(pages.indices, id: \.self) { index in
+                    pageContent(for: pages[index])
+                        .tag(index)
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .frame(maxWidth: isLandscape ? 700 : 600)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             bottomControls
                 .frame(maxWidth: isLandscape ? 400 : 500)
@@ -103,6 +108,10 @@ struct OnboardingView: View {
         }
     }
 
+    private var hasSelection: Bool {
+        !selectedHabitPresets.isEmpty || !selectedVicePresets.isEmpty
+    }
+
     private var bottomControls: some View {
         VStack(spacing: usesCompactLayout ? 12 : 24) {
             HStack(spacing: 8) {
@@ -115,6 +124,8 @@ struct OnboardingView: View {
                 }
             }
             .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("Page \(currentPage + 1) of \(pages.count)")
 
             VStack(spacing: 12) {
                 if currentPage > 0 {
@@ -143,13 +154,22 @@ struct OnboardingView: View {
                     .buttonStyle(PrimaryButtonStyle())
                     .frame(maxWidth: .infinity)
                 } else {
-                    Button("Get Started") {
-                        logger.logUserAction("Complete onboarding")
-                        completeOnboarding()
+                    VStack(spacing: 8) {
+                        if !hasSelection {
+                            Text("Pick at least one habit or vice, or we'll help you add one next.")
+                                .font(.footnote)
+                                .foregroundStyle(Color.currentSecondaryText)
+                                .multilineTextAlignment(.center)
+                        }
+
+                        Button("Get Started") {
+                            logger.logUserAction("Complete onboarding")
+                            completeOnboarding()
+                        }
+                        .buttonStyle(PrimaryButtonStyle())
+                        .frame(maxWidth: .infinity)
+                        .accessibilityIdentifier(AccessibilityIdentifiers.onboardingGetStarted)
                     }
-                    .buttonStyle(PrimaryButtonStyle())
-                    .frame(maxWidth: .infinity)
-                    .accessibilityIdentifier(AccessibilityIdentifiers.onboardingGetStarted)
                 }
             }
             .padding(.horizontal, 32)
@@ -166,6 +186,10 @@ struct OnboardingView: View {
         logger.info("Onboarding completed with \(presets.count) preset metrics")
         UserDefaults.standard.set(true, forKey: ThemePreferences.hasCompletedOnboarding)
         AppEvent.post(.onboardingCompleted)
+
+        if presets.isEmpty {
+            AppEvent.post(.openAddMetric)
+        }
     }
 }
 
@@ -264,6 +288,7 @@ struct PresetChipGrid: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
+                .accessibilityHint("Double tap to select or deselect")
             }
         }
     }

@@ -22,15 +22,6 @@ struct TrackPhoneLandscapeLayout: View {
         ScrollView {
             LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
                 HStack(alignment: .top, spacing: 12) {
-                    TrackStatsGrid(
-                        totalHabits: viewModel.totalHabits(from: metrics),
-                        totalVices: viewModel.totalVices(from: metrics),
-                        activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
-                        todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
-                        totalMetrics: metrics.count
-                    )
-                    .frame(maxWidth: 280)
-
                     TrackDashboardHeader(
                         weekDays: weekDays,
                         selectedDate: $viewModel.selectedDate,
@@ -43,6 +34,15 @@ struct TrackPhoneLandscapeLayout: View {
                         onGoToToday: { viewModel.goToToday() }
                     )
                     .frame(maxWidth: .infinity)
+
+                    TrackStatsGrid(
+                        totalHabits: viewModel.totalHabits(from: metrics),
+                        totalVices: viewModel.totalVices(from: metrics),
+                        activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
+                        todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+                        totalMetrics: metrics.count
+                    )
+                    .frame(maxWidth: 280)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 4)
@@ -63,6 +63,7 @@ struct TrackPhoneLandscapeLayout: View {
                 )
             }
             .padding(.bottom, 8)
+            .adaptiveScrollInset()
         }
     }
 }

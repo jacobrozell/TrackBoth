@@ -46,8 +46,8 @@ final class TrackingSemanticsTests: XCTestCase {
 
     func testStatusLabelsForHabitsAndVices() {
         let unlogged = MetricEntry(metricID: UUID(), date: Date(), value: false, hasBeenLogged: false)
-        XCTAssertEqual(TrackingSemantics.statusLabel(habitType: .positive, entry: unlogged).text, "Incomplete")
-        XCTAssertEqual(TrackingSemantics.statusLabel(habitType: .vice, entry: unlogged).text, "Not Avoided")
+        XCTAssertEqual(TrackingSemantics.statusLabel(habitType: .positive, entry: unlogged).text, "Not logged")
+        XCTAssertEqual(TrackingSemantics.statusLabel(habitType: .vice, entry: unlogged).text, "Not logged")
 
         let habitDone = MetricEntry(metricID: UUID(), date: Date(), value: true, hasBeenLogged: true)
         XCTAssertEqual(TrackingSemantics.statusLabel(habitType: .positive, entry: habitDone).text, "Completed")

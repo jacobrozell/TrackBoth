@@ -32,8 +32,8 @@ struct TrackWeekCalendar: View {
 
     @ViewBuilder
     private func dayCell(for day: Date) -> some View {
-        let isSelected = Calendar.current.isDate(day, inSameDayAs: selectedDate)
-        let isToday = Calendar.current.isDateInToday(day)
+        let isSelected = CalendarHelper.isSameDay(day, selectedDate)
+        let isToday = CalendarHelper.isToday(day)
 
         Button {
             onSelect(day)

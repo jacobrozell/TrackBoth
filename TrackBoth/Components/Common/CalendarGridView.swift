@@ -53,6 +53,7 @@ struct CalendarGridView: View {
                     Image(systemName: "chevron.left")
                         .foregroundColor(.currentPrimary)
                 }
+                .accessibilityLabel("Previous month")
                 
                 Spacer()
                 
@@ -73,6 +74,7 @@ struct CalendarGridView: View {
                     Image(systemName: "chevron.right")
                         .foregroundColor(.currentPrimary)
                 }
+                .accessibilityLabel("Next month")
             }
             .padding()
             
@@ -98,7 +100,13 @@ struct CalendarGridView: View {
                         entries: entries[date] ?? [],
                         selectedFilter: selectedFilter,
                         isCurrentMonth: calendar.isDate(date, equalTo: currentMonth, toGranularity: .month),
-                        metrics: metrics
+                        isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
+                        metrics: metrics,
+                        onSelect: {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                selectedDate = calendar.startOfDay(for: date)
+                            }
+                        }
                     )
                 }
             }
@@ -109,6 +117,6 @@ struct CalendarGridView: View {
     }
 
     private var weekdaySymbols: [String] {
-        CalendarHelper.calendar.shortWeekdaySymbols.map { String($0.prefix(1)) }
+        CalendarHelper.calendar.shortWeekdaySymbols
     }
 }

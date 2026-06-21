@@ -100,12 +100,7 @@ enum TrackingSemantics {
 
     static func statusLabel(habitType: HabitType, entry: MetricEntry?) -> (text: String, isSuccess: Bool) {
         guard isLoggedForDay(entry: entry) else {
-            switch habitType {
-            case .positive:
-                return ("Incomplete", false)
-            case .vice:
-                return ("Not Avoided", false)
-            }
+            return ("Not logged", false)
         }
 
         let success = isSuccessful(habitType: habitType, value: entry!.value)

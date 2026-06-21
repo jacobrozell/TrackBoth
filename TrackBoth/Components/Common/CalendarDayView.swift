@@ -6,12 +6,14 @@ struct CalendarDayView: View {
     let entries: [MetricEntry]
     let selectedFilter: MetricFilter
     let isCurrentMonth: Bool
+    let isSelected: Bool
     let metrics: [Metric]
+    let onSelect: () -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var dayNumber: String {
-        Calendar.current.component(.day, from: date).description
+        CalendarHelper.calendar.component(.day, from: date).description
     }
 
     private var isToday: Bool {
@@ -53,38 +55,53 @@ struct CalendarDayView: View {
     }
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text(dayNumber)
-                .font(.caption)
-                .fontWeight(isToday ? .bold : .regular)
-                .foregroundColor(isCurrentMonth ? Color.currentText : Color.currentSecondaryText)
+        Button(action: onSelect) {
+            VStack(spacing: 2) {
+                Text(dayNumber)
+                    .font(.caption)
+                    .fontWeight(isToday ? .bold : .regular)
+                    .foregroundColor(isCurrentMonth ? Color.currentText : Color.currentSecondaryText)
 
-            if let entry = displayEntry, let metric = getMetric(for: entry) {
-                Circle()
-                    .fill(dotColor(for: entry, metric: metric))
-                    .frame(width: 6, height: 6)
-            } else if !filteredEntries.isEmpty {
-                Circle()
-                    .fill(Color.currentSecondaryText.opacity(0.4))
-                    .frame(width: 6, height: 6)
+                if let entry = displayEntry, let metric = getMetric(for: entry) {
+                    Circle()
+                        .fill(dotColor(for: entry, metric: metric))
+                        .frame(width: 6, height: 6)
+                } else if !filteredEntries.isEmpty {
+                    Circle()
+                        .fill(Color.currentSecondaryText.opacity(0.4))
+                        .frame(width: 6, height: 6)
+                }
             }
-
+            .frame(minHeight: dynamicTypeSize.usesAccessibilityLayout ? 48 : 36)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(selectionBackground)
+            )
         }
-        .frame(minHeight: dynamicTypeSize.usesAccessibilityLayout ? 48 : 36)
-        .background(
-            RoundedRectangle(cornerRadius: 8)
-                .fill(isToday ? Color.currentAccent.opacity(0.2) : Color.clear)
-        )
+        .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(calendarAccessibilityLabel)
-        .accessibilityAddTraits(isToday ? .isSelected : [])
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityHint("Shows entries for this day")
+    }
+
+    private var selectionBackground: Color {
+        if isSelected {
+            return Color.currentPrimary.opacity(0.25)
+        }
+        if isToday {
+            return Color.currentAccent.opacity(0.15)
+        }
+        return Color.clear
     }
 
     private var calendarAccessibilityLabel: String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         let dateText = formatter.string(from: date)
-        if isToday { return "Today, \(dateText), \(hasEntry ? "has entries" : "no entries")" }
-        return "\(dateText), \(hasEntry ? "has entries" : "no entries")"
+        let selectionPrefix = isSelected ? "Selected, " : ""
+        let todayPrefix = isToday ? "Today, " : ""
+        return "\(selectionPrefix)\(todayPrefix)\(dateText), \(hasEntry ? "has entries" : "no entries")"
     }
 }

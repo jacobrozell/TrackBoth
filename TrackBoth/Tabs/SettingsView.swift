@@ -18,7 +18,7 @@ struct SettingsView: View {
     @State private var importErrorMessage: String?
     @State private var importedSummary: String?
     @State private var showingDeleteConfirmation = false
-    @State private var exportData: Data?
+    @State private var exportFileURL: URL?
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
 
     var body: some View {
@@ -29,8 +29,8 @@ struct SettingsView: View {
                 Section {
                     Button {
                         logger.logUserAction("Export data button tapped")
-                        exportData = generateExportData()
-                        showingExportSheet = true
+                        exportFileURL = writeExportFile()
+                        showingExportSheet = exportFileURL != nil
                     } label: {
                         Label("Export Data", systemImage: "square.and.arrow.up")
                     }
@@ -97,9 +97,11 @@ struct SettingsView: View {
                 logger.info("SettingsView appeared")
                 logger.debug("Metrics count: \(metrics.count), Entries count: \(entries.count)", category: .data)
             }
-            .sheet(isPresented: $showingExportSheet) {
-                if let exportData = exportData {
-                    ShareSheet(activityItems: [exportData])
+            .sheet(isPresented: $showingExportSheet, onDismiss: {
+                exportFileURL = nil
+            }) {
+                if let exportFileURL {
+                    ShareSheet(activityItems: [exportFileURL])
                         .onAppear {
                             logger.info("Export data sheet presented")
                         }
@@ -111,7 +113,7 @@ struct SettingsView: View {
                     deleteAllData()
                 }
             } message: {
-                Text("This will permanently delete all habits and entries on this device. This action cannot be undone.")
+                Text("This will permanently delete all habits, vices, and entries on this device. This action cannot be undone.")
             }
             .alert("Import Data?", isPresented: $showingImportConfirmation) {
                 Button("Cancel", role: .cancel) {
@@ -121,7 +123,7 @@ struct SettingsView: View {
                     performImport()
                 }
             } message: {
-                Text("This will replace all habits and entries with the selected JSON export file.")
+                Text("This will replace all habits, vices, and entries with the selected JSON export file.")
             }
             .alert("Import Complete", isPresented: $showingImportSuccess) {
                 Button("OK", role: .cancel) { }
@@ -167,7 +169,9 @@ struct SettingsView: View {
             let data = try Data(contentsOf: url)
             let payload = try TrackBothExport.decode(data)
             let counts = try ExportImportService.importPayload(payload, into: modelContext)
-            importedSummary = "Imported \(counts.metrics) habits, \(counts.entries) entries, and \(counts.goals) goals."
+            importedSummary = ProductSurface.showsGoals
+                ? "Imported \(counts.metrics) habits, \(counts.entries) entries, and \(counts.goals) goals."
+                : "Imported \(counts.metrics) habits or vices and \(counts.entries) log entries."
             showingImportSuccess = true
             WidgetSyncCoordinator.onDataChanged(context: modelContext)
             logger.info(
@@ -186,6 +190,19 @@ struct SettingsView: View {
             return try TrackBothExport.encode(metrics: metrics, entries: entries)
         } catch {
             logger.error("Failed to encode export data: \(error.localizedDescription)", category: .data)
+            return nil
+        }
+    }
+
+    private func writeExportFile() -> URL? {
+        guard let data = generateExportData() else { return nil }
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("TrackBoth-export-\(ISO8601DateFormatter().string(from: Date())).json")
+        do {
+            try data.write(to: url, options: .atomic)
+            return url
+        } catch {
+            logger.error("Failed to write export file: \(error.localizedDescription)", category: .data)
             return nil
         }
     }
@@ -378,7 +395,7 @@ private struct SettingsAppearanceSection: View {
     }
 
     private func themeIcon(for theme: AppTheme) -> String {
-        theme.name == "Midnight" ? "moon.fill" : "sun.max.fill"
+        theme.name == "Midnight" ? "moon.stars.fill" : "water.waves"
     }
 }
 
