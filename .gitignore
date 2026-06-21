@@ -25,5 +25,9 @@ Pods/
 # Carthage
 Carthage/Build/
 
+# Cursor MCP (local machine paths)
+.cursor/mcp.json
+.xcodebuildmcp/
+
 # MCP screenshot / scratch output
 tmp/
