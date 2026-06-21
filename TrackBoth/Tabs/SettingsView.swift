@@ -2,17 +2,13 @@ import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
 
-// Import the backup service and components
-// These should be accessible if all files are in the same target
-
 // MARK: - SettingsView
 /// View for app settings, data export, and configuration
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
-    // Goals are embedded in Metric now
-    
+
     @State private var showingExportSheet = false
     @State private var showingImportPicker = false
     @State private var showingImportConfirmation = false
@@ -23,23 +19,14 @@ struct SettingsView: View {
     @State private var importedSummary: String?
     @State private var showingDeleteConfirmation = false
     @State private var exportData: Data?
-    @State private var showingRestoreSheet = false
-    @State private var showingBackupSheet = false
-    @State private var backupService = iCloudBackupService()
-    @State private var backupInfo: BackupInfo?
-    @State private var isBackingUp = false
-    @State private var isRestoring = false
-    @State private var backupError: String?
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
-    @State private var currentTime = Date()
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.currentBackground.ignoresSafeArea()
                 List {
-                // Data Management Section
-                Section("Data Management") {
+                Section {
                     Button("Export Data") {
                         logger.logUserAction("Export data button tapped")
                         exportData = generateExportData()
@@ -56,7 +43,7 @@ struct SettingsView: View {
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsImportData)
                     .foregroundColor(Color.currentPrimary)
                     .listRowBackground(Color.currentSecondaryBackground)
-                    
+
                     if ProductSurface.showsDemoData {
                         if DemoDataGenerator.hasDemoData() {
                             Button("Clear Demo Data") {
@@ -74,38 +61,10 @@ struct SettingsView: View {
                             .listRowBackground(Color.currentSecondaryBackground)
                         }
                     }
+                } header: {
+                    Text("Data Management")
                 }
-                
-                // iCloud Backup Section
-                Section("iCloud Backup") {
-                    Button("Backup to iCloud") {
-                        logger.logUserAction("Backup to iCloud button tapped")
-                        showingBackupSheet = true
-                    }
-                    .foregroundColor(Color.currentPrimary)
-                    .disabled(isBackingUp)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    Button("Restore from iCloud") {
-                        logger.logUserAction("Restore from iCloud button tapped")
-                        showingRestoreSheet = true
-                    }
-                    .foregroundColor(Color.currentSuccess)
-                    .disabled(isRestoring)
-                    .listRowBackground(Color.currentSecondaryBackground)
-                    
-                    if let backupInfo = backupInfo {
-                        HStack {
-                            Text("Last Backup")
-                            Spacer()
-                            Text(backupInfo.timestamp, style: .relative)
-                                .foregroundColor(Color.currentSecondaryText)
-                        }
-                        .listRowBackground(Color.currentSecondaryBackground)
-                    }
-                }
-                
-                // Week Settings Section
+
                 Section("Week Settings") {
                     Picker("Week Starts On", selection: $weekStartDay) {
                         Text("Sunday").tag(1)
@@ -119,10 +78,9 @@ struct SettingsView: View {
                     .pickerStyle(.menu)
                     .listRowBackground(Color.currentSecondaryBackground)
                 }
-                
-                // Theme Settings Section
+
                 SettingsAppearanceSection()
-                
+
                 SettingsDataSection(showingDeleteConfirmation: $showingDeleteConfirmation)
                 SettingsHelpAndFeedbackSection()
                 SettingsAboutSection(onViewOnboarding: showOnboardingAgain)
@@ -137,13 +95,6 @@ struct SettingsView: View {
             .onAppear {
                 logger.info("SettingsView appeared")
                 logger.debug("Metrics count: \(metrics.count), Entries count: \(entries.count)", category: .data)
-                // Update time every second
-                Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
-                    currentTime = Date()
-                }
-                
-                // Load backup info
-                loadBackupInfo()
             }
             .sheet(isPresented: $showingExportSheet) {
                 if let exportData = exportData {
@@ -151,32 +102,6 @@ struct SettingsView: View {
                         .onAppear {
                             logger.info("Export data sheet presented")
                         }
-                }
-            }
-            .sheet(isPresented: $showingBackupSheet) {
-                BackupSheet(
-                    backupService: backupService,
-                    metrics: metrics,
-                    entries: entries,
-                    isBackingUp: $isBackingUp,
-                    backupError: $backupError
-                )
-                .onAppear {
-                    logger.info("Backup sheet presented")
-                }
-            }
-            .sheet(isPresented: $showingRestoreSheet) {
-                RestoreSheet(
-                    backupService: backupService,
-                    isRestoring: $isRestoring,
-                    backupError: $backupError,
-                    onRestore: { backupData in
-                        try backupService.restoreFromBackup(backupData, context: modelContext)
-                        WidgetSyncCoordinator.onDataChanged(context: modelContext)
-                    }
-                )
-                .onAppear {
-                    logger.info("Restore sheet presented")
                 }
             }
             .alert("Reset All Local Data", isPresented: $showingDeleteConfirmation) {
@@ -241,17 +166,20 @@ struct SettingsView: View {
             let data = try Data(contentsOf: url)
             let payload = try TrackBothExport.decode(data)
             let counts = try ExportImportService.importPayload(payload, into: modelContext)
-            importedSummary = "Imported \(counts.metrics) habits and \(counts.entries) entries."
+            importedSummary = "Imported \(counts.metrics) habits, \(counts.entries) entries, and \(counts.goals) goals."
             showingImportSuccess = true
             WidgetSyncCoordinator.onDataChanged(context: modelContext)
-            logger.info("JSON import succeeded — \(counts.metrics) metrics, \(counts.entries) entries", category: .data)
+            logger.info(
+                "JSON import succeeded — \(counts.metrics) metrics, \(counts.entries) entries, \(counts.goals) goals",
+                category: .data
+            )
         } catch {
             importErrorMessage = error.localizedDescription
             showingImportError = true
             logger.error("JSON import failed: \(error.localizedDescription)", category: .data)
         }
     }
-    
+
     private func generateExportData() -> Data? {
         do {
             return try TrackBothExport.encode(metrics: metrics, entries: entries)
@@ -260,58 +188,29 @@ struct SettingsView: View {
             return nil
         }
     }
-    
+
     private func deleteAllData() {
         withAnimation {
-            // Delete all entries
             for entry in entries {
                 modelContext.delete(entry)
             }
-            
-            // No separate goals to delete
-            
-            // Delete all metrics
+
             for metric in metrics {
                 modelContext.delete(metric)
             }
-            
+
             MetricCostStore.clearAll()
             MetricDisplayPreferences.clearAll()
             modelContext.saveChanges(operation: "delete all data", entity: "Model")
             WidgetSyncCoordinator.onDataChanged(context: modelContext)
         }
     }
-    
+
     private func showOnboardingAgain() {
-        // Reset the onboarding completion flag
         UserDefaults.standard.set(false, forKey: ThemePreferences.hasCompletedOnboarding)
         AppEvent.post(.onboardingCompleted)
     }
-    
-    private func loadBackupInfo() {
-        Task {
-            guard await backupService.checkiCloudAvailability() else {
-                await MainActor.run { self.backupInfo = nil }
-                return
-            }
-
-            do {
-                let info = try await backupService.getBackupInfo()
-                await MainActor.run {
-                    self.backupInfo = info
-                }
-            } catch BackupError.noBackupFound {
-                await MainActor.run { self.backupInfo = nil }
-            } catch {
-                logger.debug("Could not load iCloud backup info: \(error.localizedDescription)", category: .network)
-                await MainActor.run { self.backupInfo = nil }
-            }
-        }
-    }
 }
-
-// MARK: - Export Data Models
-// See Domain/Data/TrackBothExport.swift for canonical export types.
 
 // MARK: - Settings Data Section
 private struct SettingsDataSection: View {
@@ -515,12 +414,12 @@ private struct FontDesignPicker: View {
 // MARK: - Share Sheet
 struct ShareSheet: UIViewControllerRepresentable {
     let activityItems: [Any]
-    
+
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: activityItems, applicationActivities: nil)
         return controller
     }
-    
+
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 

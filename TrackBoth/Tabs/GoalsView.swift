@@ -91,7 +91,7 @@ struct GoalsView: View {
     }
 
     @ViewBuilder
-    private func goalsScrollContent(idPrefix: String, geometry: GeometryProxy) -> some View {
+    private func goalsScrollContent(idPrefix: String, geometry: GeometryProxy?) -> some View {
         ScrollView {
             VStack(spacing: 16) {
                 if !booleanGoals.isEmpty {
@@ -132,7 +132,7 @@ struct GoalsView: View {
             .adaptiveScrollInset()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .id("goals-\(idPrefix)-\(geometry.size.width)-\(geometry.size.height)")
+        .id("goals-\(idPrefix)-\(Int(geometry?.size.width ?? 0))-\(Int(geometry?.size.height ?? 0))")
     }
 }
 

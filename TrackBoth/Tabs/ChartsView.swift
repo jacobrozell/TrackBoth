@@ -24,7 +24,7 @@ struct ChartsView: View {
             Group {
                 if metrics.isEmpty {
                     ChartsEmptyStateView()
-                } else if usesSplit {
+                } else if usesSplit, let geometry {
                     LandscapeSplitLayout(
                         totalWidth: geometry.size.width,
                         totalHeight: geometry.size.height,

@@ -36,7 +36,7 @@ struct HistoryEntryCardView: View {
     
     private var savingsSubtitle: String? {
         guard let metric, metric.habitType == .vice, isSuccess else { return nil }
-        let cost = MetricCostStore.costPerUnit(for: metric.id)
+        let cost = metric.costPerUnitDecimal
         let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: entry.date)
         return ViceSavingsCalculator.savingsLabel(streak: streak, costPerUnit: cost)
     }

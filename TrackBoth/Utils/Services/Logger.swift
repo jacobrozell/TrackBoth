@@ -37,7 +37,6 @@ enum LogCategory: String, CaseIterable {
     case ui = "UI"
     case data = "DATA"
     case business = "BUSINESS"
-    case network = "NETWORK"
     case widget = "WIDGET"
     case performance = "PERFORMANCE"
     case general = "GENERAL"

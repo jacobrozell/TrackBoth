@@ -17,47 +17,8 @@ struct AddMetricView: View {
         selectedGoalPeriod.maxDays
     }
     
-    private var quickPresets: [QuickPreset] {
-        let isVice = selectedHabitType == .vice
-        
-        switch selectedGoalPeriod {
-        case .weekly:
-            return isVice ? [
-                QuickPreset(title: "Never", target: 0),
-                QuickPreset(title: "Rarely", target: 1),
-                QuickPreset(title: "Occasionally", target: 2),
-                QuickPreset(title: "Moderately", target: 3)
-            ] : [
-                QuickPreset(title: "Daily", target: 7),
-                QuickPreset(title: "5 Days", target: 5),
-                QuickPreset(title: "3 Days", target: 3),
-                QuickPreset(title: "Weekends", target: 2)
-            ]
-        case .monthly:
-            return isVice ? [
-                QuickPreset(title: "Never", target: 0),
-                QuickPreset(title: "Rarely", target: 2),
-                QuickPreset(title: "Occasionally", target: 5),
-                QuickPreset(title: "Moderately", target: 10)
-            ] : [
-                QuickPreset(title: "Daily", target: 30),
-                QuickPreset(title: "5x Week", target: 20),
-                QuickPreset(title: "3x Week", target: 12),
-                QuickPreset(title: "Weekends", target: 8)
-            ]
-        case .yearly:
-            return isVice ? [
-                QuickPreset(title: "Never", target: 0),
-                QuickPreset(title: "Rarely", target: 24),
-                QuickPreset(title: "Occasionally", target: 60),
-                QuickPreset(title: "Moderately", target: 120)
-            ] : [
-                QuickPreset(title: "Daily", target: 365),
-                QuickPreset(title: "5x Week", target: 260),
-                QuickPreset(title: "3x Week", target: 156),
-                QuickPreset(title: "Weekends", target: 104)
-            ]
-        }
+    private var quickPresets: [GoalPreset] {
+        getBooleanPresets(for: selectedGoalPeriod, isVice: selectedHabitType == .vice)
     }
     
     var body: some View {

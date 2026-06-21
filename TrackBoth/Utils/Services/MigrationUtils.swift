@@ -80,8 +80,40 @@ struct MigrationUtils {
         }
     }
 
+    /// Backfill `Metric.costPerUnit` from legacy UserDefaults storage.
+    static func migrateCostPerUnitFromUserDefaults(in modelContext: ModelContext) {
+        let legacyCosts = MetricCostStore.legacyCostMap()
+        guard !legacyCosts.isEmpty else { return }
+
+        logger.info("Migrating \(legacyCosts.count) legacy cost-per-unit values into SwiftData", category: .data)
+
+        do {
+            let metrics = try modelContext.fetch(FetchDescriptor<Metric>())
+            var updated = 0
+
+            for metric in metrics {
+                guard metric.costPerUnit == nil,
+                      let encoded = legacyCosts[metric.id.uuidString] else {
+                    continue
+                }
+                metric.applyEncodedCostPerUnit(encoded)
+                updated += 1
+            }
+
+            if updated > 0 {
+                try modelContext.save()
+            }
+            MetricCostStore.clearAll()
+            logger.info("Cost-per-unit migration completed — updated \(updated) metrics", category: .data)
+        } catch {
+            logger.error("Cost-per-unit migration failed: \(error.localizedDescription)", category: .data)
+        }
+    }
+
     /// Run migration if needed
     static func runMigrationIfNeeded(in modelContext: ModelContext) {
+        migrateCostPerUnitFromUserDefaults(in: modelContext)
+
         if needsMigration(in: modelContext) {
             logger.info("Running logged status migration", category: .data)
             migrateLoggedStatus(in: modelContext)

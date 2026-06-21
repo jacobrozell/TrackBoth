@@ -71,7 +71,7 @@ enum WidgetSnapshotBuilder {
         if metric.habitType == .vice,
            let label = ViceSavingsCalculator.savingsLabel(
                streak: streak,
-               costPerUnit: MetricCostStore.costPerUnit(for: metric.id)
+               costPerUnit: metric.costPerUnitDecimal
            ) {
             savings = WidgetSavingsSnapshot(label: label)
         }

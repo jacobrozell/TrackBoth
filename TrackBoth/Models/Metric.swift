@@ -12,6 +12,8 @@ class Metric {
     var habitType: HabitType = HabitType.positive
     var primaryMotivation: String? // Primary motivation set when creating the habit/vice
     var hasBeenLogged: Bool = false // User has ever explicitly logged this metric
+    /// Optional per-unit cost for vice savings (decimal string).
+    var costPerUnit: String?
     
     // Relationship to goals (one metric can have multiple goals)
     @Relationship(deleteRule: .cascade, inverse: \Goal.metric)
@@ -61,5 +63,32 @@ class Metric {
     /// Check if metric has goals for a specific period
     func hasGoals(for period: GoalPeriod) -> Bool {
         return !goals(for: period).isEmpty
+    }
+
+    var costPerUnitDecimal: Decimal? {
+        guard let costPerUnit,
+              let decimal = Decimal(string: costPerUnit),
+              decimal > 0 else {
+            return nil
+        }
+        return decimal
+    }
+
+    func setCostPerUnitDecimal(_ value: Decimal?) {
+        if let value, value > 0 {
+            costPerUnit = NSDecimalNumber(decimal: value).stringValue
+        } else {
+            costPerUnit = nil
+        }
+    }
+
+    func applyEncodedCostPerUnit(_ encoded: String?) {
+        guard let encoded,
+              let cost = Decimal(string: encoded),
+              cost > 0 else {
+            costPerUnit = nil
+            return
+        }
+        setCostPerUnitDecimal(cost)
     }
 }

@@ -22,10 +22,6 @@ enum ProductSurface {
     static var showsWidget: Bool { current == .development }
     static var showsWatch: Bool { false }
     static var showsMotivationGame: Bool { false }
-    static var showsAchievements: Bool { false }
-    static var showsNotifications: Bool { false }
-    static var showsShortcuts: Bool { false }
-    static var showsDebugLogging: Bool { current == .development }
     static var showsAccessibilityMarketing: Bool { true }
 
     /// Whether a post-1.0 surface should be visible in the current build.

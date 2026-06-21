@@ -86,7 +86,7 @@ final class WidgetSnapshotBuilderTests: XCTestCase {
         let metric = Metric(name: "Smoking", habitType: .vice)
         metric.hasBeenLogged = true
         MetricStore(context: context).insert(metric)
-        MetricCostStore.setCostPerUnit(12, for: metric.id)
+        metric.setCostPerUnitDecimal(12)
 
         let today = Calendar.current.startOfDay(for: Date())
         let entry = MetricEntry(metricID: metric.id, date: today, value: false, hasBeenLogged: true)

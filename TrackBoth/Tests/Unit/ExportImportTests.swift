@@ -59,8 +59,8 @@ final class ExportImportTests: XCTestCase {
     func testExportImportRoundTripsCostPerUnit() throws {
         let metric = Metric(name: "Smoking", habitType: .vice, primaryMotivation: "For my health")
         metric.hasBeenLogged = true
+        metric.setCostPerUnitDecimal(8)
         context.insert(metric)
-        MetricCostStore.setCostPerUnit(8, for: metric.id)
 
         let day = Calendar.current.startOfDay(for: Date())
         let entry = MetricEntry(metricID: metric.id, date: day, value: false, hasBeenLogged: true)
@@ -69,16 +69,40 @@ final class ExportImportTests: XCTestCase {
 
         let data = try TrackBothExport.encode(metrics: [metric], entries: [entry])
         let payload = try TrackBothExport.decode(data)
-        XCTAssertEqual(payload.schemaVersion, 3)
+        XCTAssertEqual(payload.schemaVersion, 4)
         XCTAssertEqual(payload.metrics.first?.costPerUnit, "8")
         XCTAssertEqual(payload.metrics.first?.primaryMotivation, "For my health")
 
-        MetricCostStore.clearAll()
         _ = try ExportImportService.importPayload(payload, into: context)
 
-        XCTAssertEqual(MetricCostStore.costPerUnit(for: metric.id), 8)
         let importedMetrics = try context.fetch(FetchDescriptor<Metric>())
+        XCTAssertEqual(importedMetrics.first?.costPerUnitDecimal, 8)
         XCTAssertEqual(importedMetrics.first?.primaryMotivation, "For my health")
+    }
+
+    func testExportImportRoundTripsGoals() throws {
+        let metric = Metric(name: "Exercise", habitType: .positive)
+        context.insert(metric)
+
+        let goal = Goal(goalType: .boolean, period: .weekly, target: 5)
+        goal.metric = metric
+        metric.goals?.append(goal)
+        context.insert(goal)
+
+        let day = Calendar.current.startOfDay(for: Date())
+        let entry = MetricEntry(metricID: metric.id, date: day, value: true, hasBeenLogged: true)
+        context.insert(entry)
+        try context.save()
+
+        let payload = try ExportImportService.exportRoundTrip(metrics: [metric], entries: [entry])
+        XCTAssertEqual(payload.goals?.count, 1)
+        XCTAssertEqual(payload.goals?.first?.target, 5)
+
+        _ = try ExportImportService.importPayload(payload, into: context)
+        let importedGoals = try context.fetch(FetchDescriptor<Goal>())
+        XCTAssertEqual(importedGoals.count, 1)
+        XCTAssertEqual(importedGoals.first?.target, 5)
+        XCTAssertEqual(importedGoals.first?.period, .weekly)
     }
 
     func testExportImportRoundTripsMood() throws {
@@ -129,6 +153,7 @@ final class ExportImportTests: XCTestCase {
                     hasBeenLogged: nil
                 )
             ],
+            goals: nil,
             exportDate: Date(timeIntervalSince1970: 172_800)
         )
 

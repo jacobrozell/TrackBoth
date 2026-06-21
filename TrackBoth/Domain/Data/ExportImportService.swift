@@ -5,7 +5,7 @@ import SwiftData
 struct ExportImportService {
 
     @discardableResult
-    static func importPayload(_ payload: TrackBothExport.Payload, into context: ModelContext) throws -> (metrics: Int, entries: Int) {
+    static func importPayload(_ payload: TrackBothExport.Payload, into context: ModelContext) throws -> (metrics: Int, entries: Int, goals: Int) {
         guard payload.schemaVersion <= TrackBothExport.currentSchemaVersion else {
             throw ExportImportError.unsupportedSchema(payload.schemaVersion)
         }
@@ -31,9 +31,37 @@ struct ExportImportService {
             metric.id = id
             metric.createdAt = record.createdAt
             metric.hasBeenLogged = record.hasBeenLogged ?? false
+            metric.applyEncodedCostPerUnit(record.costPerUnit)
             context.insert(metric)
             metricByID[id] = metric
-            MetricCostStore.applyEncodedCostPerUnit(record.costPerUnit, for: id)
+        }
+
+        var importedGoals = 0
+        if let goalRecords = payload.goals {
+            for record in goalRecords {
+                guard let id = UUID(uuidString: record.id),
+                      let metricID = UUID(uuidString: record.metricID),
+                      let metric = metricByID[metricID],
+                      let goalType = GoalType(rawValue: record.goalType),
+                      let period = GoalPeriod(rawValue: record.period) else {
+                    continue
+                }
+
+                let goal = Goal(
+                    goalType: goalType,
+                    period: period,
+                    target: record.target,
+                    quantityGoalType: record.quantityGoalType.flatMap { QuantityGoalType(rawValue: $0) },
+                    defaultUnit: record.defaultUnit,
+                    maxDailyQuantity: record.maxDailyQuantity
+                )
+                goal.id = id
+                goal.createdAt = record.createdAt
+                goal.metric = metric
+                metric.goals?.append(goal)
+                context.insert(goal)
+                importedGoals += 1
+            }
         }
 
         var importedEntries = 0
@@ -62,7 +90,7 @@ struct ExportImportService {
         }
 
         try context.save()
-        return (payload.metrics.count, importedEntries)
+        return (payload.metrics.count, importedEntries, importedGoals)
     }
 
     static func exportRoundTrip(metrics: [Metric], entries: [MetricEntry]) throws -> TrackBothExport.Payload {

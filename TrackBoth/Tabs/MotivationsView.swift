@@ -85,7 +85,7 @@ struct MotivationsView: View {
     }
 
     @ViewBuilder
-    private func motivationsScrollContent(idPrefix: String, geometry: GeometryProxy) -> some View {
+    private func motivationsScrollContent(idPrefix: String, geometry: GeometryProxy?) -> some View {
         let primaryMotivations = viewModel.primaryMotivations(metrics)
         let dailyMotivations = viewModel.dailyMotivations(entries, metrics: metrics)
 
@@ -124,7 +124,7 @@ struct MotivationsView: View {
             .padding(.vertical, 8)
             .adaptiveScrollInset()
         }
-        .id("motivations-\(idPrefix)-\(geometry.size.width)-\(geometry.size.height)")
+        .id("motivations-\(idPrefix)-\(Int(geometry?.size.width ?? 0))-\(Int(geometry?.size.height ?? 0))")
     }
 }
 

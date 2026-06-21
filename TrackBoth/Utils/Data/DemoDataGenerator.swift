@@ -42,7 +42,7 @@ struct DemoDataGenerator {
             metrics.append(metric)
 
             if let cost = plan.costPerUnit {
-                MetricCostStore.setCostPerUnit(cost, for: metric.id)
+                metric.setCostPerUnitDecimal(cost)
             }
             if plan.showRecoveryTimer {
                 MetricDisplayPreferences.setShowTimeSinceSlip(true, for: metric.id)
@@ -208,7 +208,6 @@ struct DemoDataGenerator {
 
     static func clearDemoData(modelContext: ModelContext) {
         UserDefaults.standard.set(false, forKey: "hasDemoData")
-        MetricCostStore.clearAll()
         MetricDisplayPreferences.clearAll()
         MilestoneStore.clearAll()
 

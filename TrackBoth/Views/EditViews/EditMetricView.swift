@@ -19,47 +19,8 @@ struct EditMetricView: View {
         goalPeriod.maxDays
     }
     
-    private var quickPresetsForEdit: [QuickPreset] {
-        let isVice = habitType == .vice
-        
-        switch goalPeriod {
-        case .weekly:
-            return isVice ? [
-                QuickPreset(title: "Never", target: 0),
-                QuickPreset(title: "Rarely", target: 1),
-                QuickPreset(title: "Occasionally", target: 2),
-                QuickPreset(title: "Moderately", target: 3)
-            ] : [
-                QuickPreset(title: "Daily", target: 7),
-                QuickPreset(title: "5 Days", target: 5),
-                QuickPreset(title: "3 Days", target: 3),
-                QuickPreset(title: "Weekends", target: 2)
-            ]
-        case .monthly:
-            return isVice ? [
-                QuickPreset(title: "Never", target: 0),
-                QuickPreset(title: "Rarely", target: 2),
-                QuickPreset(title: "Occasionally", target: 5),
-                QuickPreset(title: "Moderately", target: 10)
-            ] : [
-                QuickPreset(title: "Daily", target: 30),
-                QuickPreset(title: "5x Week", target: 20),
-                QuickPreset(title: "3x Week", target: 12),
-                QuickPreset(title: "Weekends", target: 8)
-            ]
-        case .yearly:
-            return isVice ? [
-                QuickPreset(title: "Never", target: 0),
-                QuickPreset(title: "Rarely", target: 24),
-                QuickPreset(title: "Occasionally", target: 60),
-                QuickPreset(title: "Moderately", target: 120)
-            ] : [
-                QuickPreset(title: "Daily", target: 365),
-                QuickPreset(title: "5x Week", target: 260),
-                QuickPreset(title: "3x Week", target: 156),
-                QuickPreset(title: "Weekends", target: 104)
-            ]
-        }
+    private var quickPresetsForEdit: [GoalPreset] {
+        getBooleanPresets(for: goalPeriod, isVice: habitType == .vice)
     }
 
     init(metric: Metric) {
@@ -69,7 +30,7 @@ struct EditMetricView: View {
         _goalPeriod = State(initialValue: metric.booleanGoals.first?.period ?? .monthly)
         _goalTarget = State(initialValue: metric.booleanGoals.first?.target ?? 20)
         _primaryMotivation = State(initialValue: metric.primaryMotivation ?? "")
-        if let cost = MetricCostStore.costPerUnit(for: metric.id) {
+        if let cost = metric.costPerUnitDecimal {
             _costPerUnitText = State(initialValue: NSDecimalNumber(decimal: cost).stringValue)
         }
         _showTimeSinceSlip = State(initialValue: MetricDisplayPreferences.showTimeSinceSlip(for: metric.id))
@@ -250,12 +211,12 @@ struct EditMetricView: View {
         if habitType == .vice {
             let trimmedCost = costPerUnitText.trimmingCharacters(in: .whitespacesAndNewlines)
             if trimmedCost.isEmpty {
-                MetricCostStore.setCostPerUnit(nil, for: metric.id)
+                metric.setCostPerUnitDecimal(nil)
             } else if let cost = Decimal(string: trimmedCost), cost > 0 {
-                MetricCostStore.setCostPerUnit(cost, for: metric.id)
+                metric.setCostPerUnitDecimal(cost)
             }
         } else {
-            MetricCostStore.setCostPerUnit(nil, for: metric.id)
+            metric.setCostPerUnitDecimal(nil)
         }
 
         if habitType == .vice {

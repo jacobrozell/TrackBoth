@@ -155,7 +155,6 @@ class HomeViewModel {
             }
 
             modelContext.delete(metric)
-            MetricCostStore.remove(for: metric.id)
             MetricDisplayPreferences.remove(for: metric.id)
 
             if modelContext.saveChanges(operation: "delete metric \(metric.name)", entity: "Metric") {

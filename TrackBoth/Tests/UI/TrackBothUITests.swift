@@ -172,6 +172,18 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(app.buttons["settings_button"].waitForExistence(timeout: 10))
     }
 
+    func testSettingsSheetOpens() throws {
+        launch()
+        tapTab(named: "Home")
+        let settingsButton = app.buttons["settings_button"].exists
+            ? app.buttons["settings_button"]
+            : app.buttons["Settings"]
+        XCTAssertTrue(settingsButton.waitForExistence(timeout: 10))
+        settingsButton.tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Appearance"].waitForExistence(timeout: 5))
+    }
+
     func testPortraitFABHasCorrectIdentifier() throws {
         try XCTSkipIf(isPad, "Portrait FAB is iPhone-only")
 

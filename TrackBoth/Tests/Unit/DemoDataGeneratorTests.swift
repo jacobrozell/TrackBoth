@@ -80,7 +80,7 @@ final class DemoDataGeneratorTests: XCTestCase {
             return
         }
 
-        XCTAssertEqual(MetricCostStore.costPerUnit(for: smoking.id), 12)
+        XCTAssertEqual(smoking.costPerUnitDecimal, 12)
         let streak = StreakUtils.calculateCurrentStreak(for: smoking, entries: entries)
         XCTAssertGreaterThanOrEqual(streak, 7)
         XCTAssertNotNil(ViceSavingsCalculator.savingsLabel(streak: streak, costPerUnit: 12))

@@ -12,27 +12,31 @@ struct BootstrapStoreRecovery {
 
     static func makeContainer() -> ModelContainer {
         mode = .normal
-        let schema = Schema([Metric.self, MetricEntry.self, Goal.self])
+        let schema = Schema(versionedSchema: TrackBothSchemaV1.self)
 
         do {
-            return try ModelContainer(for: schema)
+            let config = ModelConfiguration("TrackBoth", schema: schema)
+            return try ModelContainer(for: schema, configurations: [config])
         } catch {
             logger.error("SwiftData persistent store failed: \(error.localizedDescription)", category: .data)
             logger.warn("Falling back to in-memory store", category: .data)
-
-            do {
-                let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                let container = try ModelContainer(for: schema, configurations: [config])
-                mode = .inMemoryFallback
-                return container
-            } catch {
-                logger.fatal("In-memory store failed: \(error.localizedDescription)", category: .data)
-                fatalError("Could not create ModelContainer: \(error)")
-            }
+            return makeInMemoryContainer(schema: schema)
         }
     }
 
     static func resetModeForTesting() {
         mode = .normal
+    }
+
+    private static func makeInMemoryContainer(schema: Schema) -> ModelContainer {
+        do {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            let container = try ModelContainer(for: schema, configurations: [config])
+            mode = .inMemoryFallback
+            return container
+        } catch {
+            logger.fatal("In-memory store failed: \(error.localizedDescription)", category: .data)
+            fatalError("Could not create ModelContainer: \(error)")
+        }
     }
 }

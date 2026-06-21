@@ -3,12 +3,13 @@ import Foundation
 // MARK: - Export / Import
 /// Versioned JSON export format for TrackBoth data.
 enum TrackBothExport {
-    static let currentSchemaVersion = 3
+    static let currentSchemaVersion = 4
 
     struct Payload: Codable, Equatable {
         let schemaVersion: Int
         let metrics: [MetricRecord]
         let entries: [EntryRecord]
+        let goals: [GoalRecord]?
         let exportDate: Date
     }
 
@@ -20,6 +21,18 @@ enum TrackBothExport {
         let hasBeenLogged: Bool?
         let primaryMotivation: String?
         let costPerUnit: String?
+    }
+
+    struct GoalRecord: Codable, Equatable {
+        let id: String
+        let metricID: String
+        let goalType: String
+        let period: String
+        let target: Int
+        let createdAt: Date
+        let quantityGoalType: String?
+        let defaultUnit: String?
+        let maxDailyQuantity: Int?
     }
 
     struct EntryRecord: Codable, Equatable {
@@ -37,7 +50,23 @@ enum TrackBothExport {
     }
 
     static func makePayload(metrics: [Metric], entries: [MetricEntry], exportDate: Date = Date()) -> Payload {
-        Payload(
+        let goalRecords = metrics.flatMap { metric -> [GoalRecord] in
+            (metric.goals ?? []).map { goal in
+                GoalRecord(
+                    id: goal.id.uuidString,
+                    metricID: metric.id.uuidString,
+                    goalType: goal.goalType.rawValue,
+                    period: goal.period.rawValue,
+                    target: goal.target,
+                    createdAt: goal.createdAt,
+                    quantityGoalType: goal.quantityGoalType?.rawValue,
+                    defaultUnit: goal.defaultUnit,
+                    maxDailyQuantity: goal.maxDailyQuantity
+                )
+            }
+        }
+
+        return Payload(
             schemaVersion: currentSchemaVersion,
             metrics: metrics.map { metric in
                 MetricRecord(
@@ -47,7 +76,7 @@ enum TrackBothExport {
                     habitType: metric.habitType.rawValue,
                     hasBeenLogged: metric.hasBeenLogged,
                     primaryMotivation: metric.primaryMotivation,
-                    costPerUnit: MetricCostStore.encodedCostPerUnit(for: metric.id)
+                    costPerUnit: metric.costPerUnit
                 )
             },
             entries: entries.map { entry in
@@ -65,6 +94,7 @@ enum TrackBothExport {
                     hasBeenLogged: entry.hasBeenLogged
                 )
             },
+            goals: goalRecords.isEmpty ? nil : goalRecords,
             exportDate: exportDate
         )
     }

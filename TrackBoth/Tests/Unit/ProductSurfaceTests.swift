@@ -11,9 +11,6 @@ final class ProductSurfaceTests: XCTestCase {
         #endif
         XCTAssertFalse(ProductSurface.showsWatch)
         XCTAssertFalse(ProductSurface.showsMotivationGame)
-        XCTAssertFalse(ProductSurface.showsAchievements)
-        XCTAssertFalse(ProductSurface.showsNotifications)
-        XCTAssertFalse(ProductSurface.showsShortcuts)
     }
 
     func testCoreSurfacesEnabled() {
@@ -25,12 +22,10 @@ final class ProductSurfaceTests: XCTestCase {
         #if DEBUG
         XCTAssertEqual(ProductSurface.current, .development)
         XCTAssertTrue(ProductSurface.showsDemoData)
-        XCTAssertTrue(ProductSurface.showsDebugLogging)
         XCTAssertTrue(ProductSurface.isEnabled(.demoData))
         #else
         XCTAssertEqual(ProductSurface.current, .lean1_0)
         XCTAssertFalse(ProductSurface.showsDemoData)
-        XCTAssertFalse(ProductSurface.showsDebugLogging)
         #endif
     }
 

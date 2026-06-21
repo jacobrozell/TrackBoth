@@ -288,7 +288,7 @@ struct CompactMetricRow: View {
 
     private var viceSavingsLabel: String? {
         let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
-        let cost = MetricCostStore.costPerUnit(for: metric.id)
+        let cost = metric.costPerUnitDecimal
         return ViceSavingsCalculator.savingsLabel(streak: streak, costPerUnit: cost)
     }
 

@@ -86,7 +86,7 @@ private struct HistoryViewContent: View {
     }
 
     @ViewBuilder
-    private func historyScrollContent(idPrefix: String, geometry: GeometryProxy) -> some View {
+    private func historyScrollContent(idPrefix: String, geometry: GeometryProxy?) -> some View {
         let recentEntries = viewModel.recentEntries(entries, metrics: metrics)
 
         ScrollView {
@@ -126,7 +126,7 @@ private struct HistoryViewContent: View {
             .padding(.vertical, 8)
             .adaptiveScrollInset()
         }
-        .id("history-\(idPrefix)-\(geometry.size.width)-\(geometry.size.height)")
+        .id("history-\(idPrefix)-\(Int(geometry?.size.width ?? 0))-\(Int(geometry?.size.height ?? 0))")
     }
 }
 
