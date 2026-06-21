@@ -27,6 +27,12 @@ struct MetricPreset: Identifiable, Hashable {
     static func presets(for habitType: HabitType) -> [MetricPreset] {
         habitType == .positive ? habitPresets : vicePresets
     }
+
+    /// Starter rows when onboarding completes with no chip selection.
+    static let onboardingPlaceholders: [MetricPreset] = [
+        MetricPreset(id: "placeholder-habit", name: "My habit", habitType: .positive, suggestedUnit: nil, icon: "plus.circle"),
+        MetricPreset(id: "placeholder-vice", name: "My vice", habitType: .vice, suggestedUnit: nil, icon: "plus.circle")
+    ]
 }
 
 // MARK: - MetricPresetFactory
@@ -60,5 +66,10 @@ enum MetricPresetFactory {
             context.saveChanges(operation: "create preset metrics", entity: "Metric")
         }
         return created
+    }
+
+    @discardableResult
+    static func createOnboardingPlaceholders(in context: ModelContext) -> [Metric] {
+        createMetrics(from: MetricPreset.onboardingPlaceholders, in: context)
     }
 }

@@ -46,6 +46,8 @@ struct TrackPadLandscapeLayout: View {
             TrackWeekCalendar(
                 days: weekDays,
                 selectedDate: viewModel.selectedDate,
+                metrics: metrics,
+                entries: entries,
                 usesAccessibilityLayout: usesAccessibilityLayout,
                 onSelect: { viewModel.selectedDate = $0 }
             )
@@ -57,6 +59,8 @@ struct TrackPadLandscapeLayout: View {
         VStack(spacing: 0) {
             TrackDashboardHeader(
                 weekDays: weekDays,
+                metrics: metrics,
+                entries: entries,
                 selectedDate: $viewModel.selectedDate,
                 isToday: viewModel.isToday,
                 todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),

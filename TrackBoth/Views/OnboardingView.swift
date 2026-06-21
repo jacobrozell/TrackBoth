@@ -156,7 +156,7 @@ struct OnboardingView: View {
                 } else {
                     VStack(spacing: 8) {
                         if !hasSelection {
-                            Text("Pick at least one habit or vice, or we'll help you add one next.")
+                            Text("Skip the picks and we'll add starter rows you can rename anytime.")
                                 .font(.footnote)
                                 .foregroundStyle(Color.currentSecondaryText)
                                 .multilineTextAlignment(.center)
@@ -181,15 +181,13 @@ struct OnboardingView: View {
         let presets = Array(selectedHabitPresets) + Array(selectedVicePresets)
         if !presets.isEmpty {
             MetricPresetFactory.createMetrics(from: presets, in: modelContext)
+        } else {
+            MetricPresetFactory.createOnboardingPlaceholders(in: modelContext)
         }
 
         logger.info("Onboarding completed with \(presets.count) preset metrics")
         UserDefaults.standard.set(true, forKey: ThemePreferences.hasCompletedOnboarding)
         AppEvent.post(.onboardingCompleted)
-
-        if presets.isEmpty {
-            AppEvent.post(.openAddMetric)
-        }
     }
 }
 
@@ -358,7 +356,7 @@ struct OnboardingPage {
         OnboardingPage(
             kind: .welcome,
             title: "Welcome to TrackBoth",
-            description: "Build good habits and break bad ones — in one simple daily log. We track streaks for habits and clean days for vices.",
+            description: "Build good habits and break bad ones — one daily log. Track your day, review History, and keep Motivations close when it gets hard.",
             icon: "arrow.triangle.2.circlepath",
             color: Color.currentPrimary
         ),
@@ -379,7 +377,7 @@ struct OnboardingPage {
         OnboardingPage(
             kind: .ready,
             title: "One tap a day",
-            description: "Log each habit or vice with a single tap on Track. Review your progress anytime in History.",
+            description: "Log habits and vices on Track. See patterns in History and Charts. Write Motivations to read when you need a reminder why.",
             icon: "hand.tap.fill",
             color: Color.currentAccent
         )

@@ -21,4 +21,10 @@ final class MetricPresetTests: XCTestCase {
         XCTAssertEqual(MetricPresetFactory.defaultMonthlyTarget(for: .positive), 20)
         XCTAssertEqual(MetricPresetFactory.defaultMonthlyTarget(for: .vice), 8)
     }
+
+    func testOnboardingPlaceholdersIncludeHabitAndVice() {
+        XCTAssertEqual(MetricPreset.onboardingPlaceholders.count, 2)
+        XCTAssertTrue(MetricPreset.onboardingPlaceholders.contains { $0.habitType == .positive })
+        XCTAssertTrue(MetricPreset.onboardingPlaceholders.contains { $0.habitType == .vice })
+    }
 }

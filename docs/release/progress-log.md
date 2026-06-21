@@ -185,3 +185,22 @@ See [`lean-1.0-master-plan.md`](lean-1.0-master-plan.md) — accessibility audit
 | Physical device QA | ⬜ manual |
 
 **Verified:** 45 unit + 3 UI tests green
+
+---
+
+## 2026-06-21
+
+### Ship surface locked + release prep ✅
+
+| Task | Status |
+|------|--------|
+| Jacob decisions recorded | ✅ [`FutureIdeas/ProductUXHandoff.md`](../../FutureIdeas/ProductUXHandoff.md) |
+| `ProductSurface` — 5-tab Release (Track, History, Motivation, Charts, Settings) | ✅ |
+| Hero streaks, calendar completion dots, slip motivation | ✅ |
+| Onboarding placeholder rows on skip | ✅ |
+| Widget embed removed from main app target | ✅ `project.yml` |
+| Docs aligned (inventory, core-scope, checklist, README, app-store-copy) | ✅ |
+| Tab order — Settings last | ✅ |
+| `DayLogSummaryTests` | ✅ |
+
+**Remaining for 1.0 ship:** device QA, dogfood, TestFlight, screenshots, hosted privacy URL.

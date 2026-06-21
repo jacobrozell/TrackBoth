@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 // MARK: - TrackMetricRow
-/// Simplified metric row for Confidence 1.0 — toggle, name, status, optional streak caption.
+/// Metric row for Track — toggle, name, status, hero streak, and extended metadata.
 struct TrackMetricRow: View {
     let metric: Metric
     let selectedDate: Date
@@ -58,12 +58,23 @@ struct TrackMetricRow: View {
         return (text: status.text, color: color)
     }
 
+    private var streakCount: Int {
+        StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
+    }
+
+    private var showsHeroStreak: Bool {
+        metric.hasBeenLogged && streakCount > 0
+    }
+
+    private var heroStreakLabel: String {
+        metric.habitType == .positive ? "streak" : "clean"
+    }
+
     private var streakCaption: String? {
-        let streak = StreakUtils.calculateCurrentStreak(for: metric, entries: entries, selectedDate: selectedDate)
-        guard metric.hasBeenLogged, streak > 0 else { return nil }
+        guard showsHeroStreak else { return nil }
         return metric.habitType == .positive
-            ? StreakCopy.habitStreak(streak)
-            : StreakCopy.viceClean(streak)
+            ? StreakCopy.habitStreak(streakCount)
+            : StreakCopy.viceClean(streakCount)
     }
 
     var body: some View {
@@ -90,41 +101,49 @@ struct TrackMetricRow: View {
     }
 
     private var compactRow: some View {
-        HStack(alignment: .center, spacing: 14) {
-            toggleButton
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .center, spacing: 14) {
+                toggleButton
 
-            Button(action: onLog) {
-                HStack(alignment: .center, spacing: 14) {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(metric.name)
-                            .font(.body.weight(.medium))
-                            .foregroundStyle(Color.currentText)
+                Button(action: onLog) {
+                    HStack(alignment: .center, spacing: 14) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text(metric.name)
+                                .font(.body.weight(.medium))
+                                .foregroundStyle(Color.currentText)
 
-                        HStack(spacing: 6) {
                             Text(statusInfo.text)
                                 .font(.subheadline)
                                 .foregroundStyle(statusInfo.color)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
-                            if let streakCaption {
-                                Text("·")
-                                    .foregroundStyle(Color.currentSecondaryText)
-                                Text(streakCaption)
-                                    .font(.subheadline)
+                        if showsHeroStreak {
+                            VStack(spacing: 0) {
+                                Text("\(streakCount)")
+                                    .font(.title2.weight(.bold).monospacedDigit())
+                                    .foregroundStyle(Color.currentText)
+                                Text(heroStreakLabel)
+                                    .font(.caption2.weight(.medium))
                                     .foregroundStyle(Color.currentSecondaryText)
                             }
+                            .accessibilityLabel(streakCaption ?? "")
                         }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
 
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.currentSecondaryText.opacity(0.6))
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Color.currentSecondaryText.opacity(0.6))
+                    }
+                    .contentShape(Rectangle())
                 }
-                .contentShape(Rectangle())
+                .buttonStyle(.plain)
+                .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
+                .accessibilityHint("Opens logging details for this day")
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
-            .accessibilityHint("Opens logging details for this day")
+
+            if ProductSurface.showsExtendedRowMetadata {
+                extendedMetadataRow
+            }
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
@@ -145,7 +164,11 @@ struct TrackMetricRow: View {
                 .font(.subheadline)
                 .foregroundColor(statusInfo.color)
 
-            if let streakCaption {
+            if showsHeroStreak, let streakCaption {
+                Text(streakCaption)
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(Color.currentText)
+            } else if let streakCaption {
                 Text(streakCaption)
                     .font(.caption)
                     .foregroundColor(Color.currentSecondaryText)

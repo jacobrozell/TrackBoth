@@ -1,64 +1,47 @@
-# TrackBoth - Boolean Habit Tracker
+# TrackBoth — Habits & Vices
 
-A SwiftUI/SwiftData prototype for tracking positive habits and avoiding vices with visualizations and goal tracking.
+A SwiftUI/SwiftData app for tracking positive habits and avoiding vices in one daily log.
 
-## Features
+**Stage:** Pre-ship RC · v1.0.0 (build 3) · **Free**
 
-✅ **Core Features**
-- Custom habit and vice creation and management
-- Daily yes/no logging with toggle interface
-- Smart tracking: positive habits (days done) vs vices (days avoided)
-- SwiftData persistence
-- Visual progress tracking with Swift Charts
+## Features (1.0)
 
-📱 **Views**
-- **Home**: List of habits and vices with daily toggles and streak tracking
-- **History**: Calendar view showing completion history
-- **Goals**: Set and track monthly/yearly goals with progress bars
-- **Charts**: Multiple visualization types (line, bar, heatmap) plus streak stats
+- **Track** — One-tap daily logging; habits + vices; hero streaks; goal progress on rows; milestone banners
+- **History** — Calendar, entry list, edit past logs
+- **Motivation** — Personal reasons to stay accountable (vice-focused)
+- **Charts** — Line, bar, heatmap progress views
+- **Settings** — JSON export/import, themes, delete all data
 
 ## Tech Stack
 
-- **SwiftUI** - Modern declarative UI framework
-- **SwiftData** - Data persistence and model management
-- **Swift Charts** - Data visualization
-- **iOS 17+** - Required for SwiftData and latest SwiftUI features
+- SwiftUI + SwiftData (iOS 18+)
+- Swift Charts
+- XcodeGen
 
 ## Getting Started
 
-1. Install [XcodeGen](https://github.com/yonaskolb/XcodeGen): `brew install xcodegen`
-2. Generate the Xcode project and open it:
-
 ```bash
-cd TrackBoth
+cd TrackBoth/TrackBoth
 xcodegen generate
 open TrackBoth.xcodeproj
 ```
 
-3. Build and run on iOS 18+ simulator or device
-4. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for schemes, tests, and CI
-
-## Data Model
-
-- **Metric**: Represents a habit or vice (name, type, creation date)
-- **MetricEntry**: Daily log entries (date, boolean value)
-- **Goal**: Targets for habits/vices (monthly/yearly, target count)
-
-## Architecture
-
-The app follows a simple MVVM pattern with SwiftData:
-- Models define the data structure
-- Views handle UI and user interaction
-- SwiftData manages persistence automatically
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for schemes, tests, and CI.
 
 ## Documentation
 
-- **Specs (authoritative):** [`specs/README.md`](specs/README.md)
-- **Lean 1.0 plan:** [`docs/release/lean-1.0-master-plan.md`](docs/release/lean-1.0-master-plan.md)
-- **Feature inventory:** [`docs/feature-inventory.md`](docs/feature-inventory.md)
+| Doc | Purpose |
+|-----|---------|
+| [`docs/release/1.0.0-ship-checklist.md`](docs/release/1.0.0-ship-checklist.md) | Pre-submit gate |
+| [`docs/release/app-store-copy.md`](docs/release/app-store-copy.md) | Listing copy |
+| [`docs/feature-inventory.md`](docs/feature-inventory.md) | What ships vs dev-only |
+| [`FutureIdeas/ProductUXHandoff.md`](FutureIdeas/ProductUXHandoff.md) | Ship decisions + backlog |
+| [`Specs/ProductSurfaceSpec.md`](Specs/ProductSurfaceSpec.md) | Release gating matrix |
 
-Legacy drafts in `Specs/` (capital S) are deprecated — see [`Specs/README.md`](Specs/README.md).
+## Schemes
 
-## Future Enhancements (post-1.0)
-
-See [`specs/planned/README.md`](specs/planned/README.md) — widgets, watch, notifications, achievements, etc.
+| Scheme | Use |
+|--------|-----|
+| `TrackBoth` | Run + test (Release archive) |
+| `TrackBothWidget` | Widget extension development |
+| `TrackBothScreenshots` | Screenshot demo data |

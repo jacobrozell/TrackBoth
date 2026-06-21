@@ -4,6 +4,8 @@ import SwiftUI
 /// Week picker + day context for the Track tab.
 struct TrackDashboardHeader: View {
     let weekDays: [Date]
+    let metrics: [Metric]
+    let entries: [MetricEntry]
     @Binding var selectedDate: Date
     let isToday: Bool
     let todayCompleted: Int
@@ -20,6 +22,8 @@ struct TrackDashboardHeader: View {
                 TrackWeekCalendar(
                     days: weekDays,
                     selectedDate: selectedDate,
+                    metrics: metrics,
+                    entries: entries,
                     usesAccessibilityLayout: usesAccessibilityLayout,
                     onSelect: { selectedDate = $0 }
                 )
@@ -62,6 +66,9 @@ struct TrackDashboardHeader: View {
 
     private var progressSubtitle: String {
         guard totalMetrics > 0 else { return "Add habits and vices to start logging" }
-        return "\(todayCompleted) of \(totalMetrics) logged"
+        let remaining = totalMetrics - todayCompleted
+        if remaining == 0 { return "All \(totalMetrics) logged — nice work" }
+        if remaining == 1 { return "\(todayCompleted) of \(totalMetrics) logged — 1 left" }
+        return "\(todayCompleted) of \(totalMetrics) logged — \(remaining) left"
     }
 }

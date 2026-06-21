@@ -241,14 +241,7 @@ Ship per [Lean 1.0 Master Plan](../release/lean-1.0-master-plan.md):
 
 **Clean Slate:** $2.99/mo · $14.99/yr (Pro)
 
-**Suggested TrackBoth model:**
-
-| Tier | Includes |
-|------|----------|
-| **Free** | Unlimited habits/vices, daily log, streaks, goals, basic motivations |
-| **Pro** (~$9.99/yr or $1.99/mo) | Full charts export, iCloud sync, premium themes, money-saved insights |
-
-Do not paywall the daily logging loop. Undercut on annual; compete on trust and dual tracking.
+**TrackBoth (locked 2026-06-21):** **Free always** — unlimited habits/vices, daily log, streaks, goals (row progress), motivations, charts, export. No Pro tier planned for 1.0.
 
 ---
 

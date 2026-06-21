@@ -6,6 +6,8 @@ Define lean 1.0.0 release gating — what users see in App Store builds vs full 
 
 Mirrors Dart Buddy `ProductSurface.lean1_0` pattern.
 
+**Decisions locked:** 2026-06-21 — see [`FutureIdeas/ProductUXHandoff.md`](../FutureIdeas/ProductUXHandoff.md).
+
 ---
 
 ## 2. Surfaces
@@ -13,78 +15,78 @@ Mirrors Dart Buddy `ProductSurface.lean1_0` pattern.
 | Surface | Build | Audience |
 |---------|-------|----------|
 | `lean1_0` | Release / TestFlight | App Store users |
-| `development` | Debug | Local dev, dogfood |
+| `development` | Debug (no `-lean_ui`) | Local dev, dogfood |
+| `lean1_0` simulated | Debug + `-lean_ui` | UI tests, screenshots |
 
 ---
 
-## 3. Lean 1.0 Feature Matrix
+## 3. Lean 1.0 Feature Matrix (2026-06-21)
 
 | Feature | lean1_0 | development |
 |---------|---------|-------------|
-| Home daily logging | ✅ | ✅ |
-| Goals (boolean + quantity) | ✅ | ✅ |
+| Track daily logging | ✅ | ✅ |
+| Extended row metadata (goals progress, savings, slip timer) | ✅ | ✅ |
+| Milestone banners | ✅ | ✅ |
 | History + edit | ✅ | ✅ |
-| Charts tab | ✅ | ✅ |
-| Motivations (basic feed) | ✅ | ✅ |
-| Settings + export + iCloud | ✅ | ✅ |
-| Onboarding | ✅ | ✅ |
-| Themes (curated subset) | ✅ | ✅ |
+| Charts tab (line, bar, heatmap) | ✅ | ✅ |
+| Charts — quantity type | ❌ | ✅ |
+| Motivation tab | ✅ | ✅ |
+| Goals tab | ❌ | ✅ |
+| Settings + export JSON | ✅ | ✅ |
+| Onboarding + placeholder rows on skip | ✅ | ✅ |
+| Themes (2 ship themes) | ✅ | ✅ |
+| Themes (4 extended) | ❌ | ✅ |
+| Extended logging upfront | ❌ | ✅ |
+| Advanced metric setup | ❌ | ✅ |
 | Demo data | ❌ | ✅ |
-| Widget extension | ❌ | ❌ (removed from scheme) |
-| Watch views / promos | ❌ | ❌ |
-| Motivation game | ❌ | ❌ |
-| Achievements | ❌ | ❌ |
-| Notifications | ❌ | ❌ |
-| Shortcuts | ❌ | ❌ |
+| Widget extension | ❌ | ✅ (dev scheme) |
+| Watch / motivation game | ❌ | ❌ |
+| Monetization | **Free** | **Free** |
 
 ---
 
-## 4. Implementation
+## 4. Release tab bar
+
+| Tab | Ships 1.0 |
+|-----|-------------|
+| Track | ✅ |
+| History | ✅ |
+| Settings | ✅ |
+| Motivation | ✅ |
+| Charts | ✅ |
+| Goals | Dev only |
+
+---
+
+## 5. Implementation
 
 Target: `Support/Release/ProductSurface.swift`
 
-```swift
-enum ProductSurface {
-    case lean1_0
-    case development
-
-    static var current: ProductSurface {
-        #if DEBUG
-        return .development
-        #else
-        return .lean1_0
-        #endif
-    }
-}
-```
-
-Gate demo buttons, debug menus, and any resurrected widget/watch entry points through `ProductSurface.current`.
-
-**Release scheme:** Exclude `TrackBoth-WidgetExtension` target.
+Use `isFullDevelopment` for dev-only flags. Ship features return `true` in both Release and `-lean_ui` DEBUG.
 
 ---
 
-## 5. Launch Arguments (UI tests)
+## 6. Launch Arguments (UI tests)
 
 | Argument | Effect |
 |----------|--------|
+| `-lean_ui` | Simulate Release ship surface in DEBUG |
 | `-ui_test_reset` | Fresh UserDefaults + empty store |
 | `-skip_onboarding` | Bypass onboarding for smoke tests |
 
 ---
 
-## 6. Testing
+## 7. Testing
 
-- `ProductSurfaceTests` — flag matrix
-- `Lean1_0SmokeUITests` — Release config has no demo/widget UI
+- `ProductSurfaceTests` — flag matrix + chart type availability
+- `TrackBothUITests` — lean tabs: Track, History, Settings, Motivation, Charts
 
 ---
 
-## 7. Verification
+## 8. Verification
 
 | Field | Value |
 |-------|--------|
 | **Estimated release** | `1.0.0` |
-| **Last verified** | 2026-06-14 |
-| **Commit** | (not implemented) |
-| **Code** | Target: `Support/Release/ProductSurface.swift` |
+| **Last verified** | 2026-06-21 |
+| **Code** | `Support/Release/ProductSurface.swift` |

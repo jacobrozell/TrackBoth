@@ -39,11 +39,11 @@ final class TrackBothUITests: XCTestCase {
     }
 
     private var leanTabNames: [String] {
-        ["Track", "History", "Settings"]
+        ["Track", "History", "Motivation", "Charts", "Settings"]
     }
 
     private var devTabNames: [String] {
-        leanTabNames + ["Goals", "Motivation", "Charts"]
+        leanTabNames + ["Goals"]
     }
 
     /// iPhone uses a bottom tab bar; iPad uses a floating top tab strip with nested cells.
@@ -109,7 +109,7 @@ final class TrackBothUITests: XCTestCase {
 
     func testAllLeanTabsAreReachable() throws {
         launch()
-        for name in ["History", "Settings", "Track"] {
+        for name in ["History", "Motivation", "Charts", "Settings", "Track"] {
             tapTab(named: name)
             assertOnTab(named: name)
         }
@@ -198,6 +198,8 @@ final class TrackBothUITests: XCTestCase {
 
         assertTabExists(named: "Track")
         assertOnTab(named: "Track")
+        XCTAssertTrue(app.staticTexts["My habit"].waitForExistence(timeout: 5)
+            || app.staticTexts["Habits"].waitForExistence(timeout: 5))
     }
 
     func testOnboardingSkipCompletesToMainTabs() throws {
@@ -214,6 +216,8 @@ final class TrackBothUITests: XCTestCase {
 
         assertTabExists(named: "Track")
         assertOnTab(named: "Track")
+        XCTAssertTrue(app.staticTexts["My habit"].waitForExistence(timeout: 5)
+            || app.staticTexts["My vice"].waitForExistence(timeout: 5))
     }
 
     func testTrackShowsNavigationTitle() throws {
@@ -260,7 +264,7 @@ final class TrackBothUITests: XCTestCase {
 
     #if DEBUG
     func testDevBuildShowsExtendedTabs() throws {
-        try XCTSkipIf(isPhone, "Extended tabs require iPad tab bar space")
+        try XCTSkipIf(isPhone, "Goals tab requires iPad tab bar space")
         launch(leanUI: false)
         for name in devTabNames {
             assertTabExists(named: name)

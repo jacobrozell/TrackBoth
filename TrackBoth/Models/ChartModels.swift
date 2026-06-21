@@ -53,4 +53,12 @@ enum ChartType: String, CaseIterable {
     var displayName: String {
         rawValue
     }
+
+    /// Chart types shipped in lean 1.0 Release (quantity deferred until polish passes).
+    static var availableInCurrentSurface: [ChartType] {
+        if ProductSurface.showsQuantityCharts {
+            return allCases
+        }
+        return [.line, .bar, .heatmap]
+    }
 }

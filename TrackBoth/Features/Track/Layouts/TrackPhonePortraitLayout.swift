@@ -24,6 +24,8 @@ struct TrackPhonePortraitLayout: View {
                 VStack(spacing: 16) {
                     TrackDashboardHeader(
                         weekDays: weekDays,
+                        metrics: metrics,
+                        entries: entries,
                         selectedDate: $viewModel.selectedDate,
                         isToday: viewModel.isToday,
                         todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),

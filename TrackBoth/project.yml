@@ -33,9 +33,6 @@ targets:
       - path: TrackBoth-Info.plist
         type: file
         buildPhase: none
-    dependencies:
-      - target: TrackBoth-WidgetExtension
-        embed: true
     entitlements:
       path: TrackBoth.entitlements
     settings:

@@ -4,6 +4,8 @@ import SwiftUI
 struct TrackWeekCalendar: View {
     let days: [Date]
     let selectedDate: Date
+    let metrics: [Metric]
+    let entries: [MetricEntry]
     let usesAccessibilityLayout: Bool
     let onSelect: (Date) -> Void
 
@@ -34,6 +36,7 @@ struct TrackWeekCalendar: View {
     private func dayCell(for day: Date) -> some View {
         let isSelected = CalendarHelper.isSameDay(day, selectedDate)
         let isToday = CalendarHelper.isToday(day)
+        let completion = DayLogSummary.completionState(metrics: metrics, entries: entries, on: day)
 
         Button {
             onSelect(day)
@@ -52,12 +55,34 @@ struct TrackWeekCalendar: View {
                         Circle()
                             .fill(isSelected ? Color.currentPrimary : (isToday ? Color.currentPrimary.opacity(0.12) : Color.clear))
                     }
+
+                completionDot(for: completion, isSelected: isSelected)
             }
             .frame(maxWidth: .infinity)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(accessibilityLabel(for: day, isSelected: isSelected))
+        .accessibilityLabel(accessibilityLabel(for: day, isSelected: isSelected, completion: completion))
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    @ViewBuilder
+    private func completionDot(for completion: DayLogCompletionState, isSelected: Bool) -> some View {
+        Circle()
+            .fill(dotColor(for: completion, isSelected: isSelected))
+            .frame(width: 5, height: 5)
+            .opacity(completion == .none ? 0 : 1)
+            .accessibilityHidden(true)
+    }
+
+    private func dotColor(for completion: DayLogCompletionState, isSelected: Bool) -> Color {
+        switch completion {
+        case .none:
+            return .clear
+        case .partial:
+            return isSelected ? Color.white.opacity(0.85) : Color.currentWarning
+        case .complete:
+            return isSelected ? Color.white : Color.currentSuccess
+        }
     }
 
     private func weekdayLabel(for date: Date) -> String {
@@ -72,10 +97,20 @@ struct TrackWeekCalendar: View {
         return formatter.string(from: date)
     }
 
-    private func accessibilityLabel(for date: Date, isSelected: Bool) -> String {
+    private func accessibilityLabel(
+        for date: Date,
+        isSelected: Bool,
+        completion: DayLogCompletionState
+    ) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .full
         let prefix = isSelected ? "Selected, " : ""
-        return "\(prefix)\(formatter.string(from: date))"
+        let completionLabel: String
+        switch completion {
+        case .none: completionLabel = "nothing logged"
+        case .partial: completionLabel = "partially logged"
+        case .complete: completionLabel = "fully logged"
+        }
+        return "\(prefix)\(formatter.string(from: date)), \(completionLabel)"
     }
 }

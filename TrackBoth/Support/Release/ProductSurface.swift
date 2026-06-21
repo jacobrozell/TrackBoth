@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Product Surface
 /// Gates lean 1.0 Release vs development-only features.
-/// See `specs/ProductSurfaceSpec.md`.
+/// See `Specs/ProductSurfaceSpec.md`.
 enum ProductSurfaceKind: Equatable {
     case lean1_0
     case development
@@ -17,21 +17,37 @@ enum ProductSurface {
         #endif
     }
 
-    /// Forces Confidence 1.0 navigation in DEBUG (UI tests, screenshots).
+    /// Simulates the App Store ship surface in DEBUG (UI tests, screenshots).
     static var forceLeanUI: Bool {
         ProcessInfo.processInfo.arguments.contains("-lean_ui")
     }
 
-    static var showsDemoData: Bool { current == .development }
-    static var showsGoals: Bool { current == .development && !forceLeanUI }
-    static var showsMotivation: Bool { current == .development && !forceLeanUI }
-    static var showsCharts: Bool { current == .development && !forceLeanUI }
-    static var showsMilestoneBanners: Bool { current == .development && !forceLeanUI }
-    static var showsExtendedRowMetadata: Bool { current == .development && !forceLeanUI }
-    static var showsExtendedThemes: Bool { current == .development && !forceLeanUI }
-    static var showsAdvancedMetricSetup: Bool { current == .development && !forceLeanUI }
-    static var showsExtendedLogging: Bool { current == .development && !forceLeanUI }
-    static var showsWidget: Bool { current == .development }
+    /// Full dev surface — extra tabs and polish targets not in 1.0 Release.
+    private static var isFullDevelopment: Bool {
+        #if DEBUG
+        return !forceLeanUI
+        #else
+        return false
+        #endif
+    }
+
+    static var showsDemoData: Bool { isFullDevelopment }
+
+    /// Goals tab — dev only; goal progress still shows on Track rows in Release.
+    static var showsGoals: Bool { isFullDevelopment }
+
+    static var showsMotivation: Bool { true }
+    static var showsCharts: Bool { true }
+    static var showsMilestoneBanners: Bool { true }
+    static var showsExtendedRowMetadata: Bool { true }
+
+    /// Quantity chart type — partial polish; dev only until QA passes.
+    static var showsQuantityCharts: Bool { isFullDevelopment }
+
+    static var showsExtendedThemes: Bool { isFullDevelopment }
+    static var showsAdvancedMetricSetup: Bool { isFullDevelopment }
+    static var showsExtendedLogging: Bool { isFullDevelopment }
+    static var showsWidget: Bool { isFullDevelopment }
     static var showsWatch: Bool { false }
     static var showsMotivationGame: Bool { false }
     static var showsAccessibilityMarketing: Bool { true }
@@ -48,6 +64,7 @@ enum ProductSurface {
         case .extendedThemes: showsExtendedThemes
         case .advancedMetricSetup: showsAdvancedMetricSetup
         case .extendedLogging: showsExtendedLogging
+        case .quantityCharts: showsQuantityCharts
         case .widget: showsWidget
         case .watch: showsWatch
         case .motivationGame: showsMotivationGame
@@ -65,6 +82,7 @@ enum LeanFeature {
     case extendedThemes
     case advancedMetricSetup
     case extendedLogging
+    case quantityCharts
     case widget
     case watch
     case motivationGame

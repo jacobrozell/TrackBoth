@@ -52,9 +52,9 @@ struct MotivationsView: View {
     private var noHabitsEmptyState: some View {
         EmptyStateView(
             icon: "plus.circle.fill",
-            title: "No Habits Yet",
-            subtitle: "Start tracking your habits and vices to build a better you",
-            actionTitle: "Add Your First Habit",
+            title: "Nothing to Track Yet",
+            subtitle: "Add habits and vices on Track, then write motivations to stay accountable.",
+            actionTitle: "Add Habit or Vice",
             action: { viewModel.showAddMetric() }
         )
         .background(Color.currentBackground)

@@ -24,6 +24,8 @@ struct TrackPhoneLandscapeLayout: View {
                 HStack(alignment: .top, spacing: 12) {
                     TrackDashboardHeader(
                         weekDays: weekDays,
+                        metrics: metrics,
+                        entries: entries,
                         selectedDate: $viewModel.selectedDate,
                         isToday: viewModel.isToday,
                         todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),

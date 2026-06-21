@@ -36,6 +36,17 @@ struct LoggingSheet: View, Identifiable {
         metric.habitType == .positive ? "Did it" : "Avoided it"
     }
 
+    private var isViceSlip: Bool {
+        guard metric.habitType == .vice else { return false }
+        return !TrackingSemantics.toggleIsOn(habitType: .vice, value: value)
+    }
+
+    private var slipMotivationReminder: String? {
+        guard isViceSlip else { return nil }
+        let trimmed = metric.primaryMotivation?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
     var body: some View {
         NavigationStack {
             Form {
@@ -55,6 +66,23 @@ struct LoggingSheet: View, Identifiable {
                 Section(header: Text("Notes")) {
                     TextField("Optional notes for this day", text: $details, axis: .vertical)
                         .lineLimit(2...4)
+                }
+
+                if let reminder = slipMotivationReminder {
+                    Section {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Label("Remember why", systemImage: "heart.text.square.fill")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Color.currentPrimary)
+                            Text(reminder)
+                                .font(.body)
+                                .foregroundStyle(Color.currentText)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.vertical, 4)
+                    } footer: {
+                        Text("Your motivation for this vice — read it before you close.")
+                    }
                 }
 
                 if ProductSurface.showsExtendedLogging {

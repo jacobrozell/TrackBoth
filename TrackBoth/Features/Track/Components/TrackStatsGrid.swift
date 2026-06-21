@@ -66,8 +66,8 @@ struct TrackStatsGrid: View {
                 TrackStatTile(
                     title: "Vices",
                     value: "\(totalVices)",
-                    icon: "xmark.circle.fill",
-                    tint: Color.currentError
+                    icon: "shield.fill",
+                    tint: Color.currentPrimary
                 )
             }
             if activeStreaks > 0 {

@@ -3,55 +3,60 @@ import XCTest
 
 final class ProductSurfaceTests: XCTestCase {
 
-    func testLeanFeaturesDisabledInCurrentBuild() {
+    func testShipFeaturesEnabledInLeanRelease() {
         #if DEBUG
-        XCTAssertTrue(ProductSurface.showsWidget)
-        XCTAssertTrue(ProductSurface.showsGoals)
         XCTAssertTrue(ProductSurface.showsMotivation)
         XCTAssertTrue(ProductSurface.showsCharts)
+        XCTAssertTrue(ProductSurface.showsMilestoneBanners)
+        XCTAssertTrue(ProductSurface.showsExtendedRowMetadata)
         #else
-        XCTAssertFalse(ProductSurface.showsWidget)
+        XCTAssertTrue(ProductSurface.showsMotivation)
+        XCTAssertTrue(ProductSurface.showsCharts)
+        XCTAssertTrue(ProductSurface.showsMilestoneBanners)
+        XCTAssertTrue(ProductSurface.showsExtendedRowMetadata)
         XCTAssertFalse(ProductSurface.showsGoals)
-        XCTAssertFalse(ProductSurface.showsMotivation)
-        XCTAssertFalse(ProductSurface.showsCharts)
+        XCTAssertFalse(ProductSurface.showsQuantityCharts)
+        XCTAssertFalse(ProductSurface.showsDemoData)
+        XCTAssertFalse(ProductSurface.isEnabled(.widget))
         #endif
         XCTAssertFalse(ProductSurface.showsWatch)
         XCTAssertFalse(ProductSurface.showsMotivationGame)
     }
 
-    func testConfidenceOnePointZeroSurfaces() {
+    func testDevelopmentOnlyFeaturesInFullDebugBuild() {
         #if DEBUG
-        XCTAssertTrue(ProductSurface.showsMilestoneBanners)
-        XCTAssertTrue(ProductSurface.showsExtendedRowMetadata)
-        XCTAssertTrue(ProductSurface.showsExtendedThemes)
-        #else
-        XCTAssertFalse(ProductSurface.showsMilestoneBanners)
-        XCTAssertFalse(ProductSurface.showsExtendedRowMetadata)
-        XCTAssertFalse(ProductSurface.showsExtendedThemes)
+        if ProcessInfo.processInfo.arguments.contains("-lean_ui") {
+            XCTAssertFalse(ProductSurface.showsGoals)
+            XCTAssertFalse(ProductSurface.showsQuantityCharts)
+            XCTAssertFalse(ProductSurface.showsExtendedThemes)
+        } else {
+            XCTAssertTrue(ProductSurface.showsGoals)
+            XCTAssertTrue(ProductSurface.showsQuantityCharts)
+            XCTAssertTrue(ProductSurface.showsExtendedThemes)
+            XCTAssertTrue(ProductSurface.showsWidget)
+            XCTAssertTrue(ProductSurface.showsDemoData)
+        }
         #endif
     }
 
     func testDebugBuildUsesDevelopmentSurface() {
         #if DEBUG
         XCTAssertEqual(ProductSurface.current, .development)
-        XCTAssertTrue(ProductSurface.showsDemoData)
-        XCTAssertTrue(ProductSurface.isEnabled(.demoData))
         #else
         XCTAssertEqual(ProductSurface.current, .lean1_0)
-        XCTAssertFalse(ProductSurface.showsDemoData)
         #endif
     }
 
-    func testPostOnePointZeroFeaturesDisabledViaIsEnabled() {
+    func testChartTypesInLeanRelease() {
         #if DEBUG
-        XCTAssertTrue(ProductSurface.isEnabled(.widget))
-        XCTAssertTrue(ProductSurface.isEnabled(.charts))
+        if ProcessInfo.processInfo.arguments.contains("-lean_ui") {
+            XCTAssertEqual(ChartType.availableInCurrentSurface, [.line, .bar, .heatmap])
+        } else {
+            XCTAssertEqual(ChartType.availableInCurrentSurface, ChartType.allCases)
+        }
         #else
-        XCTAssertFalse(ProductSurface.isEnabled(.widget))
-        XCTAssertFalse(ProductSurface.isEnabled(.charts))
+        XCTAssertEqual(ChartType.availableInCurrentSurface, [.line, .bar, .heatmap])
         #endif
-        XCTAssertFalse(ProductSurface.isEnabled(.watch))
-        XCTAssertFalse(ProductSurface.isEnabled(.motivationGame))
     }
 
     func testShipThemesSubset() {

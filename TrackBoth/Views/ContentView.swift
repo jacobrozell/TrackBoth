@@ -51,18 +51,6 @@ struct ContentView: View {
                                 .tabItem { tabItem(for: .history, systemImage: "calendar.badge.clock") }
                                 .tag(MainTab.history.rawValue)
 
-                            SettingsView()
-                                .accessibilityIdentifier(AccessibilityIdentifiers.tabSettings)
-                                .tabItem { tabItem(for: .settings, systemImage: "gear") }
-                                .tag(MainTab.settings.rawValue)
-
-                            if ProductSurface.showsGoals {
-                                GoalsView()
-                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
-                                    .tabItem { tabItem(for: .goals, systemImage: "target") }
-                                    .tag(MainTab.goals.rawValue)
-                            }
-
                             if ProductSurface.showsMotivation {
                                 MotivationsView()
                                     .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
@@ -75,6 +63,18 @@ struct ContentView: View {
                                     .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
                                     .tabItem { tabItem(for: .charts, systemImage: "chart.line.uptrend.xyaxis") }
                                     .tag(MainTab.charts.rawValue)
+                            }
+
+                            SettingsView()
+                                .accessibilityIdentifier(AccessibilityIdentifiers.tabSettings)
+                                .tabItem { tabItem(for: .settings, systemImage: "gear") }
+                                .tag(MainTab.settings.rawValue)
+
+                            if ProductSurface.showsGoals {
+                                GoalsView()
+                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
+                                    .tabItem { tabItem(for: .goals, systemImage: "target") }
+                                    .tag(MainTab.goals.rawValue)
                             }
                         }
                         .publishDeviceLayout(
@@ -159,10 +159,10 @@ struct ContentView: View {
 private enum MainTab: Int {
     case track = 0
     case history = 1
-    case settings = 2
-    case goals = 3
-    case motivation = 4
-    case charts = 5
+    case motivation = 2
+    case charts = 3
+    case settings = 4
+    case goals = 5
 
     var logName: String {
         switch self {

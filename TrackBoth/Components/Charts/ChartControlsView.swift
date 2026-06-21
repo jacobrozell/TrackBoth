@@ -42,16 +42,28 @@ struct ChartControlsView: View {
                     .padding(.horizontal)
 
                 Picker("Chart Type", selection: $selectedChartType) {
-                    ForEach(ChartType.allCases, id: \.self) { type in
+                    ForEach(ChartType.availableInCurrentSurface, id: \.self) { type in
                         Text(type.displayName).tag(type)
                     }
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal)
+                .onAppear(perform: normalizeChartType)
+                .onChange(of: selectedChartType) { _, newValue in
+                    if !ChartType.availableInCurrentSurface.contains(newValue) {
+                        selectedChartType = .line
+                    }
+                }
             }
         }
         .padding(.vertical, isCompactLandscape ? 6 : 16)
         .background(Color.currentSecondaryBackground.opacity(0.5))
+    }
+
+    private func normalizeChartType() {
+        if !ChartType.availableInCurrentSurface.contains(selectedChartType) {
+            selectedChartType = .line
+        }
     }
 }
 
