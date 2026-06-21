@@ -1,0 +1,18 @@
+---
+description: TrackBoth 1.0.0 core feature scope lock. Read before adding features or changing ship scope.
+alwaysApply: false
+---
+
+# 1.0.0 core scope lock
+
+TrackBoth is **unreleased**. Goal: **ship lean 1.0.0** by iterating on locked core — not expanding scope.
+
+Before proposing or implementing features:
+
+1. Read `docs/release/1.0.0-core-scope.md`
+2. **In scope:** Home, Goals, History, Charts, Motivations, Settings (export/import, themes), onboarding, local SwiftData + JSON export v4
+3. **Out of scope for 1.0:** widgets, watch, notifications, shortcuts, CloudKit sync, motivation game, achievements, new tabs
+4. **Iteration focus:** device QA, dogfood, polish on partial features (quantity goals/charts), accessibility, TestFlight, App Store assets
+5. Schema changes: see `docs/release/1.0.0-schema-baseline.md`
+
+If a request adds scope, say so and suggest deferring to 1.1+ unless it fixes a P0 ship blocker in a locked core flow.

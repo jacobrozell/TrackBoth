@@ -1,0 +1,18 @@
+---
+description: TrackBoth 1.0.0 release readiness. When the user mentions "1.0.0", read docs/release/1.0.0-checklist.md and report status from it.
+alwaysApply: false
+---
+
+# 1.0.0 release checklist
+
+When the user mentions **1.0.0** (or asks about release readiness, ship status, or what's left before App Store):
+
+1. Read `docs/release/1.0.0-checklist.md`
+2. Present its contents — current state, remaining work, and path to ship
+3. Cross-check against `docs/release/1.0.0-ship-checklist.md` and `docs/release/progress-log.md` if status may have changed
+
+Do not improvise release scope; lean 1.0.0 scope is defined in `docs/release/lean-1.0-master-plan.md` and `docs/feature-inventory.md`.
+
+For **schema or persistence changes**, also read `docs/release/1.0.0-schema-baseline.md` (app unreleased — lock schema for 1.0, no production migration yet).
+
+For **feature scope**, read `docs/release/1.0.0-core-scope.md` — iterate on locked core until ship; defer new surfaces to 1.1+.

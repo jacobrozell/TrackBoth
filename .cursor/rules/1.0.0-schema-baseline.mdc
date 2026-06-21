@@ -1,0 +1,18 @@
+---
+description: TrackBoth pre-release schema baseline. Read before changing SwiftData models, export format, or persistence.
+alwaysApply: false
+---
+
+# 1.0.0 schema baseline
+
+TrackBoth is **unreleased** — working toward first **1.0.0** App Store ship. There are **no production users** and **no production migration obligation yet**.
+
+When changing **SwiftData models**, **JSON export/import**, **BootstrapStoreRecovery**, or **MigrationUtils**:
+
+1. Read `docs/release/1.0.0-schema-baseline.md` first
+2. Treat `TrackBothSchemaV1` + export schema **v4** as the locked 1.0 contract
+3. Do **not** add CloudKit/iCloud sync for 1.0 — local-only + JSON export (see deferred plan in `docs/plans/swiftdata-icloud-migration.md`)
+4. Before 1.0 ships: optional fields with defaults are fine; avoid drive-by renames
+5. After 1.0 ships: require new `VersionedSchema`, migration stages, export compatibility, and tests
+
+Entity details: `Specs/DataSchemaSpec.md`, `Specs/SwiftData.md`, `Specs/ExportImportSpec.md`.
