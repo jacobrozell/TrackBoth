@@ -77,6 +77,13 @@ struct TrackMetricRow: View {
             : StreakCopy.viceClean(streakCount)
     }
 
+    private var rowLogAccessibilityLabel: String {
+        if let streakCaption {
+            return "\(metric.name), \(statusInfo.text), \(streakCaption)"
+        }
+        return "\(metric.name), \(statusInfo.text)"
+    }
+
     var body: some View {
         VStack(spacing: 8) {
             if dynamicTypeSize.usesAccessibilityLayout {
@@ -127,17 +134,19 @@ struct TrackMetricRow: View {
                                     .font(.caption2.weight(.medium))
                                     .foregroundStyle(Color.currentSecondaryText)
                             }
-                            .accessibilityLabel(streakCaption ?? "")
+                            .accessibilityHidden(true)
                         }
 
                         Image(systemName: "chevron.right")
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Color.currentSecondaryText.opacity(0.6))
+                            .accessibilityHidden(true)
                     }
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
+                .accessibilityLabel(rowLogAccessibilityLabel)
                 .accessibilityHint("Opens logging details for this day")
             }
 

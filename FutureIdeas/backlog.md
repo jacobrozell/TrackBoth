@@ -1,6 +1,6 @@
 # TrackBoth — future ideas
 
-**Product/UX review & decisions:** [`ProductUXHandoff.md`](ProductUXHandoff.md) — ship-surface choices, improvement backlog, follow-up template (2026-06-21).
+**Product/UX review & decisions:** [`ProductUXHandoff.md`](ProductUXHandoff.md) · **Release handoff:** [`ReviewerReadinessHandoff.md`](ReviewerReadinessHandoff.md)
 
 Post-1.0 specs: [`../../Specs/planned/README.md`](../../Specs/planned/README.md) · Inventory: [`../feature-inventory.md`](../feature-inventory.md)
 

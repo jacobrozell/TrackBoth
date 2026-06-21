@@ -26,9 +26,9 @@ struct AddMetricView: View {
                 nameSection
                 quickAddSection
                 typeSection
+                motivationSection
 
                 if ProductSurface.showsAdvancedMetricSetup {
-                    motivationSection
                     targetSection
                 }
             }
@@ -225,9 +225,7 @@ struct AddMetricView: View {
         let metric = Metric(
             name: trimmedName,
             habitType: selectedHabitType,
-            primaryMotivation: ProductSurface.showsAdvancedMetricSetup && !trimmedMotivation.isEmpty
-                ? trimmedMotivation
-                : nil
+            primaryMotivation: trimmedMotivation.isEmpty ? nil : trimmedMotivation
         )
         modelContext.insert(metric)
 
@@ -244,9 +242,7 @@ struct AddMetricView: View {
 
         modelContext.saveChanges(operation: "create metric", entity: "Metric")
 
-        if ProductSurface.showsAdvancedMetricSetup,
-           selectedHabitType == .vice,
-           trimmedMotivation.isEmpty {
+        if selectedHabitType == .vice, trimmedMotivation.isEmpty {
             viceNeedingMotivation = metric
             showingViceMotivationPrompt = true
         } else {

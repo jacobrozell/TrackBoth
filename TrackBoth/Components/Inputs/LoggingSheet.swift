@@ -43,8 +43,22 @@ struct LoggingSheet: View, Identifiable {
 
     private var slipMotivationReminder: String? {
         guard isViceSlip else { return nil }
-        let trimmed = metric.primaryMotivation?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-        return trimmed.isEmpty ? nil : trimmed
+
+        let trimmedPrimary = metric.primaryMotivation?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !trimmedPrimary.isEmpty {
+            return trimmedPrimary
+        }
+
+        return entries
+            .filter { $0.metricID == metric.id }
+            .compactMap { entry -> (Date, String)? in
+                guard let motivation = entry.motivation?.trimmingCharacters(in: .whitespacesAndNewlines),
+                      !motivation.isEmpty else { return nil }
+                return (entry.date, motivation)
+            }
+            .sorted { $0.0 > $1.0 }
+            .first?
+            .1
     }
 
     var body: some View {

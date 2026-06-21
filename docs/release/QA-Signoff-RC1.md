@@ -2,6 +2,8 @@
 
 Use this document to record TestFlight RC1 validation before App Store submission.
 
+**Ship surface:** Track · History · Motivation · Charts · Settings (Goals tab = dev only)
+
 **Build:** _______________  
 **Tester:** _______________  
 **Device(s):** _______________  
@@ -13,18 +15,20 @@ Use this document to record TestFlight RC1 validation before App Store submissio
 
 | # | Flow | Pass | Notes |
 |---|------|------|-------|
-| 1 | Fresh install → complete onboarding | ☐ | |
-| 2 | Add positive habit → toggle done on Home | ☐ | |
-| 3 | Add vice → toggle avoided | ☐ | |
-| 4 | Open LoggingSheet → save with details | ☐ | |
-| 5 | Goals tab shows progress | ☐ | |
-| 6 | History calendar + filters | ☐ | |
-| 7 | Charts tab renders (with data) | ☐ | |
-| 8 | Motivation add/view | ☐ | |
-| 9 | Settings → Export JSON | ☐ | |
-| 10 | Settings → Import JSON (test file) | ☐ | |
-| 11 | iCloud backup + restore | ☐ | |
-| 12 | Delete all data | ☐ | |
+| 1 | Fresh install → complete onboarding (with presets) | ☐ | |
+| 2 | Fresh install → skip onboarding → placeholder rows (`My habit` / `My vice`) | ☐ | |
+| 3 | Add positive habit → toggle done on Track | ☐ | |
+| 4 | Add vice → toggle avoided; verify shield icon | ☐ | |
+| 5 | Vice slip → LoggingSheet shows “Remember why” (if motivation set) | ☐ | |
+| 6 | Track row shows goal progress + streak metadata | ☐ | |
+| 7 | Milestone banner appears and dismisses | ☐ | |
+| 8 | History calendar + filters + edit entry | ☐ | |
+| 9 | Charts tab — line / bar / heatmap (no Quantity in Release) | ☐ | |
+| 10 | Motivation — add/view primary + daily motivations | ☐ | |
+| 11 | Settings → Export JSON | ☐ | |
+| 12 | Settings → Import JSON (test file round-trip) | ☐ | |
+| 13 | Settings → Delete all data | ☐ | |
+| 14 | Support + Privacy links open in Safari | ☐ | |
 
 ---
 
@@ -35,6 +39,7 @@ Use this document to record TestFlight RC1 validation before App Store submissio
 | No phantom vice streak on create | ☐ | |
 | Vice/habit boolean semantics consistent | ☐ | |
 | Migration on launch | ☐ | |
+| Week calendar completion dots accurate | ☐ | |
 
 ---
 
@@ -42,9 +47,9 @@ Use this document to record TestFlight RC1 validation before App Store submissio
 
 | Check | Pass | Notes |
 |-------|------|-------|
-| VoiceOver — Home row | ☐ | |
+| VoiceOver — Track row (single streak label, no duplicate) | ☐ | |
 | VoiceOver — Save in LoggingSheet | ☐ | |
-| Largest Dynamic Type — Home | ☐ | |
+| Largest Dynamic Type — Track | ☐ | |
 | Midnight theme readable | ☐ | |
 
 ---

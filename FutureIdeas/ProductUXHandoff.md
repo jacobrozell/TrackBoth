@@ -33,7 +33,7 @@ TrackBoth’s wedge is **dual habit + vice tracking in one honest daily log** �
 
 ### Release tab bar (implemented)
 
-**Track · History · Settings · Motivation · Charts** (5 tabs)  
+**Track · History · Motivation · Charts · Settings** (5 tabs)  
 Goals tab = dev only · Quantity charts = dev only
 
 ### Implemented 2026-06-21
