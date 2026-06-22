@@ -74,7 +74,7 @@ struct InsightsView: View {
     @ViewBuilder
     private var insightsLayout: some View {
         switch deviceLayout {
-        case .padLandscape:
+        case .phoneLandscape, .padLandscape:
             GeometryReader { geometry in
                 InsightsPadLandscapeLayout(
                     selectedChartType: $selectedChartType,
@@ -85,7 +85,8 @@ struct InsightsView: View {
                     streakEntries: streakEntries,
                     dynamicTypeSize: dynamicTypeSize,
                     totalWidth: geometry.size.width,
-                    totalHeight: geometry.size.height
+                    totalHeight: geometry.size.height,
+                    usesPhoneLandscapeSizing: deviceLayout == .phoneLandscape
                 )
             }
         default:
@@ -99,6 +100,8 @@ struct InsightsView: View {
                 streakEntries: streakEntries,
                 dynamicTypeSize: dynamicTypeSize
             )
+            .frame(maxWidth: deviceLayout.isPad ? 760 : .infinity)
+            .frame(maxWidth: .infinity)
         }
     }
 

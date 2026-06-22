@@ -250,6 +250,23 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(addButton.isHittable)
     }
 
+    func testIPhoneLandscapeInsightsUsesSplitLayout() throws {
+        try XCTSkipIf(isPad, "Requires iPhone simulator")
+
+        launch(seedDemo: true)
+        tapTab(named: "Insights")
+        XCTAssertTrue(app.navigationBars["Insights"].waitForExistence(timeout: 10))
+
+        XCUIDevice.shared.orientation = .landscapeLeft
+        addTeardownBlock {
+            XCUIDevice.shared.orientation = .portrait
+        }
+
+        XCTAssertTrue(app.staticTexts["Trends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Calendar"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.segmentedControls.buttons["Calendar"].waitForExistence(timeout: 1))
+    }
+
     func testIPadLandscapeTrackUsesSidebarLayout() throws {
         try XCTSkipIf(isPhone, "Requires iPad simulator")
 
@@ -267,6 +284,23 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(habitsStat.waitForExistence(timeout: 10))
         XCTAssertTrue(app.staticTexts["Habits"].waitForExistence(timeout: 10))
         XCTAssertTrue(app.buttons["fab_add_metric"].waitForExistence(timeout: 5))
+    }
+
+    func testIPadLandscapeInsightsUsesSplitLayout() throws {
+        try XCTSkipIf(isPhone, "Requires iPad simulator")
+
+        launchWithDemoData()
+        tapTab(named: "Insights")
+        XCTAssertTrue(app.navigationBars["Insights"].waitForExistence(timeout: 10))
+
+        XCUIDevice.shared.orientation = .landscapeLeft
+        addTeardownBlock {
+            XCUIDevice.shared.orientation = .portrait
+        }
+
+        XCTAssertTrue(app.staticTexts["Trends"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["Calendar"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.segmentedControls.buttons["Calendar"].waitForExistence(timeout: 1))
     }
 
     #if DEBUG

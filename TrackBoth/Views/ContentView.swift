@@ -27,6 +27,10 @@ struct ContentView: View {
         dynamicTypeSize.usesExpandedChrome
     }
 
+    private func usesCompactTabLabels(for deviceLayout: DeviceLayout) -> Bool {
+        usesIconOnlyTabs || deviceLayout.isLandscape
+    }
+
     var body: some View {
         ZStack {
             Color.currentBackground.ignoresSafeArea()
@@ -39,40 +43,46 @@ struct ContentView: View {
                     }
             } else {
                 GeometryReader { geometry in
+                    let deviceLayout = DeviceLayout.resolve(
+                        horizontal: horizontalSizeClass,
+                        vertical: verticalSizeClass,
+                        size: geometry.size
+                    )
                     ZStack(alignment: .top) {
                         TabView(selection: $selectedTab) {
                             TrackScreen()
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabTrack)
-                                .tabItem { tabItem(for: .track, systemImage: "checkmark.circle.fill") }
+                                .tabItem { tabItem(for: .track, systemImage: "checkmark.circle.fill", deviceLayout: deviceLayout) }
                                 .tag(MainTab.track.rawValue)
 
                             if ProductSurface.showsInsights {
                                 InsightsView()
                                     .accessibilityIdentifier(AccessibilityIdentifiers.tabInsights)
-                                    .tabItem { tabItem(for: .insights, systemImage: "chart.bar.xaxis") }
+                                    .tabItem { tabItem(for: .insights, systemImage: "chart.bar.xaxis", deviceLayout: deviceLayout) }
                                     .tag(MainTab.insights.rawValue)
                             }
 
                             if ProductSurface.showsGoals {
                                 GoalsView()
                                     .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
-                                    .tabItem { tabItem(for: .goals, systemImage: "target") }
+                                    .tabItem { tabItem(for: .goals, systemImage: "target", deviceLayout: deviceLayout) }
                                     .tag(MainTab.goals.rawValue)
                             }
 
                             if ProductSurface.showsMotivation {
                                 MotivationsView()
                                     .accessibilityIdentifier(AccessibilityIdentifiers.tabMotivation)
-                                    .tabItem { tabItem(for: .motivation, systemImage: "heart.fill") }
+                                    .tabItem { tabItem(for: .motivation, systemImage: "heart.fill", deviceLayout: deviceLayout) }
                                     .tag(MainTab.motivation.rawValue)
                             }
 
                             SettingsView()
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabSettings)
-                                .tabItem { tabItem(for: .settings, systemImage: "gear") }
+                                .tabItem { tabItem(for: .settings, systemImage: "gear", deviceLayout: deviceLayout) }
                                 .tag(MainTab.settings.rawValue)
                         }
-                        .publishDeviceLayout(
+                        .environment(\.deviceLayout, deviceLayout)
+                        .publishAdaptiveLayoutMode(
                             horizontal: horizontalSizeClass,
                             vertical: verticalSizeClass,
                             size: geometry.size
@@ -126,10 +136,10 @@ struct ContentView: View {
     }
 
     @ViewBuilder
-    private func tabItem(for tab: AccessibilityCopy.TabItem, systemImage: String) -> some View {
+    private func tabItem(for tab: AccessibilityCopy.TabItem, systemImage: String, deviceLayout: DeviceLayout) -> some View {
         Image(systemName: systemImage)
             .accessibilityLabel(tab.accessibilityTitle)
-        Text(AccessibilityCopy.tabLabel(tab, iconOnly: usesIconOnlyTabs))
+        Text(AccessibilityCopy.tabLabel(tab, iconOnly: usesCompactTabLabels(for: deviceLayout)))
     }
 
     private func checkFirstLaunch() {

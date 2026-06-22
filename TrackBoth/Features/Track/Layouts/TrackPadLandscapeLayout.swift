@@ -30,29 +30,30 @@ struct TrackPadLandscapeLayout: View {
     }
 
     private var sidebarPanel: some View {
-        VStack(spacing: 12) {
-            TrackStatsGrid(
-                totalHabits: viewModel.totalHabits(from: metrics),
-                totalVices: viewModel.totalVices(from: metrics),
-                activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
-                todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
-                totalMetrics: metrics.count
-            )
-            .padding(.horizontal, 8)
-            .padding(.top, 8)
+        ScrollView {
+            VStack(spacing: 12) {
+                TrackStatsGrid(
+                    totalHabits: viewModel.totalHabits(from: metrics),
+                    totalVices: viewModel.totalVices(from: metrics),
+                    activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
+                    todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+                    totalMetrics: metrics.count
+                )
+                .padding(.horizontal, 8)
+                .padding(.top, 8)
 
-            Spacer(minLength: 0)
-
-            TrackWeekCalendar(
-                days: weekDays,
-                selectedDate: viewModel.selectedDate,
-                metrics: metrics,
-                entries: entries,
-                usesAccessibilityLayout: usesAccessibilityLayout,
-                onSelect: { viewModel.selectedDate = $0 }
-            )
+                TrackWeekCalendar(
+                    days: weekDays,
+                    selectedDate: viewModel.selectedDate,
+                    metrics: metrics,
+                    entries: entries,
+                    usesAccessibilityLayout: usesAccessibilityLayout,
+                    onSelect: { viewModel.selectedDate = $0 }
+                )
+            }
+            .padding()
         }
-        .padding()
+        .scrollIndicators(.hidden)
     }
 
     private var contentPanel: some View {

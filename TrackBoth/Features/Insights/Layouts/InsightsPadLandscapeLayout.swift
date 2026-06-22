@@ -13,6 +13,13 @@ struct InsightsPadLandscapeLayout: View {
     let dynamicTypeSize: DynamicTypeSize
     let totalWidth: CGFloat
     let totalHeight: CGFloat
+    var usesPhoneLandscapeSizing: Bool = false
+
+    private var chartMinHeight: CGFloat {
+        let cap: CGFloat = usesPhoneLandscapeSizing ? 200 : 320
+        let fraction: CGFloat = usesPhoneLandscapeSizing ? 0.42 : 0.38
+        return min(cap, totalHeight * fraction)
+    }
 
     var body: some View {
         LandscapeSplitLayout(
@@ -24,28 +31,29 @@ struct InsightsPadLandscapeLayout: View {
     }
 
     private var sidebarPanel: some View {
-        VStack(spacing: 12) {
-            ScreenSectionHeader(title: "Filter")
-            MetricFilterSidebar(
-                title: "",
-                metrics: metrics,
-                selectedFilter: $viewModel.selectedFilter,
-                includeIndividualMetrics: true
-            )
+        ScrollView {
+            VStack(spacing: 12) {
+                ScreenSectionHeader(title: "Filter")
+                MetricFilterSidebar(
+                    title: "",
+                    metrics: metrics,
+                    selectedFilter: $viewModel.selectedFilter,
+                    includeIndividualMetrics: true
+                )
 
-            ScreenSectionHeader(title: "Calendar")
-            CalendarGridView(
-                entries: viewModel.calendarEntries(monthEntries, metrics: metrics),
-                selectedFilter: viewModel.selectedFilter,
-                selectedDate: $viewModel.selectedDate,
-                metrics: metrics
-            )
-            .padding(12)
-            .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-
-            Spacer(minLength: 0)
+                ScreenSectionHeader(title: "Calendar")
+                CalendarGridView(
+                    entries: viewModel.calendarEntries(monthEntries, metrics: metrics),
+                    selectedFilter: viewModel.selectedFilter,
+                    selectedDate: $viewModel.selectedDate,
+                    metrics: metrics
+                )
+                .padding(12)
+                .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .padding()
         }
-        .padding()
+        .scrollIndicators(.hidden)
     }
 
     private var mainPanel: some View {
@@ -59,7 +67,7 @@ struct InsightsPadLandscapeLayout: View {
                     selectedFilter: viewModel.selectedFilter,
                     entries: chartEntries,
                     metrics: metrics,
-                    minChartHeight: min(320, totalHeight * 0.38)
+                    minChartHeight: chartMinHeight
                 )
                 .padding(.horizontal, 16)
 

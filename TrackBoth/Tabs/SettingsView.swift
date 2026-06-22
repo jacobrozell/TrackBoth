@@ -6,6 +6,7 @@ import UniformTypeIdentifiers
 /// View for app settings, data export, and configuration
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.deviceLayout) private var deviceLayout
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
 
@@ -93,6 +94,8 @@ struct SettingsView: View {
                 .scrollContentBackground(.hidden)
                 .listStyle(.insetGrouped)
                 .environment(\.defaultMinListRowHeight, 44)
+                .frame(maxWidth: deviceLayout.isPad ? 720 : .infinity)
+                .frame(maxWidth: .infinity)
             }
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)

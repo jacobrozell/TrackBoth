@@ -38,14 +38,14 @@ struct OnboardingView: View {
                 if isIPad {
                     iPadLayout(isLandscape: isLandscape, size: geometry.size)
                 } else {
-                    phoneLayout
+                    phoneLayout(isLandscape: isLandscape)
                 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private var phoneLayout: some View {
+    private func phoneLayout(isLandscape: Bool) -> some View {
         VStack(spacing: 0) {
             TabView(selection: $currentPage) {
                 ForEach(pages.indices, id: \.self) { index in
@@ -57,6 +57,7 @@ struct OnboardingView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             bottomControls
+                .padding(.bottom, isLandscape ? 4 : 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
