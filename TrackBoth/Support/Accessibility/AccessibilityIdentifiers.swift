@@ -8,6 +8,7 @@ enum AccessibilityIdentifiers {
     static let tabSettings = "tab_settings"
     static let tabGoals = "tab_goals"
     static let tabMotivation = "tab_motivation"
+    static let tabInsights = "tab_insights"
     static let tabHistory = "tab_history"
     static let tabCharts = "tab_charts"
 

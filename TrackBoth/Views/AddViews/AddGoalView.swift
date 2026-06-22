@@ -34,8 +34,8 @@ struct AddGoalView: View {
                 // Metric Selection (only show if no metric pre-selected)
                 if selectedMetric == nil {
                     Section {
-                        Picker("Select Habit", selection: $pickerSelectedMetric) {
-                            Text("Choose a habit...").tag(nil as Metric?)
+                        Picker("Select Metric", selection: $pickerSelectedMetric) {
+                            Text("Choose a habit or vice…").tag(nil as Metric?)
                             ForEach(metricsWithoutGoals, id: \.id) { metric in
                                 HStack {
                                     Image(systemName: metric.habitType.icon)
@@ -46,7 +46,7 @@ struct AddGoalView: View {
                             }
                         }
                     } header: {
-                        Text("Habit")
+                        Text("Metric")
                     } footer: {
                         if effectiveSelectedMetric != nil {
                             Text(goalExplanationText)
@@ -62,7 +62,7 @@ struct AddGoalView: View {
                                 .font(.headline)
                         }
                     } header: {
-                        Text("Habit")
+                        Text("Metric")
                     } footer: {
                         Text(goalExplanationText)
                     }

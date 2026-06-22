@@ -46,10 +46,19 @@ struct ContentView: View {
                                 .tabItem { tabItem(for: .track, systemImage: "checkmark.circle.fill") }
                                 .tag(MainTab.track.rawValue)
 
-                            HistoryView()
-                                .accessibilityIdentifier(AccessibilityIdentifiers.tabHistory)
-                                .tabItem { tabItem(for: .history, systemImage: "calendar.badge.clock") }
-                                .tag(MainTab.history.rawValue)
+                            if ProductSurface.showsInsights {
+                                InsightsView()
+                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabInsights)
+                                    .tabItem { tabItem(for: .insights, systemImage: "chart.bar.xaxis") }
+                                    .tag(MainTab.insights.rawValue)
+                            }
+
+                            if ProductSurface.showsGoals {
+                                GoalsView()
+                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
+                                    .tabItem { tabItem(for: .goals, systemImage: "target") }
+                                    .tag(MainTab.goals.rawValue)
+                            }
 
                             if ProductSurface.showsMotivation {
                                 MotivationsView()
@@ -58,24 +67,10 @@ struct ContentView: View {
                                     .tag(MainTab.motivation.rawValue)
                             }
 
-                            if ProductSurface.showsCharts {
-                                ChartsView()
-                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabCharts)
-                                    .tabItem { tabItem(for: .charts, systemImage: "chart.line.uptrend.xyaxis") }
-                                    .tag(MainTab.charts.rawValue)
-                            }
-
                             SettingsView()
                                 .accessibilityIdentifier(AccessibilityIdentifiers.tabSettings)
                                 .tabItem { tabItem(for: .settings, systemImage: "gear") }
                                 .tag(MainTab.settings.rawValue)
-
-                            if ProductSurface.showsGoals {
-                                GoalsView()
-                                    .accessibilityIdentifier(AccessibilityIdentifiers.tabGoals)
-                                    .tabItem { tabItem(for: .goals, systemImage: "target") }
-                                    .tag(MainTab.goals.rawValue)
-                            }
                         }
                         .publishDeviceLayout(
                             horizontal: horizontalSizeClass,
@@ -158,20 +153,18 @@ struct ContentView: View {
 // MARK: - MainTab
 private enum MainTab: Int {
     case track = 0
-    case history = 1
-    case motivation = 2
-    case charts = 3
+    case insights = 1
+    case goals = 2
+    case motivation = 3
     case settings = 4
-    case goals = 5
 
     var logName: String {
         switch self {
         case .track: return "Track"
-        case .history: return "History"
-        case .settings: return "Settings"
+        case .insights: return "Insights"
         case .goals: return "Goals"
         case .motivation: return "Motivation"
-        case .charts: return "Charts"
+        case .settings: return "Settings"
         }
     }
 }

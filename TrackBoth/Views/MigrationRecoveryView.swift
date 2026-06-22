@@ -16,7 +16,7 @@ struct MigrationRecoveryView: View {
                     .foregroundColor(.currentText)
             }
 
-            Text("TrackBoth is running with temporary in-memory storage. Export your previous backup if you have one, or continue and add habits again.")
+            Text("TrackBoth is running with temporary in-memory storage. Your data will not be saved until you restart the app after fixing the issue. Export a backup if you have one, or continue and add habits again.")
                 .font(.subheadline)
                 .foregroundColor(.currentSecondaryText)
 
@@ -27,7 +27,7 @@ struct MigrationRecoveryView: View {
 
                 Spacer()
 
-                Button("Dismiss") { onDismiss() }
+                Button("Continue Anyway") { onDismiss() }
                     .font(.subheadline)
                     .foregroundColor(.currentSecondaryText)
             }

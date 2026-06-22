@@ -30,8 +30,8 @@ struct MetricPreset: Identifiable, Hashable {
 
     /// Starter rows when onboarding completes with no chip selection.
     static let onboardingPlaceholders: [MetricPreset] = [
-        MetricPreset(id: "placeholder-habit", name: "My habit", habitType: .positive, suggestedUnit: nil, icon: "plus.circle"),
-        MetricPreset(id: "placeholder-vice", name: "My vice", habitType: .vice, suggestedUnit: nil, icon: "plus.circle")
+        MetricPreset(id: "starter-habit", name: "Drink water", habitType: .positive, suggestedUnit: nil, icon: "drop.fill"),
+        MetricPreset(id: "starter-vice", name: "Social media", habitType: .vice, suggestedUnit: nil, icon: "iphone")
     ]
 }
 

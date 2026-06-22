@@ -69,11 +69,11 @@ enum AccessibilityCopy {
     }
 
     static func tabLabel(_ tab: TabItem, iconOnly: Bool) -> String {
-        iconOnly ? "" : tab.standardTitle
+        iconOnly ? tab.compactTitle : tab.standardTitle
     }
 
     enum TabItem {
-        case track, home, settings, goals, motivation, history, charts
+        case track, home, settings, goals, motivation, insights, history, charts
 
         var standardTitle: String {
             switch self {
@@ -82,6 +82,21 @@ enum AccessibilityCopy {
             case .settings: return "Settings"
             case .goals: return "Goals"
             case .motivation: return "Motivation"
+            case .insights: return "Insights"
+            case .history: return "History"
+            case .charts: return "Charts"
+            }
+        }
+
+        /// Short labels when five tabs need to fit at larger Dynamic Type sizes.
+        var compactTitle: String {
+            switch self {
+            case .track: return "Track"
+            case .home: return "Home"
+            case .settings: return "Settings"
+            case .goals: return "Goals"
+            case .motivation: return "Motiv."
+            case .insights: return "Insights"
             case .history: return "History"
             case .charts: return "Charts"
             }

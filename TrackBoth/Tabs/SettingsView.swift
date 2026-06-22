@@ -19,6 +19,7 @@ struct SettingsView: View {
     @State private var importedSummary: String?
     @State private var showingDeleteConfirmation = false
     @State private var exportFileURL: URL?
+    @State private var showingExportError = false
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
 
     var body: some View {
@@ -29,8 +30,12 @@ struct SettingsView: View {
                 Section {
                     Button {
                         logger.logUserAction("Export data button tapped")
-                        exportFileURL = writeExportFile()
-                        showingExportSheet = exportFileURL != nil
+                        if let url = writeExportFile() {
+                            exportFileURL = url
+                            showingExportSheet = true
+                        } else {
+                            showingExportError = true
+                        }
                     } label: {
                         Label("Export Data", systemImage: "square.and.arrow.up")
                     }
@@ -135,6 +140,11 @@ struct SettingsView: View {
             } message: {
                 Text(importErrorMessage ?? "The file could not be imported.")
             }
+            .alert("Export Failed", isPresented: $showingExportError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text("Your data could not be exported. Try again, or contact support if the problem continues.")
+            }
             .fileImporter(
                 isPresented: $showingImportPicker,
                 allowedContentTypes: [.json],
@@ -169,7 +179,7 @@ struct SettingsView: View {
             let data = try Data(contentsOf: url)
             let payload = try TrackBothExport.decode(data)
             let counts = try ExportImportService.importPayload(payload, into: modelContext)
-            importedSummary = ProductSurface.showsGoals
+            importedSummary = ProductSurface.showsGoals || counts.goals > 0
                 ? "Imported \(counts.metrics) habits, \(counts.entries) entries, and \(counts.goals) goals."
                 : "Imported \(counts.metrics) habits or vices and \(counts.entries) log entries."
             showingImportSuccess = true
@@ -343,7 +353,7 @@ private struct SettingsAppearanceSection: View {
         } header: {
             Text("Appearance")
         } footer: {
-            Text("Theme colors apply across Track, History, and Settings.")
+            Text("Theme colors apply across Track, Insights, Goals, Motivation, and Settings.")
                 .font(.footnote)
         }
     }

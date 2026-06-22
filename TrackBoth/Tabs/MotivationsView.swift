@@ -61,27 +61,14 @@ struct MotivationsView: View {
     }
 
     private var noMotivationsEmptyState: some View {
-        ZStack {
-            EmptyStateView(
-                icon: "book.closed",
-                title: "No Motivations Yet",
-                subtitle: "Start building your motivation library to stay accountable and inspired."
-            )
-            .background(Color.currentBackground)
-
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    FloatingActionButton {
-                        viewModel.showingAddMotivation = true
-                    }
-                    .accessibilityLabel("Add Motivation")
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
-                }
-            }
-        }
+        EmptyStateView(
+            icon: "book.closed",
+            title: "No Motivations Yet",
+            subtitle: "Start building your motivation library to stay accountable and inspired.",
+            actionTitle: "Add Motivation",
+            action: { viewModel.showingAddMotivation = true }
+        )
+        .background(Color.currentBackground)
     }
 
     @ViewBuilder

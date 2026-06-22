@@ -39,11 +39,11 @@ final class TrackBothUITests: XCTestCase {
     }
 
     private var leanTabNames: [String] {
-        ["Track", "History", "Motivation", "Charts", "Settings"]
+        ["Track", "Insights", "Goals", "Motivation", "Settings"]
     }
 
     private var devTabNames: [String] {
-        leanTabNames + ["Goals"]
+        leanTabNames
     }
 
     /// iPhone uses a bottom tab bar; iPad uses a floating top tab strip with nested cells.
@@ -73,8 +73,9 @@ final class TrackBothUITests: XCTestCase {
         case "Settings": return "tab_settings"
         case "Goals": return "tab_goals"
         case "Motivation": return "tab_motivation"
-        case "History": return "tab_history"
-        case "Charts": return "tab_charts"
+        case "Insights": return "tab_insights"
+        case "History": return "tab_insights"
+        case "Charts": return "tab_insights"
         default: return nil
         }
     }
@@ -83,8 +84,9 @@ final class TrackBothUITests: XCTestCase {
         switch name {
         case "Track", "Home": return ["Track", "Home"]
         case "Motivation": return ["Motiv", "Motivation"]
-        case "History": return ["Past", "History"]
-        case "Charts": return ["Stats", "Charts"]
+        case "Insights": return ["Insights"]
+        case "History": return ["Past", "History", "Insights"]
+        case "Charts": return ["Stats", "Charts", "Insights"]
         default: return [name]
         }
     }
@@ -109,7 +111,7 @@ final class TrackBothUITests: XCTestCase {
 
     func testAllLeanTabsAreReachable() throws {
         launch()
-        for name in ["History", "Motivation", "Charts", "Settings", "Track"] {
+        for name in ["Insights", "Goals", "Motivation", "Settings", "Track"] {
             tapTab(named: name)
             assertOnTab(named: name)
         }
@@ -139,27 +141,24 @@ final class TrackBothUITests: XCTestCase {
                     || app.staticTexts["No Motivations Yet"].waitForExistence(timeout: 5)
                     || app.staticTexts["Primary Motivations"].waitForExistence(timeout: 5)
             )
-        case "History":
+        case "Insights", "History", "Charts":
             XCTAssertTrue(
-                app.navigationBars["History"].waitForExistence(timeout: 10)
+                app.navigationBars["Insights"].waitForExistence(timeout: 10)
                     || app.staticTexts["No Habits Yet"].waitForExistence(timeout: 5)
-            )
-        case "Charts":
-            XCTAssertTrue(
-                app.navigationBars["Charts"].waitForExistence(timeout: 10)
-                    || app.staticTexts["Your Journey Starts Here"].waitForExistence(timeout: 5)
+                    || app.staticTexts["Calendar"].waitForExistence(timeout: 5)
+                    || app.staticTexts["Trends"].waitForExistence(timeout: 5)
             )
         default:
             XCTFail("Unknown tab: \(name)")
         }
     }
 
-    func testHistoryTabNavigation() throws {
+    func testInsightsTabNavigation() throws {
         launch()
-        tapTab(named: "History")
-        let onHistory = app.navigationBars["History"].waitForExistence(timeout: 10)
+        tapTab(named: "Insights")
+        let onInsights = app.navigationBars["Insights"].waitForExistence(timeout: 10)
             || app.staticTexts["No Habits Yet"].waitForExistence(timeout: 5)
-        XCTAssertTrue(onHistory)
+        XCTAssertTrue(onInsights)
     }
 
     func testSettingsTabOpens() throws {
@@ -198,26 +197,34 @@ final class TrackBothUITests: XCTestCase {
 
         assertTabExists(named: "Track")
         assertOnTab(named: "Track")
-        XCTAssertTrue(app.staticTexts["My habit"].waitForExistence(timeout: 5)
-            || app.staticTexts["Habits"].waitForExistence(timeout: 5))
+        XCTAssertTrue(
+            app.staticTexts["Drink water"].waitForExistence(timeout: 10)
+                || app.staticTexts["Social media"].waitForExistence(timeout: 5)
+                || app.staticTexts["Habits"].waitForExistence(timeout: 5)
+        )
     }
 
     func testOnboardingSkipCompletesToMainTabs() throws {
         launch(skipOnboarding: false)
         XCTAssertTrue(app.staticTexts["Welcome to TrackBoth"].waitForExistence(timeout: 10))
 
-        let next = app.buttons["Next"]
-        XCTAssertTrue(next.waitForExistence(timeout: 5))
-        next.tap()
+        for _ in 0..<2 {
+            let next = app.buttons["Next"]
+            XCTAssertTrue(next.waitForExistence(timeout: 5))
+            next.tap()
+        }
 
-        let skip = app.buttons["Skip"]
+        let skip = app.buttons["Skip setup"]
         XCTAssertTrue(skip.waitForExistence(timeout: 5))
         skip.tap()
 
         assertTabExists(named: "Track")
         assertOnTab(named: "Track")
-        XCTAssertTrue(app.staticTexts["My habit"].waitForExistence(timeout: 5)
-            || app.staticTexts["My vice"].waitForExistence(timeout: 5))
+        XCTAssertTrue(
+            app.staticTexts["Drink water"].waitForExistence(timeout: 10)
+                || app.staticTexts["Social media"].waitForExistence(timeout: 5)
+                || app.staticTexts["Habits"].waitForExistence(timeout: 5)
+        )
     }
 
     func testTrackShowsNavigationTitle() throws {
@@ -263,8 +270,7 @@ final class TrackBothUITests: XCTestCase {
     }
 
     #if DEBUG
-    func testDevBuildShowsExtendedTabs() throws {
-        try XCTSkipIf(isPhone, "Goals tab requires iPad tab bar space")
+    func testDevBuildShowsAllShipTabs() throws {
         launch(leanUI: false)
         for name in devTabNames {
             assertTabExists(named: name)
@@ -278,13 +284,15 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Completion Goals"].waitForExistence(timeout: 10))
     }
 
-    func testChartsTabShowsTitleOrEmptyState() throws {
-        try XCTSkipIf(isPhone, "Charts tab requires iPad when extended tabs are shown")
-        launch(leanUI: false)
-        tapTab(named: "Charts")
-        let onCharts = app.navigationBars["Charts"].waitForExistence(timeout: 10)
-            || app.staticTexts["Your Journey Starts Here"].waitForExistence(timeout: 5)
-        XCTAssertTrue(onCharts)
+    func testInsightsTrendsSegment() throws {
+        launch(seedDemo: true, leanUI: false)
+        tapTab(named: "Insights")
+        XCTAssertTrue(app.navigationBars["Insights"].waitForExistence(timeout: 10))
+        let trends = app.segmentedControls.buttons["Trends"]
+        if trends.waitForExistence(timeout: 5) {
+            trends.tap()
+            XCTAssertTrue(app.staticTexts["Trends"].waitForExistence(timeout: 5))
+        }
     }
     #endif
 }

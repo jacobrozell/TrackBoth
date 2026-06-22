@@ -54,7 +54,7 @@ enum ChartType: String, CaseIterable {
         rawValue
     }
 
-    /// Chart types shipped in lean 1.0 Release (quantity deferred until polish passes).
+    /// Chart types available in the current product surface.
     static var availableInCurrentSurface: [ChartType] {
         if ProductSurface.showsQuantityCharts {
             return allCases

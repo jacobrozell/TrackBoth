@@ -28,16 +28,16 @@ Mirrors Dart Buddy `ProductSurface.lean1_0` pattern.
 | Extended row metadata (goals progress, savings, slip timer) | ✅ | ✅ |
 | Milestone banners | ✅ | ✅ |
 | History + edit | ✅ | ✅ |
-| Charts tab (line, bar, heatmap) | ✅ | ✅ |
-| Charts — quantity type | ❌ | ✅ |
+| Charts tab (line, bar, heatmap, quantity) | ✅ | ✅ |
 | Motivation tab | ✅ | ✅ |
 | Goals tab | ❌ | ✅ |
 | Settings + export JSON | ✅ | ✅ |
-| Onboarding + placeholder rows on skip | ✅ | ✅ |
-| Themes (2 ship themes) | ✅ | ✅ |
-| Themes (4 extended) | ❌ | ✅ |
-| Extended logging upfront | ❌ | ✅ |
-| Advanced metric setup | ❌ | ✅ |
+| Onboarding + presets | ✅ | ✅ |
+| Themes (all 4) | ✅ | ✅ |
+| Full Add Metric (motivation + targets) | ✅ | ✅ |
+| Full LoggingSheet (mood, motivation, quantity) | ✅ | ✅ |
+| Extended row metadata | ✅ | ✅ |
+| Milestone banners | ✅ | ✅ |
 | Demo data | ❌ | ✅ |
 | Widget extension | ❌ | ✅ (dev scheme) |
 | Watch / motivation game | ❌ | ❌ |
@@ -50,11 +50,12 @@ Mirrors Dart Buddy `ProductSurface.lean1_0` pattern.
 | Tab | Ships 1.0 |
 |-----|-------------|
 | Track | ✅ |
-| History | ✅ |
-| Settings | ✅ |
+| Insights | ✅ (calendar + trends charts) |
+| Goals | ✅ |
 | Motivation | ✅ |
-| Charts | ✅ |
-| Goals | Dev only |
+| Settings | ✅ |
+
+History and Charts are merged into **Insights** — no separate tabs.
 
 ---
 

@@ -1,7 +1,7 @@
 import Foundation
 
 // MARK: - Product Surface
-/// Gates lean 1.0 Release vs development-only features.
+/// Gates App Store Release vs development-only features.
 /// See `Specs/ProductSurfaceSpec.md`.
 enum ProductSurfaceKind: Equatable {
     case lean1_0
@@ -22,7 +22,7 @@ enum ProductSurface {
         ProcessInfo.processInfo.arguments.contains("-lean_ui")
     }
 
-    /// Full dev surface — extra tabs and polish targets not in 1.0 Release.
+    /// Full dev surface — extras not shipped to App Store users.
     private static var isFullDevelopment: Bool {
         #if DEBUG
         return !forceLeanUI
@@ -31,33 +31,36 @@ enum ProductSurface {
         #endif
     }
 
+    // MARK: - Dev-only (never in Release)
+
     static var showsDemoData: Bool { isFullDevelopment }
-
-    /// Goals tab — dev only; goal progress still shows on Track rows in Release.
-    static var showsGoals: Bool { isFullDevelopment }
-
-    static var showsMotivation: Bool { true }
-    static var showsCharts: Bool { true }
-    static var showsMilestoneBanners: Bool { true }
-    static var showsExtendedRowMetadata: Bool { true }
-
-    /// Quantity chart type — partial polish; dev only until QA passes.
-    static var showsQuantityCharts: Bool { isFullDevelopment }
-
-    static var showsExtendedThemes: Bool { isFullDevelopment }
-    static var showsAdvancedMetricSetup: Bool { isFullDevelopment }
-    static var showsExtendedLogging: Bool { isFullDevelopment }
     static var showsWidget: Bool { isFullDevelopment }
     static var showsWatch: Bool { false }
     static var showsMotivationGame: Bool { false }
+
+    // MARK: - Ships in Release (1.0)
+
+    static var showsInsights: Bool { true }
+    static var showsGoals: Bool { true }
+    static var showsMotivation: Bool { true }
+    static var showsQuantityCharts: Bool { true }
+    static var showsMilestoneBanners: Bool { true }
+    static var showsExtendedRowMetadata: Bool { true }
+    static var showsExtendedThemes: Bool { true }
+    static var showsAdvancedMetricSetup: Bool { true }
+    static var showsExtendedLogging: Bool { isFullDevelopment }
     static var showsAccessibilityMarketing: Bool { true }
 
-    /// Whether a post-1.0 surface should be visible in the current build.
+    /// Legacy flags — charts/history live inside Insights.
+    static var showsCharts: Bool { showsInsights }
+    static var showsHistory: Bool { showsInsights }
+
     static func isEnabled(_ feature: LeanFeature) -> Bool {
         switch feature {
         case .demoData: showsDemoData
         case .goals: showsGoals
         case .motivation: showsMotivation
+        case .insights: showsInsights
         case .charts: showsCharts
         case .milestoneBanners: showsMilestoneBanners
         case .extendedRowMetadata: showsExtendedRowMetadata
@@ -76,6 +79,7 @@ enum LeanFeature {
     case demoData
     case goals
     case motivation
+    case insights
     case charts
     case milestoneBanners
     case extendedRowMetadata

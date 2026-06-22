@@ -137,8 +137,8 @@ struct OnboardingView: View {
 
                         Spacer()
 
-                        if currentPage < pages.count - 1 && currentPage > 0 {
-                            Button("Skip") {
+                        if currentPage == pages.count - 2 {
+                            Button("Skip setup") {
                                 logger.logUserAction("Skip onboarding")
                                 completeOnboarding()
                             }
@@ -356,7 +356,7 @@ struct OnboardingPage {
         OnboardingPage(
             kind: .welcome,
             title: "Welcome to TrackBoth",
-            description: "Build good habits and break bad ones — one daily log. Track your day, review History, and keep Motivations close when it gets hard.",
+            description: "Build good habits and break bad ones — one daily log. Track daily, review Insights, and set Goals that keep you honest.",
             icon: "arrow.triangle.2.circlepath",
             color: Color.currentPrimary
         ),
@@ -377,7 +377,7 @@ struct OnboardingPage {
         OnboardingPage(
             kind: .ready,
             title: "One tap a day",
-            description: "Log habits and vices on Track. See patterns in History and Charts. Write Motivations to read when you need a reminder why.",
+            description: "Log habits and vices on Track. Explore calendar and trends in Insights. Set Goals and save Motivations for hard moments.",
             icon: "hand.tap.fill",
             color: Color.currentAccent
         )

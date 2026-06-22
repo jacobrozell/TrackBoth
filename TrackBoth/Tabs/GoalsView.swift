@@ -71,9 +71,9 @@ struct GoalsView: View {
     private var noHabitsEmptyState: some View {
         EmptyStateView(
             icon: "plus.circle.fill",
-            title: "No Habits Yet",
-            subtitle: "Create your first habit to start tracking your progress and building better routines",
-            actionTitle: "Create Your First Habit",
+            title: "Nothing to Track Yet",
+            subtitle: "Add habits and vices on Track, then set goals to measure progress.",
+            actionTitle: "Add Habit or Vice",
             action: { viewModel.showingAddMetric = true }
         )
         .background(Color.currentBackground)
