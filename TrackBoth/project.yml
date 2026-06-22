@@ -56,6 +56,8 @@ targets:
         SWIFT_EMIT_LOC_STRINGS: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_BackgroundColor: LaunchBackground
   TrackBoth-WidgetExtension:
     type: app-extension
     platform: iOS
@@ -145,4 +147,5 @@ schemes:
       config: Debug
       commandLineArguments:
         "-skip_onboarding": true
+        "-skip_splash": true
         "-screenshot_demo": true

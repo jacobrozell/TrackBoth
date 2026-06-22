@@ -10,33 +10,34 @@ struct HistoryCompactLayout: View {
     let dynamicTypeSize: DynamicTypeSize
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 20, pinnedViews: [.sectionHeaders]) {
-                if !metrics.isEmpty {
-                    MetricFilterChipRow(
-                        metrics: metrics,
-                        selectedFilter: $viewModel.selectedFilter,
-                        includeIndividualMetrics: true,
-                        usesBarBackground: false
-                    )
-                }
-
-                Section(header: ScreenSectionHeader(title: "Calendar")) {
-                    CalendarGridView(
-                        entries: viewModel.calendarEntries(entries, metrics: metrics),
-                        selectedFilter: viewModel.selectedFilter,
-                        selectedDate: $viewModel.selectedDate,
-                        metrics: metrics
-                    )
-                    .padding(12)
-                    .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                }
-
-                dayEntriesSection
+        VStack(spacing: 0) {
+            if !metrics.isEmpty {
+                MetricFilterChipRow(
+                    metrics: metrics,
+                    selectedFilter: $viewModel.selectedFilter,
+                    includeIndividualMetrics: true
+                )
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .adaptiveScrollInset()
+
+            ScrollView {
+                LazyVStack(spacing: 20, pinnedViews: [.sectionHeaders]) {
+                    Section(header: ScreenSectionHeader(title: "Calendar")) {
+                        CalendarGridView(
+                            entries: viewModel.calendarEntries(entries, metrics: metrics),
+                            selectedFilter: viewModel.selectedFilter,
+                            selectedDate: $viewModel.selectedDate,
+                            metrics: metrics
+                        )
+                        .padding(12)
+                        .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
+
+                    dayEntriesSection
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .adaptiveScrollInset()
+            }
         }
     }
 

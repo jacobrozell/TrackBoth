@@ -39,17 +39,16 @@ struct InsightsCompactLayout: View {
             .padding(.top, 8)
             .padding(.bottom, 4)
 
+            if !metrics.isEmpty {
+                MetricFilterChipRow(
+                    metrics: metrics,
+                    selectedFilter: $viewModel.selectedFilter,
+                    includeIndividualMetrics: true
+                )
+            }
+
             ScrollView {
                 LazyVStack(spacing: 20, pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]) {
-                    if !metrics.isEmpty {
-                        MetricFilterChipRow(
-                            metrics: metrics,
-                            selectedFilter: $viewModel.selectedFilter,
-                            includeIndividualMetrics: true,
-                            usesBarBackground: false
-                        )
-                    }
-
                     switch mode {
                     case .calendar:
                         calendarContent

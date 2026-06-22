@@ -22,7 +22,7 @@ final class TrackBothUITests: XCTestCase {
     }
 
     private func launch(skipOnboarding: Bool = true, seedDemo: Bool = false, leanUI: Bool = true) {
-        var args: [String] = []
+        var args: [String] = ["-skip_splash"]
         if skipOnboarding { args.append("-skip_onboarding") }
         if seedDemo { args.append("-force_seed_demo") }
         if leanUI { args.append("-lean_ui") }

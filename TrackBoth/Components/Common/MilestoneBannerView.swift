@@ -5,11 +5,20 @@ struct MilestoneBannerView: View {
     let announcement: MilestoneAnnouncement
     let onDismiss: () -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isVisible = false
+
+    private var iconName: String {
+        announcement.habitType == .positive ? "flame.fill" : "checkmark.shield.fill"
+    }
+
+    private var iconColor: Color {
+        announcement.habitType == .positive ? Color.currentWarning : Color.currentSuccess
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            Image(systemName: announcement.habitType == .positive ? "flame.fill" : "checkmark.shield.fill")
-                .font(.title2)
-                .foregroundColor(announcement.habitType == .positive ? Color.currentWarning : Color.currentSuccess)
+            milestoneIcon
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Milestone reached")
@@ -25,7 +34,7 @@ struct MilestoneBannerView: View {
 
             Spacer(minLength: 0)
 
-            Button(action: onDismiss) {
+            Button(action: dismiss) {
                 Image(systemName: "xmark")
                     .font(.caption)
                     .foregroundColor(Color.currentSecondaryText)
@@ -37,14 +46,53 @@ struct MilestoneBannerView: View {
         .padding(12)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color.currentAccent.opacity(0.12))
+                .fill(Color.currentAccent.opacity(isVisible ? 0.12 : 0.08))
                 .overlay(
                     RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.currentAccent.opacity(0.25), lineWidth: 1)
+                        .stroke(Color.currentAccent.opacity(isVisible ? 0.25 : 0.15), lineWidth: 1)
                 )
         )
+        .opacity(isVisible ? 1 : 0)
+        .offset(y: reduceMotion ? 0 : (isVisible ? 0 : -16))
         .accessibilityElement(children: .combine)
         .accessibilityLabel(announcement.message)
+        .onAppear { performEntrance() }
+    }
+
+    @ViewBuilder
+    private var milestoneIcon: some View {
+        let icon = Image(systemName: iconName)
+            .font(.title2)
+            .foregroundColor(iconColor)
+
+        if reduceMotion {
+            icon
+        } else {
+            icon.symbolEffect(.bounce, value: isVisible)
+        }
+    }
+
+    private func performEntrance() {
+        if reduceMotion {
+            isVisible = true
+            return
+        }
+        withAnimation(TrackBothMotion.celebrationSpring) {
+            isVisible = true
+        }
+    }
+
+    private func dismiss() {
+        if reduceMotion {
+            onDismiss()
+            return
+        }
+        withAnimation(TrackBothMotion.quick) {
+            isVisible = false
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.22) {
+            onDismiss()
+        }
     }
 }
 

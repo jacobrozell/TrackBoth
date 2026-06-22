@@ -3,6 +3,8 @@ import Foundation
 // MARK: - Accessibility Identifiers
 /// Central registry for UI test and VoiceOver-adjacent identifiers on lean 1.0 surfaces.
 enum AccessibilityIdentifiers {
+    static let launchSplash = "launch_splash"
+
     static let tabTrack = "tab_track"
     static let tabHome = "tab_home"
     static let tabSettings = "tab_settings"

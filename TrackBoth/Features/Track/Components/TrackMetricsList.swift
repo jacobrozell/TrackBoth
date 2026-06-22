@@ -16,6 +16,8 @@ struct TrackMetricsList: View {
     let onEdit: (Metric) -> Void
     let onDelete: (Metric) -> Void
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         LazyVStack(
             spacing: 16,
@@ -26,6 +28,11 @@ struct TrackMetricsList: View {
                let onDismissMilestone {
                 MilestoneBannerView(announcement: milestone, onDismiss: onDismissMilestone)
                     .padding(.horizontal, 4)
+                    .transition(
+                        reduceMotion
+                            ? .opacity
+                            : .move(edge: .top).combined(with: .opacity)
+                    )
             }
 
             if !habits.isEmpty {
@@ -54,6 +61,7 @@ struct TrackMetricsList: View {
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 8)
+        .trackBothAnimation(TrackBothMotion.celebrationSpring, value: milestone?.metricID, reduceMotion: reduceMotion)
     }
 
     private func metricRow(for metric: Metric) -> some View {

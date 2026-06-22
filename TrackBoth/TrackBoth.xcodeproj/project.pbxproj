@@ -15,12 +15,14 @@
 		0A6457C6476072D822F369FC /* MetricEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 588930804FA978AB4AE07738 /* MetricEntity.swift */; };
 		0C1143DDCF3FCBDEE71DF273 /* StatCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEF253D2180068F44114CA99 /* StatCard.swift */; };
 		0D14E995255DE86E36C658A8 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AED8EDD6D51508C59BA8C25B /* HomeViewModel.swift */; };
+		0F0D2DF2365CB8B7323F8F22 /* MetricMotivationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51006C74009C77889603EE8C /* MetricMotivationDetailView.swift */; };
 		0F311E6E9ABBFE70ACA8C1F1 /* ThemeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E77852227EE96A9D64262FBD /* ThemeManager.swift */; };
 		12BBC6DDCE0ECD38CFBBFB94 /* GoalPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D3D7793B7AD341CC0359FDE /* GoalPresets.swift */; };
 		15E0FC03C7672D5FCE8C99B0 /* TabBarLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB38A2AC65C16EE4941790D2 /* TabBarLayout.swift */; };
 		17371CD2171659059C68BE99 /* TrackBoth_WidgetControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 405A9F2226462639B085FE31 /* TrackBoth_WidgetControl.swift */; };
 		17D4EE7760599C843E93ECB0 /* InsightsViewMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9B75EDA9FCAFD23AAC43FF /* InsightsViewMode.swift */; };
 		17D6165EC0A00CF0A44E74C0 /* TrackBothUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C7283D76A2B19E2691625F3 /* TrackBothUITests.swift */; };
+		17FFCFF7A93F7DEFF0642A87 /* LaunchSplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847905897F015B2381133078 /* LaunchSplashView.swift */; };
 		184389162C5A26F9FF1FD56F /* GoalsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20523F18D959184E3026ABC1 /* GoalsView.swift */; };
 		194637B8CE63B2E5358159FB /* MotivationsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C7952E9A635621A4273E14 /* MotivationsView.swift */; };
 		1A0EC6E24DE80C06445A5E5B /* WidgetSnapshotBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 444D9D7E95C642A278271753 /* WidgetSnapshotBuilder.swift */; };
@@ -54,6 +56,7 @@
 		3ED7FEC4AF9EC602C18B146C /* TrackPadPortraitLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 540354AFEFECDD9EA0E4CBAC /* TrackPadPortraitLayout.swift */; };
 		3F2625239E335A30EF34E162 /* CompactThemeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDAF76629354EFE18936C281 /* CompactThemeCard.swift */; };
 		4013A8EFA136E7D9C4CF6024 /* WCAGContrastTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A129A19834A683C9841479A /* WCAGContrastTests.swift */; };
+		415AAF93B2ED79B1BA287C86 /* Motion.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12728A58F013B96C73C11C0 /* Motion.swift */; };
 		41C35D47CA021871581DAFBD /* ChartCopyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9409A4B6318B50D92D0273B2 /* ChartCopyTests.swift */; };
 		421EFB2CF0A69D76FB14D0D6 /* AddMotivationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 787DC863AE614A9E2635630E /* AddMotivationView.swift */; };
 		42975508B0F244EE9D567519 /* WidgetDataSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = C56408EF4CDBB6CC58CA3E9B /* WidgetDataSync.swift */; };
@@ -86,6 +89,7 @@
 		6670ABF44B5BD8942495727C /* TrackBothApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8183EE47DE7838AF56CE68C /* TrackBothApp.swift */; };
 		6692D4E887E2D183A28BCB4A /* ProductSurface.swift in Sources */ = {isa = PBXBuildFile; fileRef = D199292C1DC508455AB2E36D /* ProductSurface.swift */; };
 		67218513C8ACBB66C8565177 /* ViceMotivationPromptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4646DB6750C43222B76A6710 /* ViceMotivationPromptSheet.swift */; };
+		6737468F9A92F6D2B5DD7E32 /* LaunchSplashOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26339904847D3F1C0D66D935 /* LaunchSplashOverlay.swift */; };
 		68C84E19685A354139724BE0 /* CalendarHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1430C83C5F684D4A75766E0 /* CalendarHelperTests.swift */; };
 		6B18AFFC8CD8FB9A7DE2EC7A /* StreakUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E368BF3B5C9473D8817547 /* StreakUtilsTests.swift */; };
 		6D876F29DC3E6013FFA94DDA /* TrackingSemantics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2693864995EA58A925D883E1 /* TrackingSemantics.swift */; };
@@ -107,6 +111,7 @@
 		7E2C55C2D3CDFDC3252D882E /* WidgetIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3005769853B18CCFCC0194C /* WidgetIntents.swift */; };
 		80986317D989B8DA910D9715 /* InsightsDayEntriesSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93FA936E60C598A61F04C772 /* InsightsDayEntriesSection.swift */; };
 		818C2B0C458EFDE76DE1B4B2 /* TrackDashboardHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E84451AFAF71149ED252FD36 /* TrackDashboardHeader.swift */; };
+		8260836E0A3B0714088A589B /* BrandMarkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6289209FAC0931E0F1F0146D /* BrandMarkView.swift */; };
 		839479A3B791DBEE89BD61AC /* WidgetSnapshotV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AFA758B066889A6DFF79FBD /* WidgetSnapshotV1.swift */; };
 		89A8A2B508489AE10FD2B47B /* ChartsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75C29256208B9113CEF9AF58 /* ChartsView.swift */; };
 		8A36C1789C079A48B5F53E36 /* InsightsChartSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEAB77BB4E7E949295EB63FB /* InsightsChartSection.swift */; };
@@ -195,7 +200,6 @@
 		F7530156E95341C22F8A6F92 /* AppThemeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDB7EE6A342BB13771AD86FA /* AppThemeTests.swift */; };
 		F7E31DE16D43135F1E7C5F85 /* TrackBothExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E27CB1361CEC1772D6FA9 /* TrackBothExport.swift */; };
 		F877B64F2E9AF9111F2EAEC6 /* MetricMotivationCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A580E30628E599BDD4EEC3 /* MetricMotivationCardView.swift */; };
-		F9A8B7C6D5E4F3A2B1C0D9E8 /* MetricMotivationDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D9C0B1A2F3E4D5C6B7A890 /* MetricMotivationDetailView.swift */; };
 		FB4FA0A84D242C52244DC1A4 /* MetricFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F534131BDF1764FCE5F11C /* MetricFilterBar.swift */; };
 		FE9F369BE518F42376802406 /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA39E6328622258FD41CF63A /* LineChartView.swift */; };
 		FF72B8D73652D71ECA8C96E6 /* MetricStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597B518E2B660AFABFAB37B5 /* MetricStore.swift */; };
@@ -242,6 +246,7 @@
 		213A613757C9DA2542E5B327 /* MilestoneEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneEvaluator.swift; sourceTree = "<group>"; };
 		21F3907D426978C4596CF033 /* Typography.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Typography.swift; sourceTree = "<group>"; };
 		24213D6CDC6785198D90FCBB /* TrackPhonePortraitLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackPhonePortraitLayout.swift; sourceTree = "<group>"; };
+		26339904847D3F1C0D66D935 /* LaunchSplashOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchSplashOverlay.swift; sourceTree = "<group>"; };
 		265743C5C9C5A20455C64FB4 /* QueryDescriptors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryDescriptors.swift; sourceTree = "<group>"; };
 		2693864995EA58A925D883E1 /* TrackingSemantics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingSemantics.swift; sourceTree = "<group>"; };
 		28D1E94DE240BD6EB5BF3DC3 /* DemoDataGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoDataGenerator.swift; sourceTree = "<group>"; };
@@ -279,6 +284,7 @@
 		4E14F4E4116A2585DFC19A79 /* QueryDescriptorsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryDescriptorsTests.swift; sourceTree = "<group>"; };
 		4E2C8A247FB660A8E3251564 /* ViceSlipTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViceSlipTimer.swift; sourceTree = "<group>"; };
 		50135625E612B2982050AACC /* WidgetAppGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetAppGroup.swift; sourceTree = "<group>"; };
+		51006C74009C77889603EE8C /* MetricMotivationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricMotivationDetailView.swift; sourceTree = "<group>"; };
 		521AB59D1FADF7FD16C37192 /* EntryTypeFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryTypeFilter.swift; sourceTree = "<group>"; };
 		53517F1919DDECFA48FB3625 /* ChartControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartControlsView.swift; sourceTree = "<group>"; };
 		540354AFEFECDD9EA0E4CBAC /* TrackPadPortraitLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackPadPortraitLayout.swift; sourceTree = "<group>"; };
@@ -296,8 +302,8 @@
 		5DF8C23713A687DBDDF2E0D8 /* EntryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryStoreTests.swift; sourceTree = "<group>"; };
 		5E700097472F417EC9FAFCCD /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		60A580E30628E599BDD4EEC3 /* MetricMotivationCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricMotivationCardView.swift; sourceTree = "<group>"; };
-		E8D9C0B1A2F3E4D5C6B7A890 /* MetricMotivationDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricMotivationDetailView.swift; sourceTree = "<group>"; };
 		62744ED1D35D4E25BC6ABCA5 /* ScreenSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSectionHeader.swift; sourceTree = "<group>"; };
+		6289209FAC0931E0F1F0146D /* BrandMarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandMarkView.swift; sourceTree = "<group>"; };
 		62E67A8BA1659D0A4BC07AA8 /* TrackBoth.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TrackBoth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6319E0328896B810C2D56169 /* TrackBothPhaseBWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackBothPhaseBWidgets.swift; sourceTree = "<group>"; };
 		667278F4B9C15ABEECC721CC /* AddMetricView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMetricView.swift; sourceTree = "<group>"; };
@@ -324,6 +330,7 @@
 		821DD2224F329002BDA12B9E /* HistoryCompactLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryCompactLayout.swift; sourceTree = "<group>"; };
 		8305036FE2659AD333434229 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		844163CD84AD60371660DA08 /* TrackingSemanticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingSemanticsTests.swift; sourceTree = "<group>"; };
+		847905897F015B2381133078 /* LaunchSplashView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchSplashView.swift; sourceTree = "<group>"; };
 		8984034577186E26E68ABD6D /* DatePickerSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerSheet.swift; sourceTree = "<group>"; };
 		8F6DBB9FF1DCC477B7AE1EBA /* TabBarLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarLayoutTests.swift; sourceTree = "<group>"; };
 		91FD7F1692BAE31F40EDBF87 /* LandscapeSplitLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeSplitLayout.swift; sourceTree = "<group>"; };
@@ -349,6 +356,7 @@
 		B0189411A08595622117A0E5 /* WidgetPendingLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPendingLog.swift; sourceTree = "<group>"; };
 		B09B5549136E653BD454CC78 /* DayLogSummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayLogSummaryTests.swift; sourceTree = "<group>"; };
 		B0B5B0722A1FFE684127D563 /* MotivationViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MotivationViewModelTests.swift; sourceTree = "<group>"; };
+		B12728A58F013B96C73C11C0 /* Motion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Motion.swift; sourceTree = "<group>"; };
 		B5E368BF3B5C9473D8817547 /* StreakUtilsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakUtilsTests.swift; sourceTree = "<group>"; };
 		B67A4827E4BB3203D4D3E772 /* TrackStatsStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackStatsStrip.swift; sourceTree = "<group>"; };
 		B7F4FB13DD07E0A0E4007E47 /* ViceSlipTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViceSlipTimerTests.swift; sourceTree = "<group>"; };
@@ -464,6 +472,7 @@
 			isa = PBXGroup;
 			children = (
 				0B80CF32BC1BE1314DCC3C58 /* AdaptiveSectionHeader.swift */,
+				6289209FAC0931E0F1F0146D /* BrandMarkView.swift */,
 				F79B34743FF2C29D61BF9F19 /* CalendarDayView.swift */,
 				ED415AF54588D13559BDFD78 /* CalendarGridView.swift */,
 				4A6952CF50E252E5116954B1 /* ChartHeaderRow.swift */,
@@ -504,6 +513,8 @@
 				7C828CE80843235683A2549E /* AddViews */,
 				BD3A53C86601AAF2E49634D1 /* EditViews */,
 				9A54D97CEF08C855C9F7A37D /* ContentView.swift */,
+				26339904847D3F1C0D66D935 /* LaunchSplashOverlay.swift */,
+				847905897F015B2381133078 /* LaunchSplashView.swift */,
 				11CDC71CB104E1E91A35E9A1 /* MigrationRecoveryView.swift */,
 				5E700097472F417EC9FAFCCD /* OnboardingView.swift */,
 			);
@@ -779,6 +790,14 @@
 			path = "TrackBoth-Widget";
 			sourceTree = "<group>";
 		};
+		93A33EB0C01DE547EAFE153D /* Motivation */ = {
+			isa = PBXGroup;
+			children = (
+				51006C74009C77889603EE8C /* MetricMotivationDetailView.swift */,
+			);
+			path = Motivation;
+			sourceTree = "<group>";
+		};
 		98C9A85728C2B22314C43DF4 /* Insights */ = {
 			isa = PBXGroup;
 			children = (
@@ -938,19 +957,11 @@
 			children = (
 				AF01E8852D7C836CDD69FC9F /* History */,
 				98C9A85728C2B22314C43DF4 /* Insights */,
-				C7B8A9D0E1F234567890ABCD /* Motivation */,
+				93A33EB0C01DE547EAFE153D /* Motivation */,
 				F40ECE624E92E8261319CDF0 /* Shared */,
 				3B5CDFE1609851EC1E09765D /* Track */,
 			);
 			path = Features;
-			sourceTree = "<group>";
-		};
-		C7B8A9D0E1F234567890ABCD /* Motivation */ = {
-			isa = PBXGroup;
-			children = (
-				E8D9C0B1A2F3E4D5C6B7A890 /* MetricMotivationDetailView.swift */,
-			);
-			path = Motivation;
 			sourceTree = "<group>";
 		};
 		E3A9AB6316B6A628630A0F81 /* Accessibility */ = {
@@ -969,6 +980,7 @@
 				5D6C67E0CEF5585CE7D2E89A /* AdaptiveTabChrome.swift */,
 				FEA5B8CF7561962FDC109AAF /* ChartExportUtility.swift */,
 				A3B83BACA3A8207F7246AEF1 /* DeviceLayoutEnvironment.swift */,
+				B12728A58F013B96C73C11C0 /* Motion.swift */,
 				AB38A2AC65C16EE4941790D2 /* TabBarLayout.swift */,
 				E77852227EE96A9D64262FBD /* ThemeManager.swift */,
 				21F3907D426978C4596CF033 /* Typography.swift */,
@@ -1225,6 +1237,7 @@
 				234BC5209918670A20EAB8C9 /* AppTheme.swift in Sources */,
 				76BC8F00B0BD32E6AC05E969 /* BarChartView.swift in Sources */,
 				DD9B59B8097DD25586536B7A /* BootstrapStoreRecovery.swift in Sources */,
+				8260836E0A3B0714088A589B /* BrandMarkView.swift in Sources */,
 				C757B9DD0CA01321941681C1 /* CalendarDayView.swift in Sources */,
 				35D82DD9677766DFDEF5D962 /* CalendarGridView.swift in Sources */,
 				B3AE7F8C6E8FABE7EF9B3AB5 /* CalendarHelper.swift in Sources */,
@@ -1278,6 +1291,8 @@
 				1D55B21A948A8D7698DCF32E /* InsightsView.swift in Sources */,
 				17D4EE7760599C843E93ECB0 /* InsightsViewMode.swift in Sources */,
 				98EC432DD1062FE0DC139B6A /* LandscapeSplitLayout.swift in Sources */,
+				6737468F9A92F6D2B5DD7E32 /* LaunchSplashOverlay.swift in Sources */,
+				17FFCFF7A93F7DEFF0642A87 /* LaunchSplashView.swift in Sources */,
 				FE9F369BE518F42376802406 /* LineChartView.swift in Sources */,
 				77D0D37FB871E845449EB222 /* Logger.swift in Sources */,
 				2FA1DF13CE4470A3B408FCBB /* LoggingSheet.swift in Sources */,
@@ -1288,7 +1303,7 @@
 				7404F878B297D85978559E68 /* MetricEntry.swift in Sources */,
 				FB4FA0A84D242C52244DC1A4 /* MetricFilterBar.swift in Sources */,
 				F877B64F2E9AF9111F2EAEC6 /* MetricMotivationCardView.swift in Sources */,
-				F9A8B7C6D5E4F3A2B1C0D9E8 /* MetricMotivationDetailView.swift in Sources */,
+				0F0D2DF2365CB8B7323F8F22 /* MetricMotivationDetailView.swift in Sources */,
 				ABB6B4AE927282D509F113C8 /* MetricPreset.swift in Sources */,
 				FF72B8D73652D71ECA8C96E6 /* MetricStore.swift in Sources */,
 				6E37C4F2474E603A94840446 /* MetricTabShell.swift in Sources */,
@@ -1299,6 +1314,7 @@
 				771BEB5AB177A2A3947E2881 /* MilestoneStore.swift in Sources */,
 				255AC8827B6DF4532E4CC546 /* ModelContext+Persist.swift in Sources */,
 				B76E9380540616F83EDA40E9 /* MoodChipPicker.swift in Sources */,
+				415AAF93B2ED79B1BA287C86 /* Motion.swift in Sources */,
 				C9CE6C5229AD0FA31AC3C6F6 /* MotivationViewModel.swift in Sources */,
 				C599959FEEB66B3EC283AD28 /* MotivationalInsightsView.swift in Sources */,
 				194637B8CE63B2E5358159FB /* MotivationsView.swift in Sources */,
@@ -1576,6 +1592,8 @@
 				INFOPLIST_FILE = "TrackBoth-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TrackBoth;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_UILaunchScreen_BackgroundColor = LaunchBackground;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
@@ -1648,6 +1666,8 @@
 				INFOPLIST_FILE = "TrackBoth-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = TrackBoth;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_UILaunchScreen_BackgroundColor = LaunchBackground;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;

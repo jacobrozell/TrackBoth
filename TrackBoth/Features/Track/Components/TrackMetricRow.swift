@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 // MARK: - TrackMetricRow
 /// Metric row for Track — toggle, name, status, hero streak, and extended metadata.
@@ -14,7 +15,10 @@ struct TrackMetricRow: View {
 
     @Query private var entries: [MetricEntry]
     @State private var refreshTrigger = UUID()
+    @State private var toggleEffectTrigger = 0
+    @State private var showsToggleHighlight = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(
         metric: Metric,
@@ -99,6 +103,11 @@ struct TrackMetricRow: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 4)
         .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(toggleHighlightColor.opacity(showsToggleHighlight ? 0.55 : 0), lineWidth: 2)
+        }
+        .trackBothAnimation(TrackBothMotion.highlightFade, value: showsToggleHighlight, reduceMotion: reduceMotion)
         .accessibilityElement(children: .contain)
         .contextMenu {
             Button(action: onLog) { Label("Log", systemImage: "square.and.pencil") }
@@ -130,6 +139,8 @@ struct TrackMetricRow: View {
                                 Text("\(streakCount)")
                                     .font(.title2.weight(.bold).monospacedDigit())
                                     .foregroundStyle(Color.currentText)
+                                    .contentTransition(reduceMotion ? .identity : .numericText())
+                                    .trackBothAnimation(TrackBothMotion.spring, value: streakCount, reduceMotion: reduceMotion)
                                 Text(heroStreakLabel)
                                     .font(.caption2.weight(.medium))
                                     .foregroundStyle(Color.currentSecondaryText)
@@ -240,13 +251,18 @@ struct TrackMetricRow: View {
         return ViceSavingsCalculator.savingsLabel(streak: streak, costPerUnit: metric.costPerUnitDecimal)
     }
 
+    private var toggleHighlightColor: Color {
+        if isMetricCompleted() {
+            return Color.currentSuccess
+        }
+        if metric.habitType == .vice && TrackingSemantics.isLoggedForDay(entry: selectedDateEntry) {
+            return Color.currentError
+        }
+        return Color.currentPrimary
+    }
+
     private var toggleButton: some View {
-        Button(action: {
-            onToggle()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                refreshTrigger = UUID()
-            }
-        }) {
+        Button(action: performToggle) {
             toggleIcon
         }
         .buttonStyle(.plain)
@@ -256,30 +272,64 @@ struct TrackMetricRow: View {
         .id(refreshTrigger)
     }
 
+    private func performToggle() {
+        let wasCompleted = isMetricCompleted()
+        onToggle()
+        toggleEffectTrigger += 1
+        provideToggleHaptic(wasCompleted: wasCompleted)
+        flashToggleHighlight()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            refreshTrigger = UUID()
+        }
+    }
+
+    private func provideToggleHaptic(wasCompleted: Bool) {
+        let style: UIImpactFeedbackGenerator.FeedbackStyle = wasCompleted ? .soft : .light
+        UIImpactFeedbackGenerator(style: style).impactOccurred()
+    }
+
+    private func flashToggleHighlight() {
+        guard !reduceMotion else { return }
+        withAnimation(TrackBothMotion.quick) {
+            showsToggleHighlight = true
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            withAnimation(TrackBothMotion.highlightFade) {
+                showsToggleHighlight = false
+            }
+        }
+    }
+
     @ViewBuilder
     private var toggleIcon: some View {
         let isCompleted = isMetricCompleted()
         let isLogged = TrackingSemantics.isLoggedForDay(entry: selectedDateEntry)
 
-        if metric.habitType == .vice {
-            if isCompleted {
-                Image(systemName: "checkmark.shield.fill")
-                    .font(.title3)
-                    .foregroundColor(Color.currentSuccess)
-            } else if isLogged {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title3)
-                    .foregroundColor(Color.currentError)
+        Group {
+            if metric.habitType == .vice {
+                if isCompleted {
+                    Image(systemName: "checkmark.shield.fill")
+                        .font(.title3)
+                        .foregroundColor(Color.currentSuccess)
+                } else if isLogged {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title3)
+                        .foregroundColor(Color.currentError)
+                } else {
+                    Image(systemName: "circle")
+                        .font(.title3)
+                        .foregroundColor(Color.currentSecondaryText)
+                }
             } else {
-                Image(systemName: "circle")
+                Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
-                    .foregroundColor(Color.currentSecondaryText)
+                    .foregroundColor(isCompleted ? Color.currentSuccess : Color.currentSecondaryText)
             }
-        } else {
-            Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                .font(.title3)
-                .foregroundColor(isCompleted ? Color.currentSuccess : Color.currentSecondaryText)
         }
+        .modifier(ToggleIconMotionModifier(
+            reduceMotion: reduceMotion,
+            effectTrigger: toggleEffectTrigger
+        ))
     }
 
     private var optionsRow: some View {

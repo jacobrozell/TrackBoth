@@ -33,13 +33,15 @@ struct TrackBothApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(themeManager)
-                .preferredColorScheme(themeManager.preferredColorScheme)
-                .tint(themeManager.currentAppTheme.primaryColor)
-                .onAppear {
-                    logger.info("App window appeared", category: .ui)
-                }
+            LaunchSplashOverlay {
+                ContentView()
+                    .environment(themeManager)
+                    .preferredColorScheme(themeManager.preferredColorScheme)
+                    .tint(themeManager.currentAppTheme.primaryColor)
+                    .onAppear {
+                        logger.info("App window appeared", category: .ui)
+                    }
+            }
         }
         .modelContainer(sharedModelContainer)
     }
