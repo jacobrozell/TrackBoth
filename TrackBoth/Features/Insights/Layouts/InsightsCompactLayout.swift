@@ -26,7 +26,7 @@ struct InsightsCompactLayout: View {
             .padding(.bottom, 4)
 
             ScrollView {
-                LazyVStack(spacing: 20, pinnedViews: [.sectionHeaders]) {
+                LazyVStack(spacing: 20, pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]) {
                     if !metrics.isEmpty {
                         MetricFilterChipRow(
                             metrics: metrics,

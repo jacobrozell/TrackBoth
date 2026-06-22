@@ -8,6 +8,8 @@ struct TrackStatTile: View {
     let icon: String
     let tint: Color
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     var body: some View {
         HStack(spacing: 10) {
             Image(systemName: icon)
@@ -26,7 +28,8 @@ struct TrackStatTile: View {
                 Text(title)
                     .font(.caption)
                     .foregroundStyle(Color.currentSecondaryText)
-                    .lineLimit(1)
+                    .lineLimit(dynamicTypeSize.usesAccessibilityLayout ? 2 : 1)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Spacer(minLength: 0)

@@ -20,34 +20,62 @@ struct TrackPhoneLandscapeLayout: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 16, pinnedViews: [.sectionHeaders]) {
-                HStack(alignment: .top, spacing: 12) {
-                    TrackDashboardHeader(
-                        weekDays: weekDays,
-                        metrics: metrics,
-                        entries: entries,
-                        selectedDate: $viewModel.selectedDate,
-                        isToday: viewModel.isToday,
-                        todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
-                        totalMetrics: metrics.count,
-                        showingRowOptions: showingRowOptions,
-                        usesAccessibilityLayout: usesAccessibilityLayout,
-                        onToggleEdit: { showingRowOptions.toggle() },
-                        onGoToToday: { viewModel.goToToday() }
-                    )
-                    .frame(maxWidth: .infinity)
+            LazyVStack(spacing: 16, pinnedViews: usesAccessibilityLayout ? [] : [.sectionHeaders]) {
+                if usesAccessibilityLayout {
+                    VStack(alignment: .leading, spacing: 16) {
+                        TrackDashboardHeader(
+                            weekDays: weekDays,
+                            metrics: metrics,
+                            entries: entries,
+                            selectedDate: $viewModel.selectedDate,
+                            isToday: viewModel.isToday,
+                            todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+                            totalMetrics: metrics.count,
+                            showingRowOptions: showingRowOptions,
+                            usesAccessibilityLayout: usesAccessibilityLayout,
+                            onToggleEdit: { showingRowOptions.toggle() },
+                            onGoToToday: { viewModel.goToToday() }
+                        )
 
-                    TrackStatsGrid(
-                        totalHabits: viewModel.totalHabits(from: metrics),
-                        totalVices: viewModel.totalVices(from: metrics),
-                        activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
-                        todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
-                        totalMetrics: metrics.count
-                    )
-                    .frame(maxWidth: 280)
+                        TrackStatsGrid(
+                            totalHabits: viewModel.totalHabits(from: metrics),
+                            totalVices: viewModel.totalVices(from: metrics),
+                            activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
+                            todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+                            totalMetrics: metrics.count
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 4)
+                } else {
+                    HStack(alignment: .top, spacing: 12) {
+                        TrackDashboardHeader(
+                            weekDays: weekDays,
+                            metrics: metrics,
+                            entries: entries,
+                            selectedDate: $viewModel.selectedDate,
+                            isToday: viewModel.isToday,
+                            todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+                            totalMetrics: metrics.count,
+                            showingRowOptions: showingRowOptions,
+                            usesAccessibilityLayout: usesAccessibilityLayout,
+                            onToggleEdit: { showingRowOptions.toggle() },
+                            onGoToToday: { viewModel.goToToday() }
+                        )
+                        .frame(maxWidth: .infinity)
+
+                        TrackStatsGrid(
+                            totalHabits: viewModel.totalHabits(from: metrics),
+                            totalVices: viewModel.totalVices(from: metrics),
+                            activeStreaks: viewModel.activeStreaks(from: metrics, entries: entries),
+                            todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
+                            totalMetrics: metrics.count
+                        )
+                        .frame(maxWidth: 280)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 4)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 4)
 
                 TrackMetricsList(
                     habits: habits,

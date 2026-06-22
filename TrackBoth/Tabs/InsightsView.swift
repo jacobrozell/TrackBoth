@@ -73,36 +73,44 @@ struct InsightsView: View {
 
     @ViewBuilder
     private var insightsLayout: some View {
-        switch deviceLayout {
-        case .phoneLandscape, .padLandscape:
-            GeometryReader { geometry in
-                InsightsPadLandscapeLayout(
-                    selectedChartType: $selectedChartType,
-                    viewModel: viewModel,
-                    metrics: metrics,
-                    monthEntries: monthEntries,
-                    chartEntries: entries,
-                    streakEntries: streakEntries,
-                    dynamicTypeSize: dynamicTypeSize,
-                    totalWidth: geometry.size.width,
-                    totalHeight: geometry.size.height,
-                    usesPhoneLandscapeSizing: deviceLayout == .phoneLandscape
-                )
+        if dynamicTypeSize.usesAccessibilityLayout {
+            insightsCompactLayout
+        } else {
+            switch deviceLayout {
+            case .phoneLandscape, .padLandscape:
+                GeometryReader { geometry in
+                    InsightsPadLandscapeLayout(
+                        selectedChartType: $selectedChartType,
+                        viewModel: viewModel,
+                        metrics: metrics,
+                        monthEntries: monthEntries,
+                        chartEntries: entries,
+                        streakEntries: streakEntries,
+                        dynamicTypeSize: dynamicTypeSize,
+                        totalWidth: geometry.size.width,
+                        totalHeight: geometry.size.height,
+                        usesPhoneLandscapeSizing: deviceLayout == .phoneLandscape
+                    )
+                }
+            default:
+                insightsCompactLayout
             }
-        default:
-            InsightsCompactLayout(
-                mode: $mode,
-                selectedChartType: $selectedChartType,
-                viewModel: viewModel,
-                metrics: metrics,
-                monthEntries: monthEntries,
-                chartEntries: entries,
-                streakEntries: streakEntries,
-                dynamicTypeSize: dynamicTypeSize
-            )
-            .frame(maxWidth: deviceLayout.isPad ? 760 : .infinity)
-            .frame(maxWidth: .infinity)
         }
+    }
+
+    private var insightsCompactLayout: some View {
+        InsightsCompactLayout(
+            mode: $mode,
+            selectedChartType: $selectedChartType,
+            viewModel: viewModel,
+            metrics: metrics,
+            monthEntries: monthEntries,
+            chartEntries: entries,
+            streakEntries: streakEntries,
+            dynamicTypeSize: dynamicTypeSize
+        )
+        .frame(maxWidth: deviceLayout.isPad ? 760 : .infinity)
+        .frame(maxWidth: .infinity)
     }
 
     /// Entries within the month of the selected calendar date.

@@ -202,6 +202,9 @@ private struct OnboardingPresetPageView: View {
     @Binding var selection: Set<MetricPreset>
     let usesCompactLayout: Bool
 
+    @ScaledMetric(relativeTo: .largeTitle) private var heroCircleSize: CGFloat = 96
+    @ScaledMetric(relativeTo: .title) private var heroIconSize: CGFloat = 40
+
     var body: some View {
         ScrollView {
             VStack(spacing: usesCompactLayout ? 16 : 24) {
@@ -210,9 +213,9 @@ private struct OnboardingPresetPageView: View {
                 ZStack {
                     Circle()
                         .fill(color.opacity(0.2))
-                        .frame(width: usesCompactLayout ? 72 : 96, height: usesCompactLayout ? 72 : 96)
+                        .frame(width: heroCircleSize, height: heroCircleSize)
                     Image(systemName: icon)
-                        .font(.system(size: usesCompactLayout ? 30 : 40, weight: .medium))
+                        .font(.system(size: heroIconSize, weight: .medium))
                         .foregroundColor(color)
                 }
 
@@ -248,7 +251,12 @@ struct PresetChipGrid: View {
     let presets: [MetricPreset]
     @Binding var selection: Set<MetricPreset>
 
-    private let columns = [GridItem(.adaptive(minimum: 140), spacing: 10)]
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var columns: [GridItem] {
+        let minimum: CGFloat = dynamicTypeSize.usesAccessibilityLayout ? 200 : 140
+        return [GridItem(.adaptive(minimum: minimum), spacing: 10)]
+    }
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 10) {
@@ -298,6 +306,9 @@ struct OnboardingPageView: View {
     let page: OnboardingPage
     let usesCompactLayout: Bool
 
+    @ScaledMetric(relativeTo: .largeTitle) private var heroCircleSize: CGFloat = 120
+    @ScaledMetric(relativeTo: .title) private var heroIconSize: CGFloat = 50
+
     var body: some View {
         ScrollView {
             VStack(spacing: usesCompactLayout ? 20 : 32) {
@@ -306,10 +317,10 @@ struct OnboardingPageView: View {
                 ZStack {
                     Circle()
                         .fill(page.color.opacity(0.2))
-                        .frame(width: usesCompactLayout ? 88 : 120, height: usesCompactLayout ? 88 : 120)
+                        .frame(width: heroCircleSize, height: heroCircleSize)
 
                     Image(systemName: page.icon)
-                        .font(.system(size: usesCompactLayout ? 36 : 50, weight: .medium))
+                        .font(.system(size: heroIconSize, weight: .medium))
                         .foregroundColor(page.color)
                 }
 

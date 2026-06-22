@@ -7,6 +7,8 @@ struct EmptyStateView: View {
     let subtitle: String
     let actionTitle: String?
     let action: (() -> Void)?
+
+    @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 56
     
     init(
         icon: String = "plus.circle",
@@ -25,7 +27,7 @@ struct EmptyStateView: View {
     var body: some View {
         VStack(spacing: 20) {
             Image(systemName: icon)
-                .font(.system(size: 60))
+                .font(.system(size: iconSize))
                 .foregroundColor(Color.currentSecondaryText)
 
             Text(title)
