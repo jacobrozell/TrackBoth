@@ -8,69 +8,44 @@ struct ChartContentView: View {
     let entries: [MetricEntry]
     let metrics: [Metric]
     
-    @Environment(\.usesLandscapeChrome) private var usesLandscapeChrome
-
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Main chart
-                    switch selectedChartType {
-                    case .line:
-                        LineChartView(
-                            filter: selectedFilter,
-                            entries: entries,
-                            metrics: metrics
-                        )
+        ScrollView {
+            VStack(spacing: 20) {
+                switch selectedChartType {
+                case .line:
+                    LineChartView(
+                        filter: selectedFilter,
+                        entries: entries,
+                        metrics: metrics
+                    )
 
-                    case .bar:
-                        BarChartView(
-                            filter: selectedFilter,
-                            entries: entries,
-                            metrics: metrics
-                        )
+                case .bar:
+                    BarChartView(
+                        filter: selectedFilter,
+                        entries: entries,
+                        metrics: metrics
+                    )
 
-                    case .heatmap:
-                        HeatmapView(
-                            filter: selectedFilter,
-                            entries: entries,
-                            metrics: metrics
-                        )
-                    
-                    case .quantity:
-                        QuantityChartView(
-                            filter: selectedFilter,
-                            entries: entries,
-                            metrics: metrics
-                        )
-                    }
+                case .heatmap:
+                    HeatmapView(
+                        filter: selectedFilter,
+                        entries: entries,
+                        metrics: metrics
+                    )
 
-                    // Additional content - layout differently for landscape
-                    if geometry.size.width > geometry.size.height {
-                        // Landscape: side-by-side layout
-                        HStack(alignment: .top, spacing: 16) {
-                            VStack(spacing: 16) {
-                                MotivationalInsightsView(entries: entries, metrics: metrics, filter: selectedFilter)
-                            }
-                            .frame(maxWidth: .infinity)
-                            
-                            VStack(spacing: 16) {
-                                StreakInfoView(filter: selectedFilter, entries: entries, metrics: metrics)
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                    } else {
-                        // Portrait: stacked layout
-                        VStack(spacing: 16) {
-                            MotivationalInsightsView(entries: entries, metrics: metrics, filter: selectedFilter)
-                            StreakInfoView(filter: selectedFilter, entries: entries, metrics: metrics)
-                        }
-                    }
+                case .quantity:
+                    QuantityChartView(
+                        filter: selectedFilter,
+                        entries: entries,
+                        metrics: metrics
+                    )
                 }
-                .padding()
-                .adaptiveScrollInset()
+
+                MotivationalInsightsView(entries: entries, metrics: metrics, filter: selectedFilter)
+                StreakInfoView(filter: selectedFilter, entries: entries, metrics: metrics)
             }
-            .id("chart-\(geometry.size.width > geometry.size.height ? "landscape" : "portrait")-\(geometry.size.width)-\(geometry.size.height)")
+            .padding()
+            .adaptiveScrollInset()
         }
     }
 }

@@ -85,10 +85,12 @@ struct MetricFilterChipRow: View {
                 }
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.vertical, verticalPadding)
         .background {
             if usesBarBackground {
                 Color.currentSecondaryBackground
+                    .ignoresSafeArea(edges: .horizontal)
             }
         }
     }

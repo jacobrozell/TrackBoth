@@ -3,11 +3,11 @@ import SwiftData
 
 // MARK: - MotivationsView
 struct MotivationsView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
     @State private var viewModel = MotivationViewModel()
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.deviceLayout) private var deviceLayout
 
     init() {
         _metrics = QueryDescriptors.allMetrics
@@ -42,17 +42,14 @@ struct MotivationsView: View {
                     }
                 }
             }
+            .navigationDestination(for: UUID.self) { metricID in
+                if let metric = metrics.first(where: { $0.id == metricID }) {
+                    MetricMotivationDetailView(metric: metric)
+                }
+            }
         }
         .onAppear {
             logger.info("MotivationsView appeared", category: .ui)
-        }
-        .sheet(item: $viewModel.motivationSheet) { sheet in
-            switch sheet {
-            case .editWhy(let metric):
-                EditWhySheet(metric: metric)
-            case .addNote(let metric):
-                AddMotivationView(metrics: metrics, preselectedMetric: metric)
-            }
         }
         .sheet(isPresented: $viewModel.showingAddMetric) {
             AddMetricView()
@@ -63,7 +60,7 @@ struct MotivationsView: View {
         EmptyStateView(
             icon: "plus.circle.fill",
             title: "Nothing to Track Yet",
-            subtitle: "Add a vice on Track first — then set your why and save notes for tough days.",
+            subtitle: "Add a vice on Track first — then set a primary motivation and log thoughts on hard days.",
             actionTitle: "Add Habit or Vice",
             action: { viewModel.showAddMetric() }
         )
@@ -83,22 +80,26 @@ struct MotivationsView: View {
 
     @ViewBuilder
     private func motivationsScrollContent(idPrefix: String, geometry: GeometryProxy?) -> some View {
+        let pinSectionHeaders = !dynamicTypeSize.usesAccessibilityLayout && !deviceLayout.isLandscape
+        let topPadding: CGFloat = deviceLayout.isLandscape ? 16 : 8
+
         ScrollView {
             LazyVStack(
-                spacing: 16,
-                pinnedViews: dynamicTypeSize.usesAccessibilityLayout ? [] : [.sectionHeaders]
+                spacing: 12,
+                pinnedViews: pinSectionHeaders ? [.sectionHeaders] : []
             ) {
                 if !vices.isEmpty {
                     Section {
                         ForEach(vices, id: \.id) { metric in
-                            metricCard(for: metric)
+                            metricLink(for: metric)
                         }
                     } header: {
-                        AdaptiveSectionHeader(
+                        sectionHeader(
                             title: "Your vices",
-                            subtitle: "Why you're staying clean — and notes from hard days",
+                            subtitle: "Each vice has one primary motivation. Tap to view all logged motivations and add new ones.",
                             icon: "shield.fill",
-                            iconColor: Color.currentPrimary
+                            iconColor: Color.currentPrimary,
+                            extraTopPadding: deviceLayout.isLandscape ? 8 : 0
                         )
                     }
                 }
@@ -106,32 +107,52 @@ struct MotivationsView: View {
                 if !habits.isEmpty {
                     Section {
                         ForEach(habits, id: \.id) { metric in
-                            metricCard(for: metric)
+                            metricLink(for: metric)
                         }
                     } header: {
-                        AdaptiveSectionHeader(
+                        sectionHeader(
                             title: "Habits",
-                            subtitle: "Optional — your why and reflections while building the habit",
+                            subtitle: "Optional primary motivation plus day-to-day reflections as you build the habit.",
                             icon: "checkmark.circle.fill",
-                            iconColor: Color.currentSuccess
+                            iconColor: Color.currentSuccess,
+                            extraTopPadding: deviceLayout.isLandscape ? 8 : 0
                         )
                     }
                 }
             }
             .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.top, topPadding)
+            .padding(.bottom, 8)
             .adaptiveScrollInset()
         }
         .id("motivations-\(idPrefix)-\(Int(geometry?.size.width ?? 0))-\(Int(geometry?.size.height ?? 0))")
     }
 
-    private func metricCard(for metric: Metric) -> some View {
-        MetricMotivationCardView(
-            metric: metric,
-            notes: viewModel.notes(for: metric, entries: entries),
-            onEditWhy: { viewModel.presentEditWhy(for: metric) },
-            onAddNote: { viewModel.presentAddNote(for: metric) }
+    private func sectionHeader(
+        title: String,
+        subtitle: String,
+        icon: String,
+        iconColor: Color,
+        extraTopPadding: CGFloat
+    ) -> some View {
+        AdaptiveSectionHeader(
+            title: title,
+            subtitle: subtitle,
+            icon: icon,
+            iconColor: iconColor
         )
+        .padding(.top, extraTopPadding)
+    }
+
+    private func metricLink(for metric: Metric) -> some View {
+        NavigationLink(value: metric.id) {
+            MetricMotivationCardView(
+                metric: metric,
+                loggedCount: viewModel.notes(for: metric, entries: entries).count
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("motivation_metric_\(metric.id.uuidString)")
     }
 }
 

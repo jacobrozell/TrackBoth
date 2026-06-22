@@ -71,34 +71,7 @@ struct InsightsView: View {
         }
     }
 
-    @ViewBuilder
     private var insightsLayout: some View {
-        if dynamicTypeSize.usesAccessibilityLayout {
-            insightsCompactLayout
-        } else {
-            switch deviceLayout {
-            case .phoneLandscape, .padLandscape:
-                GeometryReader { geometry in
-                    InsightsPadLandscapeLayout(
-                        selectedChartType: $selectedChartType,
-                        viewModel: viewModel,
-                        metrics: metrics,
-                        monthEntries: monthEntries,
-                        chartEntries: entries,
-                        streakEntries: streakEntries,
-                        dynamicTypeSize: dynamicTypeSize,
-                        totalWidth: geometry.size.width,
-                        totalHeight: geometry.size.height,
-                        usesPhoneLandscapeSizing: deviceLayout == .phoneLandscape
-                    )
-                }
-            default:
-                insightsCompactLayout
-            }
-        }
-    }
-
-    private var insightsCompactLayout: some View {
         InsightsCompactLayout(
             mode: $mode,
             selectedChartType: $selectedChartType,
@@ -109,8 +82,19 @@ struct InsightsView: View {
             streakEntries: streakEntries,
             dynamicTypeSize: dynamicTypeSize
         )
-        .frame(maxWidth: deviceLayout.isPad ? 760 : .infinity)
+        .frame(maxWidth: insightsContentMaxWidth)
         .frame(maxWidth: .infinity)
+    }
+
+    private var insightsContentMaxWidth: CGFloat {
+        switch deviceLayout {
+        case .padPortrait, .padLandscape:
+            return 760
+        case .phoneLandscape:
+            return .infinity
+        case .phonePortrait:
+            return .infinity
+        }
     }
 
     /// Entries within the month of the selected calendar date.

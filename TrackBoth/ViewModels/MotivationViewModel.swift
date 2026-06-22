@@ -180,15 +180,11 @@ class MotivationViewModel {
         in modelContext: ModelContext,
         entries: [MetricEntry]
     ) {
-        let today = Calendar.current.startOfDay(for: Date())
-        let entry = MetricEntry.getOrCreate(
+        MetricEntry.insertMotivationNote(
             for: metric.id,
-            date: today,
-            in: modelContext,
-            entries: entries,
-            metric: metric
+            motivation: motivation,
+            in: modelContext
         )
-        entry.motivation = motivation
         modelContext.saveChanges(operation: "save motivation note", entity: "MetricEntry")
     }
 

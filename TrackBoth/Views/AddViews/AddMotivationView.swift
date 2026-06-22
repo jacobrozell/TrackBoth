@@ -4,11 +4,14 @@ import SwiftData
 struct AddMotivationView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var entries: [MetricEntry]
     let metrics: [Metric]
 
     @State private var selectedMetric: Metric?
     @State private var noteText = ""
+
+    private var isMetricLocked: Bool {
+        metrics.count == 1
+    }
 
     private var sortedMetrics: [Metric] {
         let vices = metrics.filter { $0.habitType == .vice }
@@ -20,7 +23,7 @@ struct AddMotivationView: View {
 
     init(metrics: [Metric], preselectedMetric: Metric? = nil) {
         self.metrics = metrics
-        _selectedMetric = State(initialValue: preselectedMetric)
+        _selectedMetric = State(initialValue: preselectedMetric ?? (metrics.count == 1 ? metrics.first : nil))
     }
 
     var body: some View {
@@ -28,44 +31,55 @@ struct AddMotivationView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Add a note")
+                        Text("Log motivation")
                             .font(.system(size: 28, weight: .bold))
                             .foregroundColor(Color.currentText)
 
-                        Text("Journal how you're feeling today. This is separate from your pinned why — you can update that anytime from the card.")
+                        Text(introCopy)
                             .font(.body)
                             .foregroundColor(Color.currentSecondaryText)
                             .lineSpacing(2)
                     }
                     .padding(.top, 8)
 
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("For which habit or vice?")
-                            .font(.headline)
-                            .foregroundColor(Color.currentText)
+                    if !isMetricLocked {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("For which habit or vice?")
+                                .font(.headline)
+                                .foregroundColor(Color.currentText)
 
-                        Picker("Habit or vice", selection: $selectedMetric) {
-                            Text("Choose one").tag(nil as Metric?)
-                            ForEach(sortedMetrics, id: \.id) { metric in
-                                Label {
-                                    Text(metric.name)
-                                } icon: {
-                                    Image(systemName: metric.habitType.icon)
+                            Picker("Habit or vice", selection: $selectedMetric) {
+                                Text("Choose one").tag(nil as Metric?)
+                                ForEach(sortedMetrics, id: \.id) { metric in
+                                    Label {
+                                        Text(metric.name)
+                                    } icon: {
+                                        Image(systemName: metric.habitType.icon)
+                                    }
+                                    .tag(metric as Metric?)
                                 }
-                                .tag(metric as Metric?)
                             }
+                            .pickerStyle(.menu)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.currentSecondaryBackground)
+                            )
                         }
-                        .pickerStyle(.menu)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.currentSecondaryBackground)
-                        )
+                    } else if let metric = selectedMetric {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("For")
+                                .font(.caption)
+                                .foregroundStyle(Color.currentSecondaryText)
+                            Text(metric.name)
+                                .font(.headline)
+                                .foregroundStyle(Color.currentText)
+                        }
                     }
 
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Today's note")
+                        Text("What came to mind?")
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(Color.currentText)
 
@@ -79,9 +93,7 @@ struct AddMotivationView: View {
                             )
                             .overlay {
                                 if noteText.isEmpty {
-                                    Text(selectedMetric?.habitType == .vice
-                                         ? "What helped you stay strong — or what triggered a craving?"
-                                         : "What made today easier or harder?")
+                                    Text(placeholderCopy)
                                         .font(.system(size: 16))
                                         .foregroundColor(Color.currentSecondaryText)
                                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
@@ -89,6 +101,7 @@ struct AddMotivationView: View {
                                         .allowsHitTesting(false)
                                 }
                             }
+                            .accessibilityIdentifier("motivation_note_text")
                     }
 
                     Spacer(minLength: 40)
@@ -96,7 +109,7 @@ struct AddMotivationView: View {
                 .padding(.horizontal, 20)
             }
             .background(Color.currentBackground)
-            .navigationTitle("Add Note")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -107,21 +120,39 @@ struct AddMotivationView: View {
                     Button("Save") { saveNote() }
                         .fontWeight(.semibold)
                         .disabled(selectedMetric == nil || noteText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        .accessibilityIdentifier("motivation_note_save")
                 }
             }
         }
     }
 
+    private var introCopy: String {
+        "Saved with today's date and time. This is separate from your primary motivation — add as many as you need."
+    }
+
+    private var navigationTitle: String {
+        if let metric = selectedMetric, isMetricLocked {
+            return metric.name
+        }
+        return "Log Motivation"
+    }
+
+    private var placeholderCopy: String {
+        guard let metric = selectedMetric else {
+            return "Choose a habit or vice first."
+        }
+        return metric.habitType == .vice
+            ? "What helped you stay strong — or what triggered a craving?"
+            : "What made today easier or harder?"
+    }
+
     private func saveNote() {
         guard let metric = selectedMetric else { return }
 
-        let today = CalendarHelper.startOfDay(for: Date())
-        MetricEntry.updateOrCreate(
+        MetricEntry.insertMotivationNote(
             for: metric.id,
-            date: today,
-            motivation: noteText.trimmingCharacters(in: .whitespacesAndNewlines),
-            in: modelContext,
-            entries: entries
+            motivation: noteText,
+            in: modelContext
         )
 
         modelContext.saveChanges(operation: "save motivation note", entity: "MetricEntry")

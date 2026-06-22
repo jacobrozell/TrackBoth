@@ -64,6 +64,7 @@ struct FilteredSplitTabLayout<Content: View>: View {
                 }
                 content()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .modifier(PortraitFABModifier(action: portraitFABAction))
         }
     }

@@ -67,10 +67,7 @@ class MetricEntry {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: date)
         
-        // Look for existing entry for this metric and date
-        if let existingEntry = entries.first(where: { 
-            $0.metricID == metricID && calendar.isDate($0.date, inSameDayAs: startOfDay) 
-        }) {
+        if let existingEntry = find(for: metricID, date: startOfDay, in: entries) {
             return existingEntry
         }
         
@@ -83,10 +80,12 @@ class MetricEntry {
 
     /// Find entry for metric and date without creating one.
     static func find(for metricID: UUID, date: Date, in entries: [MetricEntry]) -> MetricEntry? {
-        let startOfDay = Calendar.current.startOfDay(for: date)
-        return entries.first {
-            $0.metricID == metricID && Calendar.current.isDate($0.date, inSameDayAs: startOfDay)
+        let calendar = Calendar.current
+        let startOfDay = calendar.startOfDay(for: date)
+        let sameDay = entries.filter {
+            $0.metricID == metricID && calendar.isDate($0.date, inSameDayAs: startOfDay)
         }
+        return sameDay.first(where: \.hasBeenLogged) ?? sameDay.first
     }
 
     /// Mark entry and metric as explicitly logged by the user.
@@ -145,7 +144,27 @@ extension MetricEntry {
 
         return entry
     }
-    
+
+    /// Creates a new motivation note with the current timestamp (multiple notes per day are allowed).
+    @discardableResult
+    static func insertMotivationNote(
+        for metricID: UUID,
+        motivation: String,
+        date: Date = Date(),
+        in context: ModelContext
+    ) -> MetricEntry {
+        let trimmed = motivation.trimmingCharacters(in: .whitespacesAndNewlines)
+        let entry = MetricEntry(
+            metricID: metricID,
+            date: date,
+            value: false,
+            motivation: trimmed,
+            hasBeenLogged: false
+        )
+        context.insert(entry)
+        return entry
+    }
+
     /// Cleans up empty entries (entries with no meaningful content)
     static func cleanupEmptyEntries(in context: ModelContext, entries: [MetricEntry]) {
         let emptyEntries = entries.filter { !$0.hasContent }

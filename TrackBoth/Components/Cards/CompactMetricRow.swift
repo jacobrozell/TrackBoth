@@ -19,7 +19,7 @@ struct CompactMetricRow: View {
     private var selectedDateEntry: MetricEntry? {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
-        return entries.first { $0.metricID == metric.id && calendar.isDate($0.date, inSameDayAs: startOfDay) }
+        return MetricEntry.find(for: metric.id, date: startOfDay, in: entries)
     }
 
     private func isMetricCompleted() -> Bool {

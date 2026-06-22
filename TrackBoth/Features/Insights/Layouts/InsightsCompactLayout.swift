@@ -12,6 +12,20 @@ struct InsightsCompactLayout: View {
     let chartEntries: [MetricEntry]
     let streakEntries: [MetricEntry]
     let dynamicTypeSize: DynamicTypeSize
+    @Environment(\.deviceLayout) private var deviceLayout
+
+    private var trendsChartMinHeight: CGFloat {
+        switch deviceLayout {
+        case .phoneLandscape:
+            return 200
+        case .padLandscape:
+            return 300
+        case .padPortrait:
+            return 300
+        case .phonePortrait:
+            return 280
+        }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -79,7 +93,7 @@ struct InsightsCompactLayout: View {
                 selectedFilter: viewModel.selectedFilter,
                 entries: chartEntries,
                 metrics: metrics,
-                minChartHeight: 280
+                minChartHeight: trendsChartMinHeight
             )
             .padding(12)
             .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))

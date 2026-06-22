@@ -138,8 +138,8 @@ final class TrackBothUITests: XCTestCase {
             XCTAssertTrue(
                 app.navigationBars["Motivation"].waitForExistence(timeout: 10)
                     || app.staticTexts["No Habits Yet"].waitForExistence(timeout: 5)
-                    || app.staticTexts["No Motivations Yet"].waitForExistence(timeout: 5)
-                    || app.staticTexts["Primary Motivations"].waitForExistence(timeout: 5)
+                    || app.staticTexts["Nothing to Track Yet"].waitForExistence(timeout: 5)
+                    || app.staticTexts["Your vices"].waitForExistence(timeout: 5)
             )
         case "Insights", "History", "Charts":
             XCTAssertTrue(
@@ -250,7 +250,7 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(addButton.isHittable)
     }
 
-    func testIPhoneLandscapeInsightsUsesSplitLayout() throws {
+    func testIPhoneLandscapeInsightsUsesSegmentedLayout() throws {
         try XCTSkipIf(isPad, "Requires iPhone simulator")
 
         launch(seedDemo: true)
@@ -262,9 +262,16 @@ final class TrackBothUITests: XCTestCase {
             XCUIDevice.shared.orientation = .portrait
         }
 
-        XCTAssertTrue(app.staticTexts["Trends"].waitForExistence(timeout: 10))
+        let calendarSegment = app.segmentedControls.buttons["Calendar"]
+        let trendsSegment = app.segmentedControls.buttons["Trends"]
+        XCTAssertTrue(calendarSegment.waitForExistence(timeout: 5))
+        XCTAssertTrue(trendsSegment.waitForExistence(timeout: 5))
+
+        trendsSegment.tap()
+        XCTAssertTrue(app.staticTexts["Trends"].waitForExistence(timeout: 5))
+
+        calendarSegment.tap()
         XCTAssertTrue(app.staticTexts["Calendar"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.segmentedControls.buttons["Calendar"].waitForExistence(timeout: 1))
     }
 
     func testIPadLandscapeTrackUsesSidebarLayout() throws {
@@ -286,7 +293,7 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(app.buttons["fab_add_metric"].waitForExistence(timeout: 5))
     }
 
-    func testIPadLandscapeInsightsUsesSplitLayout() throws {
+    func testIPadLandscapeInsightsUsesSegmentedLayout() throws {
         try XCTSkipIf(isPhone, "Requires iPad simulator")
 
         launchWithDemoData()
@@ -298,9 +305,16 @@ final class TrackBothUITests: XCTestCase {
             XCUIDevice.shared.orientation = .portrait
         }
 
-        XCTAssertTrue(app.staticTexts["Trends"].waitForExistence(timeout: 10))
+        let calendarSegment = app.segmentedControls.buttons["Calendar"]
+        let trendsSegment = app.segmentedControls.buttons["Trends"]
+        XCTAssertTrue(calendarSegment.waitForExistence(timeout: 5))
+        XCTAssertTrue(trendsSegment.waitForExistence(timeout: 5))
+
+        trendsSegment.tap()
+        XCTAssertTrue(app.staticTexts["Trends"].waitForExistence(timeout: 5))
+
+        calendarSegment.tap()
         XCTAssertTrue(app.staticTexts["Calendar"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.segmentedControls.buttons["Calendar"].waitForExistence(timeout: 1))
     }
 
     #if DEBUG

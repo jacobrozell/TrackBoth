@@ -90,6 +90,35 @@ final class MetricEntryTests: XCTestCase {
         XCTAssertEqual(entry.motivation, "Stay focused")
     }
 
+    func testFindPrefersLoggedEntryOnSameDay() {
+        let metricID = UUID()
+        let date = Calendar.current.startOfDay(for: Date())
+        let note = MetricEntry(metricID: metricID, date: date, value: false, motivation: "Craving", hasBeenLogged: false)
+        let logged = MetricEntry(metricID: metricID, date: date, value: true, hasBeenLogged: true)
+        context.insert(note)
+        context.insert(logged)
+        try! context.save()
+
+        let found = MetricEntry.find(for: metricID, date: date, in: [note, logged])
+        XCTAssertEqual(found?.id, logged.id)
+    }
+
+    func testInsertMotivationNoteCreatesTimestampedEntry() {
+        let metricID = UUID()
+        let before = Date()
+
+        let first = MetricEntry.insertMotivationNote(for: metricID, motivation: "First", in: context)
+        let second = MetricEntry.insertMotivationNote(for: metricID, motivation: "Second", in: context)
+        try! context.save()
+
+        let fetched = try! context.fetch(FetchDescriptor<MetricEntry>())
+        XCTAssertEqual(fetched.count, 2)
+        XCTAssertEqual(first.motivation, "First")
+        XCTAssertEqual(second.motivation, "Second")
+        XCTAssertFalse(first.hasBeenLogged)
+        XCTAssertGreaterThanOrEqual(first.date, before)
+    }
+
     func testCleanupEmptyEntriesRemovesPlaceholders() {
         let metricID = UUID()
         let empty = MetricEntry(metricID: metricID, date: Date(), value: false)

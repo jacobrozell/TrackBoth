@@ -24,11 +24,11 @@ struct EditWhySheet: View {
                     )
                     .lineLimit(4...8)
                 } header: {
-                    Text("Your why")
+                    Text("Primary motivation")
                 } footer: {
                     Text(isVice
-                         ? "Shown on this tab and when you log a slip on Track."
-                         : "Optional reminder of why you're building this habit.")
+                         ? "Your main reason to stay clean — separate from day-to-day logged motivations."
+                         : "Your main reason for this habit — separate from logged reflections.")
                 }
             }
             .scrollContentBackground(.hidden)
