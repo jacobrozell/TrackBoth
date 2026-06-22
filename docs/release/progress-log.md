@@ -204,3 +204,14 @@ See [`lean-1.0-master-plan.md`](lean-1.0-master-plan.md) — accessibility audit
 | `DayLogSummaryTests` | ✅ |
 
 **Remaining for 1.0 ship:** device QA, dogfood, TestFlight, screenshots, hosted privacy URL.
+
+---
+
+## 2026-06-22
+
+### Build 5 — Xcode archive
+
+| Task | Status |
+|------|--------|
+| Bump `CURRENT_PROJECT_VERSION` → 5 | ✅ (Xcode project) |
+| Archive build 5 for TestFlight / Connect | 🔄 in progress |

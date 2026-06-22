@@ -1,30 +1,33 @@
 # TrackBoth — Project status
 
-> Last updated: 2026-06-21
+> Last updated: 2026-06-22
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
 | **App Store name** | TrackBoth — Habits & Vices |
-| **Stage** | **Pre-ship / RC** — ship surface locked; device QA + TestFlight pending |
+| **Stage** | **Archiving** — build 5 Xcode archive (2026-06-22) |
 | **Latest submitted** | — |
 | **Latest shipped (App Store)** | — |
-| **Repo version** | 1.0.0 (4) in `project.yml` |
+| **Repo version** | 1.0.0 (5) — `CURRENT_PROJECT_VERSION` in generated Xcode project |
 | **Active branch** | `main` |
 | **Platform** | iOS 18+ — dual habit/vice tracker |
 | **Monetization** | Free |
 
 ## Current focus
 
+**Build 5** — Xcode archive in progress for TestFlight / App Store Connect upload.
+
 Ship surface: **Track · History · Motivation · Charts · Settings** (Goals tab dev-only).
 
-**Next:** device QA, 7-day dogfood, TestFlight RC, host legal pages, App Store screenshots.
+**After archive:** upload to Connect, TestFlight RC, device QA, hosted legal pages, App Store screenshots.
 
 ## Release history
 
 | Version | Build | Date | Channel | Notes |
 |---------|-------|------|---------|-------|
+| 1.0.0 | 5 | 2026-06-22 | Archive | Xcode archive (pre–TestFlight) |
 | — | — | — | App Store | Not submitted |
 
 ## Near-term (1.0.0)
