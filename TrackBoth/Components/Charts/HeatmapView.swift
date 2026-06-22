@@ -39,7 +39,9 @@ struct HeatmapView: View {
                         .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
+                .frame(maxWidth: .infinity)
                 .frame(height: 200)
+                .padding(.horizontal, 12)
             } else {
                 VStack(alignment: .leading, spacing: 8) {
                     LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 3), count: 13), spacing: 3) {

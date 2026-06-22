@@ -94,6 +94,11 @@ struct AppTheme: Equatable {
     static var availableThemes: [AppTheme] {
         ProductSurface.showsExtendedThemes ? allThemes : shipThemes
     }
+
+    /// Drives SwiftUI system chrome so List, Form, and labels match curated colors.
+    var preferredColorScheme: ColorScheme {
+        self == Self.midnight ? .dark : .light
+    }
 }
 
 // MARK: - Theme Preview Helper

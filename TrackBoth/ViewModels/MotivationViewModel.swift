@@ -1,6 +1,26 @@
 import Foundation
 import SwiftData
 
+// MARK: - Motivation Sheet
+enum MotivationSheet: Identifiable {
+    case editWhy(Metric)
+    case addNote(Metric)
+
+    var id: UUID {
+        switch self {
+        case .editWhy(let metric), .addNote(let metric):
+            return metric.id
+        }
+    }
+
+    var metric: Metric {
+        switch self {
+        case .editWhy(let metric), .addNote(let metric):
+            return metric
+        }
+    }
+}
+
 // MARK: - MotivationViewModel
 /// ViewModel for MotivationView containing motivation content logic
 @Observable
@@ -8,35 +28,60 @@ class MotivationViewModel {
 
     // MARK: - Properties
     var selectedFilter: MetricFilter = .all
-    var selectedMetric: Metric?
-    var showingAddMotivation = false
+    var motivationSheet: MotivationSheet?
     var showingAddMetric = false
 
     // MARK: - Display Data
 
+    /// Filtered metrics with vices first, then habits — both alphabetized within type.
+    func displayMetrics(_ metrics: [Metric]) -> [Metric] {
+        let filtered = FilterUtils.filteredMetrics(selectedFilter, in: metrics)
+        let vices = filtered.filter { $0.habitType == .vice }.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        let habits = filtered.filter { $0.habitType == .positive }.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        return vices + habits
+    }
+
+    func viceDisplayMetrics(_ metrics: [Metric]) -> [Metric] {
+        displayMetrics(metrics).filter { $0.habitType == .vice }
+    }
+
+    func habitDisplayMetrics(_ metrics: [Metric]) -> [Metric] {
+        displayMetrics(metrics).filter { $0.habitType == .positive }
+    }
+
+    func notes(for metric: Metric, entries: [MetricEntry]) -> [MetricEntry] {
+        entries
+            .filter { entry in
+                entry.metricID == metric.id
+                    && !(entry.motivation?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
+            }
+            .sorted { $0.date > $1.date }
+    }
+
+    func hasWhy(_ metric: Metric) -> Bool {
+        guard let text = metric.primaryMotivation?.trimmingCharacters(in: .whitespacesAndNewlines) else { return false }
+        return !text.isEmpty
+    }
+
     func primaryMotivations(_ metrics: [Metric]) -> [Metric] {
-        FilterUtils.filteredMetrics(selectedFilter, in: metrics).filter { metric in
-            metric.primaryMotivation != nil && !metric.primaryMotivation!.isEmpty
-        }
+        displayMetrics(metrics).filter(hasWhy)
     }
 
     func dailyMotivations(_ entries: [MetricEntry], metrics: [Metric]) -> [MetricEntry] {
         let motivationEntries = entries.filter { entry in
-            entry.motivation != nil && !entry.motivation!.isEmpty
+            !(entry.motivation?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         }
         return FilterUtils.filteredEntries(selectedFilter, entries: motivationEntries, metrics: metrics)
             .sorted { $0.date > $1.date }
     }
 
     func hasAnyMotivations(_ metrics: [Metric], entries: [MetricEntry]) -> Bool {
-        let hasPrimary = metrics.contains { $0.primaryMotivation != nil && !$0.primaryMotivation!.isEmpty }
-        let hasDaily = entries.contains { $0.motivation != nil && !$0.motivation!.isEmpty }
-        return hasPrimary || hasDaily
+        displayMetrics(metrics).contains { hasWhy($0) || !notes(for: $0, entries: entries).isEmpty }
     }
 
     func entriesWithMotivation(_ entries: [MetricEntry]) -> [MetricEntry] {
         entries.filter { entry in
-            entry.motivation != nil && !entry.motivation!.isEmpty
+            !(entry.motivation?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         }.sorted { $0.date > $1.date }
     }
 
@@ -54,9 +99,8 @@ class MotivationViewModel {
         entries.filter(\.hasContent).sorted { $0.date > $1.date }
     }
 
-    func entriesForSelectedMetric(_ entries: [MetricEntry]) -> [MetricEntry] {
-        guard let selectedMetric else { return [] }
-        return entries.filter { $0.metricID == selectedMetric.id }
+    func entriesForSelectedMetric(_ entries: [MetricEntry], metric: Metric) -> [MetricEntry] {
+        entries.filter { $0.metricID == metric.id }
     }
 
     func hasMotivationContent(_ entries: [MetricEntry]) -> Bool {
@@ -75,25 +119,21 @@ class MotivationViewModel {
         metrics.filter { $0.habitType == .vice }
     }
 
-    func motivationEntries(_ entries: [MetricEntry]) -> [MetricEntry] {
-        let filteredEntries = entries.filter { entry in
-            entry.motivation != nil && !entry.motivation!.isEmpty
+    func motivationEntries(_ entries: [MetricEntry], for metric: Metric) -> [MetricEntry] {
+        entries.filter { entry in
+            entry.metricID == metric.id
+                && !(entry.motivation?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ?? true)
         }
-
-        if let selectedMetric {
-            return filteredEntries.filter { $0.metricID == selectedMetric.id }
-        }
-        return filteredEntries
     }
 
     // MARK: - Actions
 
-    func selectMetric(_ metric: Metric?) {
-        selectedMetric = metric
+    func presentEditWhy(for metric: Metric) {
+        motivationSheet = .editWhy(metric)
     }
 
-    func showAddMotivation() {
-        showingAddMotivation = true
+    func presentAddNote(for metric: Metric) {
+        motivationSheet = .addNote(metric)
     }
 
     func showAddMetric() {
@@ -106,7 +146,7 @@ class MotivationViewModel {
         in modelContext: ModelContext
     ) {
         entry.motivation = motivation
-        modelContext.saveChanges(operation: "add motivation", entity: "MetricEntry")
+        modelContext.saveChanges(operation: "add motivation note", entity: "MetricEntry")
     }
 
     func updateMotivation(
@@ -115,7 +155,7 @@ class MotivationViewModel {
         in modelContext: ModelContext
     ) {
         entry.motivation = motivation
-        modelContext.saveChanges(operation: "update motivation", entity: "MetricEntry")
+        modelContext.saveChanges(operation: "update motivation note", entity: "MetricEntry")
     }
 
     func removeMotivation(
@@ -123,7 +163,7 @@ class MotivationViewModel {
         in modelContext: ModelContext
     ) {
         entry.motivation = nil
-        modelContext.saveChanges(operation: "remove motivation", entity: "MetricEntry")
+        modelContext.saveChanges(operation: "remove motivation note", entity: "MetricEntry")
     }
 
     func toggleStarred(
@@ -149,13 +189,12 @@ class MotivationViewModel {
             metric: metric
         )
         entry.motivation = motivation
-        modelContext.saveChanges(operation: "save motivation to metric", entity: "MetricEntry")
+        modelContext.saveChanges(operation: "save motivation note", entity: "MetricEntry")
     }
 
     func reset() {
         selectedFilter = .all
-        selectedMetric = nil
-        showingAddMotivation = false
+        motivationSheet = nil
         showingAddMetric = false
     }
 }

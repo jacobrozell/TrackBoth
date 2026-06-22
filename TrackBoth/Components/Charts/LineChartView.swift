@@ -44,7 +44,9 @@ struct LineChartView: View {
                         .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
+                .frame(maxWidth: .infinity)
                 .frame(height: 200)
+                .padding(.horizontal, 12)
             } else if chartData.count < 3 {
                 VStack(spacing: 12) {
                     Chart(chartData) { dataPoint in

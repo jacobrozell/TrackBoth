@@ -147,6 +147,7 @@ struct QuantityChartView: View {
                         .multilineTextAlignment(.center)
                 }
                 .frame(maxWidth: .infinity)
+                .padding(.horizontal, 12)
                 .padding(.vertical, 40)
             }
         }

@@ -47,13 +47,39 @@ final class MotivationViewModelTests: XCTestCase {
     func testEntriesForSelectedMetric() {
         let read = Metric(name: "Read", habitType: .positive)
         let smoke = Metric(name: "Smoke", habitType: .vice)
-        viewModel.selectedMetric = read
         let entries = [
             makeEntry(metricID: read.id, motivation: "A"),
             makeEntry(metricID: smoke.id, motivation: "B")
         ]
-        XCTAssertEqual(viewModel.entriesForSelectedMetric(entries).count, 1)
-        XCTAssertEqual(viewModel.motivationEntries(entries).count, 1)
+        XCTAssertEqual(viewModel.entriesForSelectedMetric(entries, metric: read).count, 1)
+        XCTAssertEqual(viewModel.motivationEntries(entries, for: read).count, 1)
+    }
+
+    func testDisplayMetricsOrdersVicesFirst() {
+        let habit = Metric(name: "Alpha Habit", habitType: .positive)
+        let vice = Metric(name: "Beta Vice", habitType: .vice)
+        let ordered = viewModel.displayMetrics([habit, vice])
+        XCTAssertEqual(ordered.map(\.name), ["Beta Vice", "Alpha Habit"])
+    }
+
+    func testNotesForMetricFiltersAndSorts() {
+        let metric = Metric(name: "Smoke", habitType: .vice)
+        let older = makeEntry(metricID: metric.id, motivation: "Older")
+        older.date = Calendar.current.date(byAdding: .day, value: -2, to: Date())!
+        let newer = makeEntry(metricID: metric.id, motivation: "Newer")
+        let other = makeEntry(metricID: UUID(), motivation: "Other")
+
+        let notes = viewModel.notes(for: metric, entries: [older, newer, other])
+        XCTAssertEqual(notes.count, 2)
+        XCTAssertEqual(notes.first?.motivation, "Newer")
+    }
+
+    func testHasWhyIgnoresWhitespace() {
+        let metric = Metric(name: "Smoke", habitType: .vice)
+        metric.primaryMotivation = "  "
+        XCTAssertFalse(viewModel.hasWhy(metric))
+        metric.primaryMotivation = "Health"
+        XCTAssertTrue(viewModel.hasWhy(metric))
     }
 
     func testViceMetricsFilter() {
@@ -66,12 +92,10 @@ final class MotivationViewModelTests: XCTestCase {
 
     func testResetClearsSelectionAndSheets() {
         viewModel.selectedFilter = .specific(Metric(name: "Read", habitType: .positive))
-        viewModel.selectedMetric = Metric(name: "Read", habitType: .positive)
-        viewModel.showingAddMotivation = true
+        viewModel.motivationSheet = .addNote(Metric(name: "Read", habitType: .positive))
         viewModel.reset()
         XCTAssertEqual(viewModel.selectedFilter, .all)
-        XCTAssertNil(viewModel.selectedMetric)
-        XCTAssertFalse(viewModel.showingAddMotivation)
+        XCTAssertNil(viewModel.motivationSheet)
     }
 
     func testPrimaryAndDailyMotivationsRespectFilter() {
@@ -86,5 +110,11 @@ final class MotivationViewModelTests: XCTestCase {
         viewModel.selectedFilter = .allHabits
         XCTAssertEqual(viewModel.primaryMotivations([habit, vice]).count, 1)
         XCTAssertEqual(viewModel.dailyMotivations(entries, metrics: [habit, vice]).count, 1)
+        XCTAssertEqual(viewModel.viceDisplayMetrics([habit, vice]).count, 0)
+        XCTAssertEqual(viewModel.habitDisplayMetrics([habit, vice]).count, 1)
+
+        viewModel.selectedFilter = .all
+        XCTAssertEqual(viewModel.viceDisplayMetrics([habit, vice]).count, 1)
+        XCTAssertEqual(viewModel.habitDisplayMetrics([habit, vice]).count, 1)
     }
 }

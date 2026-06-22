@@ -142,7 +142,11 @@ struct AddMetricView: View {
             )
             .lineLimit(3...6)
         } header: {
-            Text("Primary Motivation")
+            Text("Your why")
+        } footer: {
+            Text(selectedHabitType == .vice
+                 ? "Pinned to this vice — shown here and when you log a slip."
+                 : "Optional — why you're building this habit.")
         }
     }
 

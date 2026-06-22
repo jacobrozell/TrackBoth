@@ -35,7 +35,8 @@ struct TrackBothApp: App {
         WindowGroup {
             ContentView()
                 .environment(themeManager)
-                .preferredColorScheme(themeManager.currentTheme.colorScheme)
+                .preferredColorScheme(themeManager.preferredColorScheme)
+                .tint(themeManager.currentAppTheme.primaryColor)
                 .onAppear {
                     logger.info("App window appeared", category: .ui)
                 }

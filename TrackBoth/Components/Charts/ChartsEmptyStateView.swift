@@ -4,6 +4,7 @@ import Charts
 // MARK: - ChartsEmptyStateView Component
 struct ChartsEmptyStateView: View {
     @State private var animateChart = false
+    @ScaledMetric(relativeTo: .body) private var horizontalInset: CGFloat = 24
     
     var body: some View {
         ScrollView {
@@ -128,7 +129,8 @@ struct ChartsEmptyStateView: View {
                         .multilineTextAlignment(.center)
                 }
             }
-            .padding()
+            .padding(.horizontal, horizontalInset)
+            .padding(.vertical, 16)
         }
         .onAppear {
             animateChart = true

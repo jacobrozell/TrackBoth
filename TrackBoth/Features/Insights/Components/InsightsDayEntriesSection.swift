@@ -20,6 +20,7 @@ struct InsightsDayEntriesSection: View {
                     .font(.subheadline)
                     .foregroundStyle(Color.currentSecondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 8)
                     .padding(.vertical, 8)
             } else {
                 LazyVStack(spacing: 8) {

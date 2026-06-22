@@ -29,7 +29,7 @@ struct SettingsView: View {
                 Color.currentBackground.ignoresSafeArea()
                 List {
                 Section {
-                    Button {
+                    settingsActionButton("Export Data", systemImage: "square.and.arrow.up") {
                         logger.logUserAction("Export data button tapped")
                         if let url = writeExportFile() {
                             exportFileURL = url
@@ -37,16 +37,12 @@ struct SettingsView: View {
                         } else {
                             showingExportError = true
                         }
-                    } label: {
-                        Label("Export Data", systemImage: "square.and.arrow.up")
                     }
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsExportData)
 
-                    Button {
+                    settingsActionButton("Import Data", systemImage: "square.and.arrow.down") {
                         logger.logUserAction("Import data button tapped")
                         showingImportPicker = true
-                    } label: {
-                        Label("Import Data", systemImage: "square.and.arrow.down")
                     }
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsImportData)
 
@@ -68,10 +64,10 @@ struct SettingsView: View {
                         }
                     }
                 } header: {
-                    Text("Data Management")
+                    SettingsSectionHeader("Data Management")
                 }
 
-                Section("Week Settings") {
+                Section {
                     Picker("Week Starts On", selection: $weekStartDay) {
                         Text("Sunday").tag(1)
                         Text("Monday").tag(2)
@@ -83,6 +79,8 @@ struct SettingsView: View {
                     }
                     .pickerStyle(.menu)
                     .listRowBackground(Color.currentSecondaryBackground)
+                } header: {
+                    SettingsSectionHeader("Week Settings")
                 }
 
                 SettingsAppearanceSection()
@@ -241,6 +239,18 @@ struct SettingsView: View {
         UserDefaults.standard.set(false, forKey: ThemePreferences.hasCompletedOnboarding)
         AppEvent.post(.onboardingCompleted)
     }
+
+    private func settingsActionButton(
+        _ title: String,
+        systemImage: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Label(title, systemImage: systemImage)
+        }
+        .foregroundStyle(Color.currentText)
+        .listRowBackground(Color.currentSecondaryBackground)
+    }
 }
 
 // MARK: - Settings Data Section
@@ -248,13 +258,15 @@ private struct SettingsDataSection: View {
     @Binding var showingDeleteConfirmation: Bool
 
     var body: some View {
-        Section("Data") {
+        Section {
             Button("Reset All Local Data", role: .destructive) {
                 logger.logUserAction("Reset all local data button tapped")
                 showingDeleteConfirmation = true
             }
             .accessibilityIdentifier(AccessibilityIdentifiers.settingsResetAllData)
             .listRowBackground(Color.currentSecondaryBackground)
+        } header: {
+            SettingsSectionHeader("Data")
         }
     }
 }
@@ -262,7 +274,7 @@ private struct SettingsDataSection: View {
 // MARK: - Settings Help & Feedback Section
 private struct SettingsHelpAndFeedbackSection: View {
     var body: some View {
-        Section("Help & Feedback") {
+        Section {
             settingsLink(
                 destination: AppLinks.support,
                 title: "Support & FAQ",
@@ -299,6 +311,8 @@ private struct SettingsHelpAndFeedbackSection: View {
                 systemImage: "hand.raised",
                 identifier: AccessibilityIdentifiers.settingsPrivacyPolicy
             )
+        } header: {
+            SettingsSectionHeader("Help & Feedback")
         }
     }
 
@@ -311,6 +325,7 @@ private struct SettingsHelpAndFeedbackSection: View {
         Link(destination: destination) {
             Label(title, systemImage: systemImage)
         }
+        .foregroundStyle(Color.currentPrimary)
         .accessibilityIdentifier(identifier)
         .listRowBackground(Color.currentSecondaryBackground)
     }
@@ -325,6 +340,7 @@ private struct SettingsAboutSection: View {
             Button(action: onViewOnboarding) {
                 Label("View Onboarding", systemImage: "book.pages")
             }
+            .foregroundStyle(Color.currentText)
             .accessibilityIdentifier(AccessibilityIdentifiers.settingsViewOnboarding)
             .listRowBackground(Color.currentSecondaryBackground)
 
@@ -333,8 +349,34 @@ private struct SettingsAboutSection: View {
                 .listRowBackground(Color.currentSecondaryBackground)
 
         } header: {
-            Text("About")
+            SettingsSectionHeader("About")
         }
+    }
+}
+
+private struct SettingsSectionHeader: View {
+    let title: String
+
+    init(_ title: String) {
+        self.title = title
+    }
+
+    var body: some View {
+        Text(title)
+            .foregroundStyle(Color.currentSecondaryText)
+    }
+}
+
+private struct SettingsSectionFooter: View {
+    let title: String
+
+    init(_ title: String) {
+        self.title = title
+    }
+
+    var body: some View {
+        Text(title)
+            .foregroundStyle(Color.currentSecondaryText)
     }
 }
 
@@ -354,9 +396,9 @@ private struct SettingsAppearanceSection: View {
                 FontDesignPicker()
             }
         } header: {
-            Text("Appearance")
+            SettingsSectionHeader("Appearance")
         } footer: {
-            Text("Theme colors apply across Track, Insights, Goals, Motivation, and Settings.")
+            SettingsSectionFooter("Theme colors apply across Track, Insights, Goals, Motivation, and Settings.")
                 .font(.footnote)
         }
     }
@@ -419,7 +461,7 @@ private struct FontDesignPicker: View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Font")
                 .font(.headline)
-                .themedPrimaryText()
+                .foregroundStyle(Color.currentText)
 
             Picker("Font Design", selection: Binding(
                 get: { themeManager.selectedFontDesign },
@@ -434,10 +476,13 @@ private struct FontDesignPicker: View {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Sample Text")
                     .font(AppTypography.h3)
+                    .foregroundStyle(Color.currentText)
                 Text("This is how the font looks in the app")
                     .font(AppTypography.body)
+                    .foregroundStyle(Color.currentText)
                 Text("Smaller text example")
                     .font(AppTypography.caption)
+                    .foregroundStyle(Color.currentSecondaryText)
             }
             .padding()
             .background(Color.currentSecondaryBackground)

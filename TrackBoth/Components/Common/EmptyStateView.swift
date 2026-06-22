@@ -9,6 +9,7 @@ struct EmptyStateView: View {
     let action: (() -> Void)?
 
     @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 56
+    @ScaledMetric(relativeTo: .body) private var horizontalInset: CGFloat = 24
     
     init(
         icon: String = "plus.circle",
@@ -56,6 +57,7 @@ struct EmptyStateView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.horizontal, horizontalInset)
         .padding(.vertical)
     }
 }

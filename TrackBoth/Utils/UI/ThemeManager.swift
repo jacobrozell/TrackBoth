@@ -259,13 +259,18 @@ final class ThemeManager {
     
     /// Gets the current effective theme colors based on system appearance
     var effectiveTheme: AppTheme {
+        currentAppTheme
+    }
+
+    /// Color scheme for SwiftUI system chrome (List labels, section headers, pickers).
+    var preferredColorScheme: ColorScheme? {
         switch currentTheme {
         case .light:
-            return currentAppTheme
+            return .light
         case .dark:
-            return currentAppTheme
+            return .dark
         case .system:
-            return currentAppTheme
+            return currentAppTheme.preferredColorScheme
         }
     }
 }

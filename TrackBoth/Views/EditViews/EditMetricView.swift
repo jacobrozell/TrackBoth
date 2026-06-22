@@ -65,11 +65,11 @@ struct EditMetricView: View {
                     )
                     .lineLimit(3...6)
                 } header: {
-                    Text("Primary Motivation")
+                    Text("Your why")
                 } footer: {
                     Text(habitType == .vice ?
-                         "Your main reason for avoiding this vice. Used to keep you focused." :
-                         "Your main motivation for doing this habit. Helps keep you focused on your goals.")
+                         "Pinned to this vice — shown on Motivation and when you log a slip." :
+                         "Optional — why you're building this habit.")
                 }
 
                 if habitType == .vice {

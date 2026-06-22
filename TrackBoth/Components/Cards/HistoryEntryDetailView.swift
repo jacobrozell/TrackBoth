@@ -91,7 +91,7 @@ struct HistoryEntryDetailView: View {
                     }
 
                     if let motivation = entry.motivation, !motivation.isEmpty {
-                        textSection(title: "Daily Motivation", body: motivation)
+                        textSection(title: "Note", body: motivation)
                     } else if let primary = metric?.primaryMotivation, !primary.isEmpty, metric?.habitType == .vice {
                         textSection(title: "Why You're Avoiding This", body: primary)
                     }

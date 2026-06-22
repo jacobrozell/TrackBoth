@@ -44,7 +44,9 @@ struct BarChartView: View {
                         .foregroundColor(.currentSecondaryText)
                         .multilineTextAlignment(.center)
                 }
+                .frame(maxWidth: .infinity)
                 .frame(height: 200)
+                .padding(.horizontal, 12)
             } else if weeklyData.count < 2 {
                 VStack(spacing: 12) {
                     Chart(weeklyData) { data in
