@@ -39,13 +39,13 @@ struct TrackStatTile: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(value)
-                    .font(.headline.monospacedDigit())
+                    .font(AppTypography.h4.monospacedDigit())
                     .foregroundStyle(Color.currentText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
 
                 Text(title)
-                    .font(.caption)
+                    .caption()
                     .foregroundStyle(Color.currentSecondaryText)
                     .lineLimit(2)
                     .minimumScaleFactor(0.75)

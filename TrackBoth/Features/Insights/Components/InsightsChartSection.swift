@@ -10,6 +10,8 @@ struct InsightsChartSection: View {
     let metrics: [Metric]
     var minChartHeight: CGFloat = 240
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Picker("Chart Type", selection: $selectedChartType) {
@@ -19,7 +21,10 @@ struct InsightsChartSection: View {
             }
             .pickerStyle(.segmented)
             .onAppear(perform: normalizeChartType)
-            .onChange(of: selectedChartType) { _, newValue in
+            .onChange(of: selectedChartType) { oldValue, newValue in
+                if oldValue != newValue {
+                    HapticFeedback.selection()
+                }
                 if !ChartType.availableInCurrentSurface.contains(newValue) {
                     selectedChartType = .line
                 }
@@ -31,7 +36,10 @@ struct InsightsChartSection: View {
                 entries: entries,
                 metrics: metrics
             )
+            .id(selectedChartType)
             .frame(minHeight: minChartHeight)
+            .transition(.opacity.combined(with: .scale(scale: 0.98)))
+            .trackBothAnimation(TrackBothMotion.quick, value: selectedChartType, reduceMotion: reduceMotion)
         }
     }
 

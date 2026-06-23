@@ -6,6 +6,7 @@ struct LineChartView: View {
     let filter: MetricFilter
     let entries: [MetricEntry]
     let metrics: [Metric]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animateChart = false
     
     private var chartData: [ChartDataPoint] {
@@ -64,8 +65,8 @@ struct LineChartView: View {
                         .foregroundStyle(Color.currentPrimary.opacity(0.2))
                     }
                     .frame(height: 120)
-                    .opacity(animateChart ? 1.0 : 0.0)
-                    .animation(.easeInOut(duration: 1.0).delay(0.2), value: animateChart)
+                    .chartReveal(isRevealed: animateChart, reduceMotion: reduceMotion, delay: 0.2)
+                    .accessibilityHidden(true)
                     
                     Text("Great start! Keep going to see trends emerge")
                         .font(.caption)
@@ -90,8 +91,8 @@ struct LineChartView: View {
                         .foregroundStyle(Color.currentPrimary.opacity(0.2))
                     }
                     .frame(height: 180)
-                    .opacity(animateChart ? 1.0 : 0.0)
-                    .animation(.easeInOut(duration: 1.0).delay(0.2), value: animateChart)
+                    .chartReveal(isRevealed: animateChart, reduceMotion: reduceMotion, delay: 0.2)
+                    .accessibilityHidden(true)
                     
                     // Progress insight
                     if let latest = chartData.last, let first = chartData.first {
@@ -108,8 +109,8 @@ struct LineChartView: View {
             }
         }
         .padding()
-        .background(Color.currentBackground)
-        .cornerRadius(12)
+        .background(Color.currentBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .chartVoiceOverSummary(ChartAccessibilitySummary.lineSummary(data: chartData, filter: filter))
         .onAppear {
             animateChart = true
         }

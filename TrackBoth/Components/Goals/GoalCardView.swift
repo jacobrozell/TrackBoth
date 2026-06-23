@@ -9,6 +9,10 @@ struct GoalCardView: View {
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
+    private var usesRelaxedLayout: Bool {
+        dynamicTypeSize.usesRelaxedListLayout
+    }
+
     private var booleanGoals: [Goal] {
         metric.booleanGoals
     }
@@ -46,9 +50,15 @@ struct GoalCardView: View {
         return "0/0"
     }
 
+    private var goalAccessibilityLabel: String {
+        let status = isCompleted ? "completed" : "in progress"
+        let percent = Int(progress * 100)
+        return "Goal for \(metric.name), \(progressText), \(percent) percent, \(status). \(goalKindLabel)."
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if dynamicTypeSize.usesAccessibilityLayout {
+            if usesRelaxedLayout {
                 accessibilityHeader
             } else {
                 compactHeader
@@ -57,18 +67,18 @@ struct GoalCardView: View {
             VStack(spacing: 8) {
                 HStack {
                     Text("Progress")
-                        .font(.caption)
+                        .caption()
                         .foregroundColor(.currentSecondaryText)
                     Spacer()
                     Text("\(Int(progress * 100))%")
-                        .font(.caption)
-                        .fontWeight(.medium)
+                        .caption()
                         .foregroundColor(.currentSecondaryText)
                 }
 
                 ProgressView(value: progress, total: 1.0)
                     .progressViewStyle(LinearProgressViewStyle(tint: isCompleted ? .currentSuccess : .currentPrimary))
                     .scaleEffect(x: 1, y: 1.5)
+                    .accessibilityHidden(true)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 12)
@@ -95,13 +105,13 @@ struct GoalCardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .metricCardStyle()
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Goal for \(metric.name): \(progressText) progress")
+        .accessibilityLabel(goalAccessibilityLabel)
     }
 
     private func goalDetails(_ text: String) -> some View {
         HStack {
             Text(text)
-                .font(.caption)
+                .caption()
                 .foregroundColor(.currentSecondaryText)
             Spacer()
         }
@@ -116,7 +126,7 @@ struct GoalCardView: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Text(metric.name)
-                        .font(.headline)
+                        .h4()
                         .foregroundColor(.currentText)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
@@ -126,7 +136,7 @@ struct GoalCardView: View {
                 }
 
                 Text(goalKindLabel)
-                    .font(.caption)
+                    .caption()
                     .foregroundColor(.currentSecondaryText)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -142,7 +152,7 @@ struct GoalCardView: View {
             goalTypeIcon
 
             Text(metric.name)
-                .font(.headline)
+                .h4()
                 .foregroundColor(.currentText)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -150,7 +160,7 @@ struct GoalCardView: View {
             HStack(spacing: 8) {
                 goalKindIcon
                 Text(goalKindLabel)
-                    .font(.caption)
+                    .caption()
                     .foregroundColor(.currentSecondaryText)
             }
 
@@ -187,12 +197,11 @@ struct GoalCardView: View {
     private func progressSummary(alignment: HorizontalAlignment) -> some View {
         VStack(alignment: alignment, spacing: 4) {
             Text(progressText)
-                .font(.headline)
-                .fontWeight(.semibold)
+                .h4()
                 .foregroundColor(isCompleted ? .currentSuccess : .currentText)
 
             Text(isCompleted ? "Completed" : "In Progress")
-                .font(.caption)
+                .caption()
                 .foregroundColor(isCompleted ? .currentSuccess : .currentSecondaryText)
         }
     }

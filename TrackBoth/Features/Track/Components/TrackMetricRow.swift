@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import UIKit
 
 // MARK: - TrackMetricRow
 /// Metric row for Track — toggle, name, status, hero streak, and extended metadata.
@@ -90,7 +89,7 @@ struct TrackMetricRow: View {
 
     var body: some View {
         VStack(spacing: 8) {
-            if dynamicTypeSize.usesAccessibilityLayout {
+            if dynamicTypeSize.usesRelaxedListLayout {
                 accessibilityRow
             } else {
                 compactRow
@@ -174,32 +173,42 @@ struct TrackMetricRow: View {
             HStack(alignment: .top, spacing: 12) {
                 toggleButton
                 Text(metric.name)
-                    .font(.headline)
+                    .h4()
                     .foregroundColor(Color.currentText)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Text(statusInfo.text)
-                .font(.subheadline)
+                .bodySmall()
                 .foregroundColor(statusInfo.color)
 
-            if showsHeroStreak, let streakCaption {
-                Text(streakCaption)
-                    .font(.title3.weight(.semibold))
-                    .foregroundColor(Color.currentText)
-            } else if let streakCaption {
-                Text(streakCaption)
-                    .font(.caption)
-                    .foregroundColor(Color.currentSecondaryText)
+            if let streakCaption {
+                Group {
+                    if showsHeroStreak {
+                        Text(streakCaption)
+                            .h3()
+                            .foregroundColor(Color.currentText)
+                    } else {
+                        Text(streakCaption)
+                            .caption()
+                            .foregroundColor(Color.currentSecondaryText)
+                    }
+                }
             }
 
             if ProductSurface.showsExtendedRowMetadata {
                 extendedMetadataRow
             }
+
+            Button(action: onLog) {
+                Label("Open log", systemImage: "square.and.pencil")
+            }
+            .buttonStyle(.bordered)
+            .accessibilityIdentifier(AccessibilityIdentifiers.metricRow(metric.id))
+            .accessibilityLabel(rowLogAccessibilityLabel)
+            .accessibilityHint("Opens logging details for this day")
         }
-        .contentShape(Rectangle())
-        .onTapGesture { onLog() }
     }
 
     @ViewBuilder
@@ -284,8 +293,7 @@ struct TrackMetricRow: View {
     }
 
     private func provideToggleHaptic(wasCompleted: Bool) {
-        let style: UIImpactFeedbackGenerator.FeedbackStyle = wasCompleted ? .soft : .light
-        UIImpactFeedbackGenerator(style: style).impactOccurred()
+        HapticFeedback.toggle(wasCompleted: wasCompleted)
     }
 
     private func flashToggleHighlight() {

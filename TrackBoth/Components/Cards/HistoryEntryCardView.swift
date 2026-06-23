@@ -46,12 +46,12 @@ struct HistoryEntryCardView: View {
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(metric?.name ?? "Unknown")
-                        .font(.body.weight(.medium))
+                        .bodyMedium()
                         .foregroundStyle(Color.currentText)
                         .multilineTextAlignment(.leading)
 
                     Text(subtitleText)
-                        .font(.subheadline)
+                        .bodySmall()
                         .foregroundStyle(Color.currentSecondaryText)
                         .multilineTextAlignment(.leading)
                 }
@@ -65,7 +65,7 @@ struct HistoryEntryCardView: View {
             .padding(.vertical, 12)
             .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         }
-        .buttonStyle(.plain)
+        .buttonStyle(CardPressButtonStyle())
         .accessibilityLabel("\(metric?.name ?? "Unknown"), \(statusText), \(dayLabel)")
         .sheet(isPresented: $showingDetails) {
             HistoryEntryDetailView(entry: entry, metric: metric)

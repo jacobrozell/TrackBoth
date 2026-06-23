@@ -31,7 +31,6 @@ struct TrackPadPortraitLayout: View {
                         todayCompleted: viewModel.todayCompleted(from: metrics, entries: entries),
                         totalMetrics: metrics.count,
                         showingRowOptions: showingRowOptions,
-                        usesAccessibilityLayout: usesAccessibilityLayout,
                         onToggleEdit: { showingRowOptions.toggle() },
                         onGoToToday: { viewModel.goToToday() }
                     )

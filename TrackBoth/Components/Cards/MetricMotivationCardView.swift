@@ -27,7 +27,7 @@ struct MetricMotivationCardView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 8) {
                     Text(metric.name)
-                        .font(.headline)
+                        .h4()
                         .foregroundStyle(Color.currentText)
 
                     Spacer(minLength: 0)
@@ -39,25 +39,25 @@ struct MetricMotivationCardView: View {
 
                 if let primary = trimmedPrimary {
                     Text(primary)
-                        .font(.subheadline)
+                        .bodySmall()
                         .foregroundStyle(Color.currentSecondaryText)
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
                 } else {
                     Text(emptyPrimaryPreview)
-                        .font(.subheadline)
+                        .bodySmall()
                         .foregroundStyle(Color.currentSecondaryText)
                         .lineLimit(2)
                 }
 
                 HStack(spacing: 8) {
                     Label(primaryBadgeLabel, systemImage: trimmedPrimary == nil ? "pin.slash" : "pin.fill")
-                        .font(.caption)
+                        .caption()
                         .foregroundStyle(trimmedPrimary == nil ? Color.currentSecondaryText : accentColor)
 
                     if loggedCount > 0 {
                         Text(loggedCountLabel)
-                            .font(.caption)
+                            .caption()
                             .foregroundStyle(Color.currentSecondaryText)
                     }
                 }

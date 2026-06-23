@@ -3,6 +3,7 @@ import Charts
 
 // MARK: - ChartsEmptyStateView Component
 struct ChartsEmptyStateView: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animateChart = false
     @ScaledMetric(relativeTo: .body) private var horizontalInset: CGFloat = 24
     
@@ -14,8 +15,12 @@ struct ChartsEmptyStateView: View {
                     Image(systemName: "chart.line.uptrend.xyaxis")
                         .font(.system(size: 50))
                         .foregroundStyle(Color.currentPrimary.gradient)
-                        .scaleEffect(animateChart ? 1.1 : 1.0)
-                        .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: animateChart)
+                        .scaleEffect(animateChart && !reduceMotion ? 1.1 : 1.0)
+                        .trackBothAnimation(
+                            reduceMotion ? TrackBothMotion.quick : .easeInOut(duration: 2).repeatForever(autoreverses: true),
+                            value: animateChart,
+                            reduceMotion: reduceMotion
+                        )
                     
                     Text("Your Journey Starts Here")
                         .font(.title2)

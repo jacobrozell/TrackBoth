@@ -22,12 +22,10 @@ struct MilestoneBannerView: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("Milestone reached")
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    .caption()
                     .foregroundColor(Color.currentSecondaryText)
                 Text(announcement.message)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
+                    .bodyMedium()
                     .foregroundColor(Color.currentText)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -56,7 +54,10 @@ struct MilestoneBannerView: View {
         .offset(y: reduceMotion ? 0 : (isVisible ? 0 : -16))
         .accessibilityElement(children: .combine)
         .accessibilityLabel(announcement.message)
-        .onAppear { performEntrance() }
+        .onAppear {
+            performEntrance()
+            HapticFeedback.success()
+        }
     }
 
     @ViewBuilder
@@ -83,6 +84,7 @@ struct MilestoneBannerView: View {
     }
 
     private func dismiss() {
+        HapticFeedback.light()
         if reduceMotion {
             onDismiss()
             return

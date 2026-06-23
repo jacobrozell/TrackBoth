@@ -11,9 +11,15 @@ struct TrackWeekCalendar: View {
 
     @ScaledMetric(relativeTo: .caption) private var dayBadgeSize: CGFloat = 34
 
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var usesRelaxedLayout: Bool {
+        dynamicTypeSize.usesRelaxedListLayout
+    }
+
     var body: some View {
         Group {
-            if usesAccessibilityLayout {
+            if usesRelaxedLayout {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
                         ForEach(days, id: \.self) { day in
@@ -39,6 +45,7 @@ struct TrackWeekCalendar: View {
         let completion = DayLogSummary.completionState(metrics: metrics, entries: entries, on: day)
 
         Button {
+            HapticFeedback.selection()
             onSelect(day)
         } label: {
             VStack(spacing: 4) {
@@ -87,7 +94,7 @@ struct TrackWeekCalendar: View {
 
     private func weekdayLabel(for date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = usesAccessibilityLayout ? "EEEEE" : "EEE"
+        formatter.dateFormat = usesRelaxedLayout ? "EEEEE" : "EEE"
         return formatter.string(from: date)
     }
 

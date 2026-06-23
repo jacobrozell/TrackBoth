@@ -80,7 +80,7 @@ struct StatCard: View {
         .padding(.vertical, dynamicTypeSize.usesAccessibilityLayout ? verticalPadding + 4 : verticalPadding)
         .padding(.horizontal, horizontalPadding)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(Color.currentSecondaryBackground)
                 .shadow(
                     color: Color.black.opacity(0.06),
@@ -90,7 +90,7 @@ struct StatCard: View {
                 )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(
                     LinearGradient(
                         gradient: Gradient(colors: [
@@ -103,6 +103,8 @@ struct StatCard: View {
                     lineWidth: 1.5
                 )
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title), \(value)")
     }
 }
 

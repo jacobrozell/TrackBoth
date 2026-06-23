@@ -152,8 +152,8 @@ struct QuantityChartView: View {
             }
         }
         .padding()
-        .background(Color.currentBackground)
-        .cornerRadius(12)
+        .background(Color.currentBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .chartVoiceOverSummary(ChartAccessibilitySummary.quantitySummary(data: quantityData, filter: filter))
     }
     
     // MARK: - Daily Quantity Chart
@@ -188,6 +188,7 @@ struct QuantityChartView: View {
             }
         }
         .frame(height: 200)
+        .accessibilityHidden(true)
     }
     
     // MARK: - Weekly Quantity Chart
@@ -213,6 +214,7 @@ struct QuantityChartView: View {
             }
         }
         .frame(height: 200)
+        .accessibilityHidden(true)
     }
     
     // MARK: - Summary Stats

@@ -5,6 +5,7 @@ struct HeatmapView: View {
     let filter: MetricFilter
     let entries: [MetricEntry]
     let metrics: [Metric]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animateChart = false
     
     private var heatmapData: [HeatmapData] {
@@ -53,8 +54,8 @@ struct HeatmapView: View {
                         }
                     }
                     .frame(height: 180)
-                    .opacity(animateChart ? 1.0 : 0.0)
-                    .animation(.easeInOut(duration: 1.0).delay(0.3), value: animateChart)
+                    .chartReveal(isRevealed: animateChart, reduceMotion: reduceMotion, delay: 0.3)
+                    .accessibilityHidden(true)
                     
                     // Consistency insights
                     HStack(spacing: 16) {
@@ -82,8 +83,8 @@ struct HeatmapView: View {
             }
         }
         .padding()
-        .background(Color.currentBackground)
-        .cornerRadius(12)
+        .background(Color.currentBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .chartVoiceOverSummary(ChartAccessibilitySummary.heatmapSummary(data: heatmapData, filter: filter))
         .onAppear {
             animateChart = true
         }

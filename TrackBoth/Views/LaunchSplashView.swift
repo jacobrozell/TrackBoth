@@ -112,7 +112,7 @@ private struct LaunchDotsIndicator: View {
                     .frame(width: dotSize, height: dotSize)
                     .opacity(index == activeIndex ? 1 : inactiveOpacity)
                     .scaleEffect(index == activeIndex ? 1.15 : 1)
-                    .animation(.easeInOut(duration: 0.28), value: activeIndex)
+                    .trackBothAnimation(TrackBothMotion.quick, value: activeIndex, reduceMotion: reduceMotion)
             }
         }
     }

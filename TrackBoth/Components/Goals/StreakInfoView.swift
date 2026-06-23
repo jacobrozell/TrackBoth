@@ -17,27 +17,25 @@ struct StreakInfoView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Streak Stats")
-                .font(.headline)
+                .h4()
                 .foregroundColor(Color.currentText)
 
             HStack(spacing: 20) {
                 VStack(alignment: .leading) {
                     Text("Current")
-                        .font(.caption)
+                        .caption()
                         .foregroundColor(Color.currentSecondaryText)
                     Text("\(currentStreak)")
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .displaySmall()
                         .foregroundColor(Color.currentWarning)
                 }
 
                 VStack(alignment: .leading) {
                     Text("Longest")
-                        .font(.caption)
+                        .caption()
                         .foregroundColor(Color.currentSecondaryText)
                     Text("\(longestStreak)")
-                        .font(.title)
-                        .fontWeight(.bold)
+                        .displaySmall()
                         .foregroundColor(Color.currentPrimary)
                 }
 
@@ -45,8 +43,14 @@ struct StreakInfoView: View {
             }
         }
         .padding()
-        .background(Color.currentBackground)
-        .cornerRadius(12)
+        .background(Color.currentBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .chartVoiceOverSummary(
+            ChartAccessibilitySummary.streakSummary(
+                current: currentStreak,
+                longest: longestStreak,
+                filter: filter
+            )
+        )
     }
 }
 

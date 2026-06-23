@@ -38,6 +38,11 @@ struct InsightsCompactLayout: View {
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 4)
+            .onChange(of: mode) { oldValue, newValue in
+                if oldValue != newValue {
+                    HapticFeedback.selection()
+                }
+            }
 
             if !metrics.isEmpty {
                 MetricFilterChipRow(

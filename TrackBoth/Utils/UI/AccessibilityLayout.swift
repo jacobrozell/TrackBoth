@@ -11,6 +11,11 @@ extension DynamicTypeSize {
     var usesExpandedChrome: Bool {
         isAccessibilitySize || self >= .xLarge
     }
+
+    /// Stacked Track rows and scrollable Insights calendar (XXXL and accessibility sizes).
+    var usesRelaxedListLayout: Bool {
+        isAccessibilitySize || self >= .xxxLarge
+    }
 }
 
 extension EnvironmentValues {
@@ -20,6 +25,10 @@ extension EnvironmentValues {
 
     var usesExpandedChrome: Bool {
         dynamicTypeSize.usesExpandedChrome
+    }
+
+    var usesRelaxedListLayout: Bool {
+        dynamicTypeSize.usesRelaxedListLayout
     }
 }
 

@@ -21,6 +21,7 @@ struct SettingsView: View {
     @State private var showingDeleteConfirmation = false
     @State private var exportFileURL: URL?
     @State private var showingExportError = false
+    @State private var isImporting = false
     @AppStorage("weekStartDay") private var weekStartDay: Int = 1 // 1 = Sunday (default)
 
     var body: some View {
@@ -29,27 +30,38 @@ struct SettingsView: View {
                 Color.currentBackground.ignoresSafeArea()
                 List {
                 Section {
-                    settingsActionButton("Export Data", systemImage: "square.and.arrow.up") {
+                    settingsActionButton(
+                        "Export Data",
+                        systemImage: "square.and.arrow.up"
+                    ) {
                         logger.logUserAction("Export data button tapped")
                         if let url = writeExportFile() {
                             exportFileURL = url
                             showingExportSheet = true
+                            HapticFeedback.success()
                         } else {
                             showingExportError = true
                         }
                     }
+                    .disabled(isImporting)
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsExportData)
 
-                    settingsActionButton("Import Data", systemImage: "square.and.arrow.down") {
+                    settingsActionButton(
+                        "Import Data",
+                        systemImage: "square.and.arrow.down",
+                        isLoading: isImporting
+                    ) {
                         logger.logUserAction("Import data button tapped")
                         showingImportPicker = true
                     }
+                    .disabled(isImporting)
                     .accessibilityIdentifier(AccessibilityIdentifiers.settingsImportData)
 
                     if ProductSurface.showsDemoData {
                         if DemoDataGenerator.hasDemoData() {
                             Button("Clear Demo Data") {
                                 logger.logUserAction("Clear demo data button tapped")
+                                HapticFeedback.warning()
                                 DemoDataGenerator.clearDemoData(modelContext: modelContext)
                             }
                             .foregroundColor(Color.currentWarning)
@@ -57,6 +69,7 @@ struct SettingsView: View {
                         } else {
                             Button("Try Demo Data") {
                                 logger.logUserAction("Generate demo data button tapped")
+                                HapticFeedback.success()
                                 DemoDataGenerator.generateDemoData(modelContext: modelContext)
                             }
                             .foregroundColor(Color.currentPrimary)
@@ -78,6 +91,9 @@ struct SettingsView: View {
                         Text("Saturday").tag(7)
                     }
                     .pickerStyle(.menu)
+                    .onChange(of: weekStartDay) { _, _ in
+                        HapticFeedback.selection()
+                    }
                     .listRowBackground(Color.currentSecondaryBackground)
                 } header: {
                     SettingsSectionHeader("Week Settings")
@@ -116,6 +132,7 @@ struct SettingsView: View {
             .alert("Reset All Local Data", isPresented: $showingDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { }
                 Button("Reset All", role: .destructive) {
+                    HapticFeedback.warning()
                     deleteAllData()
                 }
             } message: {
@@ -170,6 +187,9 @@ struct SettingsView: View {
 
     private func performImport() {
         guard let url = pendingImportURL else { return }
+        isImporting = true
+        defer { isImporting = false }
+
         let accessed = url.startAccessingSecurityScopedResource()
         defer {
             if accessed { url.stopAccessingSecurityScopedResource() }
@@ -184,6 +204,7 @@ struct SettingsView: View {
                 ? "Imported \(counts.metrics) habits, \(counts.entries) entries, and \(counts.goals) goals."
                 : "Imported \(counts.metrics) habits or vices and \(counts.entries) log entries."
             showingImportSuccess = true
+            HapticFeedback.success()
             WidgetSyncCoordinator.onDataChanged(context: modelContext)
             logger.info(
                 "JSON import succeeded — \(counts.metrics) metrics, \(counts.entries) entries, \(counts.goals) goals",
@@ -232,10 +253,12 @@ struct SettingsView: View {
             MetricDisplayPreferences.clearAll()
             modelContext.saveChanges(operation: "delete all data", entity: "Model")
             WidgetSyncCoordinator.onDataChanged(context: modelContext)
+            HapticFeedback.success()
         }
     }
 
     private func showOnboardingAgain() {
+        HapticFeedback.light()
         UserDefaults.standard.set(false, forKey: ThemePreferences.hasCompletedOnboarding)
         AppEvent.post(.onboardingCompleted)
     }
@@ -243,10 +266,18 @@ struct SettingsView: View {
     private func settingsActionButton(
         _ title: String,
         systemImage: String,
+        isLoading: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            Label(title, systemImage: systemImage)
+            HStack {
+                Label(title, systemImage: systemImage)
+                Spacer(minLength: 0)
+                if isLoading {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
         }
         .foregroundStyle(Color.currentText)
         .listRowBackground(Color.currentSecondaryBackground)
@@ -337,7 +368,10 @@ private struct SettingsAboutSection: View {
 
     var body: some View {
         Section {
-            Button(action: onViewOnboarding) {
+            Button {
+                HapticFeedback.light()
+                onViewOnboarding()
+            } label: {
                 Label("View Onboarding", systemImage: "book.pages")
             }
             .foregroundStyle(Color.currentText)
@@ -406,6 +440,8 @@ private struct SettingsAppearanceSection: View {
     private var leanThemePicker: some View {
         ForEach(AppTheme.availableThemes, id: \.name) { theme in
             Button {
+                guard themeManager.currentAppTheme.name != theme.name else { return }
+                HapticFeedback.selection()
                 themeManager.updateAppTheme(theme)
             } label: {
                 HStack {
@@ -432,6 +468,8 @@ private struct SettingsAppearanceSection: View {
                             theme: theme,
                             isSelected: themeManager.currentAppTheme.name == theme.name
                         ) {
+                            guard themeManager.currentAppTheme.name != theme.name else { return }
+                            HapticFeedback.selection()
                             themeManager.updateAppTheme(theme)
                         }
                     }
@@ -440,6 +478,7 @@ private struct SettingsAppearanceSection: View {
 
             Button("Reset to Default Theme") {
                 logger.logUserAction("Reset theme button tapped")
+                HapticFeedback.light()
                 themeManager.resetToDefaultTheme()
             }
             .font(.subheadline)
@@ -465,7 +504,11 @@ private struct FontDesignPicker: View {
 
             Picker("Font Design", selection: Binding(
                 get: { themeManager.selectedFontDesign },
-                set: { themeManager.updateFontDesign($0) }
+                set: { newValue in
+                    guard themeManager.selectedFontDesign != newValue else { return }
+                    HapticFeedback.selection()
+                    themeManager.updateFontDesign(newValue)
+                }
             )) {
                 ForEach(FontDesign.allCases, id: \.self) { design in
                     Text(design.displayName).tag(design)

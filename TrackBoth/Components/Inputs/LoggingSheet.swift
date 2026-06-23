@@ -253,8 +253,7 @@ struct LoggingSheet: View, Identifiable {
             MetricEntry.markLogged(entry: entry, metric: metric)
         }
 
-        let impact = UIImpactFeedbackGenerator(style: .light)
-        impact.impactOccurred()
+        HapticFeedback.light()
 
         modelContext.saveChanges(operation: "save log entry", entity: "MetricEntry")
         dismiss()

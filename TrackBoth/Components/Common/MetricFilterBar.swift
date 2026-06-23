@@ -42,13 +42,29 @@ struct MetricFilterMenu: View {
 
     @ViewBuilder
     private var filterMenuItems: some View {
-        Button("All") { selectedFilter = .all }
-        Button("All Habits") { selectedFilter = .allHabits }
-        Button("All Vices") { selectedFilter = .allVices }
+        Button("All") {
+            guard selectedFilter != .all else { return }
+            HapticFeedback.selection()
+            selectedFilter = .all
+        }
+        Button("All Habits") {
+            guard selectedFilter != .allHabits else { return }
+            HapticFeedback.selection()
+            selectedFilter = .allHabits
+        }
+        Button("All Vices") {
+            guard selectedFilter != .allVices else { return }
+            HapticFeedback.selection()
+            selectedFilter = .allVices
+        }
 
         if includeIndividualMetrics {
             ForEach(metrics) { metric in
-                Button(metric.name) { selectedFilter = .specific(metric) }
+                Button(metric.name) {
+                    if case .specific(let selected) = selectedFilter, selected.id == metric.id { return }
+                    HapticFeedback.selection()
+                    selectedFilter = .specific(metric)
+                }
             }
         }
     }

@@ -41,10 +41,15 @@ struct LaunchSplashOverlay<Content: View>: View {
             return
         }
 
+        if reduceMotion {
+            isActive = false
+            return
+        }
+
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(350))
-            withAnimation(.easeInOut(duration: 0.35)) { logoOpacity = 0 }
-            withAnimation(.easeInOut(duration: 0.75)) { scrimOpacity = 0 }
+            withAnimation(TrackBothMotion.quick) { logoOpacity = 0 }
+            withAnimation(TrackBothMotion.highlightFade) { scrimOpacity = 0 }
             try? await Task.sleep(for: .milliseconds(800))
             isActive = false
         }

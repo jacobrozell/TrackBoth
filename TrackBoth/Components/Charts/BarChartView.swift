@@ -6,6 +6,7 @@ struct BarChartView: View {
     let filter: MetricFilter
     let entries: [MetricEntry]
     let metrics: [Metric]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animateChart = false
     
     private var weeklyData: [WeeklyData] {
@@ -57,8 +58,8 @@ struct BarChartView: View {
                         .foregroundStyle(Color.currentPrimary.gradient)
                     }
                     .frame(height: 120)
-                    .opacity(animateChart ? 1.0 : 0.0)
-                    .animation(.easeInOut(duration: 0.8).delay(0.2), value: animateChart)
+                    .chartReveal(isRevealed: animateChart, reduceMotion: reduceMotion, delay: 0.2)
+                    .accessibilityHidden(true)
                     
                     Text("Keep it up! More weeks will show patterns")
                         .font(.caption)
@@ -76,8 +77,8 @@ struct BarChartView: View {
                         .foregroundStyle(Color.currentPrimary.gradient)
                     }
                     .frame(height: 180)
-                    .opacity(animateChart ? 1.0 : 0.0)
-                    .animation(.easeInOut(duration: 0.8).delay(0.2), value: animateChart)
+                    .chartReveal(isRevealed: animateChart, reduceMotion: reduceMotion, delay: 0.2)
+                    .accessibilityHidden(true)
                     
                     // Weekly insights
                     if let bestWeek = weeklyData.max(by: { $0.count < $1.count }) {
@@ -93,8 +94,8 @@ struct BarChartView: View {
             }
         }
         .padding()
-        .background(Color.currentBackground)
-        .cornerRadius(12)
+        .background(Color.currentBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .chartVoiceOverSummary(ChartAccessibilitySummary.barSummary(data: weeklyData, filter: filter))
         .onAppear {
             logger.debug("BarChartView appeared - Filter: \(filter), Entries: \(entries.count)", category: .ui)
             animateChart = true

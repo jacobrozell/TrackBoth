@@ -11,10 +11,15 @@ struct TrackDashboardHeader: View {
     let todayCompleted: Int
     let totalMetrics: Int
     let showingRowOptions: Bool
-    let usesAccessibilityLayout: Bool
     var showsWeekCalendar: Bool = true
     let onToggleEdit: () -> Void
     let onGoToToday: () -> Void
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var usesRelaxedLayout: Bool {
+        dynamicTypeSize.usesRelaxedListLayout
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -24,7 +29,7 @@ struct TrackDashboardHeader: View {
                     selectedDate: selectedDate,
                     metrics: metrics,
                     entries: entries,
-                    usesAccessibilityLayout: usesAccessibilityLayout,
+                    usesAccessibilityLayout: usesRelaxedLayout,
                     onSelect: { selectedDate = $0 }
                 )
             }
@@ -33,27 +38,52 @@ struct TrackDashboardHeader: View {
         }
     }
 
+    @ViewBuilder
     private var dayContextRow: some View {
-        HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(dayTitle)
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(Color.currentText)
+        if usesRelaxedLayout {
+            VStack(alignment: .leading, spacing: 10) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(dayTitle)
+                        .h3()
+                        .foregroundStyle(Color.currentText)
 
-                Text(progressSubtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.currentSecondaryText)
+                    Text(progressSubtitle)
+                        .bodySmall()
+                        .foregroundStyle(Color.currentSecondaryText)
+                }
+
+                HStack(spacing: 16) {
+                    if !isToday {
+                        Button("Today", action: onGoToToday)
+                            .buttonSmall()
+                    }
+
+                    Button(showingRowOptions ? "Done" : "Edit", action: onToggleEdit)
+                        .buttonSmall()
+                }
             }
+        } else {
+            HStack(alignment: .firstTextBaseline) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(dayTitle)
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(Color.currentText)
 
-            Spacer(minLength: 12)
+                    Text(progressSubtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(Color.currentSecondaryText)
+                }
 
-            if !isToday {
-                Button("Today", action: onGoToToday)
+                Spacer(minLength: 12)
+
+                if !isToday {
+                    Button("Today", action: onGoToToday)
+                        .font(.subheadline.weight(.medium))
+                }
+
+                Button(showingRowOptions ? "Done" : "Edit", action: onToggleEdit)
                     .font(.subheadline.weight(.medium))
             }
-
-            Button(showingRowOptions ? "Done" : "Edit", action: onToggleEdit)
-                .font(.subheadline.weight(.medium))
         }
     }
 

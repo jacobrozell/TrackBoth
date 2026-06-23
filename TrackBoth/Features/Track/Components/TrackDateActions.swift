@@ -6,15 +6,18 @@ struct TrackDateActions: View {
     let showingRowOptions: Bool
     let isToday: Bool
     let usesAccessibilityLayout: Bool
+
+    private var usesRelaxedLayout: Bool { usesAccessibilityLayout }
+
     let onToggleEdit: () -> Void
     let onGoToToday: () -> Void
 
     var body: some View {
         Group {
-            if usesAccessibilityLayout {
+            if usesRelaxedLayout {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(weekHeaderTitle)
-                        .font(.subheadline)
+                        .bodySmall()
                         .foregroundColor(Color.currentSecondaryText)
                     actionButtons
                 }
@@ -41,7 +44,7 @@ struct TrackDateActions: View {
             .caption()
             .foregroundColor(Color.currentPrimary)
 
-            if usesAccessibilityLayout {
+            if usesRelaxedLayout {
                 Spacer()
                 if !isToday {
                     todayButton

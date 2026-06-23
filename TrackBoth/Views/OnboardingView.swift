@@ -8,6 +8,7 @@ struct OnboardingView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.verticalSizeClass) private var verticalSizeClass
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var currentPage = 0
     @State private var selectedHabitPresets: Set<MetricPreset> = []
@@ -121,7 +122,7 @@ struct OnboardingView: View {
                         .fill(currentPage == index ? Color.currentAccent : Color.currentSecondaryText.opacity(0.3))
                         .frame(width: 8, height: 8)
                         .scaleEffect(currentPage == index ? 1.2 : 1.0)
-                        .animation(.easeInOut(duration: 0.2), value: currentPage)
+                        .trackBothAnimation(TrackBothMotion.quick, value: currentPage, reduceMotion: reduceMotion)
                 }
             }
             .frame(maxWidth: .infinity)
@@ -132,7 +133,8 @@ struct OnboardingView: View {
                 if currentPage > 0 {
                     HStack {
                         Button("Previous") {
-                            withAnimation { currentPage -= 1 }
+                            HapticFeedback.light()
+                            withAnimation(TrackBothMotion.spring) { currentPage -= 1 }
                         }
                         .buttonStyle(SecondaryButtonStyle())
 
@@ -141,6 +143,7 @@ struct OnboardingView: View {
                         if currentPage == pages.count - 2 {
                             Button("Skip setup") {
                                 logger.logUserAction("Skip onboarding")
+                                HapticFeedback.light()
                                 completeOnboarding()
                             }
                             .foregroundColor(Color.currentSecondaryText)
@@ -150,7 +153,8 @@ struct OnboardingView: View {
 
                 if currentPage < pages.count - 1 {
                     Button("Next") {
-                        withAnimation { currentPage += 1 }
+                        HapticFeedback.selection()
+                        withAnimation(TrackBothMotion.spring) { currentPage += 1 }
                     }
                     .buttonStyle(PrimaryButtonStyle())
                     .frame(maxWidth: .infinity)
@@ -165,6 +169,7 @@ struct OnboardingView: View {
 
                         Button("Get Started") {
                             logger.logUserAction("Complete onboarding")
+                            HapticFeedback.success()
                             completeOnboarding()
                         }
                         .buttonStyle(PrimaryButtonStyle())
@@ -268,6 +273,7 @@ struct PresetChipGrid: View {
                     } else {
                         selection.insert(preset)
                     }
+                    HapticFeedback.selection()
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: preset.icon)
@@ -293,7 +299,7 @@ struct PresetChipGrid: View {
                             .stroke(isSelected ? Color.currentPrimary : Color.currentSecondaryText.opacity(0.2), lineWidth: 1)
                     )
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(CardPressButtonStyle())
                 .accessibilityAddTraits(isSelected ? .isSelected : [])
                 .accessibilityHint("Double tap to select or deselect")
             }

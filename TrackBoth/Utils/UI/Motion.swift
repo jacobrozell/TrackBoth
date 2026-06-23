@@ -25,6 +25,22 @@ extension View {
             self.animation(animation, value: value)
         }
     }
+
+    /// Gentle fade-and-rise entrance for empty states and inline banners.
+    func trackBothEntrance(isVisible: Bool, reduceMotion: Bool) -> some View {
+        opacity(isVisible ? 1 : 0)
+            .offset(y: reduceMotion ? 0 : (isVisible ? 0 : 12))
+    }
+
+    /// Chart/content reveal that respects Reduce Motion.
+    func chartReveal(isRevealed: Bool, reduceMotion: Bool, delay: TimeInterval = 0) -> some View {
+        opacity(isRevealed || reduceMotion ? 1 : 0)
+            .trackBothAnimation(
+                TrackBothMotion.spring.delay(delay),
+                value: isRevealed,
+                reduceMotion: reduceMotion
+            )
+    }
 }
 
 // MARK: - ToggleIconMotionModifier

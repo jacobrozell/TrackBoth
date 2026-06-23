@@ -9,12 +9,13 @@ struct ScreenSectionHeader: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
             Text(title)
-                .font(.headline)
+                .h4()
                 .foregroundStyle(Color.currentText)
             Spacer()
             if let trailing {
                 Text(trailing)
-                    .font(.subheadline.monospacedDigit())
+                    .bodySmall()
+                    .monospacedDigit()
                     .foregroundStyle(Color.currentSecondaryText)
             }
         }

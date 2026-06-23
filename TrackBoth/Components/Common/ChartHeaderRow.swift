@@ -15,10 +15,10 @@ struct ChartHeaderRow<Trailing: View>: View {
 
     var body: some View {
         Group {
-            if dynamicTypeSize.usesAccessibilityLayout {
+            if dynamicTypeSize.usesRelaxedListLayout {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(displayTitle)
-                        .font(.headline)
+                        .h4()
                         .foregroundColor(.currentText)
                         .fixedSize(horizontal: false, vertical: true)
                     trailing()
@@ -26,7 +26,7 @@ struct ChartHeaderRow<Trailing: View>: View {
             } else {
                 HStack {
                     Text(displayTitle)
-                        .font(.headline)
+                        .h4()
                         .foregroundColor(.currentText)
                     Spacer()
                     trailing()
@@ -36,6 +36,6 @@ struct ChartHeaderRow<Trailing: View>: View {
     }
 
     private var displayTitle: String {
-        AccessibilityCopy.shortChartTitle(title, accessibility: dynamicTypeSize.usesAccessibilityLayout)
+        AccessibilityCopy.shortChartTitle(title, accessibility: dynamicTypeSize.usesRelaxedListLayout)
     }
 }

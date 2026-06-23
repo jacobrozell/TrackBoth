@@ -11,6 +11,17 @@ struct CalendarDayView: View {
     let onSelect: () -> Void
 
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @ScaledMetric(relativeTo: .caption) private var statusDotSize: CGFloat = 6
+
+    private var usesRelaxedLayout: Bool {
+        dynamicTypeSize.usesRelaxedListLayout
+    }
+
+    private var dayCellMinHeight: CGFloat {
+        if dynamicTypeSize.usesAccessibilityLayout { return 52 }
+        if usesRelaxedLayout { return 44 }
+        return 36
+    }
 
     private var dayNumber: String {
         CalendarHelper.calendar.component(.day, from: date).description
@@ -65,14 +76,14 @@ struct CalendarDayView: View {
                 if let entry = displayEntry, let metric = getMetric(for: entry) {
                     Circle()
                         .fill(dotColor(for: entry, metric: metric))
-                        .frame(width: 6, height: 6)
+                        .frame(width: statusDotSize, height: statusDotSize)
                 } else if !filteredEntries.isEmpty {
                     Circle()
                         .fill(Color.currentSecondaryText.opacity(0.4))
-                        .frame(width: 6, height: 6)
+                        .frame(width: statusDotSize, height: statusDotSize)
                 }
             }
-            .frame(minHeight: dynamicTypeSize.usesAccessibilityLayout ? 48 : 36)
+            .frame(minHeight: dayCellMinHeight)
             .frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: 8)
@@ -102,6 +113,19 @@ struct CalendarDayView: View {
         let dateText = formatter.string(from: date)
         let selectionPrefix = isSelected ? "Selected, " : ""
         let todayPrefix = isToday ? "Today, " : ""
-        return "\(selectionPrefix)\(todayPrefix)\(dateText), \(hasEntry ? "has entries" : "no entries")"
+        let entrySummary = entryAccessibilitySummary
+        return "\(selectionPrefix)\(todayPrefix)\(dateText), \(entrySummary)"
+    }
+
+    private var entryAccessibilitySummary: String {
+        guard !filteredEntries.isEmpty else { return "no entries" }
+        let successCount = FilterUtils.successfulEntries(selectedFilter, entries: filteredEntries, metrics: metrics).count
+        if successCount == filteredEntries.count {
+            return "\(filteredEntries.count) successful \(filteredEntries.count == 1 ? "entry" : "entries")"
+        }
+        if successCount == 0 {
+            return "\(filteredEntries.count) logged \(filteredEntries.count == 1 ? "entry" : "entries")"
+        }
+        return "\(successCount) of \(filteredEntries.count) successful"
     }
 }

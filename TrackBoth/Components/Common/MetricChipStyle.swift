@@ -28,7 +28,7 @@ struct MetricChipStyle: ButtonStyle {
                     .stroke(isSelected ? Color.clear : Color.currentSecondaryText.opacity(0.3), lineWidth: 1)
             )
             .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
-            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
+            .animation(TrackBothMotion.quick, value: configuration.isPressed)
             .shadow(
                 color: isSelected ? Color.currentAccent.opacity(0.3) : .clear,
                 radius: isSelected ? 8 : 0,
@@ -45,7 +45,11 @@ struct ReactiveFilterButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        Button {
+            guard !isSelected else { return }
+            HapticFeedback.selection()
+            action()
+        } label: {
             Text(title)
         }
         .buttonStyle(MetricChipStyle(isSelected: isSelected))

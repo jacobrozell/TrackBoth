@@ -8,6 +8,8 @@ struct EmptyStateView: View {
     let actionTitle: String?
     let action: (() -> Void)?
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var isVisible = false
     @ScaledMetric(relativeTo: .largeTitle) private var iconSize: CGFloat = 56
     @ScaledMetric(relativeTo: .body) private var horizontalInset: CGFloat = 24
     
@@ -27,9 +29,7 @@ struct EmptyStateView: View {
     
     var body: some View {
         VStack(spacing: 20) {
-            Image(systemName: icon)
-                .font(.system(size: iconSize))
-                .foregroundColor(Color.currentSecondaryText)
+            emptyStateIcon
 
             Text(title)
                 .h3()
@@ -39,9 +39,12 @@ struct EmptyStateView: View {
                 .body()
                 .foregroundColor(Color.currentSecondaryText)
                 .multilineTextAlignment(.center)
-            
+
             if let actionTitle = actionTitle, let action = action {
-                Button(action: action) {
+                Button {
+                    HapticFeedback.medium()
+                    action()
+                } label: {
                     HStack(spacing: 8) {
                         Image(systemName: "plus.circle.fill")
                         Text(actionTitle)
@@ -51,14 +54,40 @@ struct EmptyStateView: View {
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .background(Color.currentPrimary)
-                    .cornerRadius(25)
+                    .clipShape(Capsule())
                 }
+                .buttonStyle(CardPressButtonStyle())
                 .padding(.vertical)
             }
         }
+        .trackBothEntrance(isVisible: isVisible, reduceMotion: reduceMotion)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(.horizontal, horizontalInset)
         .padding(.vertical)
+        .onAppear { performEntrance() }
+    }
+
+    @ViewBuilder
+    private var emptyStateIcon: some View {
+        let iconView = Image(systemName: icon)
+            .font(.system(size: iconSize))
+            .foregroundColor(Color.currentSecondaryText)
+
+        if reduceMotion {
+            iconView
+        } else {
+            iconView.symbolEffect(.pulse, options: .repeating.speed(0.35), value: isVisible)
+        }
+    }
+
+    private func performEntrance() {
+        if reduceMotion {
+            isVisible = true
+            return
+        }
+        withAnimation(TrackBothMotion.spring) {
+            isVisible = true
+        }
     }
 }
 

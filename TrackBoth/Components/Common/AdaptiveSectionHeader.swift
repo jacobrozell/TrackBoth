@@ -12,7 +12,7 @@ struct AdaptiveSectionHeader: View {
 
     var body: some View {
         Group {
-            if dynamicTypeSize.usesAccessibilityLayout {
+            if dynamicTypeSize.usesRelaxedListLayout {
                 accessibilityLayout
             } else {
                 compactLayout
@@ -28,10 +28,10 @@ struct AdaptiveSectionHeader: View {
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.headline)
+                    .h4()
                     .foregroundColor(Color.currentText)
                 Text(subtitle)
-                    .font(.subheadline)
+                    .bodySmall()
                     .foregroundColor(Color.currentSecondaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -51,13 +51,13 @@ struct AdaptiveSectionHeader: View {
             }
 
             Text(title)
-                .font(.headline)
+                .h4()
                 .foregroundColor(Color.currentText)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
             Text(subtitle)
-                .font(.subheadline)
+                .bodySmall()
                 .foregroundColor(Color.currentSecondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -79,10 +79,10 @@ struct AdaptiveSectionHeader: View {
     }
 
     private var background: some View {
-        RoundedRectangle(cornerRadius: 12)
+        RoundedRectangle(cornerRadius: 12, style: .continuous)
             .fill(Color.currentSecondaryBackground)
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(iconColor.opacity(0.2), lineWidth: 1)
             )
     }

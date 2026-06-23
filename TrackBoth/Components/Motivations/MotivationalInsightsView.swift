@@ -6,6 +6,7 @@ struct MotivationalInsightsView: View {
     let metrics: [Metric]
     let filter: MetricFilter
     
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animateInsights = false
     
     private var insights: [Insight] {
@@ -283,7 +284,7 @@ struct MotivationalInsightsView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Your Insights")
-                    .font(.headline)
+                    .h4()
                     .foregroundColor(.currentText)
                 Spacer()
                 Image(systemName: "lightbulb.fill")
@@ -305,16 +306,20 @@ struct MotivationalInsightsView: View {
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 160), spacing: 12)], spacing: 12) {
                     ForEach(Array(insights.enumerated()), id: \.element.type) { index, insight in
                         InsightCard(insight: insight)
-                            .opacity(animateInsights ? 1.0 : 0.0)
-                            .offset(y: animateInsights ? 0 : 20)
-                            .animation(.easeInOut(duration: 0.6).delay(Double(index) * 0.1), value: animateInsights)
+                            .trackBothEntrance(isVisible: animateInsights, reduceMotion: reduceMotion)
+                            .offset(y: reduceMotion ? 0 : (animateInsights ? 0 : 20))
+                            .trackBothAnimation(
+                                TrackBothMotion.spring.delay(Double(index) * 0.08),
+                                value: animateInsights,
+                                reduceMotion: reduceMotion
+                            )
                     }
                 }
             }
         }
         .padding()
-        .background(Color.currentBackground)
-        .cornerRadius(12)
+        .background(Color.currentBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .chartVoiceOverSummary(ChartAccessibilitySummary.insightsSummary(insights))
         .onAppear {
             animateInsights = true
         }
@@ -335,25 +340,25 @@ struct InsightCard: View {
             }
             
             Text(insight.title)
-                .font(.caption)
+                .caption()
                 .foregroundColor(.currentSecondaryText)
             
             Text(insight.value)
-                .font(.title2)
-                .fontWeight(.bold)
+                .h2()
                 .foregroundColor(.currentText)
             
             Text(insight.description)
-                .font(.caption2)
+                .captionSmall()
                 .foregroundColor(.currentSecondaryText)
                 .multilineTextAlignment(.leading)
                 .lineLimit(3)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding()
-        .background(Color.currentSecondaryBackground)
-        .cornerRadius(8)
+        .background(Color.currentSecondaryBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
         .shadow(color: .black.opacity(0.05), radius: 2, x: 0, y: 1)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(insight.title), \(insight.value), \(insight.description)")
     }
 }
 

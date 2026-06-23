@@ -104,6 +104,7 @@ struct TrackScreen: View {
             .alert("Delete Metric", isPresented: $viewModel.showingDeleteConfirmation) {
                 Button("Cancel", role: .cancel) { viewModel.metricToDelete = nil }
                 Button("Delete", role: .destructive) {
+                    HapticFeedback.warning()
                     viewModel.deleteMetric(in: modelContext, entries: entries)
                 }
             } message: {
@@ -129,7 +130,7 @@ struct TrackScreen: View {
                 viewModel: viewModel,
                 showingRowOptions: $showingRowOptions,
                 activeMilestone: activeMilestone,
-                usesAccessibilityLayout: dynamicTypeSize.usesAccessibilityLayout,
+                usesAccessibilityLayout: dynamicTypeSize.usesRelaxedListLayout,
                 onToggle: toggleMetric,
                 onLog: { showingLoggingSheetForMetric = $0 },
                 onEdit: { viewModel.showEditMetric($0) },
@@ -147,7 +148,7 @@ struct TrackScreen: View {
                 viewModel: viewModel,
                 showingRowOptions: $showingRowOptions,
                 activeMilestone: activeMilestone,
-                usesAccessibilityLayout: dynamicTypeSize.usesAccessibilityLayout,
+                usesAccessibilityLayout: dynamicTypeSize.usesRelaxedListLayout,
                 onToggle: toggleMetric,
                 onLog: { showingLoggingSheetForMetric = $0 },
                 onEdit: { viewModel.showEditMetric($0) },
@@ -165,7 +166,7 @@ struct TrackScreen: View {
                 viewModel: viewModel,
                 showingRowOptions: $showingRowOptions,
                 activeMilestone: activeMilestone,
-                usesAccessibilityLayout: dynamicTypeSize.usesAccessibilityLayout,
+                usesAccessibilityLayout: dynamicTypeSize.usesRelaxedListLayout,
                 onToggle: toggleMetric,
                 onLog: { showingLoggingSheetForMetric = $0 },
                 onEdit: { viewModel.showEditMetric($0) },
@@ -186,7 +187,7 @@ struct TrackScreen: View {
                     viewModel: viewModel,
                     showingRowOptions: $showingRowOptions,
                     activeMilestone: activeMilestone,
-                    usesAccessibilityLayout: dynamicTypeSize.usesAccessibilityLayout,
+                    usesAccessibilityLayout: dynamicTypeSize.usesRelaxedListLayout,
                     onToggle: toggleMetric,
                     onLog: { showingLoggingSheetForMetric = $0 },
                     onEdit: { viewModel.showEditMetric($0) },

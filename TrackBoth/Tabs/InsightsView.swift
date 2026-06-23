@@ -173,6 +173,7 @@ struct InsightsView: View {
                 isExporting = false
                 exportData = result
                 if result != nil {
+                    HapticFeedback.success()
                     showingExportSheet = true
                 } else {
                     showingExportError = true

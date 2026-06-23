@@ -7,8 +7,7 @@ struct FloatingActionButton: View {
     var body: some View {
         Button(action: {
             logger.logUserAction("Floating action button tapped")
-            let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
-            impactFeedback.impactOccurred()
+            HapticFeedback.medium()
             action()
         }) {
             Image(systemName: "plus.circle.fill")
@@ -34,7 +33,7 @@ struct FloatingActionButton: View {
         }
         .buttonStyle(PlainButtonStyle())
         .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity, pressing: { pressing in
-            withAnimation(.easeInOut(duration: 0.1)) {
+            withAnimation(TrackBothMotion.quick) {
                 isPressed = pressing
             }
         }, perform: {})

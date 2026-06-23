@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 63;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -29,6 +29,7 @@
 		1A0F0D49D4077DA0CCD13236 /* TrackWeekCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4473203AD675C3EB8F33F0F4 /* TrackWeekCalendar.swift */; };
 		1A9295BA3228A322E8150A54 /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5623015EAEBDB947DC40C33 /* ViewModifiers.swift */; };
 		1D55B21A948A8D7698DCF32E /* InsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 983481D93DD7D6710065A0DE /* InsightsView.swift */; };
+		1FA36A4FC653692545274728 /* AccessibilityLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69B372D33E488A884626AF3E /* AccessibilityLayoutTests.swift */; };
 		234BC5209918670A20EAB8C9 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C6EE924C3337C94B04E30B7 /* AppTheme.swift */; };
 		255AC8827B6DF4532E4CC546 /* ModelContext+Persist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4364DFEE101CFB7B18B19F1B /* ModelContext+Persist.swift */; };
 		257D63ADA9A45AAE40AB97C8 /* MetricChipStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F729FA2ED68F277C7EACD7A7 /* MetricChipStyle.swift */; };
@@ -81,6 +82,7 @@
 		5E1C4DC0A504600462517178 /* ExportImportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD114D8A9C1CFF0F12F52D39 /* ExportImportTests.swift */; };
 		5E9262CC6004EF268EA643B6 /* HomeStatsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9709C70AC19030D6A2FFB9 /* HomeStatsSection.swift */; };
 		5F0EACAFFE036CDCFBBEDF4A /* StreakCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC215FF3B2F46D34A7AC668C /* StreakCopy.swift */; };
+		62F9936E947831DE0E4CE807 /* ChartAccessibilitySummary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B550A9D139DCFE34B593CEB /* ChartAccessibilitySummary.swift */; };
 		62FA9FDD1A417CEB188B39C2 /* StreakUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B88429C62321D95BA6EAAA90 /* StreakUtils.swift */; };
 		63172EABAE0F56F6D13022A0 /* AdaptiveLayoutEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD3B83F8CD25136E132B6C3C /* AdaptiveLayoutEnvironment.swift */; };
 		6405077BAF124B38853AB7E8 /* TrackMetricsList.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB2DE0BB95E15567700147D3 /* TrackMetricsList.swift */; };
@@ -91,6 +93,7 @@
 		67218513C8ACBB66C8565177 /* ViceMotivationPromptSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4646DB6750C43222B76A6710 /* ViceMotivationPromptSheet.swift */; };
 		6737468F9A92F6D2B5DD7E32 /* LaunchSplashOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26339904847D3F1C0D66D935 /* LaunchSplashOverlay.swift */; };
 		68C84E19685A354139724BE0 /* CalendarHelperTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1430C83C5F684D4A75766E0 /* CalendarHelperTests.swift */; };
+		6A5F253760409680CA80739F /* ChartAccessibilitySummaryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCEF810C981626583F16EB3B /* ChartAccessibilitySummaryTests.swift */; };
 		6B18AFFC8CD8FB9A7DE2EC7A /* StreakUtilsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E368BF3B5C9473D8817547 /* StreakUtilsTests.swift */; };
 		6D876F29DC3E6013FFA94DDA /* TrackingSemantics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2693864995EA58A925D883E1 /* TrackingSemantics.swift */; };
 		6DB953E3BF0EB0B3C8F30172 /* GoalsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A624DCB01E6B1A150F723D8B /* GoalsViewModel.swift */; };
@@ -201,6 +204,7 @@
 		F7E31DE16D43135F1E7C5F85 /* TrackBothExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 466E27CB1361CEC1772D6FA9 /* TrackBothExport.swift */; };
 		F877B64F2E9AF9111F2EAEC6 /* MetricMotivationCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60A580E30628E599BDD4EEC3 /* MetricMotivationCardView.swift */; };
 		FB4FA0A84D242C52244DC1A4 /* MetricFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5F534131BDF1764FCE5F11C /* MetricFilterBar.swift */; };
+		FCD14F8B1D288E477EC9B0E8 /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6430F3C731A34CA7CD1D0D29 /* HapticFeedback.swift */; };
 		FE9F369BE518F42376802406 /* LineChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA39E6328622258FD41CF63A /* LineChartView.swift */; };
 		FF72B8D73652D71ECA8C96E6 /* MetricStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 597B518E2B660AFABFAB37B5 /* MetricStore.swift */; };
 /* End PBXBuildFile section */
@@ -237,7 +241,7 @@
 		1598BF3F0DFC33AD1C2419E0 /* WCAGContrast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WCAGContrast.swift; sourceTree = "<group>"; };
 		174BC95B41433AC1801F004E /* MilestoneStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilestoneStore.swift; sourceTree = "<group>"; };
 		185E991274C9F48E50B5607E /* ProductSurfaceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductSurfaceTests.swift; sourceTree = "<group>"; };
-		18A5B2827469CE1908439A0C /* TrackBoth-WidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "TrackBoth-WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		18A5B2827469CE1908439A0C /* TrackBoth-WidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = "TrackBoth-WidgetExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		194A418907E32265DA2B0332 /* Enums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Enums.swift; sourceTree = "<group>"; };
 		1A1A2740DA023F7436BBBBF1 /* HistoryViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModelTests.swift; sourceTree = "<group>"; };
 		1DFCA37EC6FEE065F9F0448A /* WidgetPendingLogProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPendingLogProcessor.swift; sourceTree = "<group>"; };
@@ -280,6 +284,7 @@
 		49E27F858F68A1E6CA386071 /* ChartDataProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartDataProcessor.swift; sourceTree = "<group>"; };
 		4A6952CF50E252E5116954B1 /* ChartHeaderRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartHeaderRow.swift; sourceTree = "<group>"; };
 		4AFA758B066889A6DFF79FBD /* WidgetSnapshotV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotV1.swift; sourceTree = "<group>"; };
+		4B550A9D139DCFE34B593CEB /* ChartAccessibilitySummary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartAccessibilitySummary.swift; sourceTree = "<group>"; };
 		4D2038EEFF1A11D9D82672EB /* AccessibilityIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityIdentifiers.swift; sourceTree = "<group>"; };
 		4E14F4E4116A2585DFC19A79 /* QueryDescriptorsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueryDescriptorsTests.swift; sourceTree = "<group>"; };
 		4E2C8A247FB660A8E3251564 /* ViceSlipTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViceSlipTimer.swift; sourceTree = "<group>"; };
@@ -304,12 +309,14 @@
 		60A580E30628E599BDD4EEC3 /* MetricMotivationCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricMotivationCardView.swift; sourceTree = "<group>"; };
 		62744ED1D35D4E25BC6ABCA5 /* ScreenSectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenSectionHeader.swift; sourceTree = "<group>"; };
 		6289209FAC0931E0F1F0146D /* BrandMarkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrandMarkView.swift; sourceTree = "<group>"; };
-		62E67A8BA1659D0A4BC07AA8 /* TrackBoth.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TrackBoth.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		62E67A8BA1659D0A4BC07AA8 /* TrackBoth.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TrackBoth.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6319E0328896B810C2D56169 /* TrackBothPhaseBWidgets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackBothPhaseBWidgets.swift; sourceTree = "<group>"; };
+		6430F3C731A34CA7CD1D0D29 /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		667278F4B9C15ABEECC721CC /* AddMetricView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMetricView.swift; sourceTree = "<group>"; };
 		66C7D9EAE75210DD2C2B59B2 /* MoodChipPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodChipPicker.swift; sourceTree = "<group>"; };
 		6944E1A27D1D9A39BCB91C4B /* MetricPreset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricPreset.swift; sourceTree = "<group>"; };
 		699D7597462078F3855C4BCB /* ChartsEmptyStateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartsEmptyStateView.swift; sourceTree = "<group>"; };
+		69B372D33E488A884626AF3E /* AccessibilityLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityLayoutTests.swift; sourceTree = "<group>"; };
 		6A595DB175AD9349EC913E62 /* LoggingSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoggingSheet.swift; sourceTree = "<group>"; };
 		6C11BA95B69FAD309744D5DC /* FilterUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterUtils.swift; sourceTree = "<group>"; };
 		6C6EE924C3337C94B04E30B7 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
@@ -362,6 +369,7 @@
 		B7F4FB13DD07E0A0E4007E47 /* ViceSlipTimerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViceSlipTimerTests.swift; sourceTree = "<group>"; };
 		B88429C62321D95BA6EAAA90 /* StreakUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreakUtils.swift; sourceTree = "<group>"; };
 		BB9709C70AC19030D6A2FFB9 /* HomeStatsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeStatsSection.swift; sourceTree = "<group>"; };
+		BCEF810C981626583F16EB3B /* ChartAccessibilitySummaryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartAccessibilitySummaryTests.swift; sourceTree = "<group>"; };
 		BD48DAA0678BB4D859DA832B /* BootstrapStoreRecovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BootstrapStoreRecovery.swift; sourceTree = "<group>"; };
 		BDA4E28256CC05D0DCF55F2E /* HistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryViewModel.swift; sourceTree = "<group>"; };
 		BEE9F0D8A6D14642F0EAEB60 /* FloatingActionButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingActionButton.swift; sourceTree = "<group>"; };
@@ -501,6 +509,7 @@
 		218493B899DC8A6ECE86127A /* Charts */ = {
 			isa = PBXGroup;
 			children = (
+				4B550A9D139DCFE34B593CEB /* ChartAccessibilitySummary.swift */,
 				A024DC88908EBBA726768007 /* ChartCopy.swift */,
 				49E27F858F68A1E6CA386071 /* ChartDataProcessor.swift */,
 			);
@@ -656,11 +665,13 @@
 			isa = PBXGroup;
 			children = (
 				734B5800A656986B2E38BF8C /* AccessibilityIdentifiersTests.swift */,
+				69B372D33E488A884626AF3E /* AccessibilityLayoutTests.swift */,
 				7DB0CD38B606CC72C5408DC8 /* AppSupportTests.swift */,
 				FDB7EE6A342BB13771AD86FA /* AppThemeTests.swift */,
 				75F520226920E3440DA3A134 /* BootstrapStoreRecoveryTests.swift */,
 				5793974EAD29C29150F53CDF /* BuildConfigurationTests.swift */,
 				F1430C83C5F684D4A75766E0 /* CalendarHelperTests.swift */,
+				BCEF810C981626583F16EB3B /* ChartAccessibilitySummaryTests.swift */,
 				9409A4B6318B50D92D0273B2 /* ChartCopyTests.swift */,
 				774B216B3657178700E190BB /* ChartDataProcessorTests.swift */,
 				D75971569151647F57731709 /* ChartsViewModelTests.swift */,
@@ -980,6 +991,7 @@
 				5D6C67E0CEF5585CE7D2E89A /* AdaptiveTabChrome.swift */,
 				FEA5B8CF7561962FDC109AAF /* ChartExportUtility.swift */,
 				A3B83BACA3A8207F7246AEF1 /* DeviceLayoutEnvironment.swift */,
+				6430F3C731A34CA7CD1D0D29 /* HapticFeedback.swift */,
 				B12728A58F013B96C73C11C0 /* Motion.swift */,
 				AB38A2AC65C16EE4941790D2 /* TabBarLayout.swift */,
 				E77852227EE96A9D64262FBD /* ThemeManager.swift */,
@@ -1142,6 +1154,7 @@
 			);
 			mainGroup = B0E19ED38AB61128C31E0647;
 			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -1178,11 +1191,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				447BD7710FB5D360835F35FB /* AccessibilityIdentifiersTests.swift in Sources */,
+				1FA36A4FC653692545274728 /* AccessibilityLayoutTests.swift in Sources */,
 				38B0B178E911C9495FB4FB97 /* AppSupportTests.swift in Sources */,
 				F7530156E95341C22F8A6F92 /* AppThemeTests.swift in Sources */,
 				5CF6BB64302C536F32F69135 /* BootstrapStoreRecoveryTests.swift in Sources */,
 				DCD99ACD3982F169797198ED /* BuildConfigurationTests.swift in Sources */,
 				68C84E19685A354139724BE0 /* CalendarHelperTests.swift in Sources */,
+				6A5F253760409680CA80739F /* ChartAccessibilitySummaryTests.swift in Sources */,
 				41C35D47CA021871581DAFBD /* ChartCopyTests.swift in Sources */,
 				E21E34E02AC04DBC9F9203EF /* ChartDataProcessorTests.swift in Sources */,
 				73B88D5906E24AF9D1007395 /* ChartsViewModelTests.swift in Sources */,
@@ -1240,6 +1255,7 @@
 				C757B9DD0CA01321941681C1 /* CalendarDayView.swift in Sources */,
 				35D82DD9677766DFDEF5D962 /* CalendarGridView.swift in Sources */,
 				B3AE7F8C6E8FABE7EF9B3AB5 /* CalendarHelper.swift in Sources */,
+				62F9936E947831DE0E4CE807 /* ChartAccessibilitySummary.swift in Sources */,
 				F6A5A69699E14FD5F1C4F84E /* ChartContentView.swift in Sources */,
 				B9F8CC6D643756B5F2F95058 /* ChartControlsView.swift in Sources */,
 				A5AE43F20D3AE984C1DF44AA /* ChartCopy.swift in Sources */,
@@ -1274,6 +1290,7 @@
 				27C6E0DF8463C8AF3DD86843 /* GoalUtils.swift in Sources */,
 				184389162C5A26F9FF1FD56F /* GoalsView.swift in Sources */,
 				6DB953E3BF0EB0B3C8F30172 /* GoalsViewModel.swift in Sources */,
+				FCD14F8B1D288E477EC9B0E8 /* HapticFeedback.swift in Sources */,
 				EFF0E89FB735B6AE25063E75 /* HeatmapView.swift in Sources */,
 				CB2EBA1DBF42A364EBA7AA71 /* HistoryCompactLayout.swift in Sources */,
 				988AEFA636952E93317CD413 /* HistoryEntryCardView.swift in Sources */,
@@ -1558,7 +1575,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = "TrackBoth-Widget/TrackBoth-Widget.entitlements";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "TrackBoth-Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "TrackBoth-Widget";
@@ -1585,7 +1602,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TrackBoth.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TrackBoth-Info.plist";
@@ -1632,7 +1649,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CODE_SIGN_ENTITLEMENTS = "TrackBoth-Widget/TrackBoth-Widget.entitlements";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = "TrackBoth-Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "TrackBoth-Widget";
@@ -1659,7 +1676,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TrackBoth.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "TrackBoth-Info.plist";

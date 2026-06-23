@@ -60,7 +60,7 @@ struct MotivationsView: View {
         EmptyStateView(
             icon: "plus.circle.fill",
             title: "Nothing to Track Yet",
-            subtitle: "Add a vice on Track first — then set a primary motivation and log thoughts on hard days.",
+            subtitle: "Add a habit or vice on Track first — then set a primary motivation and log thoughts on hard days.",
             actionTitle: "Add Habit or Vice",
             action: { viewModel.showAddMetric() }
         )
@@ -151,7 +151,7 @@ struct MotivationsView: View {
                 loggedCount: viewModel.notes(for: metric, entries: entries).count
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(CardPressButtonStyle())
         .accessibilityIdentifier("motivation_metric_\(metric.id.uuidString)")
     }
 }

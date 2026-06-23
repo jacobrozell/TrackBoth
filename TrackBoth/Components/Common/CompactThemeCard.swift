@@ -33,7 +33,7 @@ struct CompactThemeCard: View {
                 }
             }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(CardPressButtonStyle())
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

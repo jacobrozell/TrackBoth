@@ -16,12 +16,7 @@ struct InsightsDayEntriesSection: View {
             trailing: dayEntries.isEmpty ? nil : entryCountLabel(dayEntries.count)
         )) {
             if dayEntries.isEmpty {
-                Text(emptyDayMessage)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.currentSecondaryText)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 8)
+                emptyDayContent
             } else {
                 LazyVStack(spacing: 8) {
                     ForEach(dayEntries) { entry in
@@ -30,6 +25,30 @@ struct InsightsDayEntriesSection: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private var emptyDayContent: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(emptyDayMessage)
+                .bodySmall()
+                .foregroundStyle(Color.currentSecondaryText)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            if CalendarHelper.isToday(viewModel.selectedDate) {
+                Button {
+                    HapticFeedback.medium()
+                    AppEvent.post(.switchToTrack)
+                } label: {
+                    Label("Go to Track", systemImage: "checkmark.circle.fill")
+                        .button()
+                }
+                .buttonStyle(CardPressButtonStyle())
+                .foregroundStyle(Color.currentPrimary)
+            }
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 8)
     }
 
     private var emptyDayMessage: String {
