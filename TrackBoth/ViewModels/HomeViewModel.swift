@@ -221,15 +221,19 @@ class HomeViewModel {
     ) {
         let calendar = Calendar.current
         let startOfDay = calendar.startOfDay(for: selectedDate)
-        
-        let entry = MetricEntry.getOrCreate(
-            for: metric.id,
-            date: startOfDay,
-            in: modelContext,
-            entries: entries,
-            metric: metric
-        )
-        
+
+        // Route persistence through the repository seam. Fall back to the legacy
+        // in-memory helper only if the fetch fails, preserving prior behavior.
+        let store = EntryStore(context: modelContext)
+        let entry = (try? store.getOrCreate(for: metric.id, on: startOfDay))
+            ?? MetricEntry.getOrCreate(
+                for: metric.id,
+                date: startOfDay,
+                in: modelContext,
+                entries: entries,
+                metric: metric
+            )
+
         if let details = details {
             entry.details = details
         }
