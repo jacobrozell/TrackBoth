@@ -1369,7 +1369,7 @@ Each phase: **Goal → Steps → Files → Tests → DoD → Commit message.** W
 4. Rewrite `README.md`: new one-liner, the 3 tabs, build/test commands (from §0.2), folder layout (§7.1), doc map. Fix every `specs/` link to `Specs/`.
 5. Update `ongoing/README.md` (Active row for this plan), `docs/project-status.md` (Stage: "Overhaul in progress"; Current focus: "Recovery overhaul, Phase N"), and `docs/feature-inventory.md` (rewrite tables from the §2.4 cut list and the §4 feature list, with every new feature marked "Planned").
 
-**DoD:** no remaining links point at `specs/` (check with `grep -rn "](specs/\|](../specs/" --include=*.md .`).
+**DoD:** no markdown link destination uses a lowercase `specs` path. Search `*.md` for link targets `specs/` and `../specs/`.
 **Commit:** `Reset specs and docs around the recovery-focused core loop.`
 
 ### Phase 2 — New Domain, test-first (1–2 days)
@@ -1727,4 +1727,5 @@ Custom vices use the verb phrase "do it". **Verify every SF Symbol name** in the
 |------|-------|--------|--------|--------------------------------------------|
 | 2026-10-28 | Plan | — | Plan written | Awaiting Decision Gates sign-off (§3) |
 | 2026-10-28 | Plan | — | Gates answered | Owner: D1 fresh data ✅, D3 I Am Sober model ✅, D5 free/slip ✅, D9 subtitle ✅, D6 iPhone portrait for 1.0, iPad + both orientations later (Phase 15, adaptive-ready rules in §8.7). Other gates use their defaults. **Ready for Phase 0.** |
-| 2026-10-28 | 0 | (this commit) | Green | Baseline before the cut: **183 passed, 0 failed, 1 skipped** (`TrackBothTests`, iPhone 17 / iOS 27, scheme TrackBoth). Did not check out main (branch already at the approved plan). Fixtures: `Tests/Unit/Fixtures/legacy-v{1,3,4}.json` use ISO 8601 dates. The legacy decoder will also accept the old encoder's numeric reference dates. v1 omits optional keys; v3 adds a primary motivation and two motivation notes; v4 adds `costPerUnit` 8, a goal (dropped on import), a habit day with value false (dropped), and quantity/mood (dropped). Build number set to **6** on both targets. |
+| 2026-10-28 | 0 | 22e1a52 | Green | Baseline before the cut: **183 passed, 0 failed, 1 skipped** (`TrackBothTests`, iPhone 17 / iOS 27, scheme TrackBoth). Did not check out main (branch already at the approved plan). Fixtures: `Tests/Unit/Fixtures/legacy-v{1,3,4}.json` use ISO 8601 dates. The legacy decoder will also accept the old encoder's numeric reference dates. v1 omits optional keys; v3 adds a primary motivation and two motivation notes; v4 adds `costPerUnit` 8, a goal (dropped on import), a habit day with value false (dropped), and quantity/mood (dropped). Build number set to **6** on both targets. |
+| 2026-10-28 | 1 | (this commit) | Green | Archived lean-1.0 docs and old specs. New specs copied from the plan. App Store copy rewritten to the approved subtitle and self-help wording (upload still waits for Phase 13). The plan's Phase 1 link check was reworded so the instruction itself is not a false match. |

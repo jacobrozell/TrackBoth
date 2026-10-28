@@ -1,55 +1,39 @@
 # TrackBoth — Project status
 
-> Last updated: 2026-06-22
+> Last updated: 2026-10-28
 
 ## At a glance
 
 | Field | Value |
 |-------|-------|
-| **App Store name** | TrackBoth — Habits & Vices |
-| **Stage** | **Archiving** — build 5 Xcode archive (2026-06-22) |
+| **App Store name** | TrackBoth |
+| **Subtitle** | Quit vices. Build habits. |
+| **Stage** | **Overhaul in progress** |
 | **Latest submitted** | — |
 | **Latest shipped (App Store)** | — |
-| **Repo version** | 1.0.0 (5) — `CURRENT_PROJECT_VERSION` in generated Xcode project |
-| **Active branch** | `main` |
-| **Platform** | iOS 18+ — dual habit/vice tracker |
-| **Monetization** | Free |
+| **Repo version** | 1.0.0 (6) |
+| **Active branch** | `claude/dazzling-albattani-7mg4uh` |
+| **Platform** | iOS 18+ — iPhone portrait for 1.0 |
+| **Monetization** | Free, no IAP |
 
 ## Current focus
 
-**Build 5** — Xcode archive in progress for TestFlight / App Store Connect upload.
+**Recovery overhaul.** Phase 1 (specs and docs) is in this commit. Next: Phase 2, the new Domain rules.
 
-Ship surface: **Track · History · Motivation · Charts · Settings** (Goals tab dev-only).
-
-**After archive:** upload to Connect, TestFlight RC, device QA, hosted legal pages, App Store screenshots.
+The app has never shipped. Build 5 was archived on 2026-06-22 and never uploaded. There is no production data to migrate.
 
 ## Release history
 
 | Version | Build | Date | Channel | Notes |
 |---------|-------|------|---------|-------|
-| 1.0.0 | 5 | 2026-06-22 | Archive | Xcode archive (pre–TestFlight) |
-| — | — | — | App Store | Not submitted |
-
-## Near-term (1.0.0)
-
-- Device QA — [`docs/release/QA-Signoff-RC1.md`](release/QA-Signoff-RC1.md)
-- Ship checklist — [`docs/release/1.0.0-ship-checklist.md`](release/1.0.0-ship-checklist.md)
-- Release handoff — [`FutureIdeas/ReviewerReadinessHandoff.md`](../FutureIdeas/ReviewerReadinessHandoff.md)
-- App Store copy — [`docs/release/app-store-copy.md`](release/app-store-copy.md)
-
-## Future (post-1.0)
-
-- [`Specs/planned/README.md`](../Specs/planned/README.md) — widgets, Watch, notifications
-- [`FutureIdeas/backlog.md`](../FutureIdeas/backlog.md)
-- Competitive 1.1–1.2 — [`docs/product/competitive-strategy.md`](product/competitive-strategy.md)
+| 1.0.0 | 5 | 2026-06-22 | Archive | Pre-overhaul Xcode archive. Not uploaded. |
+| 1.0.0 | 6 | 2026-10-28 | Repo | Build number bumped for the overhaul. Not archived. |
 
 ## Key docs
 
 | Doc | Purpose |
 |-----|---------|
-| [`FutureIdeas/ProductUXHandoff.md`](../FutureIdeas/ProductUXHandoff.md) | Ship-surface decisions + UX backlog |
-| [`Specs/ProductSurfaceSpec.md`](../Specs/ProductSurfaceSpec.md) | Release gating matrix |
-| [`docs/feature-inventory.md`](feature-inventory.md) | What ships vs dev-only |
-| [`docs/release/1.0.0-core-scope.md`](release/1.0.0-core-scope.md) | Scope lock |
-| [`docs/release/progress-log.md`](release/progress-log.md) | Implementation log |
-| [`ongoing/README.md`](../ongoing/README.md) | Active release train |
+| [`ongoing/recovery-overhaul-plan.md`](../ongoing/recovery-overhaul-plan.md) | Approved plan and progress log |
+| [`Specs/README.md`](../Specs/README.md) | Current behavior specs |
+| [`docs/feature-inventory.md`](feature-inventory.md) | Cut list and planned features |
+| [`docs/release/app-store-copy.md`](release/app-store-copy.md) | Listing copy (rewritten at the end of the overhaul) |

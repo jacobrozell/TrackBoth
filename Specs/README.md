@@ -1,19 +1,15 @@
-# Legacy Specs (Deprecated)
+# TrackBoth specs
 
-These files are **historical drafts**. Do not edit for new work.
+These specs are the behavior contract for the recovery overhaul. The approved plan lives in [`ongoing/recovery-overhaul-plan.md`](../ongoing/recovery-overhaul-plan.md). Historical lean-1.0 specs are in [`archive/`](archive/).
 
-**Authoritative specs live in [`specs/`](../specs/)** (lowercase).
+**Spec governance:** behavior changes update the spec in the same commit.
 
-| Legacy file | Superseded by |
-|-------------|---------------|
-| `updated-specs.md` | Feature specs in `specs/` + `docs/feature-inventory.md` |
-| `logged-status-spec.md` | `specs/TrackingSemanticsSpec.md` |
-| `home-view-redesign-spec.md` | `specs/HomeSpec.md` |
-| `motivation-view-redesign-spec.md` | `specs/MotivationsSpec.md` |
-| `motivation-game-spec.md` | `specs/planned/MotivationGameSpec.md` |
-| `apple-watch-spec.md` | `specs/planned/AppleWatchSpec.md` |
-| `apple-watch-wireframes.md` | `specs/planned/AppleWatchSpec.md` |
-| `android-porting-spec.md` | `specs/planned/AndroidPortSpec.md` |
-| `react-native-porting-spec.md` | `specs/planned/ReactNativePortSpec.md` |
+| Spec | Covers |
+|------|--------|
+| [ProductSpec.md](ProductSpec.md) | Who the app is for, the three tabs, flows, and copy |
+| [RulesAndDataSpec.md](RulesAndDataSpec.md) | Models, recovery math, habits, milestones, export |
+| [DesignSystemSpec.md](DesignSystemSpec.md) | Palette, type, components, accessibility, adaptive rules |
+| [PrivacySafetySpec.md](PrivacySafetySpec.md) | Crisis help, reminders, app lock, privacy release gate |
+| [TestPlan.md](TestPlan.md) | Unit tests, UI tests, accessibility identifiers |
 
-When migrating content, copy into the appropriate `specs/` file, add a Verification block, and leave a one-line redirect here if needed.
+Each spec ends with a Verification block. Fill `Last verified` and `Commit` when you confirm the code matches.

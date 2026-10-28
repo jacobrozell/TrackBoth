@@ -1,46 +1,44 @@
-# TrackBoth — App Store Copy (1.0)
+# TrackBoth — App Store copy (1.0)
 
-**Last updated:** 2026-06-21  
-**Screenshots:** deferred — capture after final UI pass  
-**Monetization:** Free — no IAP, no subscription (Decision 9)
-
----
+**Last updated:** 2026-10-28
+**Status:** Draft for the recovery overhaul. Do not upload until Phase 13 privacy and screenshot checks.
+**Monetization:** Free. No IAP.
 
 ## Listing
 
 | Field | Copy |
 |-------|------|
 | **Name** | TrackBoth |
-| **Subtitle** | Habits & Vices |
-| **Promotional text** | Build streaks. Track clean days. One honest daily log. |
-| **Description (short)** | Track habits you want to build and vices you want to break — in one app. One tap a day on Track. Review your history, see charts, and keep personal Motivations ready when you need them. |
-| **Description (keywords to weave)** | habit tracker, vice tracker, streak, clean days, sobriety, accountability, motivation library, daily log |
+| **Subtitle** | Quit vices. Build habits. |
+| **Promotional text** | Ride out urges. Keep the progress a slip can't erase. |
+| **Category** | Health & Fitness |
+| **Keywords** | `quit,sober,addiction,urge,habit,tracker,streak,smoking,drinking,recovery,vape,porn,gambling` |
 
----
+### Description
 
-## Positioning (vs quit-only apps)
+TrackBoth helps you quit what's hurting you and build what helps.
 
-- **Not** a quit-only app — habits and vices are first-class.
-- **Trust:** day-based streaks with tested semantics; edit history anytime.
-- **Motivation tab:** personal reasons to stay clean (inspired by I Am Sober-style relapse prevention).
-- **Vice rows:** clean-day streaks, optional money saved, slip recovery timer.
-- **Free forever:** unlimited metrics, logging, streaks, export.
+Check in once a day. It takes about 10 seconds. When an urge hits, open the app and ride it out with a timer, your reasons, and a plan you wrote yourself. If you slip, your total free days and the money you've saved stay. A slip restarts the current run. It does not erase the progress you already made.
 
----
+TrackBoth is a self-help tool. It does not treat, cure, or diagnose anything.
 
-## Screenshot plan (later)
+- Quit one or more vices and build the habits that replace them
+- Live count of days free, and a calendar of confirmed days
+- A guided way to ride out an urge
+- Optional daily reminder. Nothing else
+- Lock the app with Face ID, Touch ID, or your passcode
+- Export a backup you control. Nothing leaves your device unless you share the file
 
-1. **Track** — Habits + Vices sections visible, streak/metadata on rows  
-2. **History** — calendar + entry list  
-3. **Charts** — line or heatmap with real-looking data  
-4. **Motivation** — motivation library / add flow  
-5. **Onboarding** — “What do you want to build?” + “What do you want to break?”
+### Review notes
 
----
+No account or login. Everything is stored on the device. To see populated screens, complete onboarding by choosing Alcohol with a quit date 10 days ago. The urge tool is the "I'm having an urge" button on Today, or long-press the app icon.
 
-## What not to claim
+### Age rating notes
 
-- iCloud sync (not in 1.0)
-- Widget (post-1.0)
-- Quantity charts (dev-only until polish)
-- Pro / subscription tier
+Answer "Alcohol, Tobacco, or Drug Use or References: Infrequent/Mild" (presets name substances) and "Medical/Treatment Information: Infrequent/Mild" (the disclaimer and crisis resources). Expect 13+.
+
+App Privacy: Data Not Collected.
+
+### Claims to avoid
+
+Do not say "treats", "cures", or "clinically proven". Say "self-help", "track", and "support".
