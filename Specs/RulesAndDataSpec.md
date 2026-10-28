@@ -589,6 +589,6 @@ Tests: round-trip v5; import a fixture of each legacy version (put JSON fixtures
 
 | Field | Value |
 |-------|--------|
-| Last verified | — |
-| Commit | — |
+| Last verified | 2026-10-28 |
+| Commit | Phase 2 domain tests (V1–V8, H1–H5) |
 

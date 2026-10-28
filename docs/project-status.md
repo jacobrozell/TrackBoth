@@ -18,7 +18,7 @@
 
 ## Current focus
 
-**Recovery overhaul.** Phase 1 (specs and docs) is in this commit. Next: Phase 2, the new Domain rules.
+**Recovery overhaul.** Phase 2 domain rules are in. Next: Phase 3, the cut and the new store.
 
 The app has never shipped. Build 5 was archived on 2026-06-22 and never uploaded. There is no production data to migrate.
 
