@@ -15,7 +15,7 @@ Plans and projects **in implementation** — approved, specced, and actively bei
 
 | Plan | Doc | Status | Notes |
 |------|-----|--------|-------|
-| **Recovery overhaul → production** | [`recovery-overhaul-plan.md`](recovery-overhaul-plan.md) | Proposed | Refocus on addiction-recovery loop; 3 tabs; awaiting Decision Gates (§3). Supersedes lean 1.0 plan once approved |
+| **Recovery overhaul → production** | [`recovery-overhaul-plan.md`](recovery-overhaul-plan.md) | Approved 2026-10-28 | Refocus on addiction-recovery loop; 3 tabs; iPhone portrait for 1.0, iPad + landscape in Phase 15. Supersedes lean 1.0 plan. Next: Phase 0 |
 | Lean 1.0 master plan | [`docs/release/lean-1.0-master-plan.md`](../docs/release/lean-1.0-master-plan.md) | Archiving | Build 5 Xcode archive (2026-06-22) |
 | Product UX handoff | [`FutureIdeas/ProductUXHandoff.md`](../FutureIdeas/ProductUXHandoff.md) | Decisions locked | P0 impl done 2026-06-21 |
 | Release progress log | [`docs/release/progress-log.md`](../docs/release/progress-log.md) | In progress | Device QA + assets pending |

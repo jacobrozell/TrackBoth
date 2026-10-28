@@ -1,6 +1,6 @@
 # TrackBoth — Recovery Overhaul Plan (to production)
 
-> **Status:** Proposed — waiting on owner sign-off for the Decision Gates (§3)
+> **Status:** Approved 2026-10-28. Owner answered D1, D3, D5, D6, D9 (§3); the other gates use their defaults
 > **Created:** 2026-10-28 · **Branch:** `claude/dazzling-albattani-7mg4uh` (or a fresh `overhaul/*` branch off `main`)
 > **Audience:** the implementing agent. Written so an agent with no prior context can run it phase by phase.
 > **Supersedes:** `docs/release/lean-1.0-master-plan.md`, `docs/release/1.0.0-core-scope.md`, `FutureIdeas/ProductUXHandoff.md`, `REFACTOR_PLAN.md`, `REFACTOR_IMPLEMENTATION.md` (all get archived in Phase 1).
@@ -140,7 +140,7 @@ Every feature below traces back to one of these. If a feature can't be traced, i
 | Quantity, units, mood chips, starred entries | Extra input on every log adds friction and doesn't change behavior. Trigger tags replace mood where it matters (slips and urges). |
 | Charts tab (line, bar, heatmap), chart PNG/PDF export | Generic analytics. Replaced by a calendar plus three recovery stats. |
 | Multiple color themes, font picker | Decoration. One calm palette that follows system light/dark. |
-| iPad layouts and iPhone landscape | 4× QA for little benefit. **Ship iPhone only, portrait** (Decision D6). |
+| Per-device layout files (4 per screen) | 4× the QA work. **1.0 ships iPhone portrait.** iPad and landscape come back in Phase 15 as **one adaptive layout per screen**, not separate files (D6, §8.7). |
 | Widget, Watch, Live Activities, Shortcuts | Post-launch. A single "days free" widget is Phase 14 (optional). |
 | Launch splash animation | Delays the moment of need. The system launch screen is enough. |
 | Week-start picker | Use `Calendar.current.firstWeekday` (follows the user's locale). |
@@ -151,19 +151,19 @@ Every feature below traces back to one of these. If a feature can't be traced, i
 
 ## 3. Decision gates (defaults chosen — owner may override)
 
-The agent proceeds with the **Default** unless the owner has written something different in the Owner column.
+The agent proceeds with the **Default** unless the owner has written something different in the Owner column. **Owner answers recorded 2026-10-28.** Gates with an empty Owner cell use their default.
 
 | # | Decision | Default | Owner |
 |---|----------|---------|-------|
-| D1 | Data reset. The app has never shipped, so the schema is redefined from scratch with a **new store file**. Old exports stay importable. | **Yes** | |
+| D1 | Data reset. The app has never shipped, so the schema is redefined from scratch with a **new store file**. Old exports stay importable. | **Yes** | ✅ Yes, start fresh (app not released) |
 | D2 | Keep habits? | **Yes**, framed as "Building" (helper habits that replace the vice). A user can still track habits only. | |
-| D3 | How vice days count | **Presumed free:** time counts up from the quit date, and only *logged slips* break it. Check-ins *confirm* days (solid in the calendar); unconfirmed past days count but look hollow. Same model as I Am Sober. | |
+| D3 | How vice days count | **Presumed free:** time counts up from the quit date, and only *logged slips* break it. Check-ins *confirm* days (solid in the calendar); unconfirmed past days count but look hollow. Same model as I Am Sober. | ✅ Yes, same as I Am Sober |
 | D4 | Habit streak rule | **Never miss twice** (§6.6) | |
-| D5 | Vocabulary | **"Free / slip"** (not "clean / relapse / fail") | |
-| D6 | Devices | **iPhone only, portrait only.** (Dropping iPad later isn't allowed, but adding it is easy. Since we've never shipped, now is the moment to drop it.) | |
+| D5 | Vocabulary | **"Free / slip"** (not "clean / relapse / fail") | ✅ Yes |
+| D6 | Devices | **1.0: iPhone, portrait only.** Every screen is built **adaptive-ready** (§8.7) so iPad and portrait + landscape on both devices can be added later without a redesign. | ✅ iPhone + iPad, portrait + landscape, in a future release → Phase 15 |
 | D7 | Widget | **Post-launch** (Phase 14, optional) | |
 | D8 | App lock (Face ID/passcode) | **Ship it, off by default, offered during onboarding** | |
-| D9 | App Store name/subtitle | Name **TrackBoth**. Subtitle **"Quit vices. Build habits."** (25/30 chars) | |
+| D9 | App Store name/subtitle | Name **TrackBoth**. Subtitle **"Quit vices. Build habits."** (25/30 chars) | ✅ Yes |
 | D10 | Version | **Stays 1.0.0** (never shipped). Build number continues from **6**. | |
 | D11 | Monetization | **Free**, no IAP (existing decision) | |
 | D12 | Telemetry | **None** | |
@@ -389,7 +389,7 @@ Paths are relative to `TrackBoth/TrackBoth/`. **"Delete"** means remove the file
 | `Domain/Charts/`, `Domain/Filters/`, `Domain/Goals/`, `Domain/Streaks/`, `Domain/Calendar/`, `Domain/Tracking/`, `Domain/Milestones/`, `Domain/Metrics/` | Replaced by the new Domain (§6.5–6.9). |
 | `Domain/Data/ThemePreferences.swift`, `Domain/Data/QueryDescriptors.swift` | Replaced by `Services/Preferences.swift`. Queries are written inline. |
 | `Models/` (all: `Metric`, `MetricEntry`, `Goal`, `Enums`, `AppTheme`, `ChartModels`, `EntryTypeFilter`) | Replaced by `Data/Models/`. |
-| `Utils/UI/ThemeManager.swift`, `TabBarLayout.swift`, `AdaptiveTabChrome.swift`, `AdaptiveLayoutEnvironment.swift`, `DeviceLayoutEnvironment.swift`, `ChartExportUtility.swift`, `Typography.swift`, `ViewModifiers.swift` | Replaced by `DesignSystem/`. Adaptive layouts are gone (D6). |
+| `Utils/UI/ThemeManager.swift`, `TabBarLayout.swift`, `AdaptiveTabChrome.swift`, `AdaptiveLayoutEnvironment.swift`, `DeviceLayoutEnvironment.swift`, `ChartExportUtility.swift`, `Typography.swift`, `ViewModifiers.swift` | Replaced by `DesignSystem/`. The per-device layout files are gone. Phase 15 brings iPad and landscape back through size classes (D6, §8.7). |
 | `Utils/Data/DemoDataGenerator.swift`, `Utils/Services/MigrationUtils.swift`, `Utils/Services/AppEvents.swift` | Demo data is rewritten in Phase 13. Migration is not needed (D1). AppEvents (NotificationCenter + `asyncAfter` hacks) is replaced by `AppRouter`. |
 | All asset colorsets except `AppIcon`, `AccentColor`, `LaunchBackground` | Replaced by the new palette (§8.1). |
 | Tests for anything deleted (Goals, Charts, Filters, History, Widget, Theme, TabBar, Streak*, Milestone*, Tracking*, Calendar*, DayLogSummary, MetricCostStore, ViceSlipTimer, ViceSavings, Migration, ProductSurface, AppSupport, BuildConfiguration, DemoData, ModelContextPersist, view-model tests, `Fakes/InMemoryRepositories.swift`, all current UI tests) | Rewritten against the new code. |
@@ -1025,7 +1025,7 @@ TrackBoth/TrackBoth/
 │   ├── AccessibilityLayout.swift
 │   └── Components/                 PrimaryButton, SecondaryButton, Card, StatTile, Chip, ChipGrid,
 │                                   EmptyState, BreathingCircle, DayDots, MonthCalendar, SectionHeader,
-│                                   BrandMark, IconBadge
+│                                   BrandMark, IconBadge, ReadableColumn
 ├── Features/
 │   ├── Today/          TodayScreen, TodayViewModel, ViceCard, HabitCheckRow, CheckInBanner, YesterdayPrompt, SOSButton
 │   ├── CheckIn/        CheckInSheet, CheckInViewModel, CheckInCompleteView
@@ -1258,6 +1258,8 @@ After a `CelebrationView` for a **7-day vice milestone** is dismissed, and only 
 
 `Spacing.xs 4 · s 8 · m 12 · l 16 · xl 24 · xxl 32`. `Radius.card 20 · control 14 · chip = Capsule`. Screen horizontal padding = `Spacing.l`. Gap between cards = `Spacing.m`.
 
+> Adaptive-ready rules for 1.0 (iPad and landscape come later, D6) are in §8.7. Follow them from Phase 4 on.
+
 ### 8.3 Type
 
 Use Dynamic Type text styles only (`.largeTitle`, `.title2`, `.headline`, `.body`, `.subheadline`, `.footnote`, `.caption`). Big numbers (days free, run counts): `.system(.largeTitle, design: .rounded).weight(.bold).monospacedDigit()`. Section headers: `.footnote.weight(.semibold)`, uppercase, `TextSecondary`. No custom fonts.
@@ -1277,6 +1279,7 @@ Use Dynamic Type text styles only (`.largeTitle`, `.title2`, `.headline`, `.body
 | `MonthCalendar` | `MonthCalendar(month:, stateFor: (Date) -> DayVisualState, onSelect:)` | `firstWeekday` from `Calendar.current`. Cells ≥44pt. |
 | `SectionHeader` | `SectionHeader("Quitting")` | Adds the `.isHeader` accessibility trait |
 | `IconBadge` | `IconBadge(systemImage:, tint:)` | 36pt rounded square |
+| `ReadableColumn` | `ReadableColumn { content }` | Max width 640, centered, `Spacing.l` side padding. Wraps every screen (§8.7) |
 
 ### 8.5 Motion and haptics
 
@@ -1293,6 +1296,17 @@ Use Dynamic Type text styles only (`.largeTitle`, `.title2`, `.headline`, `.body
 - VoiceOver: every interactive element has a label. ViceCard reads as one element: "Alcohol, 12 days free, 96 dollars saved, button". The live clock is announced only on focus (`.accessibilityElement(children: .combine)`).
 - Reduce Motion: breathing, celebration, and the number transitions all honor it.
 - Tap targets ≥ 44×44pt.
+
+### 8.7 Adaptive-ready rules (D6: iPad + landscape in a future release)
+
+1.0 ships iPhone portrait only. Build every screen so that turning on iPad and landscape (Phase 15) means **adding** layouts, not rewriting screens:
+
+1. **No device checks.** Never use `UIDevice.current.userInterfaceIdiom`, screen-size constants, or `UIScreen.main.bounds`. Use `@Environment(\.horizontalSizeClass)` / `verticalSizeClass` and the size the view is given.
+2. **One readable column.** Wrap each screen's scroll content in `ReadableColumn` (a DesignSystem component: `frame(maxWidth: 640)` centered, with `Spacing.l` side padding). On iPhone portrait it's full width. On iPad it stays readable.
+3. **No fixed widths or heights** on cards, grids, or the calendar. Use flexible frames, `GridItem(.adaptive(minimum:))`, and `ViewThatFits`.
+4. **Navigation that can split.** Progress → Metric Detail uses `NavigationStack` with value-based `navigationDestination(for: UUID.self)`, so Phase 15 can swap it for `NavigationSplitView` on regular width without touching the detail screen.
+5. **Full-screen flows** (Urge, Onboarding, Lock) center their content in a `ReadableColumn` and never assume portrait height. Put the breathing circle and the buttons in a `ViewThatFits(in: .vertical)` that falls back to a horizontal arrangement when height is short.
+6. **Previews:** every screen gets one extra landscape preview (`#Preview(traits: .landscapeLeft)`). It doesn't have to look final, but nothing may clip or overlap. That keeps Phase 15 small.
 
 ---
 
@@ -1414,7 +1428,7 @@ Do these in order:
 
 1. Build `Spacing`, `TypeScale`, and every component in §8.4 under `DesignSystem/Components/`.
 2. `DayVisualState` enum (`.confirmedFree, .presumedFree, .slipped, .habitDone, .missed, .todayPending, .inactive`) lives in `DesignSystem` with color + shape + accessibility label mappings. Add a mapping from `DayState` (Domain) in `Data/Snapshots.swift` or in the feature view models.
-3. Previews: light, dark, `.dynamicTypeSize(.accessibility3)`.
+3. Previews: light, dark, `.dynamicTypeSize(.accessibility3)`, and landscape (`#Preview(traits: .landscapeLeft)`) per §8.7.
 
 **DoD:** builds. Contrast tests pass. You've checked each preview in Xcode at AX3, and nothing clips.
 **Commit:** `Add TrackBoth design system tokens and core components.`
@@ -1566,6 +1580,22 @@ Do these in order:
 
 A single small widget plus a lock-screen accessory: "N days free" for one chosen vice (with discreet mode showing only "N days"). It needs an App Group (`group.com.jacobrozell.TrackBoth`) in both entitlements, and the app writes a tiny snapshot JSON to the group container after each data change. Spec it first in `Specs/ProductSpec.md`. Don't revive the old 8-configuration widget code.
 
+### Phase 15 — (Future release) iPad + portrait/landscape on both devices (D6)
+
+**Goal:** TrackBoth runs well on iPhone and iPad, in portrait and landscape. Thanks to §8.7 this should be mostly configuration plus a few regular-width layouts.
+
+1. `project.yml`: `TARGETED_DEVICE_FAMILY: "1,2"`. `INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight`. `INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad`: all four. Turn off `UIRequiresFullScreen` so iPad multitasking (Split View, Slide Over, Stage Manager) works.
+2. **Regular width** (iPad, and big iPhones in landscape): Progress uses `NavigationSplitView` (metric list in the sidebar, Metric Detail in the detail column). Today shows "Quitting" and "Building" side by side in two columns (`ViewThatFits` or `horizontalSizeClass == .regular`). The check-in and slip sheets use `.presentationSizing(.form)`.
+3. **Compact height** (iPhone landscape): Today keeps one column. The SOS button stays pinned. The Urge flow uses the horizontal arrangement from §8.7 rule 5.
+4. **The tab bar stays a `TabView`.** On iPad (iPadOS 18+) it becomes the top tab bar automatically. Don't build a custom sidebar.
+5. **Keyboard (iPad):** ⌘N new metric, ⌘U urge flow, ⌘K check-in (`.keyboardShortcut`).
+6. **Tests:** UI test the core loop (check-in, urge, slip) on an iPad simulator in landscape and on iPhone in landscape. Add `DeviceMatrix` rows to the QA doc: iPad mini, iPad Air 11", iPad Pro 13", Split View ⅓ and ½.
+7. **App Store:** 13" iPad screenshots (2064×2752) of the same 5 scenes. Update the description if it mentions iPhone only.
+8. **Docs:** turn §8.7 into a "Shipped" section in `Specs/DesignSystemSpec.md`, and update the feature inventory.
+
+**DoD:** zero clipping or overlap at AX3 in all four device/orientation combinations, and the core-loop UI tests pass on iPad landscape.
+**Commit:** `Add iPad and landscape support with adaptive regular-width layouts.`
+
 ---
 
 ## 11. Test plan
@@ -1696,3 +1726,4 @@ Custom vices use the verb phrase "do it". **Verify every SF Symbol name** in the
 | Date | Phase | Commit | Result | Notes / decisions taken / unverified items |
 |------|-------|--------|--------|--------------------------------------------|
 | 2026-10-28 | Plan | — | Plan written | Awaiting Decision Gates sign-off (§3) |
+| 2026-10-28 | Plan | — | Gates answered | Owner: D1 fresh data ✅, D3 I Am Sober model ✅, D5 free/slip ✅, D9 subtitle ✅, D6 iPhone portrait for 1.0, iPad + both orientations later (Phase 15, adaptive-ready rules in §8.7). Other gates use their defaults. **Ready for Phase 0.** |
