@@ -1,0 +1,143 @@
+{
+  "schemaVersion": 4,
+  "exportDate": "2026-06-15T16:00:00Z",
+  "metrics": [
+    {
+      "id": "A1111111-1111-4111-8111-111111111111",
+      "name": "Go for a walk",
+      "createdAt": "2026-10-01T13:00:00Z",
+      "habitType": "positive",
+      "hasBeenLogged": true,
+      "primaryMotivation": null,
+      "costPerUnit": null
+    },
+    {
+      "id": "B2222222-2222-4222-8222-222222222222",
+      "name": "Alcohol",
+      "createdAt": "2026-10-01T13:00:00Z",
+      "habitType": "vice",
+      "hasBeenLogged": true,
+      "primaryMotivation": "For my health",
+      "costPerUnit": "8"
+    }
+  ],
+  "entries": [
+    {
+      "id": "C1000001-0000-4000-8000-000000000001",
+      "metricID": "A1111111-1111-4111-8111-111111111111",
+      "date": "2026-10-10T16:00:00Z",
+      "value": true,
+      "details": null,
+      "motivation": null,
+      "starred": null,
+      "quantity": null,
+      "unit": null,
+      "mood": null,
+      "hasBeenLogged": true
+    },
+    {
+      "id": "C1000001-0000-4000-8000-000000000002",
+      "metricID": "A1111111-1111-4111-8111-111111111111",
+      "date": "2026-10-11T16:00:00Z",
+      "value": true,
+      "details": null,
+      "motivation": null,
+      "starred": null,
+      "quantity": null,
+      "unit": null,
+      "mood": null,
+      "hasBeenLogged": true
+    },
+    {
+      "id": "C1000001-0000-4000-8000-000000000003",
+      "metricID": "A1111111-1111-4111-8111-111111111111",
+      "date": "2026-10-12T16:00:00Z",
+      "value": true,
+      "details": "Morning loop",
+      "motivation": null,
+      "starred": false,
+      "quantity": 2,
+      "unit": "miles",
+      "mood": "calm",
+      "hasBeenLogged": true
+    },
+    {
+      "id": "C1000001-0000-4000-8000-000000000004",
+      "metricID": "A1111111-1111-4111-8111-111111111111",
+      "date": "2026-10-09T16:00:00Z",
+      "value": false,
+      "details": "Skipped",
+      "motivation": null,
+      "starred": false,
+      "quantity": null,
+      "unit": null,
+      "mood": null,
+      "hasBeenLogged": true
+    },
+    {
+      "id": "C2000001-0000-4000-8000-000000000001",
+      "metricID": "B2222222-2222-4222-8222-222222222222",
+      "date": "2026-10-02T16:00:00Z",
+      "value": false,
+      "details": "Stayed in",
+      "motivation": null,
+      "starred": null,
+      "quantity": null,
+      "unit": null,
+      "mood": null,
+      "hasBeenLogged": true
+    },
+    {
+      "id": "C2000001-0000-4000-8000-000000000002",
+      "metricID": "B2222222-2222-4222-8222-222222222222",
+      "date": "2026-10-05T16:00:00Z",
+      "value": true,
+      "details": "After dinner",
+      "motivation": null,
+      "starred": null,
+      "quantity": null,
+      "unit": null,
+      "mood": null,
+      "hasBeenLogged": true
+    },
+    {
+      "id": "C2000001-0000-4000-8000-000000000003",
+      "metricID": "B2222222-2222-4222-8222-222222222222",
+      "date": "2026-10-03T16:00:00Z",
+      "value": false,
+      "details": null,
+      "motivation": "Remember my kids",
+      "starred": true,
+      "quantity": null,
+      "unit": null,
+      "mood": null,
+      "hasBeenLogged": false
+    },
+    {
+      "id": "C2000001-0000-4000-8000-000000000004",
+      "metricID": "B2222222-2222-4222-8222-222222222222",
+      "date": "2026-10-04T16:00:00Z",
+      "value": false,
+      "details": null,
+      "motivation": "I want to feel clear",
+      "starred": false,
+      "quantity": null,
+      "unit": null,
+      "mood": null,
+      "hasBeenLogged": false
+    }
+  ],
+  "goals": [
+    {
+      "id": "D4444444-4444-4444-8444-444444444444",
+      "metricID": "B2222222-2222-4222-8222-222222222222",
+      "goalType": "boolean",
+      "period": "weekly",
+      "target": 5,
+      "createdAt": "2026-10-01T13:00:00Z",
+      "quantityGoalType": null,
+      "defaultUnit": null,
+      "maxDailyQuantity": null
+    }
+  ]
+}
