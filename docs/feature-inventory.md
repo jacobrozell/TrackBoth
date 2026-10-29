@@ -24,11 +24,11 @@ Living register for the recovery overhaul. Every new feature starts as **Planned
 | Slip flow | **Ships 1.0** | Phase 6. Amber, no guilt copy |
 | Milestone celebration, re-earnable after a slip | **Ships 1.0** | Phase 6. Ledger records when Keep going is tapped |
 | Progress + metric detail + day editor | **Planned** | Phase 7. Progress already shows the urges-beaten count |
-| Add / edit metric | **Planned** | Phase 7 |
-| Onboarding (quit date, reason, reminders, lock, disclaimer) | **Planned** | Phase 8 |
-| Daily reminder + milestone notifications | **Planned** | Phase 9. At most one check-in a day |
-| App lock and app-switcher privacy cover | **Planned** | Phase 9. Off by default |
-| Settings, backup/restore, delete all, crisis resources | **Planned** | Phase 10 |
+| Add / edit metric | **Ships 1.0** | Progress and Today both open the form |
+| Onboarding (quit date, reason, reminders, lock, disclaimer) | **Ships 1.0** | Built. Unit-tested draft mapping. UI test not run |
+| Daily reminder + milestone notifications | **Ships 1.0** | Scheduler and settings toggle. Not fired on a device yet |
+| App lock and app-switcher privacy cover | **Ships 1.0** | Built. Not checked on a device |
+| Settings, backup/restore, delete all, crisis resources | **Ships 1.0** | v5 round-trip unit-tested. Legacy import code exists, not retested this pass |
 | Home-screen quick action and `trackboth://urge` | **Ships 1.0** | Phase 6 |
 
 ## Cut from the pre-overhaul app

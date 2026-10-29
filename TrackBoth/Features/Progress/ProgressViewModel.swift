@@ -11,6 +11,7 @@ struct ProgressCardModel: Identifiable, Equatable {
     var id: UUID
     var name: String
     var iconName: String
+    var habitType: HabitType
     var line: String
     var isArchived: Bool
 }
@@ -79,6 +80,6 @@ final class ProgressViewModel {
                 counted: 30
             )
         }
-        return ProgressCardModel(id: metric.id, name: metric.name, iconName: metric.iconName, line: line, isArchived: metric.isArchived)
+        return ProgressCardModel(id: metric.id, name: metric.name, iconName: metric.iconName, habitType: metric.habitType, line: line, isArchived: metric.isArchived)
     }
 }

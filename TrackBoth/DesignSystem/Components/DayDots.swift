@@ -5,26 +5,14 @@ struct DayDots: View {
     var labels: [String] = []
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: Spacing.s) {
-                marks
-            }
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: Spacing.s)], spacing: Spacing.s) {
-                marks
+        HStack(spacing: Spacing.m) {
+            ForEach(Array(states.enumerated()), id: \.offset) { index, state in
+                DayMark(state: state, size: 16)
+                    .accessibilityLabel(spoken(index: index, state: state))
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .contain)
-    }
-
-    @ViewBuilder
-    private var marks: some View {
-        ForEach(Array(states.enumerated()), id: \.offset) { index, state in
-            DayMark(state: state)
-                .frame(minWidth: 44, minHeight: 44)
-                .accessibilityElement()
-                .accessibilityLabel(spoken(index: index, state: state))
-        }
+        .accessibilityHidden(true)
     }
 
     private func spoken(index: Int, state: DayVisualState) -> String {

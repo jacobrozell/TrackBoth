@@ -1,0 +1,202 @@
+import Foundation
+import Observation
+
+struct OnboardingChoice: Identifiable, Equatable {
+    var id: String
+    var name: String
+    var iconName: String
+    var verb: String
+}
+
+struct OnboardingMetricDraft: Equatable {
+    var name: String
+    var habitType: HabitType
+    var iconName: String
+    var startedAt: Date
+    var costPerDay: Decimal?
+    var firstReason: String?
+}
+
+@MainActor
+@Observable
+final class OnboardingViewModel {
+    enum When: String, Equatable {
+        case today, yesterday, picked
+    }
+
+    struct ViceDetail: Equatable {
+        var when: When = .today
+        var pickedDay: Date
+        var costText: String = ""
+    }
+
+    enum Page: Equatable {
+        case welcome
+        case chooseVices
+        case viceWhen(String)
+        case why
+        case habits
+        case reminders
+        case privacy
+        case disclaimer
+    }
+
+    var habitOnly = false
+    var selectedViceIDs: [String] = []
+    var customViceName = ""
+    var viceDetails: [String: ViceDetail] = [:]
+    var reasonText = ""
+    var selectedHabitIDs: [String] = []
+    var customHabitName = ""
+    var reminderHour = 20
+    var reminderMinute = 0
+    var wantsReminders = false
+    var wantsLock = false
+    var acceptedDisclaimer = false
+    var pageIndex = 0
+    var lockAvailable = true
+
+    private let maxChoices = 3
+
+    var pages: [Page] {
+        var result: [Page] = [.welcome, .chooseVices]
+        if !habitOnly {
+            result.append(contentsOf: viceChoices.map { .viceWhen($0.id) })
+            result.append(.why)
+        }
+        result.append(contentsOf: [.habits, .reminders])
+        if lockAvailable { result.append(.privacy) }
+        result.append(.disclaimer)
+        return result
+    }
+
+    var page: Page { pages[min(pageIndex, pages.count - 1)] }
+    var canGoBack: Bool { pageIndex > 0 }
+    var isLastPage: Bool { pageIndex >= pages.count - 1 }
+
+    var viceChoices: [OnboardingChoice] {
+        var result: [OnboardingChoice] = []
+        for id in selectedViceIDs {
+            guard let preset = Presets.vices.first(where: { $0.id == id }) else { continue }
+            result.append(OnboardingChoice(id: preset.id, name: preset.name, iconName: preset.iconName, verb: preset.lastUseVerb))
+        }
+        let custom = customViceName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !custom.isEmpty, result.count < maxChoices {
+            result.append(OnboardingChoice(id: "custom", name: custom, iconName: Presets.fallbackIcon, verb: Presets.customVerb))
+        }
+        return result
+    }
+
+    var habitChoices: [OnboardingChoice] {
+        var result: [OnboardingChoice] = []
+        for id in selectedHabitIDs {
+            guard let preset = Presets.habits.first(where: { $0.id == id }) else { continue }
+            result.append(OnboardingChoice(id: preset.id, name: preset.name, iconName: preset.iconName, verb: ""))
+        }
+        let custom = customHabitName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !custom.isEmpty, result.count < maxChoices {
+            result.append(OnboardingChoice(id: "custom-habit", name: custom, iconName: Presets.fallbackIcon, verb: ""))
+        }
+        return result
+    }
+
+    var canAdvance: Bool {
+        switch page {
+        case .chooseVices:
+            return habitOnly || !viceChoices.isEmpty
+        case .disclaimer:
+            return acceptedDisclaimer
+        default:
+            return true
+        }
+    }
+
+    func toggleVice(_ id: String) {
+        habitOnly = false
+        if let index = selectedViceIDs.firstIndex(of: id) {
+            selectedViceIDs.remove(at: index)
+        } else if viceChoices.count < maxChoices {
+            selectedViceIDs.append(id)
+        }
+    }
+
+    func toggleHabit(_ id: String) {
+        if let index = selectedHabitIDs.firstIndex(of: id) {
+            selectedHabitIDs.remove(at: index)
+        } else if habitChoices.count < maxChoices {
+            selectedHabitIDs.append(id)
+        }
+    }
+
+    func chooseHabitsOnly() {
+        habitOnly = true
+        selectedViceIDs = []
+        customViceName = ""
+    }
+
+    func detail(for id: String, now: Date) -> ViceDetail {
+        if let existing = viceDetails[id] { return existing }
+        return ViceDetail(pickedDay: now)
+    }
+
+    func setDetail(_ detail: ViceDetail, for id: String) {
+        viceDetails[id] = detail
+    }
+
+    func goBack() {
+        pageIndex = max(0, pageIndex - 1)
+    }
+
+    func advance() {
+        guard canAdvance else { return }
+        pageIndex = min(pages.count - 1, pageIndex + 1)
+    }
+
+    func drafts(now: Date, calendar: Calendar) -> [OnboardingMetricDraft] {
+        var drafts: [OnboardingMetricDraft] = []
+        if !habitOnly {
+            let reason = reasonText.trimmingCharacters(in: .whitespacesAndNewlines)
+            for (index, vice) in viceChoices.enumerated() {
+                let detail = detail(for: vice.id, now: now)
+                drafts.append(OnboardingMetricDraft(
+                    name: vice.name,
+                    habitType: .vice,
+                    iconName: vice.iconName,
+                    startedAt: startedAt(detail, now: now, calendar: calendar),
+                    costPerDay: cost(detail.costText),
+                    firstReason: index == 0 && !reason.isEmpty ? reason : nil
+                ))
+            }
+        }
+        for habit in habitChoices {
+            drafts.append(OnboardingMetricDraft(
+                name: habit.name,
+                habitType: .positive,
+                iconName: habit.iconName,
+                startedAt: now,
+                costPerDay: nil,
+                firstReason: nil
+            ))
+        }
+        return drafts
+    }
+
+    func startedAt(_ detail: ViceDetail, now: Date, calendar: Calendar) -> Date {
+        switch detail.when {
+        case .today:
+            return now
+        case .yesterday:
+            let yesterday = calendar.date(byAdding: .day, value: -1, to: now) ?? now
+            return DayMath.endOfDay(yesterday, calendar: calendar)
+        case .picked:
+            if calendar.isDate(detail.pickedDay, inSameDayAs: now) { return now }
+            return DayMath.endOfDay(detail.pickedDay, calendar: calendar)
+        }
+    }
+
+    private func cost(_ text: String) -> Decimal? {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, let value = Decimal(string: trimmed), value > 0 else { return nil }
+        return value
+    }
+}

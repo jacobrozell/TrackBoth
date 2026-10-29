@@ -32,7 +32,8 @@ struct ViceCard: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(Spacing.l)
+            .padding(.horizontal, Spacing.l)
+            .padding(.vertical, Spacing.m)
             .background(Color.tbSurface, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
         }
         .buttonStyle(.plain)

@@ -56,6 +56,8 @@ enum BackupService {
             throw BackupError.invalid
         }
         try store.replaceAll(metrics: built.metrics, entries: built.entries, urges: built.urges, reasons: built.reasons)
+        Preferences.hasCompletedOnboarding = true
+        Preferences.hasAcceptedDisclaimer = true
     }
 
     // MARK: Decode

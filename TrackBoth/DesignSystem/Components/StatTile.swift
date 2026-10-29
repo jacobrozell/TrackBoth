@@ -6,21 +6,23 @@ struct StatTile: View {
     var systemImage: String
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.s) {
-            Image(systemName: systemImage)
-                .font(.body)
-                .foregroundStyle(Color.tbBrand)
-                .accessibilityHidden(true)
-            Text(value)
-                .bigNumberStyle()
-                .foregroundStyle(Color.tbTextPrimary)
-                .fixedSize(horizontal: false, vertical: true)
-            Text(label)
-                .font(.footnote)
-                .foregroundStyle(Color.tbTextSecondary)
-                .fixedSize(horizontal: false, vertical: true)
+        Card {
+            VStack(alignment: .leading, spacing: Spacing.s) {
+                Image(systemName: systemImage)
+                    .font(.body)
+                    .foregroundStyle(Color.tbBrand)
+                    .accessibilityHidden(true)
+                Text(value)
+                    .bigNumberStyle()
+                    .foregroundStyle(Color.tbTextPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                Text(label)
+                    .font(.footnote)
+                    .foregroundStyle(Color.tbTextSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(label), \(value)")
     }

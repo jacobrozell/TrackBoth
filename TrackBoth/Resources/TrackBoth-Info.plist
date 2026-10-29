@@ -13,21 +13,21 @@
 			</array>
 		</dict>
 	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>wind</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>I'm having an urge</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.jacobrozell.TrackBoth.urge</string>
+		</dict>
+	</array>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
 		<string>LaunchBackground</string>
 	</dict>
-	<key>UIApplicationShortcutItems</key>
-	<array>
-		<dict>
-			<key>UIApplicationShortcutItemType</key>
-			<string>com.jacobrozell.TrackBoth.urge</string>
-			<key>UIApplicationShortcutItemTitle</key>
-			<string>I'm having an urge</string>
-			<key>UIApplicationShortcutItemIconSymbolName</key>
-			<string>wind</string>
-		</dict>
-	</array>
 </dict>
 </plist>

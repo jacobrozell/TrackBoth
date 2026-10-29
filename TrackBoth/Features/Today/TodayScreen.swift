@@ -11,46 +11,63 @@ struct TodayScreen: View {
     @State private var model = TodayViewModel()
     @State private var sheet: TodaySheet?
     @State private var dismissedYesterday = Preferences.dismissedYesterdayPromptDay
+    @State private var didPresentSlip = false
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                ReadableColumn {
-                    VStack(alignment: .leading, spacing: Spacing.m) {
-                        if let prompt = model.yesterdayPrompt {
-                            YesterdayPrompt(name: prompt.name) {
-                                confirmYesterday(prompt.metricID)
-                            } onSlipped: {
-                                sheet = .slip(prompt.metricID)
-                            } onDismiss: {
-                                dismissYesterday()
+            VStack(spacing: 0) {
+                ScrollView {
+                    ReadableColumn {
+                        VStack(alignment: .leading, spacing: Spacing.m) {
+                            if let prompt = model.yesterdayPrompt {
+                                YesterdayPrompt(name: prompt.name) {
+                                    confirmYesterday(prompt.metricID)
+                                } onSlipped: {
+                                    sheet = .slip(prompt.metricID)
+                                } onDismiss: {
+                                    dismissYesterday()
+                                }
+                            }
+                            if model.checkInRemaining > 0 {
+                                CheckInBanner(remaining: model.checkInRemaining) { router.present(.checkIn) }
+                            }
+                            if model.isEmpty {
+                                EmptyState(
+                                    systemImage: "sun.max",
+                                    title: RecoveryCopy.startWithOneThing,
+                                    message: RecoveryCopy.startWithOneThingMessage,
+                                    actionTitle: RecoveryCopy.addSomething
+                                ) { sheet = .add }
+                            }
+                            if !model.vices.isEmpty {
+                                VStack(alignment: .leading, spacing: Spacing.s) {
+                                    SectionHeader(RecoveryCopy.quitting)
+                                    VStack(spacing: Spacing.m) {
+                                        ForEach(model.vices) { card in
+                                            ViceCard(model: card, calendar: model.calendar) { sheet = .detail(card.id) }
+                                        }
+                                    }
+                                }
+                            }
+                            if !model.habits.isEmpty {
+                                VStack(alignment: .leading, spacing: Spacing.s) {
+                                    SectionHeader(RecoveryCopy.building)
+                                    VStack(spacing: Spacing.s) {
+                                        ForEach(model.habits) { row in
+                                            HabitCheckRow(model: row, onToggle: { toggleHabit(row.id) }, onOpen: { sheet = .detail(row.id) })
+                                        }
+                                    }
+                                }
                             }
                         }
-                        if model.checkInRemaining > 0 {
-                            CheckInBanner(remaining: model.checkInRemaining) { router.present(.checkIn) }
-                        }
-                        if model.isEmpty {
-                            EmptyState(
-                                systemImage: "sun.max",
-                                title: RecoveryCopy.startWithOneThing,
-                                message: RecoveryCopy.startWithOneThingMessage,
-                                actionTitle: RecoveryCopy.addSomething
-                            ) { sheet = .add }
-                        }
-                        if !model.vices.isEmpty {
-                            SectionHeader(RecoveryCopy.quitting)
-                            ForEach(model.vices) { card in
-                                ViceCard(model: card, calendar: model.calendar) { sheet = .detail(card.id) }
-                            }
-                        }
-                        if !model.habits.isEmpty {
-                            SectionHeader(RecoveryCopy.building)
-                            ForEach(model.habits) { row in
-                                HabitCheckRow(model: row, onToggle: { toggleHabit(row.id) }, onOpen: { sheet = .detail(row.id) })
-                            }
-                        }
+                        .padding(.top, Spacing.s)
+                        .padding(.bottom, Spacing.m)
                     }
-                    .padding(.vertical, Spacing.m)
+                }
+                if model.showsSOS {
+                    SOSButton {
+                        router.present(.urge(nil))
+                    }
                 }
             }
             .background(Color.tbBackground)
@@ -61,18 +78,18 @@ struct TodayScreen: View {
                     Text(Date().formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
                         .font(.subheadline)
                         .foregroundStyle(Color.tbTextSecondary)
-                }
-            }
-            .safeAreaInset(edge: .bottom) {
-                if model.showsSOS {
-                    SOSButton {
-                        router.present(.urge(nil))
-                    }
+                        .accessibilityLabel(Date().formatted(date: .complete, time: .omitted))
                 }
             }
         }
-        .onAppear { refresh() }
-        .onChange(of: snapshotToken) { refresh() }
+        .onAppear {
+            refresh()
+            presentSlipIfNeeded()
+        }
+        .onChange(of: snapshotToken) {
+            refresh()
+            presentSlipIfNeeded()
+        }
         .sheet(item: $sheet) { sheet in
             switch sheet {
             case .slip(let id):
@@ -80,7 +97,7 @@ struct TodayScreen: View {
                     SlipFlowView(metric: metric, prefilledTriggers: []) { self.sheet = nil }
                 }
             case .add:
-                FlowStub(title: RecoveryCopy.addSomething, message: RecoveryCopy.addStub) { self.sheet = nil }
+                MetricFormView(metric: nil)
             case .detail(let id):
                 if let metric = metrics.first(where: { $0.id == id }) {
                     NavigationStack { MetricDetailScreen(metric: metric) }
@@ -97,6 +114,13 @@ struct TodayScreen: View {
 
     private func refresh() {
         model.update(metrics: metrics, entries: entries, now: Date(), dismissedYesterday: dismissedYesterday)
+    }
+
+    private func presentSlipIfNeeded() {
+        guard LaunchConfiguration.presentsSlip, !didPresentSlip,
+              let vice = metrics.first(where: { $0.habitType == .vice && !$0.isArchived }) else { return }
+        didPresentSlip = true
+        sheet = .slip(vice.id)
     }
 
     private func toggleHabit(_ id: UUID) {

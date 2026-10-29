@@ -43,7 +43,7 @@ final class MetricDetailViewModel {
                     (RecoveryCopy.currentRun, "\(days)"),
                     (RecoveryCopy.longestRun, "\(RecoveryMath.longestRunDays(history, now: now, calendar: calendar))"),
                     (RecoveryCopy.freeLast30, "\(window.free)/\(window.counted)"),
-                    (RecoveryCopy.savedStat, saved.map { RecoveryCopy.saved($0, locale: locale) } ?? "—")
+                    (RecoveryCopy.savedStat, saved.map { RecoveryCopy.money($0, locale: locale) } ?? "—")
                 ],
                 plan: metric.ifThenPlan ?? "",
                 urgeLine: urgeLine(urges.filter { $0.metricID == metric.id }),

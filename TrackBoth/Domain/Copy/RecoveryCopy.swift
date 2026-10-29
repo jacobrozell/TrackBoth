@@ -6,7 +6,12 @@ enum RecoveryCopy {
     }
 
     static func clock(days: Int, hours: Int, minutes: Int) -> String {
-        if days > 0 { return "\(days)d \(hours)h \(minutes)m" }
+        if days > 0 {
+            var parts = ["\(days)d"]
+            if hours > 0 { parts.append("\(hours)h") }
+            if minutes > 0 { parts.append("\(minutes)m") }
+            return parts.joined(separator: " ")
+        }
         if hours > 0 { return "\(hours)h \(minutes)m" }
         if minutes > 0 { return "\(minutes)m" }
         return "Just started"
@@ -16,10 +21,13 @@ enum RecoveryCopy {
         clock(days: components.day ?? 0, hours: components.hour ?? 0, minutes: components.minute ?? 0)
     }
 
-    static func saved(_ amount: Decimal, locale: Locale = .current) -> String {
+    static func money(_ amount: Decimal, locale: Locale = .current) -> String {
         let code = locale.currency?.identifier ?? "USD"
-        let formatted = amount.formatted(.currency(code: code).locale(locale))
-        return "\(formatted) saved"
+        return amount.formatted(.currency(code: code).locale(locale))
+    }
+
+    static func saved(_ amount: Decimal, locale: Locale = .current) -> String {
+        "\(money(amount, locale: locale)) saved"
     }
 
     static func freeOfLast(free: Int, counted: Int) -> String {
@@ -83,10 +91,6 @@ enum RecoveryCopy {
     static let done = "Done"
     static let backToToday = "Back to Today"
     static let close = "Close"
-    static let urgeFlowStub = "Urge flow — Phase 6"
-    static let slipFlowStub = "Slip flow — Phase 6"
-    static let detailStub = "Detail comes in the next update."
-    static let addStub = "Adding a metric comes in the next update."
 
     static func yesterdayPrompt(_ name: String) -> String {
         "Yesterday: were you free from \(name)?"
@@ -138,11 +142,11 @@ enum RecoveryCopy {
     static func urgesBeatenCount(_ count: Int) -> String { "\(urgesBeaten) \(count)" }
 
     static func viceProgress(days: Int, longest: Int, free: Int, counted: Int) -> String {
-        "\(daysFree(days)) · longest \(longest) · \(free)/\(counted) days"
+        "\(daysFree(days))\nLongest \(longest) days · \(free)/\(counted) days"
     }
 
     static func habitProgress(run: Int, best: Int, done: Int, counted: Int) -> String {
-        "\(habitRun(run)) · best \(best) · \(done)/\(counted) days"
+        "\(habitRun(run))\nBest \(best) days · \(done)/\(counted) days"
     }
 
     static let totalSaved = "Total saved"
@@ -188,4 +192,85 @@ enum RecoveryCopy {
     static func milestoneNotificationBody(_ threshold: Int, name: String) -> String {
         "You reached \(threshold) days free from \(name). Open TrackBoth to celebrate."
     }
+
+    static let welcomeTitle = "Quit what's hurting you. Build what helps."
+    static let welcomeLine1 = "Check in once a day. It takes about 10 seconds."
+    static let welcomeLine2 = "When an urge hits, ride it out."
+    static let welcomeLine3 = "A slip restarts the clock. It does not erase your progress."
+    static let getStarted = "Get started"
+    static let whatToQuit = "What do you want to quit?"
+    static let somethingElse = "Something else…"
+    static let habitOnlyLink = "I only want to build habits"
+    static let pickUpToThree = "Pick up to 3."
+    static let whatDoesItCost = "What does it cost you per day?"
+    static let optional = "Optional"
+    static let forMyHealth = "For my health…"
+    static let forMyFamily = "For my family…"
+    static let toSaveMoney = "To save money…"
+    static let toFeelInControl = "To feel in control…"
+    static let whatHelps = "What helps you?"
+    static let dailyCheckInTime = "Daily check-in time"
+    static let reminderExplainer = "We'll send one gentle reminder a day. Nothing else."
+    static let turnOnReminders = "Turn on reminders"
+    static let notNow = "Not now"
+    static let keepPrivate = "Keep it private?"
+    static let lockPrompt = "Lock TrackBoth when you leave the app."
+    static let turnOn = "Turn on"
+    static let important = "Important"
+    static let iUnderstand = "I understand"
+    static let next = "Next"
+    static let back = "Back"
+    static let onboardingToday = "Today"
+    static func whenDidYouLast(_ verb: String) -> String { "When did you last \(verb)?" }
+    static func whyQuitNamed(_ name: String) -> String {
+        name.isEmpty ? "Why does this matter?" : "Why do you want to quit \(name)?"
+    }
+    static func onboardingProgress(current: Int, total: Int) -> String { "Step \(current) of \(total)" }
+
+    static let settingsReminders = "Reminders"
+    static let dailyCheckInToggle = "Daily check-in"
+    static let time = "Time"
+    static let milestoneNotifications = "Milestone notifications"
+    static let discreetNotifications = "Discreet notifications"
+    static let discreetFooter = "Hides habit and vice names on your lock screen."
+    static let privacySection = "Privacy"
+    static let lockFaceID = "Lock with Face ID"
+    static let lockTouchID = "Lock with Touch ID"
+    static let lockOpticID = "Lock with Optic ID"
+    static let lockPasscode = "Lock with passcode"
+    static let noPasscodeNote = "Set a device passcode to lock TrackBoth."
+    static let appearanceSection = "Appearance"
+    static let systemAppearance = "System"
+    static let lightAppearance = "Light"
+    static let darkAppearance = "Dark"
+    static let yourData = "Your data"
+    static let exportBackup = "Export backup"
+    static let importBackup = "Import backup"
+    static let deleteAll = "Delete all data"
+    static let deleteAllConfirm = "Delete everything on this device?"
+    static let deleteAllSecond = "This removes your vices, habits, and history. This can't be undone."
+    static let continueDelete = "Continue"
+    static let supportSection = "Support"
+    static let contactSupport = "Contact support"
+    static let privacyPolicy = "Privacy policy"
+    static let rateTrackBoth = "Rate TrackBoth"
+    static let aboutSection = "About"
+    static let version = "Version"
+    static let accessibilityStatement = "Accessibility statement"
+    static let replaceBackup = "This replaces everything on this device with the backup."
+    static let newerBackup = "This backup is from a newer version of TrackBoth."
+    static let invalidBackup = "This file isn't a TrackBoth backup."
+    static let backupProblem = "Backup"
+    static let lockedTitle = "TrackBoth is locked"
+    static let unlock = "Unlock"
+    static let unlockReason = "Unlock TrackBoth"
+    static let crisisImmediate = "If you're in immediate danger, call 911 or your local emergency number."
+    static let crisis988 = "988 Suicide & Crisis Lifeline"
+    static let call988 = "Call 988"
+    static let text988 = "Text 988"
+    static let crisisSAMHSA = "SAMHSA National Helpline"
+    static let crisisSAMHSADetail = "1-800-662-4357. Free, confidential, 24/7, English and Spanish."
+    static let callSAMHSA = "Call 1-800-662-4357"
+    static let crisisOutside = "Outside the US, find a helpline"
+    static let crisisMedical = "Stopping alcohol, benzodiazepines, or opioids suddenly can be dangerous. Talk to a doctor or pharmacist."
 }

@@ -18,7 +18,7 @@
 
 ## Current focus
 
-**Recovery overhaul.** Phases 0–6 are committed and green. Phase 7 (Progress, metric detail, metric form) is checkpointed and not yet built or tested. Next: finish Phase 7, then Phase 8 onboarding.
+**Recovery overhaul.** Onboarding, Settings, reminders, and app lock are in the working tree and not committed yet. Phases 0–6 are on the branch. Phase 7 is still a checkpoint. Next: commit this pass, finish Phase 7's UI check, then the accessibility and App Store phases.
 
 The app has never shipped. Build 5 was archived on 2026-06-22 and never uploaded. There is no production data to migrate.
 

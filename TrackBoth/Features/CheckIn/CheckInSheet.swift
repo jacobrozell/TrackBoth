@@ -53,16 +53,32 @@ struct CheckInSheet: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                ReadableColumn {
-                    VStack(alignment: .leading, spacing: Spacing.l) {
-                        if let model, model.showComplete {
-                            CheckInCompleteView(lines: model.lines)
-                        } else if let model {
-                            form(model)
+            VStack(spacing: 0) {
+                ScrollView {
+                    ReadableColumn {
+                        VStack(alignment: .leading, spacing: Spacing.m) {
+                            if let model, model.showComplete {
+                                CheckInCompleteView(lines: model.lines)
+                            } else if let model {
+                                form(model)
+                            }
                         }
+                        .padding(.top, Spacing.s)
+                        .padding(.bottom, Spacing.m)
                     }
-                    .padding(.vertical, Spacing.l)
+                }
+                if let model {
+                    PrimaryButton(
+                        title: model.showComplete ? RecoveryCopy.backToToday : RecoveryCopy.done,
+                        systemImage: nil,
+                        accessibilityID: AccessibilityIdentifiers.checkInDone,
+                        action: { finish(model) }
+                    )
+                    .disabled(!model.showComplete && !model.canFinish)
+                    .padding(.horizontal, Spacing.l)
+                    .padding(.top, Spacing.s)
+                    .padding(.bottom, Spacing.s)
+                    .background(Color.tbBackground)
                 }
             }
             .background(Color.tbBackground)
@@ -72,23 +88,10 @@ struct CheckInSheet: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(RecoveryCopy.close) { dismiss() }
                 }
-                ToolbarItem(placement: .principal) {
+                ToolbarItem(placement: .topBarTrailing) {
                     Text(Date().formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
                         .font(.subheadline)
                         .foregroundStyle(Color.tbTextSecondary)
-                }
-            }
-            .safeAreaInset(edge: .bottom) {
-                if let model {
-                    PrimaryButton(
-                        title: model.showComplete ? RecoveryCopy.backToToday : RecoveryCopy.done,
-                        systemImage: nil,
-                        accessibilityID: AccessibilityIdentifiers.checkInDone,
-                        action: { finish(model) }
-                    )
-                    .disabled(!model.showComplete && !model.canFinish)
-                    .padding(Spacing.l)
-                    .background(Color.tbBackground)
                 }
             }
         }
@@ -106,65 +109,83 @@ struct CheckInSheet: View {
         entries.map { "\($0.metricID.uuidString):\($0.statusRaw)" }.joined()
     }
 
-    @ViewBuilder
     private func form(_ model: CheckInViewModel) -> some View {
-        ForEach(model.vices) { row in
-            VStack(alignment: .leading, spacing: Spacing.s) {
-                Text(row.name)
-                    .font(.headline)
-                    .foregroundStyle(Color.tbTextPrimary)
-                if row.answer == .slipped {
-                    Text(RecoveryCopy.slipLoggedThanks)
-                        .font(.body)
-                        .foregroundStyle(Color.tbTextSecondary)
-                } else {
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: Spacing.s) { answerButtons(row) }
-                        VStack(spacing: Spacing.s) { answerButtons(row) }
+        VStack(alignment: .leading, spacing: Spacing.m) {
+            ForEach(model.vices) { row in
+                VStack(alignment: .leading, spacing: Spacing.s) {
+                    Text(row.name)
+                        .font(.headline)
+                        .foregroundStyle(Color.tbTextPrimary)
+                    if row.answer == .slipped {
+                        Text(RecoveryCopy.slipLoggedThanks)
+                            .font(.body)
+                            .foregroundStyle(Color.tbTextSecondary)
+                    } else {
+                        answerRow(row)
                     }
                 }
+                .padding(.horizontal, Spacing.l)
+                .padding(.vertical, Spacing.m)
+                .background(Color.tbSurface, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
             }
-        }
-        if !model.habits.isEmpty {
-            SectionHeader(RecoveryCopy.building)
-            ForEach(model.habits) { row in
-                Button {
-                    toggleHabit(row.id)
-                } label: {
-                    HStack {
-                        Image(systemName: row.isDone ? "checkmark.circle.fill" : "circle")
-                            .foregroundStyle(row.isDone ? Color.tbHabit : Color.tbTextSecondary)
-                        Text(row.name)
-                            .foregroundStyle(Color.tbTextPrimary)
-                        Spacer()
+            if !model.habits.isEmpty {
+                SectionHeader(RecoveryCopy.building)
+                ForEach(model.habits) { row in
+                    Button {
+                        toggleHabit(row.id)
+                    } label: {
+                        HStack(spacing: Spacing.s) {
+                            Image(systemName: row.isDone ? "checkmark.circle.fill" : "circle")
+                                .font(.title2)
+                                .foregroundStyle(row.isDone ? Color.tbHabit : Color.tbTextSecondary)
+                                .frame(minWidth: 44, minHeight: 44)
+                            Text(row.name)
+                                .foregroundStyle(Color.tbTextPrimary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .padding(.horizontal, Spacing.l)
+                        .padding(.vertical, Spacing.s)
+                        .background(Color.tbSurface, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
                     }
-                    .frame(minHeight: 44)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(row.isDone ? "\(row.name), done" : "\(row.name), not done")
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel(row.isDone ? "\(row.name), done" : "\(row.name), not done")
             }
+            Button(RecoveryCopy.havingAnUrge) {
+                router.present(.urge(nil))
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
         }
-        Button(RecoveryCopy.havingAnUrge) {
-            router.present(.urge(nil))
-        }
-        .frame(minHeight: 44)
     }
 
-    @ViewBuilder
-    private func answerButtons(_ row: CheckInViceRow) -> some View {
+    private func answerRow(_ row: CheckInViceRow) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: Spacing.s) {
+                freeButton(row)
+                slippedButton(row)
+            }
+            VStack(spacing: Spacing.s) {
+                freeButton(row)
+                slippedButton(row)
+            }
+        }
+    }
+
+    private func freeButton(_ row: CheckInViceRow) -> some View {
         Button(RecoveryCopy.freeToday) { markFree(row.id) }
             .buttonStyle(.borderedProminent)
             .tint(Color.tbBrand)
             .frame(maxWidth: .infinity, minHeight: 44)
             .accessibilityIdentifier(AccessibilityIdentifiers.checkInFree(row.id))
             .accessibilityAddTraits(row.answer == .free ? .isSelected : [])
-        Button(RecoveryCopy.iSlipped) {
-            slippingID = row.id
-        }
-        .buttonStyle(.bordered)
-        .tint(Color.tbSlip)
-        .frame(maxWidth: .infinity, minHeight: 44)
-        .accessibilityIdentifier(AccessibilityIdentifiers.checkInSlipped(row.id))
+    }
+
+    private func slippedButton(_ row: CheckInViceRow) -> some View {
+        Button(RecoveryCopy.iSlipped) { slippingID = row.id }
+            .buttonStyle(.bordered)
+            .tint(Color.tbSlip)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .accessibilityIdentifier(AccessibilityIdentifiers.checkInSlipped(row.id))
     }
 
     private func prepare() {

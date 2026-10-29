@@ -15,29 +15,33 @@ struct MetricDetailScreen: View {
     @State private var newReason = ""
 
     var body: some View {
-        ScrollView {
-            ReadableColumn {
-                VStack(alignment: .leading, spacing: Spacing.l) {
-                    header
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: Spacing.m)], spacing: Spacing.m) {
-                        ForEach(Array(model.stats.tiles.enumerated()), id: \.offset) { _, tile in
-                            StatTile(value: tile.1, label: tile.0, systemImage: "circle")
+        VStack(spacing: 0) {
+            ScrollView {
+                ReadableColumn {
+                    VStack(alignment: .leading, spacing: Spacing.l) {
+                        header
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: Spacing.m)], spacing: Spacing.m) {
+                            ForEach(Array(model.stats.tiles.enumerated()), id: \.offset) { _, tile in
+                                StatTile(value: tile.1, label: tile.0, systemImage: icon(for: tile.0))
+                            }
+                        }
+                        calendar
+                        if metric.habitType == .vice {
+                            reasonsSection
+                            planSection
+                            if !model.stats.triggers.isEmpty {
+                                patterns
+                            }
+                            if let urgeLine = model.stats.urgeLine {
+                                Text(urgeLine).font(.body).foregroundStyle(Color.tbTextPrimary)
+                            }
                         }
                     }
-                    calendar
-                    if metric.habitType == .vice {
-                        reasonsSection
-                        planSection
-                        if !model.stats.triggers.isEmpty {
-                            patterns
-                        }
-                        if let urgeLine = model.stats.urgeLine {
-                            Text(urgeLine).font(.body).foregroundStyle(Color.tbTextPrimary)
-                        }
-                    }
+                    .padding(.top, Spacing.s)
+                    .padding(.bottom, Spacing.l)
                 }
-                .padding(.vertical, Spacing.l)
             }
+            Color.clear.frame(height: 72)
         }
         .background(Color.tbBackground)
         .navigationTitle(metric.name)
@@ -66,33 +70,38 @@ struct MetricDetailScreen: View {
     }
 
     private var header: some View {
-        HStack(spacing: Spacing.m) {
-            IconBadge(systemImage: metric.iconName, tint: metric.habitType == .vice ? .tbBrand : .tbHabit)
-            VStack(alignment: .leading) {
-                Text(metric.name).font(.title2).foregroundStyle(Color.tbTextPrimary)
-                if metric.habitType == .vice {
-                    TimelineView(.periodic(from: .now, by: 60)) { context in
-                        let history = Snapshots.viceHistory(for: metric, entries: entries, calendar: model.calendar)
-                        Text(RecoveryCopy.clock(RecoveryMath.currentRunClock(history, now: context.date, calendar: model.calendar)))
-                            .font(.subheadline)
-                            .foregroundStyle(Color.tbTextSecondary)
-                    }
-                }
+        VStack(alignment: .leading, spacing: Spacing.s) {
+            HStack(alignment: .center, spacing: Spacing.m) {
+                IconBadge(systemImage: metric.iconName, tint: metric.habitType == .vice ? .tbBrand : .tbHabit)
                 Text(model.stats.primary).bigNumberStyle().foregroundStyle(Color.tbTextPrimary)
+            }
+            if metric.habitType == .vice {
+                TimelineView(.periodic(from: .now, by: 60)) { context in
+                    let history = Snapshots.viceHistory(for: metric, entries: entries, calendar: model.calendar)
+                    Text(RecoveryCopy.clock(RecoveryMath.currentRunClock(history, now: context.date, calendar: model.calendar)))
+                        .font(.subheadline)
+                        .foregroundStyle(Color.tbTextSecondary)
+                }
             }
         }
     }
 
     private var calendar: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: Spacing.s) {
             HStack {
-                Button("Previous month") { model.shiftMonth(-1, metric: metric, now: Date()) }
-                    .frame(minHeight: 44)
+                Button { model.shiftMonth(-1, metric: metric, now: Date()) } label: {
+                    Image(systemName: "chevron.left")
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel("Previous month")
                 Spacer()
-                Button("Next month") { model.shiftMonth(1, metric: metric, now: Date()) }
-                    .frame(minHeight: 44)
+                Button { model.shiftMonth(1, metric: metric, now: Date()) } label: {
+                    Image(systemName: "chevron.right")
+                        .frame(minWidth: 44, minHeight: 44)
+                }
+                .accessibilityLabel("Next month")
             }
-            .font(.subheadline)
+            .font(.subheadline.weight(.semibold))
             .foregroundStyle(Color.tbBrand)
             MonthCalendar(month: model.month, stateFor: { day in
                 model.state(for: day, metric: metric, entries: entries, now: Date())
@@ -101,52 +110,75 @@ struct MetricDetailScreen: View {
                 sheet = .editor(day)
             })
         }
+        .padding(Spacing.l)
+        .background(Color.tbSurface, in: RoundedRectangle(cornerRadius: Radius.card, style: .continuous))
     }
 
     private var reasonsSection: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
             SectionHeader(RecoveryCopy.yourReasons)
-            ForEach(metricReasons) { reason in
-                Text(reason.text).font(.body).foregroundStyle(Color.tbTextPrimary)
+            Card {
+                VStack(alignment: .leading, spacing: Spacing.m) {
+                    ForEach(metricReasons) { reason in
+                        Text(reason.text).font(.body).foregroundStyle(Color.tbTextPrimary)
+                    }
+                    TextField(RecoveryCopy.addReason, text: $newReason)
+                        .textFieldStyle(.roundedBorder)
+                    Button(RecoveryCopy.addReason) {
+                        try? RecoveryStore(context: modelContext).addReason(newReason, to: metric)
+                        newReason = ""
+                    }
+                    .frame(minHeight: 44)
+                }
             }
-            TextField(RecoveryCopy.addReason, text: $newReason)
-                .textFieldStyle(.roundedBorder)
-            Button(RecoveryCopy.addReason) {
-                try? RecoveryStore(context: modelContext).addReason(newReason, to: metric)
-                newReason = ""
-            }
-            .frame(minHeight: 44)
         }
     }
 
     private var planSection: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
             SectionHeader(RecoveryCopy.yourPlan)
-            TextField(RecoveryCopy.nextTimePlan, text: $planText, axis: .vertical)
-                .textFieldStyle(.roundedBorder)
-            Button(RecoveryCopy.edit) {
-                try? RecoveryStore(context: modelContext).setPlan(metric, plan: planText)
+            Card {
+                VStack(alignment: .leading, spacing: Spacing.m) {
+                    TextField(RecoveryCopy.nextTimePlan, text: $planText, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                    Button(RecoveryCopy.edit) {
+                        try? RecoveryStore(context: modelContext).setPlan(metric, plan: planText)
+                    }
+                    .frame(minHeight: 44)
+                }
             }
-            .frame(minHeight: 44)
         }
     }
 
     private var patterns: some View {
         VStack(alignment: .leading, spacing: Spacing.s) {
             SectionHeader(RecoveryCopy.patterns)
-            ForEach(model.stats.triggers, id: \.0) { trigger in
-                Text("\(trigger.0) \(trigger.1)")
-                    .font(.body)
-                    .foregroundStyle(Color.tbTextPrimary)
-            }
-            if let hardest = model.stats.hardest {
-                Text(hardest).font(.subheadline).foregroundStyle(Color.tbTextSecondary)
+            Card {
+                VStack(alignment: .leading, spacing: Spacing.s) {
+                    ForEach(model.stats.triggers, id: \.0) { trigger in
+                        Text("\(trigger.0) \(trigger.1)")
+                            .font(.body)
+                            .foregroundStyle(Color.tbTextPrimary)
+                    }
+                    if let hardest = model.stats.hardest {
+                        Text(hardest).font(.subheadline).foregroundStyle(Color.tbTextSecondary)
+                    }
+                }
             }
         }
     }
 
     private var metricReasons: [Reason] {
         reasons.filter { $0.metricID == metric.id }.sorted { $0.sortOrder < $1.sortOrder }
+    }
+
+    private func icon(for label: String) -> String {
+        switch label {
+        case RecoveryCopy.savedStat: "dollarsign.circle"
+        case RecoveryCopy.freeLast30, RecoveryCopy.doneLast30: "calendar"
+        case RecoveryCopy.doneAllTime: "checkmark.circle"
+        default: "flame"
+        }
     }
 
     private func refresh() {
@@ -180,25 +212,17 @@ struct DayEditorSheet: View {
     var body: some View {
         NavigationStack {
             ReadableColumn {
-                VStack(spacing: Spacing.m) {
+                VStack(spacing: Spacing.s) {
                     if metric.habitType == .vice {
-                        Button(RecoveryCopy.free) { markFree() }
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                            .accessibilityIdentifier(AccessibilityIdentifiers.dayEditorFree)
-                        Button(RecoveryCopy.iSlipped) { onSlip(); dismiss() }
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .accessibilityIdentifier(AccessibilityIdentifiers.dayEditorSlipped)
-                        Button(RecoveryCopy.clearDay) { clear() }
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                            .accessibilityIdentifier(AccessibilityIdentifiers.dayEditorClear)
+                        editorButton(RecoveryCopy.free, id: AccessibilityIdentifiers.dayEditorFree, prominent: true, action: markFree)
+                        editorButton(RecoveryCopy.iSlipped, id: AccessibilityIdentifiers.dayEditorSlipped) { onSlip(); dismiss() }
+                        editorButton(RecoveryCopy.clearDay, id: AccessibilityIdentifiers.dayEditorClear, action: clear)
                     } else {
-                        Button(RecoveryCopy.doneLast30) { setDone(true) }
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                        Button(RecoveryCopy.notDone) { setDone(false) }
-                            .frame(maxWidth: .infinity, minHeight: 44)
+                        editorButton(RecoveryCopy.doneLast30, prominent: true) { setDone(true) }
+                        editorButton(RecoveryCopy.notDone) { setDone(false) }
                     }
                 }
-                .padding(.vertical, Spacing.xl)
+                .padding(.vertical, Spacing.l)
             }
             .background(Color.tbBackground)
             .navigationTitle(day.formatted(date: .abbreviated, time: .omitted))
@@ -206,6 +230,21 @@ struct DayEditorSheet: View {
             .toolbar { Button(RecoveryCopy.close) { dismiss() } }
         }
         .presentationDetents([.medium])
+    }
+
+    private func editorButton(_ title: String, id: String? = nil, prominent: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.headline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(prominent ? Color.tbOnBrand : Color.tbTextPrimary)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .padding(.horizontal, Spacing.l)
+                .padding(.vertical, Spacing.s)
+                .background(prominent ? Color.tbBrand : Color.tbSurface, in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier(id ?? "")
     }
 
     private func markFree() {

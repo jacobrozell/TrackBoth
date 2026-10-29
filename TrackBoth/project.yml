@@ -46,6 +46,7 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Resources/TrackBoth.entitlements
         INFOPLIST_KEY_CFBundleDisplayName: TrackBoth
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.healthcare-fitness
+        INFOPLIST_KEY_NSFaceIDUsageDescription: Use Face ID to keep your progress private.
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
         TARGETED_DEVICE_FAMILY: "1"
         IPHONEOS_DEPLOYMENT_TARGET: "18.0"

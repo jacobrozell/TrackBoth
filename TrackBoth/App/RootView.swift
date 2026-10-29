@@ -3,13 +3,16 @@ import SwiftData
 
 struct RootView: View {
     @Environment(AppRouter.self) private var router
+    @Environment(AppLock.self) private var appLock
     @Environment(\.modelContext) private var modelContext
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("pref.appearance") private var appearanceRaw = AppAppearance.system.rawValue
     @Query(filter: #Predicate<Metric> { !$0.isArchived }, sort: \Metric.sortOrder) private var metrics: [Metric]
     @Query private var entries: [MetricEntry]
     @Query private var reasons: [Reason]
     @State private var onboarded = Preferences.hasCompletedOnboarding
     @State private var celebration: CelebrationRequest?
+    @State private var cover: RootCover?
 
     var body: some View {
         @Bindable var router = router
@@ -17,19 +20,36 @@ struct RootView: View {
             if onboarded {
                 MainTabView()
             } else {
-                OnboardingPlaceholder {
-                    Preferences.hasCompletedOnboarding = true
-                    onboarded = true
-                }
+                OnboardingFlow { onboarded = true }
             }
         }
         .background(Color.tbBackground)
+        .preferredColorScheme(colorScheme)
+        .overlay {
+            if onboarded && appLock.isLocked && scenePhase == .active && !appLock.isAuthenticating {
+                LockScreen()
+            }
+        }
+        .overlay {
+            if appLock.isEnabled && scenePhase != .active {
+                PrivacyCover()
+            }
+        }
         .task {
-            guard LaunchConfiguration.shouldSeedDemo else { return }
-            try? DemoData.seedIfEmpty(context: modelContext)
-            refreshCelebration()
+            if let tab = LaunchConfiguration.initialTab {
+                router.selectedTab = tab
+            }
+            if LaunchConfiguration.shouldSeedDemo {
+                try? DemoData.seedIfEmpty(context: modelContext)
+                refreshCelebration()
+            }
+            if let flow = LaunchConfiguration.initialPresentation {
+                router.present(flow)
+            }
+            syncCover()
         }
         .onChange(of: scenePhase) { _, phase in
+            if phase == .background { appLock.lockIfEnabled() }
             guard phase == .active else { return }
             try? RecoveryStore(context: modelContext).resolveAbandonedUrges()
             if onboarded, let pending = router.pendingQuickAction {
@@ -47,21 +67,30 @@ struct RootView: View {
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .recoveryDataChanged)) { _ in
+            onboarded = Preferences.hasCompletedOnboarding
             refreshCelebration()
+            syncCover()
+            Task { await ReminderScheduler.refresh(context: modelContext) }
+        }
+        .onChange(of: router.presented) { _, _ in syncCover() }
+        .onChange(of: cover?.id) { _, newID in
+            if newID == nil, case .checkIn = router.presented { router.presented = nil }
         }
         .fullScreenCover(item: urgeBinding) { flow in
             if case .urge(let id) = flow {
                 UrgeFlowView(metrics: metrics, preferredID: id) { router.presented = nil }
             }
         }
-        .sheet(item: rootSheet) { sheet in
-            switch sheet.kind {
+        .sheet(item: $cover) { item in
+            switch item {
             case .checkIn:
                 CheckInSheet(metrics: metrics, entries: entries)
             case .celebration(let request):
                 CelebrationView(request: request) {
                     celebration = nil
+                    cover = nil
                     refreshCelebration()
+                    syncCover()
                 }
             }
         }
@@ -84,20 +113,26 @@ struct RootView: View {
         )
     }
 
-    private var rootSheet: Binding<RootSheet?> {
-        Binding(
-            get: {
-                if case .checkIn = router.presented { return RootSheet(kind: .checkIn) }
-                if case .urge = router.presented { return nil }
-                if let celebration { return RootSheet(kind: .celebration(celebration)) }
-                return nil
-            },
-            set: { newValue in
-                guard newValue == nil else { return }
-                if case .checkIn = router.presented { router.presented = nil }
-                celebration = nil
-            }
-        )
+    private func syncCover() {
+        let next: RootCover?
+        if case .checkIn = router.presented {
+            next = .checkIn
+        } else if case .urge = router.presented {
+            return
+        } else if let celebration {
+            next = .celebration(celebration)
+        } else {
+            next = nil
+        }
+        if next?.id != cover?.id { cover = next }
+    }
+
+    private var colorScheme: ColorScheme? {
+        switch AppAppearance(rawValue: appearanceRaw) ?? .system {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
     }
 
     private func refreshCelebration() {
@@ -112,17 +147,14 @@ struct RootView: View {
     }
 }
 
-private struct RootSheet: Identifiable {
-    enum Kind {
-        case checkIn
-        case celebration(CelebrationRequest)
-    }
+private enum RootCover: Identifiable {
+    case checkIn
+    case celebration(CelebrationRequest)
 
-    var kind: Kind
     var id: String {
-        switch kind {
+        switch self {
         case .checkIn: "check-in"
-        case .celebration(let request): "celebration-\(request.metricID.uuidString)"
+        case .celebration(let request): "celebration-\(request.id)"
         }
     }
 }
@@ -147,23 +179,3 @@ private struct MainTabView: View {
     }
 }
 
-private struct OnboardingPlaceholder: View {
-    var skip: () -> Void
-
-    var body: some View {
-        VStack(spacing: Spacing.l) {
-            BrandMark(size: 72)
-            Text("Onboarding coming soon")
-                .font(.title2)
-                .foregroundStyle(Color.tbTextPrimary)
-            if ProductSurface.showsDebugTools {
-                Button("Skip", action: skip)
-                    .buttonStyle(.borderedProminent)
-                    .tint(Color.tbBrand)
-                    .frame(minHeight: 44)
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.tbBackground)
-    }
-}

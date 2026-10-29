@@ -13,6 +13,32 @@ enum LaunchConfiguration {
         let arguments = ProcessInfo.processInfo.arguments
         return arguments.contains("-seed_demo") || arguments.contains("-screenshot_demo")
     }
+
+    static var initialTab: AppTab? {
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-tab_progress") { return .progress }
+        if arguments.contains("-tab_settings") { return .settings }
+        return nil
+    }
+
+    static var opensFirstDetail: Bool {
+        ProcessInfo.processInfo.arguments.contains("-open_first_detail")
+    }
+
+    static var presentsSlip: Bool {
+        ProcessInfo.processInfo.arguments.contains("-present_slip")
+    }
+
+    static var startsOnVices: Bool {
+        ProcessInfo.processInfo.arguments.contains("-onboarding_vices")
+    }
+
+    static var initialPresentation: PresentedFlow? {
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-present_checkin") { return .checkIn }
+        if arguments.contains("-present_urge") { return .urge(nil) }
+        return nil
+    }
 }
 
 enum DemoData {
@@ -27,7 +53,8 @@ enum DemoData {
     static func seed(context: ModelContext, now: Date = Date(), calendar: Calendar = .current) throws {
         let store = RecoveryStore(context: context, calendar: calendar)
         let alcoholStart = calendar.date(byAdding: .day, value: -23, to: now) ?? now
-        let socialStart = calendar.date(byAdding: .day, value: -6, to: now) ?? now
+        let socialDay = calendar.date(byAdding: .day, value: -6, to: now) ?? now
+        let socialStart = calendar.date(bySettingHour: 9, minute: 15, second: 0, of: socialDay) ?? socialDay
         let slipAt = calendar.date(bySettingHour: 20, minute: 0, second: 0, of: calendar.date(byAdding: .day, value: -9, to: now) ?? now) ?? now
 
         let alcohol = try store.addMetric(
@@ -42,6 +69,11 @@ enum DemoData {
         try store.addReason("For my family", to: alcohol)
         try store.addReason("To feel in control", to: alcohol)
         try store.logSlip(alcohol, occurredAt: slipAt, triggers: [.tired, .routine], note: nil)
+        for offset in [-1, -2, -3, -4] {
+            if let day = calendar.date(byAdding: .day, value: offset, to: now) {
+                try store.markFree(alcohol, on: day, now: day)
+            }
+        }
 
         _ = try store.addMetric(
             name: "Social media",

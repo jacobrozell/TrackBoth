@@ -14,34 +14,36 @@ struct SlipFlowView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                ReadableColumn {
-                    if let model {
-                        if let summary = model.summary {
-                            summaryView(summary)
-                        } else {
-                            form(model)
+            VStack(spacing: 0) {
+                ScrollView {
+                    ReadableColumn {
+                        if let model {
+                            if let summary = model.summary {
+                                summaryView(summary)
+                            } else {
+                                form(model)
+                            }
                         }
                     }
+                    .padding(.top, Spacing.m)
+                    .padding(.bottom, Spacing.l)
                 }
-                .padding(.vertical, Spacing.l)
-            }
-            .background(Color.tbBackground)
-            .navigationTitle(RecoveryCopy.slipTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(RecoveryCopy.close) { dismiss() }
-                }
-            }
-            .safeAreaInset(edge: .bottom) {
                 if model?.summary == nil {
                     PrimaryButton(title: RecoveryCopy.save, systemImage: nil, accessibilityID: AccessibilityIdentifiers.slipSave) {
                         try? model?.save(metric: metric, now: Date())
                     }
-                    .padding(Spacing.l)
+                    .padding(.horizontal, Spacing.l)
+                    .padding(.top, Spacing.s)
+                    .padding(.bottom, Spacing.s)
                     .background(Color.tbBackground)
                     .sensoryFeedback(.impact(weight: .light), trigger: model?.summary?.body)
+                }
+            }
+            .background(Color.tbBackground)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(RecoveryCopy.close) { dismiss() }
                 }
             }
         }
@@ -58,7 +60,10 @@ struct SlipFlowView: View {
     @ViewBuilder
     private func form(_ model: SlipViewModel) -> some View {
         VStack(alignment: .leading, spacing: Spacing.l) {
-            Text(RecoveryCopy.slipTitle).font(.title2).foregroundStyle(Color.tbTextPrimary)
+            Text(RecoveryCopy.slipTitle)
+                .font(.title2.weight(.bold))
+                .foregroundStyle(Color.tbTextPrimary)
+                .fixedSize(horizontal: false, vertical: true)
             Text(RecoveryCopy.slipSubtitle).font(.body).foregroundStyle(Color.tbTextSecondary)
             Text(RecoveryCopy.whenQuestion).font(.headline).foregroundStyle(Color.tbTextPrimary)
             whenButtons(model)
@@ -115,19 +120,27 @@ struct SlipFlowView: View {
             (RecoveryCopy.pickADay, .picked(pickedDay))
         ]
         ViewThatFits(in: .horizontal) {
-            HStack { optionButtons(options, model: model) }
-            VStack(alignment: .leading) { optionButtons(options, model: model) }
+            HStack(spacing: Spacing.s) {
+                ForEach(Array(options.enumerated()), id: \.offset) { _, option in
+                    whenChip(option.0, when: option.1, model: model)
+                }
+            }
+            VStack(alignment: .leading, spacing: Spacing.s) {
+                ForEach(Array(options.enumerated()), id: \.offset) { _, option in
+                    whenChip(option.0, when: option.1, model: model)
+                }
+            }
         }
     }
 
-    private func optionButtons(_ options: [(String, SlipWhen)], model: SlipViewModel) -> some View {
-        ForEach(Array(options.enumerated()), id: \.offset) { _, option in
-            Button(option.0) { model.when = option.1 }
-                .frame(minHeight: 44)
-                .foregroundStyle(isSelected(option.1, model: model) ? Color.tbOnBrand : Color.tbTextPrimary)
-                .padding(.horizontal, Spacing.m)
-                .background(isSelected(option.1, model: model) ? Color.tbBrand : Color.tbSurfaceMuted, in: Capsule())
-        }
+    private func whenChip(_ title: String, when: SlipWhen, model: SlipViewModel) -> some View {
+        Button(title) { model.when = when }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(isSelected(when, model: model) ? Color.tbOnBrand : Color.tbTextPrimary)
+            .padding(.horizontal, Spacing.m)
+            .padding(.vertical, Spacing.s)
+            .frame(minHeight: 44)
+            .background(isSelected(when, model: model) ? Color.tbBrand : Color.tbSurfaceMuted, in: Capsule())
     }
 
     private func isSelected(_ when: SlipWhen, model: SlipViewModel) -> Bool {

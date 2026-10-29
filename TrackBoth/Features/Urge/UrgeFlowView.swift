@@ -67,34 +67,39 @@ struct UrgeFlowView: View {
                 .font(.title2)
                 .foregroundStyle(Color.tbOnCalm)
         case .choose:
-            Text(RecoveryCopy.whichOne)
-                .font(.title2)
-                .foregroundStyle(Color.tbOnCalm)
-            ForEach(model.vices) { metric in
-                Button(metric.name) { model.choose(metric.id) }
-                    .frame(maxWidth: .infinity, minHeight: 44)
+            VStack(alignment: .leading, spacing: Spacing.m) {
+                Text(RecoveryCopy.whichOne)
+                    .font(.title2)
                     .foregroundStyle(Color.tbOnCalm)
+                ForEach(model.vices) { metric in
+                    calmChoice(metric.name) { model.choose(metric.id) }
+                }
             }
         case .intensity:
-            Text(RecoveryCopy.howStrong)
-                .font(.title2)
-                .foregroundStyle(Color.tbOnCalm)
-            ForEach(1...5, id: \.self) { level in
-                Button(RecoveryCopy.intensityLabel(level)) {
-                    model.intensity = level
+            VStack(alignment: .leading, spacing: Spacing.s) {
+                Text(RecoveryCopy.howStrong)
+                    .font(.title2)
+                    .foregroundStyle(Color.tbOnCalm)
+                    .padding(.bottom, Spacing.s)
+                ForEach(1...5, id: \.self) { level in
+                    Button(RecoveryCopy.intensityLabel(level)) {
+                        model.intensity = level
+                        try? model.begin(metrics: metrics, now: Date())
+                    }
+                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity, minHeight: 52)
+                    .padding(.horizontal, Spacing.l)
+                    .background(Color.tbOnCalm.opacity(model.intensity == level ? 0.2 : 0.12), in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+                    .foregroundStyle(Color.tbOnCalm)
+                    .accessibilityIdentifier(AccessibilityIdentifiers.urgeIntensity(level))
+                }
+                Button(RecoveryCopy.skip) {
+                    model.intensity = 3
                     try? model.begin(metrics: metrics, now: Date())
                 }
-                .frame(maxWidth: .infinity, minHeight: 52)
-                .background(model.intensity == level ? Color.tbOnCalm.opacity(0.2) : Color.clear, in: RoundedRectangle(cornerRadius: Radius.control))
+                .frame(minHeight: 44)
                 .foregroundStyle(Color.tbOnCalm)
-                .accessibilityIdentifier(AccessibilityIdentifiers.urgeIntensity(level))
             }
-            Button(RecoveryCopy.skip) {
-                model.intensity = 3
-                try? model.begin(metrics: metrics, now: Date())
-            }
-            .frame(minHeight: 44)
-            .foregroundStyle(Color.tbOnCalm)
         case .ride:
             ride(model)
         case .passed:
@@ -102,6 +107,20 @@ struct UrgeFlowView: View {
         case .unsure:
             EmptyView()
         }
+    }
+
+    private func calmChoice(_ title: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(title)
+                .font(.headline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(Color.tbOnCalm)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .padding(.horizontal, Spacing.l)
+                .padding(.vertical, Spacing.s)
+                .background(Color.tbOnCalm.opacity(0.12), in: RoundedRectangle(cornerRadius: Radius.control, style: .continuous))
+        }
+        .buttonStyle(.plain)
     }
 
     private func ride(_ model: UrgeViewModel) -> some View {
@@ -199,16 +218,16 @@ struct UrgeFlowView: View {
     private var habitChips: some View {
         let habits = metrics.filter { $0.habitType == .positive && !$0.isArchived }
         if !habits.isEmpty {
-            Text(RecoveryCopy.tryOneInstead)
-                .font(.headline)
-                .foregroundStyle(Color.tbOnCalm)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            ForEach(habits) { habit in
-                Button(habit.name) {
-                    try? RecoveryStore(context: modelContext).setHabitDone(habit, on: Date(), done: true, now: Date())
+            VStack(alignment: .leading, spacing: Spacing.s) {
+                Text(RecoveryCopy.tryOneInstead)
+                    .font(.headline)
+                    .foregroundStyle(Color.tbOnCalm)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                ForEach(habits) { habit in
+                    calmChoice(habit.name) {
+                        try? RecoveryStore(context: modelContext).setHabitDone(habit, on: Date(), done: true, now: Date())
+                    }
                 }
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .foregroundStyle(Color.tbOnCalm)
             }
         }
     }

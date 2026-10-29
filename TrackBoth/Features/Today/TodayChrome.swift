@@ -81,7 +81,8 @@ struct SOSButton: View {
     var body: some View {
         PrimaryButton(title: RecoveryCopy.sosButton, systemImage: "wind", accessibilityID: AccessibilityIdentifiers.todaySOSButton, action: action)
             .padding(.horizontal, Spacing.l)
-            .padding(.vertical, Spacing.s)
+            .padding(.top, Spacing.s)
+            .padding(.bottom, Spacing.s)
             .frame(maxWidth: 640)
             .frame(maxWidth: .infinity)
             .background(Color.tbBackground)

@@ -9,19 +9,23 @@ struct ProgressScreen: View {
     @Environment(\.modelContext) private var modelContext
     @State private var model = ProgressViewModel()
     @State private var showAdd = false
+    @State private var path = NavigationPath()
+    @State private var didOpenDetail = false
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 Section {
-                    if let saved = model.summary.savedText {
-                        StatTile(value: saved, label: RecoveryCopy.totalSaved, systemImage: "dollarsign.circle")
+                    VStack(alignment: .leading, spacing: Spacing.m) {
+                        if let saved = model.summary.savedText {
+                            summaryLine(saved, systemImage: "dollarsign.circle")
+                        }
+                        summaryLine(RecoveryCopy.urgesBeatenCount(model.summary.urgesBeaten), systemImage: "wind")
+                        summaryLine("\(model.summary.daysCheckedIn) \(RecoveryCopy.daysCheckedIn.lowercased())", systemImage: "checkmark.circle")
                     }
-                    StatTile(value: "\(model.summary.urgesBeaten)", label: RecoveryCopy.urgesBeaten, systemImage: "wind")
-                    StatTile(value: "\(model.summary.daysCheckedIn)", label: RecoveryCopy.daysCheckedIn, systemImage: "checkmark.circle")
-                    Text(RecoveryCopy.urgesBeatenCount(model.summary.urgesBeaten))
-                        .font(.headline)
-                        .foregroundStyle(Color.tbTextPrimary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, Spacing.s)
+                    .listRowBackground(Color.tbSurface)
                 }
                 Section {
                     ForEach(model.active) { card in
@@ -63,14 +67,29 @@ struct ProgressScreen: View {
                 MetricFormView(metric: nil)
             }
         }
-        .onAppear { refresh() }
-        .onChange(of: snapshot) { refresh() }
+        .onAppear {
+            refresh()
+            openFirstDetailIfNeeded()
+        }
+        .onChange(of: snapshot) {
+            refresh()
+            openFirstDetailIfNeeded()
+        }
+    }
+
+    private func summaryLine(_ text: String, systemImage: String) -> some View {
+        Label(text, systemImage: systemImage)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(Color.tbTextPrimary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, Spacing.xs)
+            .accessibilityLabel(text)
     }
 
     private func cardRow(_ card: ProgressCardModel) -> some View {
         HStack(spacing: Spacing.m) {
-            IconBadge(systemImage: card.iconName, tint: .tbBrand)
-            VStack(alignment: .leading, spacing: Spacing.xs) {
+            IconBadge(systemImage: card.iconName, tint: card.habitType == .vice ? .tbBrand : .tbHabit)
+            VStack(alignment: .leading, spacing: Spacing.s) {
                 Text(card.name).font(.headline).foregroundStyle(Color.tbTextPrimary)
                 Text(card.line).font(.subheadline).foregroundStyle(Color.tbTextSecondary)
             }
@@ -86,5 +105,11 @@ struct ProgressScreen: View {
 
     private func refresh() {
         model.update(metrics: metrics, entries: entries, urges: urges, now: Date())
+    }
+
+    private func openFirstDetailIfNeeded() {
+        guard LaunchConfiguration.opensFirstDetail, !didOpenDetail, let id = model.active.first?.id else { return }
+        didOpenDetail = true
+        path.append(id)
     }
 }

@@ -15,6 +15,8 @@ final class RecoveryCopyTests: XCTestCase {
 
     func testClockFormats() {
         XCTAssertEqual(RecoveryCopy.clock(days: 12, hours: 4, minutes: 13), "12d 4h 13m")
+        XCTAssertEqual(RecoveryCopy.clock(days: 6, hours: 0, minutes: 0), "6d")
+        XCTAssertEqual(RecoveryCopy.clock(days: 9, hours: 0, minutes: 40), "9d 40m")
         XCTAssertEqual(RecoveryCopy.clock(days: 0, hours: 3, minutes: 0), "3h 0m")
         XCTAssertEqual(RecoveryCopy.clock(days: 0, hours: 0, minutes: 6), "6m")
         XCTAssertEqual(RecoveryCopy.clock(days: 0, hours: 0, minutes: 0), "Just started")

@@ -14,6 +14,7 @@ struct TrackBothApp: App {
         WindowGroup {
             RootView()
                 .environment(AppRouter.shared)
+                .environment(AppLock.shared)
         }
         .modelContainer(container)
     }

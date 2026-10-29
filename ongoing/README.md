@@ -8,7 +8,7 @@ Plans **in implementation**. Shipped behavior lives in [`Specs/`](../Specs/).
 
 | Plan | Doc | Status | Notes |
 |------|-----|--------|-------|
-| **Recovery overhaul → production** | [`recovery-overhaul-plan.md`](recovery-overhaul-plan.md) | Phase 7 checkpoint, not green | 3 tabs. iPhone portrait for 1.0. Phases 0–6 committed. Finish Phase 7, then onboarding. |
+| **Recovery overhaul → production** | [`recovery-overhaul-plan.md`](recovery-overhaul-plan.md) | Onboarding and Settings in the working tree | 3 tabs. Phases 0–6 committed. Phase 7 checkpoint. Onboarding, Settings, reminders, and lock are local and not committed. |
 
 ## Finished (archive)
 
