@@ -15,3 +15,22 @@ enum Snapshots {
         return HabitHistory(startedAt: metric.startedAt, doneDays: Set(done))
     }
 }
+
+extension DayVisualState {
+    init(dayState: DayState) {
+        switch dayState {
+        case .confirmedFree: self = .confirmedFree
+        case .presumedFree: self = .presumedFree
+        case .slipped: self = .slipped
+        case .todayPending: self = .todayPending
+        case .beforeStart, .future: self = .inactive
+        }
+    }
+
+    /// A habit day. Today is never shown as missed.
+    static func habit(isDone: Bool, isToday: Bool, isActive: Bool) -> DayVisualState {
+        guard isActive else { return .inactive }
+        if isDone { return .habitDone }
+        return isToday ? .todayPending : .missed
+    }
+}

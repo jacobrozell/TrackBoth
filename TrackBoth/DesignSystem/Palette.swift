@@ -14,4 +14,6 @@ extension Color {
     static let tbSlip = Color("Slip")
     static let tbSlipSoft = Color("SlipSoft")
     static let tbCalm = Color("Calm")
+    /// White text on `Calm` in both appearances. Calm does not change with the color scheme.
+    static let tbOnCalm = Color.white
 }

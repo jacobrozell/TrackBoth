@@ -23,4 +23,22 @@ final class SnapshotsTests: XCTestCase {
         let habitHistory = Snapshots.habitHistory(for: habit, entries: entries, calendar: calendar)
         XCTAssertEqual(habitHistory.doneDays, [calendar.startOfDay(for: date(2026, 10, 3))])
     }
+
+    func testDayVisualStateMapsViceAndHabitDays() {
+        XCTAssertEqual(DayVisualState(dayState: .confirmedFree), .confirmedFree)
+        XCTAssertEqual(DayVisualState(dayState: .presumedFree), .presumedFree)
+        XCTAssertEqual(DayVisualState(dayState: .slipped), .slipped)
+        XCTAssertEqual(DayVisualState(dayState: .todayPending), .todayPending)
+        XCTAssertEqual(DayVisualState(dayState: .beforeStart), .inactive)
+        XCTAssertEqual(DayVisualState(dayState: .future), .inactive)
+        XCTAssertEqual(DayVisualState.habit(isDone: true, isToday: true, isActive: true), .habitDone)
+        XCTAssertEqual(DayVisualState.habit(isDone: false, isToday: true, isActive: true), .todayPending)
+        XCTAssertEqual(DayVisualState.habit(isDone: false, isToday: false, isActive: true), .missed)
+        XCTAssertEqual(DayVisualState.habit(isDone: false, isToday: false, isActive: false), .inactive)
+        for state in DayVisualState.allCases {
+            XCTAssertFalse(state.accessibilityName.isEmpty)
+            XCTAssertFalse(state.accessibilityName.localizedCaseInsensitiveContains("fail"))
+            XCTAssertFalse(state.accessibilityName.localizedCaseInsensitiveContains("relapse"))
+        }
+    }
 }

@@ -52,6 +52,8 @@ Use Dynamic Type text styles only (`.largeTitle`, `.title2`, `.headline`, `.body
 | `IconBadge` | `IconBadge(systemImage:, tint:)` | 36pt rounded square |
 | `ReadableColumn` | `ReadableColumn { content }` | Max width 640, centered, `Spacing.l` side padding. Wraps every screen (§8.7) |
 
+`DayVisualState` cases: confirmed free (solid circle, brand), presumed free (ring), slip (triangle), habit done (rounded square, habit), missed (hollow square), today pending (dashed ring), inactive (muted dot). Vice `DayState` and habit days map onto these in `Snapshots.swift`. Text on the urge background uses `Color.tbOnCalm` (white in both appearances) because `OnBrand` is not white in dark mode.
+
 ### 8.5 Motion and haptics
 
 - Check-in done: `.symbolEffect(.bounce)` on the checkmark + `.sensoryFeedback(.success, trigger:)`.
@@ -84,6 +86,6 @@ Use Dynamic Type text styles only (`.largeTitle`, `.title2`, `.headline`, `.body
 
 | Field | Value |
 |-------|--------|
-| Last verified | — |
-| Commit | — |
+| Last verified | 2026-10-28 |
+| Commit | Phase 4 |
 

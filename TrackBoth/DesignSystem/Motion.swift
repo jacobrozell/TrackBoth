@@ -29,4 +29,14 @@ extension View {
         opacity(isVisible ? 1 : 0)
             .offset(y: reduceMotion ? 0 : (isVisible ? 0 : 12))
     }
+
+    /// Scale and a soft glow. Reduce Motion keeps a fade and skips the scale.
+    func trackBothCelebration(isPresented: Bool, reduceMotion: Bool) -> some View {
+        opacity(isPresented ? 1 : 0)
+            .scaleEffect(reduceMotion || isPresented ? 1 : 0.92)
+            .shadow(
+                color: reduceMotion ? .clear : Color.tbBrand.opacity(isPresented ? 0.35 : 0),
+                radius: isPresented ? 16 : 0
+            )
+    }
 }
