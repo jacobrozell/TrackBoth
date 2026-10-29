@@ -46,8 +46,9 @@ struct CheckInSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppRouter.self) private var router
     @State private var model: CheckInViewModel?
-    @State private var stub: Stub?
+    @State private var slippingID: UUID?
     @State private var detent: PresentationDetent = .large
 
     var body: some View {
@@ -94,8 +95,10 @@ struct CheckInSheet: View {
         .presentationDetents([.medium, .large], selection: $detent)
         .onAppear { prepare() }
         .onChange(of: entryToken) { prepare() }
-        .sheet(item: $stub) { stub in
-            FlowStub(title: stub.title, message: stub.message) { self.stub = nil }
+        .sheet(isPresented: slippingPresented) {
+            if let slippingID, let metric = metrics.first(where: { $0.id == slippingID }) {
+                SlipFlowView(metric: metric, prefilledTriggers: []) { self.slippingID = nil }
+            }
         }
     }
 
@@ -142,7 +145,7 @@ struct CheckInSheet: View {
             }
         }
         Button(RecoveryCopy.havingAnUrge) {
-            stub = Stub(title: RecoveryCopy.sosButton, message: RecoveryCopy.urgeFlowStub)
+            router.present(.urge(nil))
         }
         .frame(minHeight: 44)
     }
@@ -156,7 +159,7 @@ struct CheckInSheet: View {
             .accessibilityIdentifier(AccessibilityIdentifiers.checkInFree(row.id))
             .accessibilityAddTraits(row.answer == .free ? .isSelected : [])
         Button(RecoveryCopy.iSlipped) {
-            stub = Stub(title: RecoveryCopy.slipTitle, message: RecoveryCopy.slipFlowStub)
+            slippingID = row.id
         }
         .buttonStyle(.bordered)
         .tint(Color.tbSlip)
@@ -192,10 +195,8 @@ struct CheckInSheet: View {
             try? model.finish(metrics: metrics, now: Date(), celebrated: celebrated)
         }
     }
-}
 
-private struct Stub: Identifiable {
-    var title: String
-    var message: String
-    var id: String { title }
+    private var slippingPresented: Binding<Bool> {
+        Binding(get: { slippingID != nil }, set: { if !$0 { slippingID = nil } })
+    }
 }

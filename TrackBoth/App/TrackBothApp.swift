@@ -3,6 +3,7 @@ import SwiftData
 
 @main
 struct TrackBothApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     private let container = BootstrapStoreRecovery.makeContainer()
 
     init() {

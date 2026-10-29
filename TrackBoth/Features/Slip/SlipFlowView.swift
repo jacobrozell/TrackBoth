@@ -1,0 +1,142 @@
+import SwiftData
+import SwiftUI
+
+struct SlipFlowView: View {
+    var metric: Metric
+    var prefilledTriggers: [TriggerTag]
+    var onFinish: () -> Void
+
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.dismiss) private var dismiss
+    @State private var model: SlipViewModel?
+    @State private var pickedDay = Date()
+    @State private var showHelp = false
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                ReadableColumn {
+                    if let model {
+                        if let summary = model.summary {
+                            summaryView(summary)
+                        } else {
+                            form(model)
+                        }
+                    }
+                }
+                .padding(.vertical, Spacing.l)
+            }
+            .background(Color.tbBackground)
+            .navigationTitle(RecoveryCopy.slipTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(RecoveryCopy.close) { dismiss() }
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                if model?.summary == nil {
+                    PrimaryButton(title: RecoveryCopy.save, systemImage: nil, accessibilityID: AccessibilityIdentifiers.slipSave) {
+                        try? model?.save(metric: metric, now: Date())
+                    }
+                    .padding(Spacing.l)
+                    .background(Color.tbBackground)
+                    .sensoryFeedback(.impact(weight: .light), trigger: model?.summary?.body)
+                }
+            }
+        }
+        .onAppear {
+            if model == nil {
+                model = SlipViewModel(store: RecoveryStore(context: modelContext), plan: metric.ifThenPlan, triggers: prefilledTriggers)
+            }
+        }
+        .sheet(isPresented: $showHelp) {
+            CrisisResourcesView()
+        }
+    }
+
+    @ViewBuilder
+    private func form(_ model: SlipViewModel) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.l) {
+            Text(RecoveryCopy.slipTitle).font(.title2).foregroundStyle(Color.tbTextPrimary)
+            Text(RecoveryCopy.slipSubtitle).font(.body).foregroundStyle(Color.tbTextSecondary)
+            Text(RecoveryCopy.whenQuestion).font(.headline).foregroundStyle(Color.tbTextPrimary)
+            whenButtons(model)
+            if case .picked = model.when {
+                DatePicker(
+                    RecoveryCopy.pickADay,
+                    selection: $pickedDay,
+                    in: calendar.startOfDay(for: metric.startedAt)...Date(),
+                    displayedComponents: .date
+                )
+                .onChange(of: pickedDay) { _, day in model.when = .picked(day) }
+            }
+            Text(RecoveryCopy.whatWasGoingOn).font(.headline).foregroundStyle(Color.tbTextPrimary)
+            ChipGrid(
+                items: TriggerTag.allCases.map { ChipOption(id: $0.rawValue, title: $0.title, systemImage: $0.systemImage) },
+                selection: Binding(
+                    get: { Set(model.triggers.map(\.rawValue)) },
+                    set: { model.triggers = Set($0.compactMap(TriggerTag.init(rawValue:))) }
+                )
+            )
+            Text(RecoveryCopy.anythingElse).font(.headline).foregroundStyle(Color.tbTextPrimary)
+            TextField(RecoveryCopy.anythingElse, text: Bindable(model).note, axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+            Text(RecoveryCopy.nextTimePlan).font(.headline).foregroundStyle(Color.tbTextPrimary)
+            TextField(RecoveryCopy.nextTimePlan, text: Bindable(model).plan, axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+            if let errorMessage = model.errorMessage {
+                Text(errorMessage).font(.footnote).foregroundStyle(Color.tbSlip)
+            }
+        }
+    }
+
+    private func summaryView(_ summary: SlipSummary) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.l) {
+            Text(summary.title).font(.title2).foregroundStyle(Color.tbTextPrimary)
+            Text(summary.body).font(.body).foregroundStyle(Color.tbTextSecondary)
+            if let reason = summary.reason {
+                Text(reason).font(.body).foregroundStyle(Color.tbTextPrimary)
+            }
+            Button(RecoveryCopy.needSupport) { showHelp = true }
+                .frame(minHeight: 44)
+            PrimaryButton(title: RecoveryCopy.backToToday, systemImage: nil, action: onFinish)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier(AccessibilityIdentifiers.slipSummary)
+    }
+
+    @ViewBuilder
+    private func whenButtons(_ model: SlipViewModel) -> some View {
+        let options: [(String, SlipWhen)] = [
+            (RecoveryCopy.justNow, .justNow),
+            (RecoveryCopy.earlierToday, .earlierToday),
+            (RecoveryCopy.yesterday, .yesterday),
+            (RecoveryCopy.pickADay, .picked(pickedDay))
+        ]
+        ViewThatFits(in: .horizontal) {
+            HStack { optionButtons(options, model: model) }
+            VStack(alignment: .leading) { optionButtons(options, model: model) }
+        }
+    }
+
+    private func optionButtons(_ options: [(String, SlipWhen)], model: SlipViewModel) -> some View {
+        ForEach(Array(options.enumerated()), id: \.offset) { _, option in
+            Button(option.0) { model.when = option.1 }
+                .frame(minHeight: 44)
+                .foregroundStyle(isSelected(option.1, model: model) ? Color.tbOnBrand : Color.tbTextPrimary)
+                .padding(.horizontal, Spacing.m)
+                .background(isSelected(option.1, model: model) ? Color.tbBrand : Color.tbSurfaceMuted, in: Capsule())
+        }
+    }
+
+    private func isSelected(_ when: SlipWhen, model: SlipViewModel) -> Bool {
+        switch (model.when, when) {
+        case (.justNow, .justNow), (.earlierToday, .earlierToday), (.yesterday, .yesterday): true
+        case (.picked, .picked): true
+        default: false
+        }
+    }
+
+    private var calendar: Calendar { Calendar.current }
+}

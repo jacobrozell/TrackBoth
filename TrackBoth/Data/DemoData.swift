@@ -85,5 +85,11 @@ enum DemoData {
             let urge = try store.startUrge(for: alcohol, intensity: (index % 5) + 1, now: started)
             try store.finishUrge(urge, outcome: outcome, triggers: index.isMultiple(of: 2) ? [.stressed] : [], note: nil, now: started)
         }
+        let seededMetrics = try context.fetch(FetchDescriptor<Metric>())
+        let seededEntries = try context.fetch(FetchDescriptor<MetricEntry>())
+        let seededReasons = try context.fetch(FetchDescriptor<Reason>())
+        for request in MilestoneCenter.pending(metrics: seededMetrics, entries: seededEntries, reasons: seededReasons, now: now, calendar: calendar) {
+            MilestoneLedger.record(request.threshold, for: request.metricID)
+        }
     }
 }

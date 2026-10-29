@@ -20,16 +20,16 @@ Living register for the recovery overhaul. Every new feature starts as **Planned
 |---------|--------|-------|
 | Today — check-in banner, vice cards, habit rows | **Ships 1.0** | Phase 5. Urge, slip, and detail from Today are stubs until Phases 6 and 7 |
 | Daily check-in sheet | **Ships 1.0** | Phase 5. "I slipped" opens a stub until Phase 6 |
-| Urge flow (ride it out) | **Planned** | Phase 6 |
-| Slip flow | **Planned** | Phase 6. Amber, no guilt copy |
-| Milestone celebration, re-earnable after a slip | **Planned** | Phase 6 |
-| Progress + metric detail + day editor | **Planned** | Phase 7 |
+| Urge flow (ride it out) | **Ships 1.0** | Phase 6 |
+| Slip flow | **Ships 1.0** | Phase 6. Amber, no guilt copy |
+| Milestone celebration, re-earnable after a slip | **Ships 1.0** | Phase 6. Ledger records when Keep going is tapped |
+| Progress + metric detail + day editor | **Planned** | Phase 7. Progress already shows the urges-beaten count |
 | Add / edit metric | **Planned** | Phase 7 |
 | Onboarding (quit date, reason, reminders, lock, disclaimer) | **Planned** | Phase 8 |
 | Daily reminder + milestone notifications | **Planned** | Phase 9. At most one check-in a day |
 | App lock and app-switcher privacy cover | **Planned** | Phase 9. Off by default |
 | Settings, backup/restore, delete all, crisis resources | **Planned** | Phase 10 |
-| Home-screen quick action and `trackboth://urge` | **Planned** | Phase 6 |
+| Home-screen quick action and `trackboth://urge` | **Ships 1.0** | Phase 6 |
 
 ## Cut from the pre-overhaul app
 

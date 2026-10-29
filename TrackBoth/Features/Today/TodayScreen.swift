@@ -21,13 +21,13 @@ struct TodayScreen: View {
                             YesterdayPrompt(name: prompt.name) {
                                 confirmYesterday(prompt.metricID)
                             } onSlipped: {
-                                sheet = .slip
+                                sheet = .slip(prompt.metricID)
                             } onDismiss: {
                                 dismissYesterday()
                             }
                         }
                         if model.checkInRemaining > 0 {
-                            CheckInBanner(remaining: model.checkInRemaining) { sheet = .checkIn }
+                            CheckInBanner(remaining: model.checkInRemaining) { router.present(.checkIn) }
                         }
                         if model.isEmpty {
                             EmptyState(
@@ -67,26 +67,18 @@ struct TodayScreen: View {
                 if model.showsSOS {
                     SOSButton {
                         router.present(.urge(nil))
-                        sheet = .urge
                     }
                 }
             }
         }
         .onAppear { refresh() }
         .onChange(of: snapshotToken) { refresh() }
-        .onChange(of: sheet?.id) { _, _ in
-            if sheet?.id != TodaySheet.urge.id {
-                router.presented = nil
-            }
-        }
         .sheet(item: $sheet) { sheet in
             switch sheet {
-            case .checkIn:
-                CheckInSheet(metrics: metrics, entries: entries)
-            case .urge:
-                FlowStub(title: RecoveryCopy.sosButton, message: RecoveryCopy.urgeFlowStub) { self.sheet = nil }
-            case .slip:
-                FlowStub(title: RecoveryCopy.slipTitle, message: RecoveryCopy.slipFlowStub) { self.sheet = nil }
+            case .slip(let id):
+                if let metric = metrics.first(where: { $0.id == id }) {
+                    SlipFlowView(metric: metric, prefilledTriggers: []) { self.sheet = nil }
+                }
             case .add:
                 FlowStub(title: RecoveryCopy.addSomething, message: RecoveryCopy.addStub) { self.sheet = nil }
             case .detail(let id):
@@ -128,17 +120,13 @@ struct TodayScreen: View {
 }
 
 private enum TodaySheet: Identifiable {
-    case checkIn
-    case urge
-    case slip
+    case slip(UUID)
     case add
     case detail(UUID)
 
     var id: String {
         switch self {
-        case .checkIn: "check-in"
-        case .urge: "urge"
-        case .slip: "slip"
+        case .slip(let id): "slip-\(id.uuidString)"
         case .add: "add"
         case .detail(let id): id.uuidString
         }

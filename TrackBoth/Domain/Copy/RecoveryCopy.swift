@@ -97,6 +97,46 @@ enum RecoveryCopy {
         return daysFree(days)
     }
 
+    static let whichOne = "Which one?"
+    static let howStrong = "How strong is it?"
+    static let mild = "Mild"
+    static let intense = "Intense"
+    static let skip = "Skip"
+    static let theUrgePassed = "The urge passed"
+    static let notSure = "Not sure"
+    static let howDidItGo = "How did it go?"
+    static let addFiveMinutes = "+5 min"
+    static let stillWithIt = "Still with it? You can add 5 minutes, or check in with yourself."
+    static let yourWhy = "Your why"
+    static let yourPlanPrefix = "When I feel the urge, I will:"
+    static let tryOneInstead = "Try one instead"
+    static let whatSetItOff = "What set it off?"
+    static let whenQuestion = "When?"
+    static let justNow = "Just now"
+    static let earlierToday = "Earlier today"
+    static let yesterday = "Yesterday"
+    static let pickADay = "Pick a day…"
+    static let whatWasGoingOn = "What was going on?"
+    static let anythingElse = "Anything else?"
+    static let nextTimePlan = "Next time I feel the urge, I will…"
+    static let save = "Save"
+    static let rememberWhy = "Remember why:"
+    static let keepGoing = "Keep going"
+    static let needSupport = "Need more support?"
+    static let getHelpNow = "Get help now"
+    static let noViceForUrge = "Add something you're quitting first."
+    static let slipBeforeStart = "That day is before this quit date."
+    static let urgesBeaten = "Urges beaten"
+    static func intensityLabel(_ level: Int) -> String {
+        switch level {
+        case 1: "1 \(mild)"
+        case 5: "5 \(intense)"
+        default: "\(level)"
+        }
+    }
+
+    static func urgesBeatenCount(_ count: Int) -> String { "\(urgesBeaten) \(count)" }
+
     static let checkInNotificationTitle = "Daily check-in"
     static let checkInNotificationBody = "How did today go? It takes 10 seconds."
     static let discreetCheckInTitle = "TrackBoth"
