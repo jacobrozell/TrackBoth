@@ -1,0 +1,201 @@
+import SwiftData
+import SwiftUI
+
+struct CheckInCompleteView: View {
+    var lines: [CheckInSummaryLine]
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var appeared = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.l) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 56))
+                .foregroundStyle(Color.tbBrand)
+                .frame(maxWidth: .infinity)
+                .symbolEffect(.bounce, value: reduceMotion ? false : appeared)
+                .accessibilityHidden(true)
+            Text(RecoveryCopy.checkInTitle)
+                .font(.title2)
+                .foregroundStyle(Color.tbTextPrimary)
+                .frame(maxWidth: .infinity, alignment: .center)
+            ForEach(lines) { line in
+                VStack(alignment: .leading, spacing: Spacing.xs) {
+                    Text(line.name)
+                        .font(.headline)
+                        .foregroundStyle(Color.tbTextPrimary)
+                    Text(line.detail)
+                        .font(.body)
+                        .foregroundStyle(Color.tbTextSecondary)
+                    if let milestone = line.milestone {
+                        Text(milestone)
+                            .font(.body)
+                            .foregroundStyle(Color.tbTextPrimary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+        .onAppear { appeared = true }
+        .sensoryFeedback(.success, trigger: appeared)
+    }
+}
+
+struct CheckInSheet: View {
+    var metrics: [Metric]
+    var entries: [MetricEntry]
+
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @State private var model: CheckInViewModel?
+    @State private var stub: Stub?
+    @State private var detent: PresentationDetent = .large
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                ReadableColumn {
+                    VStack(alignment: .leading, spacing: Spacing.l) {
+                        if let model, model.showComplete {
+                            CheckInCompleteView(lines: model.lines)
+                        } else if let model {
+                            form(model)
+                        }
+                    }
+                    .padding(.vertical, Spacing.l)
+                }
+            }
+            .background(Color.tbBackground)
+            .navigationTitle(RecoveryCopy.checkInTitle)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(RecoveryCopy.close) { dismiss() }
+                }
+                ToolbarItem(placement: .principal) {
+                    Text(Date().formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
+                        .font(.subheadline)
+                        .foregroundStyle(Color.tbTextSecondary)
+                }
+            }
+            .safeAreaInset(edge: .bottom) {
+                if let model {
+                    PrimaryButton(
+                        title: model.showComplete ? RecoveryCopy.backToToday : RecoveryCopy.done,
+                        systemImage: nil,
+                        accessibilityID: AccessibilityIdentifiers.checkInDone,
+                        action: { finish(model) }
+                    )
+                    .disabled(!model.showComplete && !model.canFinish)
+                    .padding(Spacing.l)
+                    .background(Color.tbBackground)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large], selection: $detent)
+        .onAppear { prepare() }
+        .onChange(of: entryToken) { prepare() }
+        .sheet(item: $stub) { stub in
+            FlowStub(title: stub.title, message: stub.message) { self.stub = nil }
+        }
+    }
+
+    private var entryToken: String {
+        entries.map { "\($0.metricID.uuidString):\($0.statusRaw)" }.joined()
+    }
+
+    @ViewBuilder
+    private func form(_ model: CheckInViewModel) -> some View {
+        ForEach(model.vices) { row in
+            VStack(alignment: .leading, spacing: Spacing.s) {
+                Text(row.name)
+                    .font(.headline)
+                    .foregroundStyle(Color.tbTextPrimary)
+                if row.answer == .slipped {
+                    Text(RecoveryCopy.slipLoggedThanks)
+                        .font(.body)
+                        .foregroundStyle(Color.tbTextSecondary)
+                } else {
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: Spacing.s) { answerButtons(row) }
+                        VStack(spacing: Spacing.s) { answerButtons(row) }
+                    }
+                }
+            }
+        }
+        if !model.habits.isEmpty {
+            SectionHeader(RecoveryCopy.building)
+            ForEach(model.habits) { row in
+                Button {
+                    toggleHabit(row.id)
+                } label: {
+                    HStack {
+                        Image(systemName: row.isDone ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(row.isDone ? Color.tbHabit : Color.tbTextSecondary)
+                        Text(row.name)
+                            .foregroundStyle(Color.tbTextPrimary)
+                        Spacer()
+                    }
+                    .frame(minHeight: 44)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(row.isDone ? "\(row.name), done" : "\(row.name), not done")
+            }
+        }
+        Button(RecoveryCopy.havingAnUrge) {
+            stub = Stub(title: RecoveryCopy.sosButton, message: RecoveryCopy.urgeFlowStub)
+        }
+        .frame(minHeight: 44)
+    }
+
+    @ViewBuilder
+    private func answerButtons(_ row: CheckInViceRow) -> some View {
+        Button(RecoveryCopy.freeToday) { markFree(row.id) }
+            .buttonStyle(.borderedProminent)
+            .tint(Color.tbBrand)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .accessibilityIdentifier(AccessibilityIdentifiers.checkInFree(row.id))
+            .accessibilityAddTraits(row.answer == .free ? .isSelected : [])
+        Button(RecoveryCopy.iSlipped) {
+            stub = Stub(title: RecoveryCopy.slipTitle, message: RecoveryCopy.slipFlowStub)
+        }
+        .buttonStyle(.bordered)
+        .tint(Color.tbSlip)
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .accessibilityIdentifier(AccessibilityIdentifiers.checkInSlipped(row.id))
+    }
+
+    private func prepare() {
+        let store = RecoveryStore(context: modelContext)
+        if model == nil {
+            model = CheckInViewModel(store: store)
+        }
+        model?.load(metrics: metrics, entries: entries, now: Date())
+    }
+
+    private func markFree(_ id: UUID) {
+        guard let model else { return }
+        try? model.markFree(id, metrics: metrics, now: Date())
+    }
+
+    private func toggleHabit(_ id: UUID) {
+        guard let model else { return }
+        try? model.toggleHabit(id, metrics: metrics, now: Date())
+    }
+
+    private func finish(_ model: CheckInViewModel) {
+        if model.showComplete {
+            dismiss()
+        } else {
+            let celebrated = Dictionary(uniqueKeysWithValues: metrics.map { metric in
+                (metric.id, MilestoneLedger.highestCelebrated(for: metric.id))
+            })
+            try? model.finish(metrics: metrics, now: Date(), celebrated: celebrated)
+        }
+    }
+}
+
+private struct Stub: Identifiable {
+    var title: String
+    var message: String
+    var id: String { title }
+}

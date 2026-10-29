@@ -18,8 +18,8 @@ Living register for the recovery overhaul. Every new feature starts as **Planned
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Today — check-in banner, vice cards, habit rows | **Planned** | Phase 5 |
-| Daily check-in sheet | **Planned** | Phase 5. Habits optional for completeness |
+| Today — check-in banner, vice cards, habit rows | **Ships 1.0** | Phase 5. Urge, slip, and detail from Today are stubs until Phases 6 and 7 |
+| Daily check-in sheet | **Ships 1.0** | Phase 5. "I slipped" opens a stub until Phase 6 |
 | Urge flow (ride it out) | **Planned** | Phase 6 |
 | Slip flow | **Planned** | Phase 6. Amber, no guilt copy |
 | Milestone celebration, re-earnable after a slip | **Planned** | Phase 6 |

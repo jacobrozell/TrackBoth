@@ -3,6 +3,7 @@ import SwiftUI
 struct PrimaryButton: View {
     var title: String
     var systemImage: String? = nil
+    var accessibilityID: String? = nil
     var action: () -> Void
 
     var body: some View {
@@ -18,6 +19,7 @@ struct PrimaryButton: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
+        .modifier(AccessibilityIDModifier(id: accessibilityID))
     }
 
     @ViewBuilder
@@ -109,6 +111,18 @@ struct SecondaryButton: View {
         VStack(spacing: Spacing.m) {
             PrimaryButton(title: "Check in", systemImage: "checkmark", action: {})
             SecondaryButton(title: "Not now", systemImage: "clock", action: {})
+        }
+    }
+}
+
+private struct AccessibilityIDModifier: ViewModifier {
+    var id: String?
+
+    func body(content: Content) -> some View {
+        if let id {
+            content.accessibilityIdentifier(id)
+        } else {
+            content
         }
     }
 }

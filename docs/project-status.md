@@ -18,7 +18,7 @@
 
 ## Current focus
 
-**Recovery overhaul.** Phase 4 design system components are in. Next: Phase 5, Today and check-in.
+**Recovery overhaul.** Phase 5 Today and check-in work. Next: Phase 6, urge, slip, and celebration.
 
 The app has never shipped. Build 5 was archived on 2026-06-22 and never uploaded. There is no production data to migrate.
 

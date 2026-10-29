@@ -68,6 +68,35 @@ enum RecoveryCopy {
 
     static let disclaimer = "TrackBoth is a self-help tool, not medical treatment. Stopping some substances suddenly, like alcohol, benzodiazepines, or opioids, can be dangerous. Talk to a doctor. If you're in crisis, help is in Settings → Get help now."
 
+    static let checkInTitle = "Daily check-in"
+    static let freeToday = "Free today"
+    static let iSlipped = "I slipped"
+    static let quitting = "Quitting"
+    static let building = "Building"
+    static let startWithOneThing = "Start with one thing"
+    static let startWithOneThingMessage = "Add a vice or a habit and today gets simpler."
+    static let addSomething = "Add something"
+    static let yesterdayYes = "Yes"
+    static let dismiss = "Dismiss"
+    static let slipLoggedThanks = "Slip logged · thanks for being honest"
+    static let havingAnUrge = "Having an urge right now?"
+    static let done = "Done"
+    static let backToToday = "Back to Today"
+    static let close = "Close"
+    static let urgeFlowStub = "Urge flow — Phase 6"
+    static let slipFlowStub = "Slip flow — Phase 6"
+    static let detailStub = "Detail comes in the next update."
+    static let addStub = "Adding a metric comes in the next update."
+
+    static func yesterdayPrompt(_ name: String) -> String {
+        "Yesterday: were you free from \(name)?"
+    }
+
+    static func checkInSummary(days: Int, saved: String?) -> String {
+        if let saved { return "\(daysFree(days)) · \(saved)" }
+        return daysFree(days)
+    }
+
     static let checkInNotificationTitle = "Daily check-in"
     static let checkInNotificationBody = "How did today go? It takes 10 seconds."
     static let discreetCheckInTitle = "TrackBoth"
