@@ -8,7 +8,7 @@ Plans **in implementation**. Shipped behavior lives in [`Specs/`](../Specs/).
 
 | Plan | Doc | Status | Notes |
 |------|-----|--------|-------|
-| **Recovery overhaul → production** | [`recovery-overhaul-plan.md`](recovery-overhaul-plan.md) | Phase 2 domain in | 3 tabs. iPhone portrait for 1.0. Next: Phase 3 cut and store. |
+| **Recovery overhaul → production** | [`recovery-overhaul-plan.md`](recovery-overhaul-plan.md) | Phase 3 store and shell in | 3 tabs. iPhone portrait for 1.0. Next: Phase 4 design system. |
 
 ## Finished (archive)
 

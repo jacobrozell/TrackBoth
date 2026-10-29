@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-screenshot_demo"
+            argument = "-seed_demo"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
@@ -71,7 +71,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-skip_splash"
+            argument = "-ui_testing"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

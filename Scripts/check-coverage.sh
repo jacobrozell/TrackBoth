@@ -15,13 +15,11 @@ COVERAGE_LINE=$(xcrun xccov view --report --json "$RESULT_BUNDLE" \
 import json, sys
 
 CORE_FILES = {
-    "StreakUtils.swift", "GoalUtils.swift", "FilterUtils.swift", "CalendarHelper.swift",
-    "TrackingSemantics.swift", "ExportImportService.swift", "TrackBothExport.swift",
-    "BootstrapStoreRecovery.swift", "WCAGContrast.swift", "HomeViewModel.swift",
-    "GoalsViewModel.swift", "HistoryViewModel.swift", "MotivationViewModel.swift",
-    "ChartsViewModel.swift", "SettingsViewModel.swift", "MigrationUtils.swift",
-    "MetricEntry.swift", "DemoDataGenerator.swift", "DateFormatterUtils.swift",
-    "ProductSurface.swift",
+    "DayMath.swift", "RecoveryMath.swift", "HabitMath.swift", "MilestonePolicy.swift",
+    "TriggerTag.swift", "PatternInsights.swift", "RecoveryStore.swift", "Snapshots.swift",
+    "BackupService.swift", "BackupV5.swift", "LegacyExportV4.swift", "MilestoneLedger.swift",
+    "Preferences.swift", "BootstrapStoreRecovery.swift", "WCAGContrast.swift",
+    "RecoveryCopy.swift", "ReminderScheduler.swift",
 }
 
 data = json.load(sys.stdin)

@@ -18,7 +18,7 @@
 
 ## Current focus
 
-**Recovery overhaul.** Phase 2 domain rules are in. Next: Phase 3, the cut and the new store.
+**Recovery overhaul.** Phase 3 cut and store are in. The app launches into a placeholder 3-tab shell. Next: Phase 4, design system components.
 
 The app has never shipped. Build 5 was archived on 2026-06-22 and never uploaded. There is no production data to migrate.
 
