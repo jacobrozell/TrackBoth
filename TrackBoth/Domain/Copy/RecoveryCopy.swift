@@ -137,6 +137,44 @@ enum RecoveryCopy {
 
     static func urgesBeatenCount(_ count: Int) -> String { "\(urgesBeaten) \(count)" }
 
+    static func viceProgress(days: Int, longest: Int, free: Int, counted: Int) -> String {
+        "\(daysFree(days)) · longest \(longest) · \(free)/\(counted) days"
+    }
+
+    static func habitProgress(run: Int, best: Int, done: Int, counted: Int) -> String {
+        "\(habitRun(run)) · best \(best) · \(done)/\(counted) days"
+    }
+
+    static let totalSaved = "Total saved"
+    static let daysCheckedIn = "Days checked in"
+    static let archived = "Archived"
+    static let yourReasons = "Your reasons"
+    static let yourPlan = "Your plan"
+    static let patterns = "Patterns"
+    static let hardestTime = "Hardest time"
+    static let addReason = "Add a reason"
+    static let edit = "Edit"
+    static let quitDate = "Quit date"
+    static let nameField = "Name"
+    static let nameRequired = "Add a name."
+    static let nameTooLong = "Keep the name under 40 characters."
+    static let costPerDay = "Cost per day"
+    static let archive = "Archive"
+    static let restore = "Restore"
+    static let delete = "Delete"
+    static func deleteConfirm(_ name: String) -> String { "Delete \(name) and all of its history? This can't be undone." }
+    static let currentRun = "Current run"
+    static let longestRun = "Longest run"
+    static let freeLast30 = "Free days"
+    static let savedStat = "Saved"
+    static let bestRun = "Best run"
+    static let doneLast30 = "Done"
+    static let doneAllTime = "Done, all time"
+    static let free = "Free"
+    static let clearDay = "Clear"
+    static let notDone = "Not done"
+    static let beatenOf = "Beaten"
+
     static let checkInNotificationTitle = "Daily check-in"
     static let checkInNotificationBody = "How did today go? It takes 10 seconds."
     static let discreetCheckInTitle = "TrackBoth"

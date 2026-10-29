@@ -18,7 +18,7 @@
 
 ## Current focus
 
-**Recovery overhaul.** Phase 6 urge, slip, and celebration work. Next: Phase 7, Progress and metric detail.
+**Recovery overhaul.** Phases 0–6 are committed and green. Phase 7 (Progress, metric detail, metric form) is checkpointed and not yet built or tested. Next: finish Phase 7, then Phase 8 onboarding.
 
 The app has never shipped. Build 5 was archived on 2026-06-22 and never uploaded. There is no production data to migrate.
 

@@ -82,7 +82,9 @@ struct TodayScreen: View {
             case .add:
                 FlowStub(title: RecoveryCopy.addSomething, message: RecoveryCopy.addStub) { self.sheet = nil }
             case .detail(let id):
-                FlowStub(title: metrics.first { $0.id == id }?.name ?? "", message: RecoveryCopy.detailStub) { self.sheet = nil }
+                if let metric = metrics.first(where: { $0.id == id }) {
+                    NavigationStack { MetricDetailScreen(metric: metric) }
+                }
             }
         }
     }

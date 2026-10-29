@@ -77,6 +77,7 @@ struct MonthCalendar: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(day.formatted(date: .abbreviated, time: .omitted)), \(state.accessibilityName)")
+        .accessibilityIdentifier(AccessibilityIdentifiers.calendarDay(day, calendar: calendar))
     }
 }
 

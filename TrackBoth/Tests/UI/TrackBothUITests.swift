@@ -76,6 +76,31 @@ final class TrackBothUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'of your last'")).firstMatch.exists)
     }
 
+    func testEditPastDayToSlipUpdatesStats() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-ui_testing", "-skip_onboarding", "-seed_demo"]
+        app.launch()
+
+        app.tabBars.buttons["Progress"].tap()
+        let alcohol = app.staticTexts["Alcohol"]
+        XCTAssertTrue(alcohol.waitForExistence(timeout: 8))
+        alcohol.tap()
+
+        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
+        let parts = Calendar.current.dateComponents([.year, .month, .day], from: yesterday)
+        let identifier = String(format: "detail.calendarDay.%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
+        var day = app.buttons[identifier]
+        if !day.waitForExistence(timeout: 2) {
+            app.swipeUp()
+            day = app.buttons[identifier]
+        }
+        XCTAssertTrue(day.waitForExistence(timeout: 4))
+        day.tap()
+        app.buttons["dayEditor.slipped"].tap()
+        app.buttons["slip.save"].tap()
+        XCTAssertTrue(app.staticTexts["0 days free"].waitForExistence(timeout: 6))
+    }
+
     private func tab(named label: String, identifier: String, in app: XCUIApplication) -> XCUIElement {
         let identified = app.buttons[identifier]
         if identified.exists { return identified }
