@@ -602,3 +602,4 @@ Commit: `Add landscape, iPad, and resize UI tests and a device QA matrix.`
 | Date | Phase | Result | Notes |
 |------|-------|--------|-------|
 | 2026-10-31 | 0 | Started | Build 7 in pbxproj; Duo sim available (91C5CAC3). Baseline tests pending. |
+| 2026-10-31 | 1–9 | f9b1494+ | Green | Foundation + all screen phases; UI tests on iPhone 17 (12 tests, 1 skipped). iPad split uses container width ≥744 when TabView reports compact horizontal. |
