@@ -1,12 +1,18 @@
 import XCTest
 
-final class AdaptiveLayoutUITests: XCTestCase {
+final class AdaptiveLayoutUITests: TrackBothUITestCase {
+    override func setUpWithError() throws {
+        try super.setUpWithError()
+        resetOrientation()
+    }
+
     override func tearDownWithError() throws {
-        XCUIDevice.shared.orientation = .portrait
+        resetOrientation()
+        try super.tearDownWithError()
     }
 
     func testTodayLandscapeKeepsSOSAndCheckInReachable() {
-        let app = launchSeeded()
+        launchApp()
         XCUIDevice.shared.orientation = .landscapeLeft
 
         let sos = app.buttons["today.sosButton"]
@@ -18,7 +24,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
     }
 
     func testCheckInDoneInToolbarInLandscape() {
-        let app = launchSeeded()
+        launchApp()
         XCUIDevice.shared.orientation = .landscapeLeft
 
         let banner = app.buttons["today.checkInBanner"]
@@ -39,8 +45,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
     }
 
     func testCheckInSheetSurvivesRotation() {
-        let app = launchSeeded()
-
+        launchApp()
         let banner = app.buttons["today.checkInBanner"]
         XCTAssertTrue(banner.waitForExistence(timeout: 8))
         banner.tap()
@@ -53,10 +58,12 @@ final class AdaptiveLayoutUITests: XCTestCase {
 
         XCTAssertTrue(app.buttons["checkIn.done"].waitForExistence(timeout: 4))
         XCTAssertTrue(freeButtons.firstMatch.exists)
+
+        app.buttons["Close"].tap()
     }
 
     func testUrgeRideInLandscape() {
-        let app = launchSeeded()
+        launchApp()
         XCUIDevice.shared.orientation = .landscapeLeft
 
         app.buttons["today.sosButton"].tap()
@@ -73,7 +80,7 @@ final class AdaptiveLayoutUITests: XCTestCase {
     }
 
     func testSlipSaveInToolbarInLandscape() {
-        let app = launchSeeded()
+        launchApp()
         XCUIDevice.shared.orientation = .landscapeLeft
 
         let banner = app.buttons["today.checkInBanner"]
@@ -92,7 +99,6 @@ final class AdaptiveLayoutUITests: XCTestCase {
     }
 
     func testOnboardingNextReachableInLandscape() {
-        let app = XCUIApplication()
         app.launchArguments = ["-ui_testing"]
         app.launch()
 
@@ -104,34 +110,16 @@ final class AdaptiveLayoutUITests: XCTestCase {
     }
 
     func testProgressSplitOnRegularWidth() throws {
-        let app = launchSeeded()
+        launchApp()
         guard app.windows.firstMatch.frame.width >= 744 else {
             throw XCTSkip("Requires iPad-width simulator window")
         }
 
-        tab(named: "Progress", identifier: "tab.progress", in: app).tap()
-
-        XCTAssertTrue(app.staticTexts["Alcohol"].waitForExistence(timeout: 8))
-        app.staticTexts["Alcohol"].tap()
-        XCTAssertTrue(app.navigationBars["Alcohol"].waitForExistence(timeout: 6))
+        tab(named: "Progress", identifier: "tab.progress").tap()
+        openProgressMetric(named: "Alcohol")
 
         if app.staticTexts["Social media"].waitForExistence(timeout: 2) {
             XCTAssertTrue(app.staticTexts["Social media"].exists)
         }
-    }
-
-    private func launchSeeded() -> XCUIApplication {
-        let app = XCUIApplication()
-        app.launchArguments = ["-ui_testing", "-skip_onboarding", "-seed_demo"]
-        app.launch()
-        return app
-    }
-
-    private func tab(named label: String, identifier: String, in app: XCUIApplication) -> XCUIElement {
-        let identified = app.buttons[identifier]
-        if identified.exists { return identified }
-        let tabButton = app.tabBars.buttons[label]
-        if tabButton.exists { return tabButton }
-        return app.buttons[label]
     }
 }

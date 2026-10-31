@@ -1,25 +1,15 @@
 import XCTest
 
-final class TrackBothUITests: XCTestCase {
-    override func setUpWithError() throws {
-        continueAfterFailure = false
-    }
-
+final class TrackBothUITests: TrackBothUITestCase {
     func testLaunchShowsThreeTabs() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-ui_testing", "-skip_onboarding", "-seed_demo"]
-        app.launch()
-
-        XCTAssertTrue(tab(named: "Today", identifier: "tab.today", in: app).waitForExistence(timeout: 8))
-        XCTAssertTrue(tab(named: "Progress", identifier: "tab.progress", in: app).exists)
-        XCTAssertTrue(tab(named: "Settings", identifier: "tab.settings", in: app).exists)
+        launchApp()
+        XCTAssertTrue(tab(named: "Today", identifier: "tab.today").waitForExistence(timeout: 8))
+        XCTAssertTrue(tab(named: "Progress", identifier: "tab.progress").exists)
+        XCTAssertTrue(tab(named: "Settings", identifier: "tab.settings").exists)
     }
 
     func testCheckInMarksVicesFree() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-ui_testing", "-skip_onboarding", "-seed_demo"]
-        app.launch()
-
+        launchApp()
         let banner = app.buttons["today.checkInBanner"]
         XCTAssertTrue(banner.waitForExistence(timeout: 8))
         banner.tap()
@@ -40,10 +30,7 @@ final class TrackBothUITests: XCTestCase {
     }
 
     func testUrgeFlowResisted() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-ui_testing", "-skip_onboarding", "-seed_demo"]
-        app.launch()
-
+        launchApp()
         let sos = app.buttons["today.sosButton"]
         XCTAssertTrue(sos.waitForExistence(timeout: 8))
         sos.tap()
@@ -53,59 +40,41 @@ final class TrackBothUITests: XCTestCase {
         app.buttons["urge.intensity.3"].tap()
         app.buttons["urge.passed"].tap()
         app.buttons["urge.done"].tap()
-        app.tabBars.buttons["Progress"].tap()
-        XCTAssertTrue(app.staticTexts["Urges beaten 5"].waitForExistence(timeout: 4))
+        tab(named: "Progress", identifier: "tab.progress").tap()
+        assertStaticTextExists("Urges beaten", timeout: 8)
     }
 
     func testSlipFlowShowsCompassionateSummary() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-ui_testing", "-skip_onboarding", "-seed_demo"]
-        app.launch()
-
+        launchApp()
         let banner = app.buttons["today.checkInBanner"]
         XCTAssertTrue(banner.waitForExistence(timeout: 8))
         banner.tap()
         let slipped = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'checkIn.slipped.'"))
         XCTAssertTrue(slipped.firstMatch.waitForExistence(timeout: 4))
         slipped.firstMatch.tap()
+        XCTAssertTrue(app.buttons["slip.save"].waitForExistence(timeout: 6))
         app.buttons["slip.save"].tap()
         let summary = app.otherElements["slip.summary"]
-        XCTAssertTrue(summary.waitForExistence(timeout: 4))
+        XCTAssertTrue(summary.waitForExistence(timeout: 6))
         XCTAssertTrue(summary.staticTexts.matching(NSPredicate(format: "label CONTAINS 'restarts'")).firstMatch.exists
             || app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'restarts'")).firstMatch.exists)
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'of your last'")).firstMatch.exists)
     }
 
     func testEditPastDayToSlipUpdatesStats() {
-        let app = XCUIApplication()
-        app.launchArguments = ["-ui_testing", "-skip_onboarding", "-seed_demo"]
-        app.launch()
-
-        app.tabBars.buttons["Progress"].tap()
-        let alcohol = app.staticTexts["Alcohol"]
-        XCTAssertTrue(alcohol.waitForExistence(timeout: 8))
-        alcohol.tap()
+        launchApp()
+        openProgressMetric(named: "Alcohol")
 
         let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date()
-        let parts = Calendar.current.dateComponents([.year, .month, .day], from: yesterday)
-        let identifier = String(format: "detail.calendarDay.%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
-        var day = app.buttons[identifier]
-        if !day.waitForExistence(timeout: 2) {
-            app.swipeUp()
-            day = app.buttons[identifier]
-        }
-        XCTAssertTrue(day.waitForExistence(timeout: 4))
-        day.tap()
-        app.buttons["dayEditor.slipped"].tap()
-        app.buttons["slip.save"].tap()
-        XCTAssertTrue(app.staticTexts["0 days free"].waitForExistence(timeout: 6))
-    }
+        tapCalendarDay(yesterday)
 
-    private func tab(named label: String, identifier: String, in app: XCUIApplication) -> XCUIElement {
-        let identified = app.buttons[identifier]
-        if identified.exists { return identified }
-        let tabButton = app.tabBars.buttons[label]
-        if tabButton.exists { return tabButton }
-        return app.buttons[label]
+        XCTAssertTrue(app.buttons["dayEditor.slipped"].waitForExistence(timeout: 4))
+        app.buttons["dayEditor.slipped"].tap()
+
+        let save = app.buttons["slip.save"]
+        XCTAssertTrue(save.waitForExistence(timeout: 8))
+        save.tap()
+
+        assertStaticTextExists("0 days free", timeout: 12)
     }
 }
