@@ -36,6 +36,7 @@ struct RootView: View {
             }
         }
         .task {
+            await SnapshotOrientationLock.applyIfNeeded()
             if let tab = LaunchConfiguration.initialTab {
                 router.selectedTab = tab
             }
