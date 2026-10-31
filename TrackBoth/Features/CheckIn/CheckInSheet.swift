@@ -47,6 +47,11 @@ struct CheckInSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    private var pinsActionInToolbar: Bool {
+        AdaptiveLayout.isShortHeight(vertical: verticalSizeClass)
+    }
     @State private var model: CheckInViewModel?
     @State private var slippingID: UUID?
     @State private var detent: PresentationDetent = .large
@@ -67,15 +72,16 @@ struct CheckInSheet: View {
                         .padding(.bottom, Spacing.m)
                     }
                 }
-                if let model {
-                    PrimaryButton(
-                        title: model.showComplete ? RecoveryCopy.backToToday : RecoveryCopy.done,
-                        systemImage: nil,
-                        accessibilityID: AccessibilityIdentifiers.checkInDone,
-                        action: { finish(model) }
-                    )
-                    .disabled(!model.showComplete && !model.canFinish)
-                    .padding(.horizontal, Spacing.l)
+                if let model, !pinsActionInToolbar {
+                    ReadableColumn {
+                        PrimaryButton(
+                            title: doneTitle(model),
+                            systemImage: nil,
+                            accessibilityID: AccessibilityIdentifiers.checkInDone,
+                            action: { finish(model) }
+                        )
+                        .disabled(!model.showComplete && !model.canFinish)
+                    }
                     .padding(.top, Spacing.s)
                     .padding(.bottom, Spacing.s)
                     .background(Color.tbBackground)
@@ -93,9 +99,17 @@ struct CheckInSheet: View {
                         .font(.subheadline)
                         .foregroundStyle(Color.tbTextSecondary)
                 }
+                if let model, pinsActionInToolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(doneTitle(model)) { finish(model) }
+                            .disabled(!model.showComplete && !model.canFinish)
+                            .accessibilityIdentifier(AccessibilityIdentifiers.checkInDone)
+                    }
+                }
             }
         }
         .presentationDetents([.medium, .large], selection: $detent)
+        .adaptiveFormSheet()
         .onAppear { prepare() }
         .onChange(of: entryToken) { prepare() }
         .sheet(isPresented: slippingPresented) {
@@ -204,6 +218,10 @@ struct CheckInSheet: View {
     private func toggleHabit(_ id: UUID) {
         guard let model else { return }
         try? model.toggleHabit(id, metrics: metrics, now: Date())
+    }
+
+    private func doneTitle(_ model: CheckInViewModel) -> String {
+        model.showComplete ? RecoveryCopy.backToToday : RecoveryCopy.done
     }
 
     private func finish(_ model: CheckInViewModel) {

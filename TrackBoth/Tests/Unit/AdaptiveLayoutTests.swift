@@ -11,6 +11,23 @@ final class AdaptiveLayoutTests: XCTestCase {
         XCTAssertFalse(AdaptiveLayout.usesSplitNavigation(horizontal: .regular, vertical: nil))
     }
 
+    func testUsesSplitNavigationOnWideContainerWhenVerticalRegular() {
+        XCTAssertTrue(
+            AdaptiveLayout.usesSplitNavigation(
+                horizontal: .compact,
+                vertical: .regular,
+                containerWidth: AdaptiveLayout.splitNavigationMinWidth
+            )
+        )
+        XCTAssertFalse(
+            AdaptiveLayout.usesSplitNavigation(
+                horizontal: .compact,
+                vertical: .regular,
+                containerWidth: 700
+            )
+        )
+    }
+
     func testIsShortHeightOnCompactVertical() {
         XCTAssertTrue(AdaptiveLayout.isShortHeight(vertical: .compact))
         XCTAssertTrue(AdaptiveLayout.isShortHeight(vertical: .compact))

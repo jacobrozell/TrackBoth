@@ -5,11 +5,19 @@ enum AdaptiveLayout {
     static let wideColumnWidth: CGFloat = 1_040
     static let twoColumnMinWidth: CGFloat = 700
     static let sideColumnWidth: CGFloat = 300
+    /// Minimum width for list + detail split when TabView reports compact horizontal on iPad.
+    static let splitNavigationMinWidth: CGFloat = 744
 
     /// iPad, iPhone Duo inner display, and tall resizable windows. Pro Max landscape is
     /// regular width but compact height, so it keeps the phone stack.
-    static func usesSplitNavigation(horizontal: UserInterfaceSizeClass?, vertical: UserInterfaceSizeClass?) -> Bool {
-        horizontal == .regular && vertical == .regular
+    static func usesSplitNavigation(
+        horizontal: UserInterfaceSizeClass?,
+        vertical: UserInterfaceSizeClass?,
+        containerWidth: CGFloat = 0
+    ) -> Bool {
+        if horizontal == .regular && vertical == .regular { return true }
+        if vertical == .regular && containerWidth >= splitNavigationMinWidth { return true }
+        return false
     }
 
     /// iPhone landscape (including Pro Max), Duo outer landscape, short Stage Manager windows.

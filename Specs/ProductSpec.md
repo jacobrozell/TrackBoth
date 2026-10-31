@@ -59,7 +59,7 @@ Every feature below traces back to one of these. If a feature can't be traced, i
 | Quantity, units, mood chips, starred entries | Extra input on every log adds friction and doesn't change behavior. Trigger tags replace mood where it matters (slips and urges). |
 | Charts tab (line, bar, heatmap), chart PNG/PDF export | Generic analytics. Replaced by a calendar plus three recovery stats. |
 | Multiple color themes, font picker | Decoration. One calm palette that follows system light/dark. |
-| Per-device layout files (4 per screen) | 4× the QA work. **1.0 ships iPhone portrait.** iPad and landscape come back in Phase 15 as **one adaptive layout per screen**, not separate files (D6, §8.7). |
+| Per-device layout files (4 per screen) | 4× the QA work. **Ship one adaptive layout per screen** (D6, §8.7), not separate orientation files. |
 | Widget, Watch, Live Activities, Shortcuts | Post-launch. A single "days free" widget is Phase 14 (optional). |
 | Launch splash animation | Delays the moment of need. The system launch screen is enough. |
 | Week-start picker | Use `Calendar.current.firstWeekday` (follows the user's locale). |
@@ -79,7 +79,7 @@ The agent proceeds with the **Default** unless the owner has written something d
 | D3 | How vice days count | **Presumed free:** time counts up from the quit date, and only *logged slips* break it. Check-ins *confirm* days (solid in the calendar); unconfirmed past days count but look hollow. Same model as I Am Sober. | ✅ Yes, same as I Am Sober |
 | D4 | Habit streak rule | **Never miss twice** (§6.6) | |
 | D5 | Vocabulary | **"Free / slip"** (not "clean / relapse / fail") | ✅ Yes |
-| D6 | Devices | **1.0: iPhone, portrait only.** Every screen is built **adaptive-ready** (§8.7) so iPad and portrait + landscape on both devices can be added later without a redesign. | ✅ iPhone + iPad, portrait + landscape, in a future release → Phase 15 |
+| D6 | Devices | **iPhone and iPad, portrait and landscape, iPhone Duo-ready** via size-class adaptive layout (§8.7). | ✅ Shipped on branch (adaptive-layout plan, 2026-10-31) |
 | D7 | Widget | **Post-launch** (Phase 14, optional) | |
 | D8 | App lock (Face ID/passcode) | **Ship it, off by default, offered during onboarding** | |
 | D9 | App Store name/subtitle | Name **TrackBoth**. Subtitle **"Quit vices. Build habits."** (25/30 chars) | ✅ Yes |

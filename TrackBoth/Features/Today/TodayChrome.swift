@@ -76,13 +76,14 @@ struct YesterdayPrompt: View {
 }
 
 struct SOSButton: View {
+    var isCompact = false
     var action: () -> Void
 
     var body: some View {
         PrimaryButton(title: RecoveryCopy.sosButton, systemImage: "wind", accessibilityID: AccessibilityIdentifiers.todaySOSButton, action: action)
             .padding(.horizontal, Spacing.l)
-            .padding(.top, Spacing.s)
-            .padding(.bottom, Spacing.s)
+            .padding(.top, isCompact ? Spacing.xs : Spacing.s)
+            .padding(.bottom, isCompact ? Spacing.xs : Spacing.s)
             .frame(maxWidth: 640)
             .frame(maxWidth: .infinity)
             .background(Color.tbBackground)

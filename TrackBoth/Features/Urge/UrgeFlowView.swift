@@ -8,6 +8,7 @@ struct UrgeFlowView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model: UrgeViewModel?
     @State private var showSlip = false
     @State private var askClose = false
@@ -15,18 +16,22 @@ struct UrgeFlowView: View {
 
     var body: some View {
         NavigationStack {
-            ReadableColumn {
-                ScrollView {
-                    Group {
-                        if let model {
-                            content(model)
+            Group {
+                if let model {
+                    if model.step == .ride && AdaptiveLayout.isShortHeight(vertical: verticalSizeClass) {
+                        rideSideBySide(model)
+                    } else {
+                        ScrollView {
+                            ReadableColumn {
+                                content(model)
+                            }
+                            .padding(.vertical, Spacing.l)
                         }
                     }
-                    .frame(maxWidth: .infinity, alignment: .top)
-                    .padding(.vertical, Spacing.l)
                 }
             }
-            .background(Color.tbCalm)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(Color.tbCalm.ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -101,7 +106,10 @@ struct UrgeFlowView: View {
                 .foregroundStyle(Color.tbOnCalm)
             }
         case .ride:
-            ride(model)
+            VStack(spacing: Spacing.l) {
+                rideFocus(model)
+                rideSupport(model)
+            }
         case .passed:
             passed(model)
         case .unsure:
@@ -123,20 +131,27 @@ struct UrgeFlowView: View {
         .buttonStyle(.plain)
     }
 
-    private func ride(_ model: UrgeViewModel) -> some View {
-        ViewThatFits(in: .vertical) {
-            VStack(spacing: Spacing.l) { rideBody(model) }
-            HStack(alignment: .top, spacing: Spacing.l) { rideBody(model) }
+    private func rideSideBySide(_ model: UrgeViewModel) -> some View {
+        HStack(alignment: .top, spacing: Spacing.l) {
+            VStack(spacing: Spacing.m) {
+                rideFocus(model)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.l) {
+                    rideSupport(model)
+                }
+                .padding(.vertical, Spacing.m)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+            .frame(maxWidth: .infinity)
         }
+        .padding(.horizontal, Spacing.l)
     }
 
     @ViewBuilder
-    private func rideBody(_ model: UrgeViewModel) -> some View {
-        Text(RecoveryCopy.urgeIntro)
-            .font(.body)
-            .foregroundStyle(Color.tbOnCalm)
-            .multilineTextAlignment(.center)
-        BreathingCircle()
+    private func rideFocus(_ model: UrgeViewModel) -> some View {
+        BreathingCircle(maxDiameter: AdaptiveLayout.breathingDiameter(vertical: verticalSizeClass))
         TimelineView(.periodic(from: .now, by: 1)) { context in
             let remaining = model.remaining(at: context.date)
             VStack(spacing: Spacing.s) {
@@ -155,6 +170,14 @@ struct UrgeFlowView: View {
         Button(RecoveryCopy.addFiveMinutes) { model.addFiveMinutes(now: Date()) }
             .frame(minHeight: 44)
             .foregroundStyle(Color.tbOnCalm)
+    }
+
+    @ViewBuilder
+    private func rideSupport(_ model: UrgeViewModel) -> some View {
+        Text(RecoveryCopy.urgeIntro)
+            .font(.body)
+            .foregroundStyle(Color.tbOnCalm)
+            .multilineTextAlignment(.center)
         if let plan = selectedMetric?.ifThenPlan, !plan.isEmpty {
             VStack(alignment: .leading, spacing: Spacing.xs) {
                 Text(RecoveryCopy.yourPlanPrefix).font(.headline)

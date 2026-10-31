@@ -3,6 +3,7 @@ import Foundation
 enum AccessibilityIdentifiers {
     static let tabToday = "tab.today"
     static let tabProgress = "tab.progress"
+    static let progressDetailPlaceholder = "progress.detailPlaceholder"
     static let tabSettings = "tab.settings"
     static let todayCheckInBanner = "today.checkInBanner"
     static let todaySOSButton = "today.sosButton"

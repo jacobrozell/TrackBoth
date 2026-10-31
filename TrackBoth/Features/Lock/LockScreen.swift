@@ -4,19 +4,25 @@ struct LockScreen: View {
     @Environment(AppLock.self) private var appLock
 
     var body: some View {
-        VStack(spacing: Spacing.xl) {
-            BrandMark(size: 72)
-            Text(RecoveryCopy.lockedTitle)
-                .font(.title2)
-                .foregroundStyle(Color.tbTextPrimary)
-                .multilineTextAlignment(.center)
-            PrimaryButton(title: RecoveryCopy.unlock, action: {
-                Task { await appLock.unlock() }
-            })
+        ScrollView {
+            ReadableColumn {
+                VStack(spacing: Spacing.xl) {
+                    BrandMark(size: 72)
+                    Text(RecoveryCopy.lockedTitle)
+                        .font(.title2)
+                        .foregroundStyle(Color.tbTextPrimary)
+                        .multilineTextAlignment(.center)
+                    PrimaryButton(title: RecoveryCopy.unlock, action: {
+                        Task { await appLock.unlock() }
+                    })
+                }
+                .padding(Spacing.xl)
+            }
         }
-        .padding(Spacing.xl)
+        .scrollBounceBehavior(.basedOnSize)
+        .defaultScrollAnchor(.center, for: .alignment)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.tbBackground)
+        .background(Color.tbBackground.ignoresSafeArea())
         .task { await appLock.unlock() }
     }
 }
@@ -27,7 +33,7 @@ struct PrivacyCover: View {
             BrandMark(size: 72)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.tbBackground)
+        .background(Color.tbBackground.ignoresSafeArea())
         .accessibilityHidden(true)
     }
 }

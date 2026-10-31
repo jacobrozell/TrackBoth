@@ -8,6 +8,11 @@ struct SlipFlowView: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
+    private var pinsActionInToolbar: Bool {
+        AdaptiveLayout.isShortHeight(vertical: verticalSizeClass)
+    }
     @State private var model: SlipViewModel?
     @State private var pickedDay = Date()
     @State private var showHelp = false
@@ -28,11 +33,12 @@ struct SlipFlowView: View {
                     .padding(.top, Spacing.m)
                     .padding(.bottom, Spacing.l)
                 }
-                if model?.summary == nil {
-                    PrimaryButton(title: RecoveryCopy.save, systemImage: nil, accessibilityID: AccessibilityIdentifiers.slipSave) {
-                        try? model?.save(metric: metric, now: Date())
+                if model?.summary == nil, !pinsActionInToolbar {
+                    ReadableColumn {
+                        PrimaryButton(title: RecoveryCopy.save, systemImage: nil, accessibilityID: AccessibilityIdentifiers.slipSave) {
+                            try? model?.save(metric: metric, now: Date())
+                        }
                     }
-                    .padding(.horizontal, Spacing.l)
                     .padding(.top, Spacing.s)
                     .padding(.bottom, Spacing.s)
                     .background(Color.tbBackground)
@@ -45,8 +51,17 @@ struct SlipFlowView: View {
                 ToolbarItem(placement: .cancellationAction) {
                     Button(RecoveryCopy.close) { dismiss() }
                 }
+                if model?.summary == nil, pinsActionInToolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button(RecoveryCopy.save) {
+                            try? model?.save(metric: metric, now: Date())
+                        }
+                        .accessibilityIdentifier(AccessibilityIdentifiers.slipSave)
+                    }
+                }
             }
         }
+        .adaptiveFormSheet()
         .onAppear {
             if model == nil {
                 model = SlipViewModel(store: RecoveryStore(context: modelContext), plan: metric.ifThenPlan, triggers: prefilledTriggers)
@@ -54,6 +69,7 @@ struct SlipFlowView: View {
         }
         .sheet(isPresented: $showHelp) {
             CrisisResourcesView()
+                .adaptiveFormSheet()
         }
     }
 

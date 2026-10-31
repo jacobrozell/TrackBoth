@@ -15,18 +15,15 @@ struct MetricDetailScreen: View {
     @State private var newReason = ""
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                ReadableColumn {
-                    VStack(alignment: .leading, spacing: Spacing.l) {
-                        header
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: Spacing.m)], spacing: Spacing.m) {
-                            ForEach(Array(model.stats.tiles.enumerated()), id: \.offset) { _, tile in
-                                StatTile(value: tile.1, label: tile.0, systemImage: icon(for: tile.0))
-                            }
-                        }
-                        calendar
-                        if metric.habitType == .vice {
+        ScrollView {
+            ReadableColumn(width: .wide) {
+                VStack(alignment: .leading, spacing: Spacing.l) {
+                    header
+                    if metric.habitType == .vice {
+                        AdaptiveColumns {
+                            statTiles
+                            calendar
+                        } trailing: {
                             reasonsSection
                             planSection
                             if !model.stats.triggers.isEmpty {
@@ -36,13 +33,19 @@ struct MetricDetailScreen: View {
                                 Text(urgeLine).font(.body).foregroundStyle(Color.tbTextPrimary)
                             }
                         }
+                    } else {
+                        AdaptiveColumns {
+                            statTiles
+                        } trailing: {
+                            calendar
+                        }
                     }
-                    .padding(.top, Spacing.s)
-                    .padding(.bottom, Spacing.l)
                 }
+                .padding(.top, Spacing.s)
+                .padding(.bottom, Spacing.l)
             }
-            Color.clear.frame(height: 72)
         }
+        .contentMargins(.bottom, Spacing.xl, for: .scrollContent)
         .background(Color.tbBackground)
         .navigationTitle(metric.name)
         .toolbar {
@@ -65,6 +68,14 @@ struct MetricDetailScreen: View {
                 SlipFlowView(metric: metric, prefilledTriggers: []) { self.sheet = nil }
             case .form:
                 MetricFormView(metric: metric)
+            }
+        }
+    }
+
+    private var statTiles: some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: Spacing.m)], spacing: Spacing.m) {
+            ForEach(Array(model.stats.tiles.enumerated()), id: \.offset) { _, tile in
+                StatTile(value: tile.1, label: tile.0, systemImage: icon(for: tile.0))
             }
         }
     }
@@ -211,25 +222,29 @@ struct DayEditorSheet: View {
 
     var body: some View {
         NavigationStack {
-            ReadableColumn {
-                VStack(spacing: Spacing.s) {
-                    if metric.habitType == .vice {
-                        editorButton(RecoveryCopy.free, id: AccessibilityIdentifiers.dayEditorFree, prominent: true, action: markFree)
-                        editorButton(RecoveryCopy.iSlipped, id: AccessibilityIdentifiers.dayEditorSlipped) { onSlip(); dismiss() }
-                        editorButton(RecoveryCopy.clearDay, id: AccessibilityIdentifiers.dayEditorClear, action: clear)
-                    } else {
-                        editorButton(RecoveryCopy.doneLast30, prominent: true) { setDone(true) }
-                        editorButton(RecoveryCopy.notDone) { setDone(false) }
+            ScrollView {
+                ReadableColumn {
+                    VStack(spacing: Spacing.s) {
+                        if metric.habitType == .vice {
+                            editorButton(RecoveryCopy.free, id: AccessibilityIdentifiers.dayEditorFree, prominent: true, action: markFree)
+                            editorButton(RecoveryCopy.iSlipped, id: AccessibilityIdentifiers.dayEditorSlipped) { onSlip(); dismiss() }
+                            editorButton(RecoveryCopy.clearDay, id: AccessibilityIdentifiers.dayEditorClear, action: clear)
+                        } else {
+                            editorButton(RecoveryCopy.doneLast30, prominent: true) { setDone(true) }
+                            editorButton(RecoveryCopy.notDone) { setDone(false) }
+                        }
                     }
+                    .padding(.vertical, Spacing.l)
                 }
-                .padding(.vertical, Spacing.l)
             }
+            .scrollBounceBehavior(.basedOnSize)
             .background(Color.tbBackground)
             .navigationTitle(day.formatted(date: .abbreviated, time: .omitted))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { Button(RecoveryCopy.close) { dismiss() } }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.medium, .large])
+        .adaptiveFormSheet()
     }
 
     private func editorButton(_ title: String, id: String? = nil, prominent: Bool = false, action: @escaping () -> Void) -> some View {

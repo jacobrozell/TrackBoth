@@ -7,14 +7,25 @@ struct ProgressScreen: View {
     @Query private var urges: [UrgeEvent]
 
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model = ProgressViewModel()
     @State private var showAdd = false
-    @State private var path = NavigationPath()
+    @State private var selection: UUID?
     @State private var didOpenDetail = false
+    @State private var containerWidth: CGFloat = 0
+
+    private var usesSplitNavigation: Bool {
+        AdaptiveLayout.usesSplitNavigation(
+            horizontal: horizontalSizeClass,
+            vertical: verticalSizeClass,
+            containerWidth: containerWidth
+        )
+    }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            List {
+        NavigationSplitView {
+            List(selection: $selection) {
                 Section {
                     VStack(alignment: .leading, spacing: Spacing.m) {
                         if let saved = model.summary.savedText {
@@ -49,11 +60,6 @@ struct ProgressScreen: View {
             .scrollContentBackground(.hidden)
             .background(Color.tbBackground)
             .navigationTitle("Progress")
-            .navigationDestination(for: UUID.self) { id in
-                if let metric = metrics.first(where: { $0.id == id }) {
-                    MetricDetailScreen(metric: metric)
-                }
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { EditButton() }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -63,9 +69,20 @@ struct ProgressScreen: View {
                     .accessibilityLabel(RecoveryCopy.addSomething)
                 }
             }
-            .sheet(isPresented: $showAdd) {
-                MetricFormView(metric: nil)
+        } detail: {
+            if let id = selection, let metric = metrics.first(where: { $0.id == id }) {
+                MetricDetailScreen(metric: metric)
+                    .id(metric.id)
+            } else {
+                ContentUnavailableView(RecoveryCopy.pickSomethingTitle, systemImage: "chart.line.uptrend.xyaxis")
+                    .accessibilityIdentifier(AccessibilityIdentifiers.progressDetailPlaceholder)
             }
+        }
+        .navigationSplitViewStyle(.balanced)
+        .environment(\.horizontalSizeClass, usesSplitNavigation ? .regular : .compact)
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { containerWidth = $0 }
+        .sheet(isPresented: $showAdd) {
+            MetricFormView(metric: nil)
         }
         .onAppear {
             refresh()
@@ -74,6 +91,11 @@ struct ProgressScreen: View {
         .onChange(of: snapshot) {
             refresh()
             openFirstDetailIfNeeded()
+        }
+        .onChange(of: metrics.map(\.id)) { _, ids in
+            if let selection, !ids.contains(selection) {
+                self.selection = nil
+            }
         }
     }
 
@@ -110,6 +132,6 @@ struct ProgressScreen: View {
     private func openFirstDetailIfNeeded() {
         guard LaunchConfiguration.opensFirstDetail, !didOpenDetail, let id = model.active.first?.id else { return }
         didOpenDetail = true
-        path.append(id)
+        selection = id
     }
 }

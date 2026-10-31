@@ -70,16 +70,19 @@ Use Dynamic Type text styles only (`.largeTitle`, `.title2`, `.headline`, `.body
 - Reduce Motion: breathing, celebration, and the number transitions all honor it.
 - Tap targets ≥ 44×44pt.
 
-### 8.7 Adaptive-ready rules (D6: iPad + landscape in a future release)
+### 8.7 Adaptive layout (shipped — iPhone + iPad, portrait + landscape, Duo-ready)
 
-1.0 ships iPhone portrait only. Build every screen so that turning on iPad and landscape (Phase 15) means **adding** layouts, not rewriting screens:
+Three layout signals (see `DesignSystem/AdaptiveLayout.swift`):
 
-1. **No device checks.** Never use `UIDevice.current.userInterfaceIdiom`, screen-size constants, or `UIScreen.main.bounds`. Use `@Environment(\.horizontalSizeClass)` / `verticalSizeClass` and the size the view is given.
-2. **One readable column.** Wrap each screen's scroll content in `ReadableColumn` (a DesignSystem component: `frame(maxWidth: 640)` centered, with `Spacing.l` side padding). On iPhone portrait it's full width. On iPad it stays readable.
-3. **No fixed widths or heights** on cards, grids, or the calendar. Use flexible frames, `GridItem(.adaptive(minimum:))`, and `ViewThatFits`.
-4. **Navigation that can split.** Progress → Metric Detail uses `NavigationStack` with value-based `navigationDestination(for: UUID.self)`, so Phase 15 can swap it for `NavigationSplitView` on regular width without touching the detail screen.
-5. **Full-screen flows** (Urge, Onboarding, Lock) center their content in a `ReadableColumn` and never assume portrait height. Put the breathing circle and the buttons in a `ViewThatFits(in: .vertical)` that falls back to a horizontal arrangement when height is short.
-6. **Previews:** every screen gets one extra landscape preview (`#Preview(traits: .landscapeLeft)`). It doesn't have to look final, but nothing may clip or overlap. That keeps Phase 15 small.
+1. **Navigation split** — `usesSplitNavigation`: regular width **and** regular height, or regular height with measured container width ≥ 744pt (TabView on iPad). Progress uses one `NavigationSplitView` with forced `.compact` horizontal size class when not split (Pro Max landscape stays stack push).
+2. **Short height** — `isShortHeight` (`verticalSizeClass == .compact`): inline nav titles, primary actions in the toolbar (check-in Done, slip Save), side-by-side urge ride and onboarding controls, landscape celebration split.
+3. **Two content columns** — `AdaptiveColumns` when measured width ≥ 700pt and Dynamic Type is not accessibility-sized. Today (Quitting | Building), metric detail (vice/habit columns).
+
+**Components:** `ReadableColumn(width: .text | .wide)`, `AdaptiveColumns`, `View.adaptiveFormSheet()`, `View.adaptivePageSheet()`, `View.readableListMargins()`.
+
+**Rules:** No `UIDevice` / `UIScreen` in app code. Keep `@State` on screen structs across layout branches. Preserve accessibility identifiers when moving controls to the toolbar.
+
+**Previews:** Light, dark, AX3, and `#Preview(traits: .landscapeLeft)` on design-system components.
 
 
 ## Verification

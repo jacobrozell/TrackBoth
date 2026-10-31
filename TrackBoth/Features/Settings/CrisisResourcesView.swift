@@ -29,6 +29,7 @@ struct CrisisResourcesView: View {
                     .foregroundStyle(Color.tbTextSecondary)
             }
         }
+        .readableListMargins()
         .navigationTitle(RecoveryCopy.getHelpNow)
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -50,4 +50,4 @@ Living register for the recovery overhaul. Every new feature starts as **Planned
 | Feature | Status | Notes |
 |---------|--------|-------|
 | One "days free" widget | **Later** | Optional post-launch |
-| iPad and landscape | **Later** | Separate release. Screens stay adaptive-ready |
+| iPad and landscape | **Shipped (in branch)** | Adaptive layout plan; see `ongoing/adaptive-layout-plan.md` |

@@ -151,6 +151,7 @@ enum RecoveryCopy {
 
     static let totalSaved = "Total saved"
     static let daysCheckedIn = "Days checked in"
+    static let pickSomethingTitle = "Pick something to see its progress"
     static let archived = "Archived"
     static let yourReasons = "Your reasons"
     static let yourPlan = "Your plan"

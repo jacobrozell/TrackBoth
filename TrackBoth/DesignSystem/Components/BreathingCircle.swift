@@ -3,6 +3,7 @@ import SwiftUI
 struct BreathingCircle: View {
     var inhale: Double = 4
     var exhale: Double = 6
+    var maxDiameter: CGFloat = 280
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var expanded = false
@@ -28,7 +29,7 @@ struct BreathingCircle: View {
                         .multilineTextAlignment(.center)
                 }
                 .aspectRatio(1, contentMode: .fit)
-                .frame(maxWidth: 280, maxHeight: 280)
+                .frame(maxWidth: maxDiameter, maxHeight: maxDiameter)
                 .trackBothAnimation(TrackBothMotion.celebrationSpring, value: expanded, reduceMotion: reduceMotion)
             }
         }

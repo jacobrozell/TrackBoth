@@ -6,25 +6,37 @@ struct OnboardingFlow: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(AppLock.self) private var appLock
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model = OnboardingViewModel()
 
+    private var isShortHeight: Bool {
+        AdaptiveLayout.isShortHeight(vertical: verticalSizeClass)
+    }
+
     var body: some View {
-        VStack(spacing: Spacing.l) {
-            progress
-            TabView(selection: pageSelection) {
-                ForEach(Array(model.pages.enumerated()), id: \.offset) { index, page in
-                    ScrollView {
-                        ReadableColumn {
-                            pageView(page)
-                                .padding(.vertical, Spacing.l)
+        Group {
+            if isShortHeight {
+                VStack(spacing: Spacing.s) {
+                    progress
+                        .padding(.horizontal, Spacing.l)
+                    HStack(alignment: .top, spacing: Spacing.l) {
+                        pager.frame(maxWidth: .infinity)
+                        ScrollView {
+                            controls
+                                .padding(.top, Spacing.s)
                         }
+                        .scrollBounceBehavior(.basedOnSize)
+                        .frame(width: AdaptiveLayout.sideColumnWidth)
                     }
-                    .tag(index)
+                    .padding(.trailing, Spacing.l)
+                }
+            } else {
+                VStack(spacing: Spacing.l) {
+                    ReadableColumn { progress }
+                    pager
+                    ReadableColumn { controls }
                 }
             }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-            .animation(.easeInOut(duration: 0.2), value: model.pageIndex)
-            controls
         }
         .background(Color.tbBackground)
         .onAppear {
@@ -42,6 +54,22 @@ struct OnboardingFlow: View {
         Binding(get: { model.pageIndex }, set: { model.pageIndex = $0 })
     }
 
+    private var pager: some View {
+        TabView(selection: pageSelection) {
+            ForEach(Array(model.pages.enumerated()), id: \.offset) { index, page in
+                ScrollView {
+                    ReadableColumn {
+                        pageView(page)
+                            .padding(.vertical, Spacing.l)
+                    }
+                }
+                .tag(index)
+            }
+        }
+        .tabViewStyle(.page(indexDisplayMode: .never))
+        .animation(.easeInOut(duration: 0.2), value: model.pageIndex)
+    }
+
     private var progress: some View {
         GeometryReader { proxy in
             Capsule()
@@ -53,7 +81,6 @@ struct OnboardingFlow: View {
                 }
         }
         .frame(height: 6)
-        .padding(.horizontal, Spacing.l)
         .padding(.top, Spacing.m)
         .accessibilityLabel(RecoveryCopy.onboardingProgress(current: model.pageIndex + 1, total: model.pages.count))
     }
@@ -89,7 +116,7 @@ struct OnboardingFlow: View {
 
     private var welcome: some View {
         VStack(alignment: .leading, spacing: Spacing.l) {
-            BrandMark(size: 72)
+            BrandMark(size: isShortHeight ? 48 : 72)
             Text(RecoveryCopy.welcomeTitle)
                 .font(.title.weight(.bold))
                 .foregroundStyle(Color.tbTextPrimary)
@@ -282,7 +309,6 @@ struct OnboardingFlow: View {
                     .foregroundStyle(Color.tbTextSecondary)
             }
         }
-        .padding(.horizontal, Spacing.l)
         .padding(.bottom, Spacing.l)
     }
 

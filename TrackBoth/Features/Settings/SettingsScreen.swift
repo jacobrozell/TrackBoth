@@ -27,8 +27,7 @@ struct SettingsScreen: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                List {
+            List {
                     reminders
                     privacy
                     appearance
@@ -46,11 +45,10 @@ struct SettingsScreen: View {
                             }
                         }
                     }
-                }
-                .scrollContentBackground(.hidden)
-                // Keeps the last visible row above the floating tab bar.
-                Color.clear.frame(height: 88)
             }
+            .scrollContentBackground(.hidden)
+            .readableListMargins()
+            .contentMargins(.bottom, Spacing.xl, for: .scrollContent)
             .background(Color.tbBackground)
             .navigationTitle("Settings")
             .alert(RecoveryCopy.backupProblem, isPresented: messagePresented) {

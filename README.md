@@ -12,7 +12,7 @@ TrackBoth helps you quit what's hurting you and build what helps: a 10-second da
 | **Progress** | Saved, urges beaten, and a calendar per metric |
 | **Settings** | Reminders, app lock, backup, and get help now |
 
-1.0 is iPhone portrait. Screens are built so iPad and landscape can be added later without a redesign.
+Universal iPhone and iPad app with portrait and landscape. Layout adapts via size classes (see `Specs/DesignSystemSpec.md` §8.7).
 
 ## Build and test
 

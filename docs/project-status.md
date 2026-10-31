@@ -1,6 +1,6 @@
 # TrackBoth — Project status
 
-> Last updated: 2026-10-28
+> Last updated: 2026-10-31
 
 ## At a glance
 
@@ -11,14 +11,14 @@
 | **Stage** | **Overhaul in progress** |
 | **Latest submitted** | — |
 | **Latest shipped (App Store)** | — |
-| **Repo version** | 1.0.0 (6) |
+| **Repo version** | 1.0.0 (7) |
 | **Active branch** | `claude/dazzling-albattani-7mg4uh` |
-| **Platform** | iOS 18+ — iPhone portrait for 1.0 |
+| **Platform** | iOS 18+ — iPhone and iPad, portrait and landscape |
 | **Monetization** | Free, no IAP |
 
 ## Current focus
 
-**Recovery overhaul.** Onboarding, Settings, reminders, and app lock are in the working tree and not committed yet. Phases 0–6 are on the branch. Phase 7 is still a checkpoint. Next: commit this pass, finish Phase 7's UI check, then the accessibility and App Store phases.
+**Recovery overhaul + adaptive layout.** Core recovery flow is on the branch; adaptive layout (landscape, iPad split, Duo-ready chrome) landed 2026-10-31. Next: manual Duo/Stage Manager QA per `docs/device-qa-matrix.md`, then App Store iPad screenshots and submit prep.
 
 The app has never shipped. Build 5 was archived on 2026-06-22 and never uploaded. There is no production data to migrate.
 

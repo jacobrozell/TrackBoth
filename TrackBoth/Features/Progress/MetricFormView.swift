@@ -51,6 +51,7 @@ struct MetricFormView: View {
                 Button(RecoveryCopy.close, role: .cancel) {}
             }
         }
+        .adaptiveFormSheet()
         .onAppear {
             if model == nil { model = MetricFormViewModel(metric: metric) }
         }

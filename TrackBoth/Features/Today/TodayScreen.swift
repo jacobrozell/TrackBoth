@@ -8,6 +8,7 @@ struct TodayScreen: View {
 
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var model = TodayViewModel()
     @State private var sheet: TodaySheet?
     @State private var dismissedYesterday = Preferences.dismissedYesterdayPromptDay
@@ -17,7 +18,7 @@ struct TodayScreen: View {
         NavigationStack {
             VStack(spacing: 0) {
                 ScrollView {
-                    ReadableColumn {
+                    ReadableColumn(width: .wide) {
                         VStack(alignment: .leading, spacing: Spacing.m) {
                             if let prompt = model.yesterdayPrompt {
                                 YesterdayPrompt(name: prompt.name) {
@@ -27,9 +28,11 @@ struct TodayScreen: View {
                                 } onDismiss: {
                                     dismissYesterday()
                                 }
+                                .frame(maxWidth: AdaptiveLayout.textColumnWidth, alignment: .leading)
                             }
                             if model.checkInRemaining > 0 {
                                 CheckInBanner(remaining: model.checkInRemaining) { router.present(.checkIn) }
+                                    .frame(maxWidth: AdaptiveLayout.textColumnWidth, alignment: .leading)
                             }
                             if model.isEmpty {
                                 EmptyState(
@@ -38,26 +41,17 @@ struct TodayScreen: View {
                                     message: RecoveryCopy.startWithOneThingMessage,
                                     actionTitle: RecoveryCopy.addSomething
                                 ) { sheet = .add }
+                                .frame(maxWidth: AdaptiveLayout.textColumnWidth, alignment: .leading)
                             }
-                            if !model.vices.isEmpty {
-                                VStack(alignment: .leading, spacing: Spacing.s) {
-                                    SectionHeader(RecoveryCopy.quitting)
-                                    VStack(spacing: Spacing.m) {
-                                        ForEach(model.vices) { card in
-                                            ViceCard(model: card, calendar: model.calendar) { sheet = .detail(card.id) }
-                                        }
-                                    }
+                            if !model.vices.isEmpty && !model.habits.isEmpty {
+                                AdaptiveColumns {
+                                    quittingSection
+                                } trailing: {
+                                    buildingSection
                                 }
-                            }
-                            if !model.habits.isEmpty {
-                                VStack(alignment: .leading, spacing: Spacing.s) {
-                                    SectionHeader(RecoveryCopy.building)
-                                    VStack(spacing: Spacing.s) {
-                                        ForEach(model.habits) { row in
-                                            HabitCheckRow(model: row, onToggle: { toggleHabit(row.id) }, onOpen: { sheet = .detail(row.id) })
-                                        }
-                                    }
-                                }
+                            } else {
+                                if !model.vices.isEmpty { quittingSection }
+                                if !model.habits.isEmpty { buildingSection }
                             }
                         }
                         .padding(.top, Spacing.s)
@@ -65,14 +59,16 @@ struct TodayScreen: View {
                     }
                 }
                 if model.showsSOS {
-                    SOSButton {
+                    SOSButton(isCompact: AdaptiveLayout.isShortHeight(vertical: verticalSizeClass)) {
                         router.present(.urge(nil))
                     }
                 }
             }
             .background(Color.tbBackground)
             .navigationTitle("Today")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(
+                AdaptiveLayout.isShortHeight(vertical: verticalSizeClass) ? .inline : .large
+            )
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Text(Date().formatted(.dateTime.weekday(.abbreviated).month(.abbreviated).day()))
@@ -101,6 +97,31 @@ struct TodayScreen: View {
             case .detail(let id):
                 if let metric = metrics.first(where: { $0.id == id }) {
                     NavigationStack { MetricDetailScreen(metric: metric) }
+                        .adaptivePageSheet()
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var quittingSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.s) {
+            SectionHeader(RecoveryCopy.quitting)
+            VStack(spacing: Spacing.m) {
+                ForEach(model.vices) { card in
+                    ViceCard(model: card, calendar: model.calendar) { sheet = .detail(card.id) }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var buildingSection: some View {
+        VStack(alignment: .leading, spacing: Spacing.s) {
+            SectionHeader(RecoveryCopy.building)
+            VStack(spacing: Spacing.s) {
+                ForEach(model.habits) { row in
+                    HabitCheckRow(model: row, onToggle: { toggleHabit(row.id) }, onOpen: { sheet = .detail(row.id) })
                 }
             }
         }
